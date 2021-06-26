@@ -115,21 +115,21 @@
     </worldbody>
 
     <actuator>
-        <position name="servo_1" forcelimited="true" forcerange="-3.0 3.0" gear="1" joint="joint1"/>
-        <position name="servo_2" forcelimited="true" forcerange="-3.0 3.0" gear="1" joint="joint2"/>
-        <position name="servo_3" forcelimited="true" forcerange="-3.0 3.0" gear="1" joint="joint3"/>
-        <position name="servo_4" forcelimited="true" forcerange="-3.0 3.0" gear="1" joint="joint4"/>
-        <position name="servo_5" forcelimited="true" forcerange="-3.0 3.0" gear="1" joint="joint5"/>
-        <position name="servo_6" forcelimited="true" forcerange="-3.0 3.0" gear="1" joint="joint6"/>
-        <position name="servo_7" forcelimited="true" forcerange="-3.0 3.0" gear="1" joint="joint7"/>
-        <position name="servo_8" forcelimited="true" forcerange="-3.0 3.0" gear="1" joint="joint8"/>
-        <position name="servo_9" forcelimited="true" forcerange="-3.0 3.0" gear="1" joint="joint9"/>
-        <position name="servo_10" forcelimited="true" forcerange="-3.0 3.0" gear="1" joint="joint10"/>
-        <position name="servo_11" forcelimited="true" forcerange="-3.0 3.0" gear="1" joint="joint11"/>
-        <position name="servo_12" forcelimited="true" forcerange="-3.0 3.0" gear="1" joint="joint12"/>
-        <position name="servo_13" forcelimited="true" forcerange="-3.0 3.0" gear="1" joint="joint13"/>
-        <position name="servo_14" forcelimited="true" forcerange="-3.0 3.0" gear="1" joint="joint14"/>
-        <position name="servo_15" forcelimited="true" forcerange="-3.0 3.0" gear="1" joint="joint15"/>
+        <position name="servo_1" ctrllimited="true" ctrlrange="-1.5708 1.5708" forcelimited="true" forcerange="-3.0 3.0" gear="1" joint="joint1"/>
+        <position name="servo_2" ctrllimited="true" ctrlrange="-1.5708 1.5708" forcelimited="true" forcerange="-3.0 3.0" gear="1" joint="joint2"/>
+        <position name="servo_3" ctrllimited="true" ctrlrange="-1.5708 1.5708" forcelimited="true" forcerange="-3.0 3.0" gear="1" joint="joint3"/>
+        <position name="servo_4" ctrllimited="true" ctrlrange="-1.5708 1.5708" forcelimited="true" forcerange="-3.0 3.0" gear="1" joint="joint4"/>
+        <position name="servo_5" ctrllimited="true" ctrlrange="-1.5708 1.5708" forcelimited="true" forcerange="-3.0 3.0" gear="1" joint="joint5"/>
+        <position name="servo_6" ctrllimited="true" ctrlrange="-1.5708 1.5708" forcelimited="true" forcerange="-3.0 3.0" gear="1" joint="joint6"/>
+        <position name="servo_7" ctrllimited="true" ctrlrange="-1.5708 1.5708" forcelimited="true" forcerange="-3.0 3.0" gear="1" joint="joint7"/>
+        <position name="servo_8" ctrllimited="true" ctrlrange="-1.5708 1.5708" forcelimited="true" forcerange="-3.0 3.0" gear="1" joint="joint8"/>
+        <position name="servo_9" ctrllimited="true" ctrlrange="-1.5708 1.5708" forcelimited="true" forcerange="-3.0 3.0" gear="1" joint="joint9"/>
+        <position name="servo_10" ctrllimited="true" ctrlrange="-1.5708 1.5708" forcelimited="true" forcerange="-3.0 3.0" gear="1" joint="joint10"/>
+        <position name="servo_11" ctrllimited="true" ctrlrange="-1.5708 1.5708" forcelimited="true" forcerange="-3.0 3.0" gear="1" joint="joint11"/>
+        <position name="servo_12" ctrllimited="true" ctrlrange="-1.5708 1.5708" forcelimited="true" forcerange="-3.0 3.0" gear="1" joint="joint12"/>
+        <position name="servo_13" ctrllimited="true" ctrlrange="-1.5708 1.5708" forcelimited="true" forcerange="-3.0 3.0" gear="1" joint="joint13"/>
+        <position name="servo_14" ctrllimited="true" ctrlrange="-1.5708 1.5708" forcelimited="true" forcerange="-3.0 3.0" gear="1" joint="joint14"/>
+        <position name="servo_15" ctrllimited="true" ctrlrange="-1.5708 1.5708" forcelimited="true" forcerange="-3.0 3.0" gear="1" joint="joint15"/>
 
         <!-- <motor name="motor_1" forcelimited="true" forcerange="-3.0 3.0" gear="1" joint="joint1" />
         <motor name="motor_2" forcelimited="true" forcerange="-3.0 3.0" gear="1" joint="joint2" />

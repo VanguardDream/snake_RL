@@ -1,3 +1,3 @@
 import mujoco_py
 
-print("import mujoco python bindings")
+print("import mujoco python bindings!")

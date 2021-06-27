@@ -1,3 +1,7 @@
+ <!-- © 2021 Bongsub Song <doorebong@gmail.com> -->
+ <!-- All right reserved -->
+ <!-- Description : BRM snake robot URDF -->
+
 <?xml version="1.0"?>
 
 <robot name="snake_v210623">

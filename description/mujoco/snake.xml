@@ -1,3 +1,7 @@
+ <!-- © 2021 Bongsub Song <doorebong@gmail.com> -->
+ <!-- All right reserved -->
+ <!-- Description : BRM snake robot Mujoco simulation xml -->
+
 <mujoco model="snake_v210623">
 
     <compiler inertiafromgeom="true" angle="degree"/>

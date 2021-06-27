@@ -162,6 +162,12 @@ while True:
     simulator.data.ctrl[14] = math.sin(t/10.0) * 1.57
     t += 1
 
+    if(t%100 == 0):
+        print(simulator.get_state())
+
+    if(t%10000 == 0):
+        simulator.reset()
+
     simulator.step()
     sim_viewer.render()
     

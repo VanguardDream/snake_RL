@@ -5,6 +5,7 @@
 import mujoco_py
 import os
 import math
+import numpy as np
 
 snake_xml = """
 
@@ -145,6 +146,16 @@ snake_xml = """
 </mujoco>
 
 """
+
+#Gait parameters
+l_amp = 0; # lateral amplitude
+l_phase = 0; # lateral phase
+d_amp = 0; # dorsal amplitude
+d_phase = 0; # dorsal phase
+k = 1; # time slot variable
+
+#Gait motion matirces
+m_vertical = np.zeros(())
 
 snake = mujoco_py.load_model_from_xml(snake_xml)
 simulator = mujoco_py.MjSim(snake)

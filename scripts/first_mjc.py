@@ -155,7 +155,7 @@ d_phase = 0; # dorsal phase
 k = 1; # time slot variable
 
 #Gait motion matirces
-m_vertical = np.zeros(())
+m_vertical = np.matrix([],[],[],[],[],[],[],[])
 
 snake = mujoco_py.load_model_from_xml(snake_xml)
 simulator = mujoco_py.MjSim(snake)

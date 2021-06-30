@@ -2,6 +2,7 @@
 # All right reserved
 # Description : BRM snake robot python simulation script
 
+from numpy.core.fromnumeric import reshape, shape
 import mujoco_py
 import os
 import math
@@ -178,8 +179,10 @@ m_vertical = np.array([[1,0,0,0,0,0,0,0],
                         [0,0,0,0,0,0,0,1],
                         [0,0,0,0,0,0,0,0]],np.float)
 
+m_sinuous = np.eye(16)
+
 def getMotionCol(M,i):
-    return
+    return M[:,i].reshape(M.shape[0],1)
 
 
 #Joint angle function

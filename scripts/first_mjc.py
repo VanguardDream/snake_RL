@@ -176,7 +176,7 @@ m_vertical = np.array([[1,0,0,0,0,0,0,0],
                         [0,0,0,0,0,0,1,0],
                         [0,0,0,0,0,0,0,0], 
                         [0,0,0,0,0,0,0,1],
-                        [0,0,0,0,0,0,0,0]],np.float)
+                        [0,0,0,0,0,0,0,0]],dtype='float')
 
 m_sinuous = np.eye(16)
 
@@ -186,22 +186,22 @@ def getMotionCol(M,i):
 
 #Joint angle function
 def P_vertical(slot):
-    return np.array([[d_amp * math.cos(slot + degtorad(d_amp))],
+    return np.array([[d_amp * math.cos(slot/10 + degtorad(d_amp))],
                         [0],
-                        [d_amp * math.cos(slot + 3 * degtorad(d_amp))],
+                        [d_amp * math.cos(slot/10 + 3 * degtorad(d_amp))],
                         [0],
-                        [d_amp * math.cos(slot + 5 * degtorad(d_amp))],
+                        [d_amp * math.cos(slot/10 + 5 * degtorad(d_amp))],
                         [0],
-                        [d_amp * math.cos(slot + 7 * degtorad(d_amp))],
+                        [d_amp * math.cos(slot/10 + 7 * degtorad(d_amp))],
                         [0],
-                        [d_amp * math.cos(slot + 9 * degtorad(d_amp))],
+                        [d_amp * math.cos(slot/10 + 9 * degtorad(d_amp))],
                         [0],
-                        [d_amp * math.cos(slot + 11 * degtorad(d_amp))],
+                        [d_amp * math.cos(slot/10 + 11 * degtorad(d_amp))],
                         [0],
-                        [d_amp * math.cos(slot + 13 * degtorad(d_amp))],
+                        [d_amp * math.cos(slot/10 + 13 * degtorad(d_amp))],
                         [0],
-                        [d_amp * math.cos(slot + 15 * degtorad(d_amp))],
-                        [0]],np.float
+                        [d_amp * math.cos(slot/10 + 15 * degtorad(d_amp))],
+                        [0]],dtype='float'
     )
 # theta_vertical = np.array([[d_amp * math.sin((2 * math.pi / 8)*k + degtorad(d_amp))],
 #                     [0],
@@ -228,20 +228,40 @@ sim_viewer = mujoco_py.MjViewer(simulator)
 #Select gait if we select vertical -> gait slot is 8.
 t = 0
 k = 0
+tau = 1 # time coefficient larger -> slower motion 0 < tau < inf
 G = np.zeros((16,1))
 while True:
    
     P = P_vertical(k)
     m_k = getMotionCol(m_vertical,(k%8)).T
-    g = np.round(np.diagonal((np.dot(P,m_k))),decimals=2)
+    g = np.round(np.diagonal((np.dot(P,m_k))),decimals=2).reshape((16,1))
     G = G + g
 
-    for motor_idx in range(16):
-        simulator.data.ctrl[motor_idx] = G[motor_idx]
+    for motor_idx in range(15):
+            simulator.data.ctrl[motor_idx] = round(degtorad(G[motor_idx].item()) * 0.1,4)
+            
+    # simulator.data.ctrl[0] = G[0]
+    # simulator.data.ctrl[1] = G[1]
+    # simulator.data.ctrl[2] = G[2]
+    # simulator.data.ctrl[3] = G[3]
+    # simulator.data.ctrl[4] = G[4]
+    # simulator.data.ctrl[5] = G[5]
+    # simulator.data.ctrl[6] = G[6]
+    # simulator.data.ctrl[7] = G[7]
+    # simulator.data.ctrl[8] = G[8]
+    # simulator.data.ctrl[9] = G[9]
+    # simulator.data.ctrl[10] = G[10]
+    # simulator.data.ctrl[11] = G[11]
+    # simulator.data.ctrl[12] = G[12]
+    # simulator.data.ctrl[13] = G[13]
+    # simulator.data.ctrl[14] = G[14]
+    # simulator.data.ctrl[15] = G[15]
 
     simulator.step()
     sim_viewer.render()
 
+    if t%tau == 0:
+        k = k + 1
 
     if(t%1000 == 0):
         print(simulator.get_state())
@@ -253,5 +273,4 @@ while True:
         break
 
     t = t + 1
-    k = (k + 1)
 

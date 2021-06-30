@@ -50,21 +50,21 @@ def getMotionCol(M,i):
 
 #Joint angle function
 def P_vertical(slot):
-    return np.array([[d_amp * math.cos(slot + degtorad(d_amp))],
+    return np.array([[d_amp/100 * math.cos(slot/100 + degtorad(d_amp))],
                         [0],
-                        [d_amp * math.cos(slot + 3 * degtorad(d_amp))],
+                        [d_amp/100 * math.cos(slot/100 + 3 * degtorad(d_amp))],
                         [0],
-                        [d_amp * math.cos(slot + 5 * degtorad(d_amp))],
+                        [d_amp/100 * math.cos(slot/100 + 5 * degtorad(d_amp))],
                         [0],
-                        [d_amp * math.cos(slot + 7 * degtorad(d_amp))],
+                        [d_amp/100 * math.cos(slot/100 + 7 * degtorad(d_amp))],
                         [0],
-                        [d_amp * math.cos(slot + 9 * degtorad(d_amp))],
+                        [d_amp/100 * math.cos(slot/100 + 9 * degtorad(d_amp))],
                         [0],
-                        [d_amp * math.cos(slot + 11 * degtorad(d_amp))],
+                        [d_amp/100 * math.cos(slot/100 + 11 * degtorad(d_amp))],
                         [0],
-                        [d_amp * math.cos(slot + 13 * degtorad(d_amp))],
+                        [d_amp/100 * math.cos(slot/100 + 13 * degtorad(d_amp))],
                         [0],
-                        [d_amp * math.cos(slot + 15 * degtorad(d_amp))],
+                        [d_amp/100 * math.cos(slot/100 + 15 * degtorad(d_amp))],
                         [0]],np.float
 )
 
@@ -77,11 +77,13 @@ while True:
    
     P = P_vertical(k)
     m_k = getMotionCol(m_vertical,(k%8)).T
-    g = np.round(np.diagonal((np.dot(P,m_k))),decimals=2)
+    g = np.round(np.diagonal((np.dot(P,m_k))),decimals=2).reshape((16,1))
+    # print(np.shape(g))
+    
     G = G + g
 
-    print(G)
-    time.sleep(0.3)
+    print(degtorad(G[0].item()))
+    time.sleep(0.1)
 
     t = t + 1
     k = (k + 1)

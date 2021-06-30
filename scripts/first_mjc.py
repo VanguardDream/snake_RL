@@ -155,11 +155,10 @@ snake_xml = """
 """
 
 #Gait parameters
-l_amp = 0; # lateral amplitude
-l_phase = 0; # lateral phase
-d_amp = 0; # dorsal amplitude
-d_phase = 0; # dorsal phase
-k = 1; # time slot variable
+l_amp = 30; # lateral amplitude
+l_phase = 150; # lateral phase
+d_amp = 30; # dorsal amplitude
+d_phase = 150; # dorsal phase
 
 #Gait motion matirces
 m_vertical = np.array([[1,0,0,0,0,0,0,0],
@@ -186,48 +185,73 @@ def getMotionCol(M,i):
 
 
 #Joint angle function
-theta_vertical = np.array([[d_amp * math.sin((2 * math.pi / 8)*k + degtorad(d_amp))],
-                    [0],
-                    [d_amp * math.sin((2 * math.pi / 8)*k + 3 * degtorad(d_amp))],
-                    [0],
-                    [d_amp * math.sin((2 * math.pi / 8)*k + 5 * degtorad(d_amp))],
-                    [0],
-                    [d_amp * math.sin((2 * math.pi / 8)*k + 7 * degtorad(d_amp))],
-                    [0],
-                    [d_amp * math.sin((2 * math.pi / 8)*k + 9 * degtorad(d_amp))],
-                    [0],
-                    [d_amp * math.sin((2 * math.pi / 8)*k + 11 * degtorad(d_amp))],
-                    [0],
-                    [d_amp * math.sin((2 * math.pi / 8)*k + 13 * degtorad(d_amp))],
-                    [0],
-                    [d_amp * math.sin((2 * math.pi / 8)*k + 15 * degtorad(d_amp))],
-                    [0]],np.float
-)
+def P_vertical(slot):
+    return np.array([[d_amp * math.cos(slot + degtorad(d_amp))],
+                        [0],
+                        [d_amp * math.cos(slot + 3 * degtorad(d_amp))],
+                        [0],
+                        [d_amp * math.cos(slot + 5 * degtorad(d_amp))],
+                        [0],
+                        [d_amp * math.cos(slot + 7 * degtorad(d_amp))],
+                        [0],
+                        [d_amp * math.cos(slot + 9 * degtorad(d_amp))],
+                        [0],
+                        [d_amp * math.cos(slot + 11 * degtorad(d_amp))],
+                        [0],
+                        [d_amp * math.cos(slot + 13 * degtorad(d_amp))],
+                        [0],
+                        [d_amp * math.cos(slot + 15 * degtorad(d_amp))],
+                        [0]],np.float
+    )
+# theta_vertical = np.array([[d_amp * math.sin((2 * math.pi / 8)*k + degtorad(d_amp))],
+#                     [0],
+#                     [d_amp * math.sin((2 * math.pi / 8)*k + 3 * degtorad(d_amp))],
+#                     [0],
+#                     [d_amp * math.sin((2 * math.pi / 8)*k + 5 * degtorad(d_amp))],
+#                     [0],
+#                     [d_amp * math.sin((2 * math.pi / 8)*k + 7 * degtorad(d_amp))],
+#                     [0],
+#                     [d_amp * math.sin((2 * math.pi / 8)*k + 9 * degtorad(d_amp))],
+#                     [0],
+#                     [d_amp * math.sin((2 * math.pi / 8)*k + 11 * degtorad(d_amp))],
+#                     [0],
+#                     [d_amp * math.sin((2 * math.pi / 8)*k + 13 * degtorad(d_amp))],
+#                     [0],
+#                     [d_amp * math.sin((2 * math.pi / 8)*k + 15 * degtorad(d_amp))],
+#                     [0]],np.float
+# )
 
 snake = mujoco_py.load_model_from_xml(snake_xml)
 simulator = mujoco_py.MjSim(snake)
 sim_viewer = mujoco_py.MjViewer(simulator)
 
+#Select gait if we select vertical -> gait slot is 8.
 t = 0
+k = 0
+G = np.zeros((16,1))
 while True:
-    simulator.data.ctrl[0] = math.sin(t/10.0) * 1.57
-    simulator.data.ctrl[2] = math.sin(t/10.0) * 1.57
-    simulator.data.ctrl[4] = math.sin(t/10.0) * 1.57
-    simulator.data.ctrl[6] = math.sin(t/10.0) * 1.57
-    simulator.data.ctrl[8] = math.sin(t/10.0) * 1.57
-    simulator.data.ctrl[10] = math.sin(t/10.0) * 1.57
-    simulator.data.ctrl[12] = math.sin(t/10.0) * 1.57
-    simulator.data.ctrl[14] = math.sin(t/10.0) * 1.57
-    t += 1
+   
+    P = P_vertical(k)
+    m_k = getMotionCol(m_vertical,(k%8)).T
+    g = np.round(np.diagonal((np.dot(P,m_k))),decimals=2)
+    G = G + g
 
-    if(t%100 == 0):
-        print(simulator.get_state())
-
-    if(t%10000 == 0):
-        simulator.reset()
+    for motor_idx in range(16):
+        simulator.data.ctrl[motor_idx] = G[motor_idx]
 
     simulator.step()
     sim_viewer.render()
-    
+
+
+    if(t%1000 == 0):
+        print(simulator.get_state())
+
+    if(t%5000 == 0):
+        simulator.reset()
+
     if t > 100 and os.getenv('TESTING') is not None:
         break
+
+    t = t + 1
+    k = (k + 1)
+

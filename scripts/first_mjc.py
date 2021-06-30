@@ -7,6 +7,12 @@ import os
 import math
 import numpy as np
 
+def radtodeg(rad):
+    return rad * 180/math.pi
+
+def degtorad(deg):
+    return deg * math.pi/180
+
 snake_xml = """
 
 <mujoco model="snake_v210623">
@@ -155,7 +161,45 @@ d_phase = 0; # dorsal phase
 k = 1; # time slot variable
 
 #Gait motion matirces
-m_vertical = np.matrix([],[],[],[],[],[],[],[])
+m_vertical = np.array([[1,0,0,0,0,0,0,0],
+                        [0,0,0,0,0,0,0,0],
+                        [0,1,0,0,0,0,0,0],
+                        [0,0,0,0,0,0,0,0],
+                        [0,0,1,0,0,0,0,0],
+                        [0,0,0,0,0,0,0,0],
+                        [0,0,0,1,0,0,0,0],
+                        [0,0,0,0,0,0,0,0],
+                        [0,0,0,0,1,0,0,0],
+                        [0,0,0,0,0,0,0,0],
+                        [0,0,0,0,0,1,0,0],
+                        [0,0,0,0,0,0,0,0],
+                        [0,0,0,0,0,0,1,0],
+                        [0,0,0,0,0,0,0,0], 
+                        [0,0,0,0,0,0,0,1],
+                        [0,0,0,0,0,0,0,0]],np.float)
+
+def getMotionCol(M,i):
+    return
+
+
+#Joint angle function
+theta_vertical = np.array([[d_amp * math.sin((2 * math.pi / 8)*k + degtorad(d_amp))],
+                    [0],
+                    [d_amp * math.sin((2 * math.pi / 8)*k + 3 * degtorad(d_amp))],
+                    [0],
+                    [d_amp * math.sin((2 * math.pi / 8)*k + 5 * degtorad(d_amp))],
+                    [0],
+                    [d_amp * math.sin((2 * math.pi / 8)*k + 7 * degtorad(d_amp))],
+                    [0],
+                    [d_amp * math.sin((2 * math.pi / 8)*k + 9 * degtorad(d_amp))],
+                    [0],
+                    [d_amp * math.sin((2 * math.pi / 8)*k + 11 * degtorad(d_amp))],
+                    [0],
+                    [d_amp * math.sin((2 * math.pi / 8)*k + 13 * degtorad(d_amp))],
+                    [0],
+                    [d_amp * math.sin((2 * math.pi / 8)*k + 15 * degtorad(d_amp))],
+                    [0]],np.float
+)
 
 snake = mujoco_py.load_model_from_xml(snake_xml)
 simulator = mujoco_py.MjSim(snake)

@@ -234,7 +234,7 @@ G = np.zeros((16,1))
 
 while True:
    
-    P = P_vertical(k/10)
+    P = P_vertical(float(k)/10)
     m_k = getMotionCol(m_vertical,(k%8)).T
     g = np.round(np.diagonal((np.dot(P,m_k))),decimals=2).reshape((16,1))
     G = G + g

@@ -186,23 +186,23 @@ def getMotionCol(M,i):
 
 #Joint angle function
 def P_vertical(slot):
-    return np.array([[d_amp * math.cos(slot/10 + degtorad(d_amp))],
-                        [0],
-                        [d_amp * math.cos(slot/10 + 3 * degtorad(d_amp))],
-                        [0],
-                        [d_amp * math.cos(slot/10 + 5 * degtorad(d_amp))],
-                        [0],
-                        [d_amp * math.cos(slot/10 + 7 * degtorad(d_amp))],
-                        [0],
-                        [d_amp * math.cos(slot/10 + 9 * degtorad(d_amp))],
-                        [0],
-                        [d_amp * math.cos(slot/10 + 11 * degtorad(d_amp))],
-                        [0],
-                        [d_amp * math.cos(slot/10 + 13 * degtorad(d_amp))],
-                        [0],
-                        [d_amp * math.cos(slot/10 + 15 * degtorad(d_amp))],
-                        [0]],dtype='float'
-    )
+    return np.array([[d_amp * math.sin((2 * math.pi / 8)*k + degtorad(d_amp))],
+                    [0],
+                    [d_amp * math.sin((2 * math.pi / 8)*k + 3 * degtorad(d_amp))],
+                    [0],
+                    [d_amp * math.sin((2 * math.pi / 8)*k + 5 * degtorad(d_amp))],
+                    [0],
+                    [d_amp * math.sin((2 * math.pi / 8)*k + 7 * degtorad(d_amp))],
+                    [0],
+                    [d_amp * math.sin((2 * math.pi / 8)*k + 9 * degtorad(d_amp))],
+                    [0],
+                    [d_amp * math.sin((2 * math.pi / 8)*k + 11 * degtorad(d_amp))],
+                    [0],
+                    [d_amp * math.sin((2 * math.pi / 8)*k + 13 * degtorad(d_amp))],
+                    [0],
+                    [d_amp * math.sin((2 * math.pi / 8)*k + 15 * degtorad(d_amp))],
+                    [0]], dtype='float')
+
 # theta_vertical = np.array([[d_amp * math.sin((2 * math.pi / 8)*k + degtorad(d_amp))],
 #                     [0],
 #                     [d_amp * math.sin((2 * math.pi / 8)*k + 3 * degtorad(d_amp))],
@@ -225,20 +225,22 @@ snake = mujoco_py.load_model_from_xml(snake_xml)
 simulator = mujoco_py.MjSim(snake)
 sim_viewer = mujoco_py.MjViewer(simulator)
 
-#Select gait if we select vertical -> gait slot is 8.
+# Select gait if we select vertical -> gait slot is 8.
 t = 0
 k = 0
-tau = 1 # time coefficient larger -> slower motion 0 < tau < inf
+tau = 10 # time coefficient larger -> slower motion 0 < tau < inf
+
 G = np.zeros((16,1))
+
 while True:
    
-    P = P_vertical(k)
+    P = P_vertical(k/10)
     m_k = getMotionCol(m_vertical,(k%8)).T
     g = np.round(np.diagonal((np.dot(P,m_k))),decimals=2).reshape((16,1))
     G = G + g
 
     for motor_idx in range(15):
-            simulator.data.ctrl[motor_idx] = round(degtorad(G[motor_idx].item()) * 0.1,4)
+            simulator.data.ctrl[motor_idx] = round(degtorad(G[motor_idx].item()),4)
             
     # simulator.data.ctrl[0] = G[0]
     # simulator.data.ctrl[1] = G[1]

@@ -186,40 +186,22 @@ def getMotionCol(M,i):
 
 #Joint angle function
 def P_vertical(slot):
-    return np.array([[d_amp * math.sin((2 * math.pi / 8)*k + degtorad(d_amp))],
+    return np.array([[d_amp * math.sin((2 * math.pi / 8) * slot + degtorad(d_amp))],
                     [0],
-                    [d_amp * math.sin((2 * math.pi / 8)*k + 3 * degtorad(d_amp))],
+                    [d_amp * math.sin((2 * math.pi / 8) * slot + 3 * degtorad(d_amp))],
                     [0],
-                    [d_amp * math.sin((2 * math.pi / 8)*k + 5 * degtorad(d_amp))],
+                    [d_amp * math.sin((2 * math.pi / 8) * slot + 5 * degtorad(d_amp))],
                     [0],
-                    [d_amp * math.sin((2 * math.pi / 8)*k + 7 * degtorad(d_amp))],
+                    [d_amp * math.sin((2 * math.pi / 8) * slot + 7 * degtorad(d_amp))],
                     [0],
-                    [d_amp * math.sin((2 * math.pi / 8)*k + 9 * degtorad(d_amp))],
+                    [d_amp * math.sin((2 * math.pi / 8) * slot + 9 * degtorad(d_amp))],
                     [0],
-                    [d_amp * math.sin((2 * math.pi / 8)*k + 11 * degtorad(d_amp))],
+                    [d_amp * math.sin((2 * math.pi / 8) * slot + 11 * degtorad(d_amp))],
                     [0],
-                    [d_amp * math.sin((2 * math.pi / 8)*k + 13 * degtorad(d_amp))],
+                    [d_amp * math.sin((2 * math.pi / 8) * slot + 13 * degtorad(d_amp))],
                     [0],
-                    [d_amp * math.sin((2 * math.pi / 8)*k + 15 * degtorad(d_amp))],
+                    [d_amp * math.sin((2 * math.pi / 8) * slot + 15 * degtorad(d_amp))],
                     [0]], dtype='float')
-
-# theta_vertical = np.array([[d_amp * math.sin((2 * math.pi / 8)*k + degtorad(d_amp))],
-#                     [0],
-#                     [d_amp * math.sin((2 * math.pi / 8)*k + 3 * degtorad(d_amp))],
-#                     [0],
-#                     [d_amp * math.sin((2 * math.pi / 8)*k + 5 * degtorad(d_amp))],
-#                     [0],
-#                     [d_amp * math.sin((2 * math.pi / 8)*k + 7 * degtorad(d_amp))],
-#                     [0],
-#                     [d_amp * math.sin((2 * math.pi / 8)*k + 9 * degtorad(d_amp))],
-#                     [0],
-#                     [d_amp * math.sin((2 * math.pi / 8)*k + 11 * degtorad(d_amp))],
-#                     [0],
-#                     [d_amp * math.sin((2 * math.pi / 8)*k + 13 * degtorad(d_amp))],
-#                     [0],
-#                     [d_amp * math.sin((2 * math.pi / 8)*k + 15 * degtorad(d_amp))],
-#                     [0]],np.float
-# )
 
 snake = mujoco_py.load_model_from_xml(snake_xml)
 simulator = mujoco_py.MjSim(snake)
@@ -230,34 +212,26 @@ t = 0
 k = 0
 tau = 10 # time coefficient larger -> slower motion 0 < tau < inf
 
-G = np.zeros((16,1))
-
 while True:
    
-    P = P_vertical(k/10)
+    if(k % 8 == 0): # Very first of gait step.
+        P = P_vertical(k/10) # Calculate joint angles for this gait stride.
+
+
     m_k = getMotionCol(m_vertical,(k%8)).T
     g = np.round(np.diagonal((np.dot(P,m_k))),decimals=2).reshape((16,1))
-    G = G + g
 
-    for motor_idx in range(15):
-            simulator.data.ctrl[motor_idx] = round(degtorad(G[motor_idx].item()),4)
+    ### Control specificated motor by M matrix.
+    spec_motor = np.nonzero(g)
+
+    for idx in spec_motor:
+        # Commnad motor here
+        simulator.data.ctrl[idx] = degtorad(g[idx])
+        
+    # for motor_idx in range(15):
+    #         simulator.data.ctrl[motor_idx] = round(degtorad(G[motor_idx].item()),4)
             
-    # simulator.data.ctrl[0] = G[0]
-    # simulator.data.ctrl[1] = G[1]
-    # simulator.data.ctrl[2] = G[2]
-    # simulator.data.ctrl[3] = G[3]
-    # simulator.data.ctrl[4] = G[4]
-    # simulator.data.ctrl[5] = G[5]
-    # simulator.data.ctrl[6] = G[6]
-    # simulator.data.ctrl[7] = G[7]
-    # simulator.data.ctrl[8] = G[8]
-    # simulator.data.ctrl[9] = G[9]
-    # simulator.data.ctrl[10] = G[10]
-    # simulator.data.ctrl[11] = G[11]
-    # simulator.data.ctrl[12] = G[12]
-    # simulator.data.ctrl[13] = G[13]
-    # simulator.data.ctrl[14] = G[14]
-    # simulator.data.ctrl[15] = G[15]
+
 
     simulator.step()
     sim_viewer.render()

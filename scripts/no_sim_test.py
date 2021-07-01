@@ -50,40 +50,44 @@ def getMotionCol(M,i):
 
 #Joint angle function
 def P_vertical(slot):
-    return np.array([[d_amp/100 * math.cos(slot/100 + degtorad(d_amp))],
-                        [0],
-                        [d_amp/100 * math.cos(slot/100 + 3 * degtorad(d_amp))],
-                        [0],
-                        [d_amp/100 * math.cos(slot/100 + 5 * degtorad(d_amp))],
-                        [0],
-                        [d_amp/100 * math.cos(slot/100 + 7 * degtorad(d_amp))],
-                        [0],
-                        [d_amp/100 * math.cos(slot/100 + 9 * degtorad(d_amp))],
-                        [0],
-                        [d_amp/100 * math.cos(slot/100 + 11 * degtorad(d_amp))],
-                        [0],
-                        [d_amp/100 * math.cos(slot/100 + 13 * degtorad(d_amp))],
-                        [0],
-                        [d_amp/100 * math.cos(slot/100 + 15 * degtorad(d_amp))],
-                        [0]],np.float
-)
+    return np.array([[d_amp * math.sin((2 * math.pi / 8) * slot + degtorad(d_amp))],
+                    [0],
+                    [d_amp * math.sin((2 * math.pi / 8) * slot + 3 * degtorad(d_amp))],
+                    [0],
+                    [d_amp * math.sin((2 * math.pi / 8) * slot + 5 * degtorad(d_amp))],
+                    [0],
+                    [d_amp * math.sin((2 * math.pi / 8) * slot + 7 * degtorad(d_amp))],
+                    [0],
+                    [d_amp * math.sin((2 * math.pi / 8) * slot + 9 * degtorad(d_amp))],
+                    [0],
+                    [d_amp * math.sin((2 * math.pi / 8) * slot + 11 * degtorad(d_amp))],
+                    [0],
+                    [d_amp * math.sin((2 * math.pi / 8) * slot + 13 * degtorad(d_amp))],
+                    [0],
+                    [d_amp * math.sin((2 * math.pi / 8) * slot + 15 * degtorad(d_amp))],
+                    [0]], dtype='float')
 
 
 #Select gait if we select vertical -> gait slot is 8.
 t = 0
 k = 0
-G = np.zeros((16,1))
 while True:
    
-    P = P_vertical(k)
-    m_k = getMotionCol(m_vertical,(k%8)).T
-    g = np.round(np.diagonal((np.dot(P,m_k))),decimals=2).reshape((16,1))
-    # print(np.shape(g))
-    
-    G = G + g
+    if(k % 8 == 0): # Very first of gait step.
+        P = P_vertical(k / 10) # Calculate joint angles for this gait stride.
 
-    print(degtorad(G[0].item()))
-    time.sleep(0.1)
+    m_k = getMotionCol(m_vertical,(k % 8)).T
+    g = np.round(np.diagonal((np.dot(P,m_k))),decimals=2).reshape((16,1))
+
+    ### Control specificated motor by M matrix.
+    spec_motor = np.nonzero(g)
+
+    for idx in spec_motor:
+        # Commnad motor here
+        k = k 
+
+    # print(degtorad(G[0].item()))
+    time.sleep(0.25)
 
     t = t + 1
     k = (k + 1)

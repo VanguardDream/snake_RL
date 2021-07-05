@@ -4,7 +4,7 @@
 
 <mujoco model="snake_v210623">
 
-    <compiler inertiafromgeom="true" angle="degree"/>
+    <compiler inertiafromgeom="true" angle="degree" convexhull="false"/>
 
     <option timestep="0.005" iterations="50" tolerance="1e-10" solver="Newton" jacobian="dense" cone="pyramidal"/>
 
@@ -28,6 +28,9 @@
         <material name="matplane" reflectance="0.3" texture="texplane" texrepeat="1 1" texuniform="true"/>
 
         <material name="matgeom" texture="texgeom" texuniform="true" rgba="0.8 0.6 .4 1"/>
+
+        <!-- Pipe Meshes -->
+        <mesh name="pipe100" file="./asset/Pipe-100mm-3T_low.stl"/>
     </asset>
 
     <worldbody>
@@ -35,7 +38,12 @@
         <geom name="floor" pos="0 0 0" size="0 0 .25" type="plane" material="matplane" condim="3"/>
 
         <light directional="false" diffuse=".2 .2 .2" specular="0 0 0" pos="0 0 5" dir="0 0 -1" castshadow="false"/>
+    <!-- Pipes -->
+        <body pos="0.500 0 0.03">
+            <geom type="mesh" mesh="pipe100"/>
+        </body>
 
+    <!-- Snake -->
         <body name="head" pos="0 0 0.1">
             <inertial pos="-0.0565 0 0" quat="0 0.707107 0 0.707107" mass="0.1" diaginertia="0.0000194 0.0000174 0.0000115" />
             <freejoint name="root"/>

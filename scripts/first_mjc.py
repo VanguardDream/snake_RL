@@ -69,8 +69,13 @@ m_sidewind = np.array([[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
                         [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
                         [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]],dtype='float')
 
-def getMotionCol(M,i):
-    return M[:,i].reshape(M.shape[0],1)
+def getMotionCol(gait,i):
+    if gait == 0:
+        return m_vertical[:,i].reshape(m_vertical.shape[0],1)
+    elif gait == 1:
+        return m_sinuous[:,i].reshape(m_sinuous.shape[0],1)
+    else:
+        return m_sidewind[:,i].reshape(m_sidewind.shape[0],1)
 
 
 #Joint angle function
@@ -117,6 +122,8 @@ def calculte_P(gait, slot):
     if gait == 0: #Vertical
         return P_vertical(slot)
 
+    elif gait == 1: # Sinuous
+        return P_sinuous(slot)
     else :
         return 0
 
@@ -137,7 +144,7 @@ while True:
         P = calculte_P(k/10) # Calculate joint angles for this gait stride.
 
 
-    m_k = getMotionCol(m_vertical,(k%8)).T
+    m_k = getMotionCol(gait,(k%getNumofSlot(gait))).T
     g = np.round(np.diagonal((np.dot(P,m_k))),decimals=2).reshape((16,1))
 
     ### Control specificated motor by M matrix.

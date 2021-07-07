@@ -115,7 +115,23 @@ def P_sinuous(slot):
                         [d_amp * math.sin((2 * math.pi / 8) * slot + 14 * degtorad(d_amp))],
                         ],dtype='float')
                         
-
+def P_sidewind(slot):
+    return np.array([[d_amp * math.sin((2 * math.pi / 8) * slot + 0.5 * degtorad(d_amp))],
+                        [l_amp * math.sin((math.pi / 8) * slot + 0 * degtorad(l_amp))],
+                        [d_amp * math.sin((2 * math.pi / 8) * slot + 1.5 * degtorad(d_amp))],
+                        [l_amp * math.sin((math.pi / 8) * slot + 1 * degtorad(l_amp))],
+                        [d_amp * math.sin((2 * math.pi / 8) * slot + 2.5 * degtorad(d_amp))],
+                        [l_amp * math.sin((math.pi / 8) * slot + 2 * degtorad(l_amp))],
+                        [d_amp * math.sin((2 * math.pi / 8) * slot + 3.5 * degtorad(d_amp))],
+                        [l_amp * math.sin((math.pi / 8) * slot + 3 * degtorad(l_amp))],
+                        [d_amp * math.sin((2 * math.pi / 8) * slot + 4.5 * degtorad(d_amp))],
+                        [l_amp * math.sin((math.pi / 8) * slot + 4 * degtorad(l_amp))],
+                        [d_amp * math.sin((2 * math.pi / 8) * slot + 5.5 * degtorad(d_amp))],
+                        [l_amp * math.sin((math.pi / 8) * slot + 5 * degtorad(l_amp))],
+                        [d_amp * math.sin((2 * math.pi / 8) * slot + 6.5 * degtorad(d_amp))],
+                        [l_amp * math.sin((math.pi / 8) * slot + 6 * degtorad(l_amp))],
+                        [d_amp * math.sin((2 * math.pi / 8) * slot + 7.5 * degtorad(d_amp))],
+                        ],dtype='float')
 
 def calculte_P(gait, slot):
     if gait == 0: #Vertical
@@ -124,7 +140,7 @@ def calculte_P(gait, slot):
     elif gait == 1: # Sinuous
         return P_sinuous(slot)
     else :
-        return 0
+        return P_sidewind(slot)
 
 # snake = mujoco_py.load_model_from_xml(snake_pipe)
 simulator = mujoco_py.MjSim(snake)
@@ -134,7 +150,7 @@ sim_viewer = mujoco_py.MjViewer(simulator)
 t = 0
 k = 0
 tau = 1 # time coefficient larger -> slower motion 0 < tau < inf
-gait = 0 # Vertical -> 0, Sinuous -> 1, Sidewind -> 2
+gait = 2 # Vertical -> 0, Sinuous -> 1, Sidewind -> 2
 
 while True:
    

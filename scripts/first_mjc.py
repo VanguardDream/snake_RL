@@ -182,7 +182,7 @@ while True:
         k = k + 1
 
     if(t%1000 == 0):
-        print(simulator.model.geom_pos)
+        print(simulator.data.get_body_xpos('head'))
 
     if(t%5000 == 0):
         simulator.reset()

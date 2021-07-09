@@ -24,7 +24,7 @@ def getNumofSlot(gait_type):
         return int(15)
 
 #load model from path
-snake = mujoco_py.load_model_from_path("../description/mujoco/snake.xml")
+snake = mujoco_py.load_model_from_path("../description/mujoco/snake_allign.xml")
 
 #Gait parameters
 l_amp = 30; # lateral amplitude

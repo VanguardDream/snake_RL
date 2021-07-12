@@ -7,6 +7,7 @@ from numpy.core.fromnumeric import reshape, shape
 import mujoco_py
 import os
 import math
+import random
 import numpy as np
 
 def radtodeg(rad):
@@ -22,6 +23,20 @@ def getNumofSlot(gait_type):
         return int(15)
     else: # For now sidewind
         return int(15)
+
+def randomize_param():
+    global l_amp
+    global l_phase
+    global d_amp
+    global d_phase
+    global tau
+
+    l_amp = random.random.randint(0, 900) / 10
+    l_phase = random.random.randint(0,3600) / 10
+    d_amp = random.random.randint(0, 900) / 10
+    d_phase = random.random.randint(0,3600) / 10
+    tau = random.randint(1,20)
+
 
 #load model from path
 snake = mujoco_py.load_model_from_path("../description/mujoco/snake_allign.xml")
@@ -186,6 +201,7 @@ while True:
 
     if(t%5000 == 0):
         simulator.reset()
+        randomize_param()
         t = 0
         k = 0
 

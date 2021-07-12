@@ -167,6 +167,14 @@ k = 0
 tau = 1 # time coefficient larger -> slower motion 0 < tau < inf
 gait = 2 # Vertical -> 0, Sinuous -> 1, Sidewind -> 2
 
+# Variable for cost(loss) function
+delta_x = 0
+delta_y = 0
+accum_theta = 0
+
+# Simulation model info
+joint_names = simulator.model.joint_names[1:]
+
 while True:
    
     P = calculte_P(gait,float(k)/10)
@@ -188,7 +196,9 @@ while True:
     # for motor_idx in range(15):
     #         simulator.data.ctrl[motor_idx] = round(degtorad(G[motor_idx].item()),4)
             
-
+    #Accumulate joint angular displacement
+    for name in joint_names:
+        accum_theta = accum_theta + abs(simulator.data.get_joint_qpos(name))
 
     simulator.step()
     sim_viewer.render()
@@ -197,13 +207,27 @@ while True:
         k = k + 1
 
     if(t%1000 == 0):
-        print(simulator.data.get_body_xpos('head'))
+        print("Accumulated joint displacement. :  %f" %accum_theta)
+        print("dX : %lf, dY : %lf" %(simulator.data.get_body_xpos('head')[0],simulator.data.get_body_xpos('head')[1]))
 
     if(t%5000 == 0):
+        #save sim data
+        delta_x = simulator.data.get_body_xpos('head')[0]
+        delta_y = simulator.data.get_body_xpos('head')[1]
+        accum_theta
+
+        #Calculate Cost here
+        J = 10 * delta_x - 5 * delta_y - 0.0003 * accum_theta
+        print("Loss is : %lf" %J)
+
         simulator.reset()
-        randomize_param()
+        
         t = 0
         k = 0
+
+        delta_x = 0
+        delta_y = 0
+        accum_theta = 0
 
     if t > 100 and os.getenv('TESTING') is not None:
         break

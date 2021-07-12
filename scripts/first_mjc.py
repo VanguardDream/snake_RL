@@ -31,10 +31,10 @@ def randomize_param():
     global d_phase
     global tau
 
-    l_amp = random.random.randint(0, 900) / 10
-    l_phase = random.random.randint(0,3600) / 10
-    d_amp = random.random.randint(0, 900) / 10
-    d_phase = random.random.randint(0,3600) / 10
+    l_amp = random.randint(0, 900) / 10
+    l_phase = random.randint(0,3600) / 10
+    d_amp = random.randint(0, 900) / 10
+    d_phase = random.randint(0,3600) / 10
     tau = random.randint(1,20)
 
 

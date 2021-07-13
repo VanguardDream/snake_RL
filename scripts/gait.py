@@ -6,7 +6,7 @@ import math
 import numpy as np
 
 class gait:
-    def __init__(self, gait,l_amp = 30, l_phase = 150, d_amp = 30, d_phase = 150, tau = 1):
+    def __init__(self, gait,d_amp = 30, d_phase = 150, l_amp = 30, l_phase = 150, tau = 1):
         #Gait selection
         self.gait = gait
         

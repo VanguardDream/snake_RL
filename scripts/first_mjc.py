@@ -2,6 +2,7 @@
 # All right reserved
 # Description : BRM snake robot python simulation script
 
+from time import sleep
 from Cython.Shadow import NULL
 from numpy.core.fromnumeric import reshape, shape
 import mujoco_py
@@ -42,10 +43,10 @@ def randomize_param():
 snake = mujoco_py.load_model_from_path("../description/mujoco/snake_allign.xml")
 
 #Gait parameters
-l_amp = 30; # lateral amplitude
-l_phase = 150; # lateral phase
-d_amp = 30; # dorsal amplitude
-d_phase = 150; # dorsal phase
+d_amp = 67.7; # dorsal amplitude
+d_phase = 345.0; # dorsal phase
+l_amp = 70.8; # lateral amplitude
+l_phase = 27.6; # lateral phase
 
 #Gait motion matirces
 m_vertical = np.array([[1,0,0,0,0,0,0,0],
@@ -165,7 +166,7 @@ sim_viewer = mujoco_py.MjViewer(simulator)
 t = 0
 k = 0
 tau = 1 # time coefficient larger -> slower motion 0 < tau < inf
-gait = 2 # Vertical -> 0, Sinuous -> 1, Sidewind -> 2
+gait = 1 # Vertical -> 0, Sinuous -> 1, Sidewind -> 2
 
 # Variable for cost(loss) function
 delta_x = 0
@@ -181,9 +182,13 @@ while True:
     # if(k % getNumofSlot(gait) == 0): # Very first of gait step.
     #     P = calculte_P(gait,k/10) # Calculate joint angles for this gait stride.
 
-
     m_k = getMotionCol(gait,(k%getNumofSlot(gait))).T
     g = np.round(np.diagonal((np.dot(P,m_k))),decimals=2).reshape((15,1))
+
+    #For just debugging
+    # os.system('clear')
+    # print(g)
+    # sleep(0.8)
 
     ### Control specificated motor by M matrix.
     spec_motor = np.nonzero(g)
@@ -207,8 +212,9 @@ while True:
         k = k + 1
 
     if(t%1000 == 0):
-        print("Accumulated joint displacement. :  %f" %accum_theta)
-        print("dX : %lf, dY : %lf" %(simulator.data.get_body_xpos('head')[0],simulator.data.get_body_xpos('head')[1]))
+        # print("Accumulated joint displacement. :  %f" %accum_theta)
+        # print("dX : %lf, dY : %lf" %(simulator.data.get_body_xpos('head')[0],simulator.data.get_body_xpos('head')[1]))
+        pass
 
     if(t%5000 == 0):
         #save sim data
@@ -218,7 +224,8 @@ while True:
 
         #Calculate Cost here
         J = 10 * delta_x - 5 * delta_y - 0.0003 * accum_theta
-        print("Loss is : %lf" %J)
+        # print("Loss is : %lf" %J)
+        print(J)
 
         simulator.reset()
         

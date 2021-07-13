@@ -48,46 +48,71 @@ def J(g,d_a,d_p,l_a,l_p,tau):
     simulator.reset()
 
     #Calculate Cost here
-    J_value = 100 * delta_x - 25 * delta_y - 0.00003 * accum_theta
-    # return 10 * delta_x - 5 * delta_y - 0.000003 * accum_theta
-    # print("%f : %f :  %f : %f : %d : %lf" %(d_a,d_p,l_a,l_p,tau,J_value))
+    if g != 2:
+        J_value = 100 * delta_x - 25 * delta_y - 0.00003 * accum_theta
+    else:
+        J_value = 100 * delta_y - 25 * delta_x - 0.00003 * accum_theta
+
     return J_value
 
 def getGradient(g = 0, d_a = 130, d_p = 150, l_a = 30, l_p = 150, tau = 1, u = 0.5):
     unit_vector = [1, 1, 1, 1, 1]
     J_k = J(g,d_a,d_p,l_a,l_p,tau)
 
-    if (J(g, d_a + u, d_p, l_a, l_p, tau) - J_k) > 0:
-        unit_vector[0] = u
-    else:
-        unit_vector[0] = -u
-
-    if (J(g, d_a, d_p + u, l_a, l_p, tau) - J_k) > 0:
-        unit_vector[1] = u
-    else:
-        unit_vector[1] = -u
-
-    if (J(g, d_a, d_p, l_a + u, l_p, tau) - J_k) > 0:
-        unit_vector[2] = u
-    else:
-        unit_vector[2] = -u
-
-    if (J(g, d_a, d_p, l_a, l_p + u, tau) - J_k) > 0:
-        unit_vector[3] = u
-    else:
-        unit_vector[3] = -u
-
-    if (J(g, d_a, d_p, l_a, l_p, tau + 1) - J_k) > 0:
-        unit_vector[4] = 1
-    else:
-        if(tau > 1):
-            unit_vector[4] = -1
+    if g != 0:
+        if (J(g, d_a + u, d_p, l_a, l_p, tau) - J_k) > 0:
+            unit_vector[0] = u
         else:
-            unit_vector[4] = 0
+            unit_vector[0] = -u
+
+        if (J(g, d_a, d_p + u, l_a, l_p, tau) - J_k) > 0:
+            unit_vector[1] = u
+        else:
+            unit_vector[1] = -u
+
+        if (J(g, d_a, d_p, l_a + u, l_p, tau) - J_k) > 0:
+            unit_vector[2] = u
+        else:
+            unit_vector[2] = -u
+
+        if (J(g, d_a, d_p, l_a, l_p + u, tau) - J_k) > 0:
+            unit_vector[3] = u
+        else:
+            unit_vector[3] = -u
+
+        if (J(g, d_a, d_p, l_a, l_p, tau + 1) - J_k) > 0:
+            unit_vector[4] = 1
+        else:
+            if(tau > 1):
+                unit_vector[4] = -1
+            else:
+                unit_vector[4] = 0
+    else:
+        if (J(g, d_a + u, d_p, l_a, l_p, tau) - J_k) > 0:
+            unit_vector[0] = u
+        else:
+            unit_vector[0] = -u
+
+        if (J(g, d_a, d_p + u, l_a, l_p, tau) - J_k) > 0:
+            unit_vector[1] = u
+        else:
+            unit_vector[1] = -u
+
+        unit_vector[2] = 0
+        unit_vector[3] = 0
+
+        if (J(g, d_a, d_p, l_a, l_p, tau + 1) - J_k) > 0:
+            unit_vector[4] = 1
+        else:
+            if(tau > 1):
+                unit_vector[4] = -1
+            else:
+                unit_vector[4] = 0
+
+
 
     return unit_vector, J_k
         
-
 def optimizeGait(eps = 1, l = 1):
     d_amp = random.randint(0, 900) / 10
     d_phase = random.randint(0,3600) / 10
@@ -95,18 +120,21 @@ def optimizeGait(eps = 1, l = 1):
     l_phase = random.randint(0,3600) / 10
     tau = random.randint(1,10)
 
+    hist = np.array(np.zeros((1,5)))
+
     param = [d_amp,d_phase,l_amp,l_phase,tau]
+    start_param = param
     gradient_vector = []
     j_k = 0
 
     while True:
+        np.vstack(hist, np.array(param))
+
         gradient_vector, j_k1 = getGradient(g=2,d_a = param[0], d_p = param[1], l_a = param[2], l_p = param[3], tau = param[4])
 
-        print(param)
-        print(j_k1)
-
         if (j_k1 - j_k) < eps:
-            break
+            return hist, j_k
+
         j_k = j_k1
 
         for i in range(len(param)):
@@ -116,7 +144,11 @@ def optimizeGait(eps = 1, l = 1):
                 param[i] = param[i] + gradient_vector[i]
 
 def main():
-    optimizeGait()
+    print('Gait optimizing Start...')
+
+    hist, j_k = optimizeGait()
+
+    print(hist)
 
 
 if __name__ == "__main__":

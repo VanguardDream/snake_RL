@@ -42,11 +42,11 @@ def randomize_param():
 #load model from path
 snake = mujoco_py.load_model_from_path("../description/mujoco/snake_allign.xml")
 
-#Gait parameters
-d_amp = 67.7; # dorsal amplitude
-d_phase = 345.0; # dorsal phase
-l_amp = 70.8; # lateral amplitude
-l_phase = 27.6; # lateral phase
+#Gait parameters 37.9, 269.6,
+d_amp = 33.6; # dorsal amplitude
+d_phase = 187.9; # dorsal phase
+l_amp = 24.0; # lateral amplitude
+l_phase = 91.5; # lateral phase
 
 #Gait motion matirces
 m_vertical = np.array([[1,0,0,0,0,0,0,0],
@@ -95,23 +95,41 @@ def getMotionCol(gait,i):
 
 
 #Joint angle function
-def P_vertical(slot):
-    return np.array([[d_amp * math.sin((2 * math.pi / 8) * slot + degtorad(d_amp))],
-                    [0],
-                    [d_amp * math.sin((2 * math.pi / 8) * slot + 3 * degtorad(d_amp))],
-                    [0],
-                    [d_amp * math.sin((2 * math.pi / 8) * slot + 5 * degtorad(d_amp))],
-                    [0],
-                    [d_amp * math.sin((2 * math.pi / 8) * slot + 7 * degtorad(d_amp))],
-                    [0],
-                    [d_amp * math.sin((2 * math.pi / 8) * slot + 9 * degtorad(d_amp))],
-                    [0],
-                    [d_amp * math.sin((2 * math.pi / 8) * slot + 11 * degtorad(d_amp))],
-                    [0],
-                    [d_amp * math.sin((2 * math.pi / 8) * slot + 13 * degtorad(d_amp))],
-                    [0],
-                    [d_amp * math.sin((2 * math.pi / 8) * slot + 15 * degtorad(d_amp))]
-                    ], dtype='float')
+# def P_vertical(slot):
+#     return np.array([[d_amp * math.sin((2 * math.pi / 8) * slot + degtorad(d_amp))],
+#                     [0],
+#                     [d_amp * math.sin((2 * math.pi / 8) * slot + 3 * degtorad(d_amp))],
+#                     [0],
+#                     [d_amp * math.sin((2 * math.pi / 8) * slot + 5 * degtorad(d_amp))],
+#                     [0],
+#                     [d_amp * math.sin((2 * math.pi / 8) * slot + 7 * degtorad(d_amp))],
+#                     [0],
+#                     [d_amp * math.sin((2 * math.pi / 8) * slot + 9 * degtorad(d_amp))],
+#                     [0],
+#                     [d_amp * math.sin((2 * math.pi / 8) * slot + 11 * degtorad(d_amp))],
+#                     [0],
+#                     [d_amp * math.sin((2 * math.pi / 8) * slot + 13 * degtorad(d_amp))],
+#                     [0],
+#                     [d_amp * math.sin((2 * math.pi / 8) * slot + 15 * degtorad(d_amp))]
+#                     ], dtype='float')
+
+def P_vertical(slot):    #20210715 P함수 변형 테스트
+    return np.array([[d_amp * math.sin((2 * math.pi / 8) * slot + 0 * degtorad(d_amp))],
+                        [l_amp * math.sin((math.pi / 8) * slot + 1.5 * degtorad(l_amp))],
+                        [d_amp * math.sin((2 * math.pi / 8) * slot + 2 * degtorad(d_amp))],
+                        [l_amp * math.sin((math.pi / 8) * slot + 2.5 * degtorad(l_amp))],
+                        [d_amp * math.sin((2 * math.pi / 8) * slot + 4 * degtorad(d_amp))],
+                        [l_amp * math.sin((math.pi / 8) * slot + 3.5 * degtorad(l_amp))],
+                        [d_amp * math.sin((2 * math.pi / 8) * slot + 6 * degtorad(d_amp))],
+                        [l_amp * math.sin((math.pi / 8) * slot + 4.5 * degtorad(l_amp))],
+                        [d_amp * math.sin((2 * math.pi / 8) * slot + 8 * degtorad(d_amp))],
+                        [l_amp * math.sin((math.pi / 8) * slot + 5.5 * degtorad(l_amp))],
+                        [d_amp * math.sin((2 * math.pi / 8) * slot + 10 * degtorad(d_amp))],
+                        [l_amp * math.sin((math.pi / 8) * slot + 6.5 * degtorad(l_amp))],
+                        [d_amp * math.sin((2 * math.pi / 8) * slot + 12 * degtorad(d_amp))],
+                        [l_amp * math.sin((math.pi / 8) * slot + 7.5 * degtorad(l_amp))],
+                        [d_amp * math.sin((2 * math.pi / 8) * slot + 14 * degtorad(d_amp))],
+                        ],dtype='float')
 
 def P_sinuous(slot):
     return np.array([[d_amp * math.sin((2 * math.pi / 8) * slot + 0 * degtorad(d_amp))],
@@ -131,22 +149,40 @@ def P_sinuous(slot):
                         [d_amp * math.sin((2 * math.pi / 8) * slot + 14 * degtorad(d_amp))],
                         ],dtype='float')
                         
-def P_sidewind(slot):
-    return np.array([[d_amp * math.sin((2 * math.pi / 8) * slot + 0.5 * degtorad(d_amp))],
-                        [l_amp * math.sin((math.pi / 8) * slot + 0 * degtorad(l_amp))],
-                        [d_amp * math.sin((2 * math.pi / 8) * slot + 1.5 * degtorad(d_amp))],
-                        [l_amp * math.sin((math.pi / 8) * slot + 1 * degtorad(l_amp))],
-                        [d_amp * math.sin((2 * math.pi / 8) * slot + 2.5 * degtorad(d_amp))],
-                        [l_amp * math.sin((math.pi / 8) * slot + 2 * degtorad(l_amp))],
-                        [d_amp * math.sin((2 * math.pi / 8) * slot + 3.5 * degtorad(d_amp))],
-                        [l_amp * math.sin((math.pi / 8) * slot + 3 * degtorad(l_amp))],
-                        [d_amp * math.sin((2 * math.pi / 8) * slot + 4.5 * degtorad(d_amp))],
-                        [l_amp * math.sin((math.pi / 8) * slot + 4 * degtorad(l_amp))],
-                        [d_amp * math.sin((2 * math.pi / 8) * slot + 5.5 * degtorad(d_amp))],
-                        [l_amp * math.sin((math.pi / 8) * slot + 5 * degtorad(l_amp))],
-                        [d_amp * math.sin((2 * math.pi / 8) * slot + 6.5 * degtorad(d_amp))],
-                        [l_amp * math.sin((math.pi / 8) * slot + 6 * degtorad(l_amp))],
-                        [d_amp * math.sin((2 * math.pi / 8) * slot + 7.5 * degtorad(d_amp))],
+# def P_sidewind(slot):
+#     return np.array([[d_amp * math.sin((2 * math.pi / 8) * slot + 0.5 * degtorad(d_amp))],
+#                         [l_amp * math.sin((math.pi / 8) * slot + 0 * degtorad(l_amp))],
+#                         [d_amp * math.sin((2 * math.pi / 8) * slot + 1.5 * degtorad(d_amp))],
+#                         [l_amp * math.sin((math.pi / 8) * slot + 1 * degtorad(l_amp))],
+#                         [d_amp * math.sin((2 * math.pi / 8) * slot + 2.5 * degtorad(d_amp))],
+#                         [l_amp * math.sin((math.pi / 8) * slot + 2 * degtorad(l_amp))],
+#                         [d_amp * math.sin((2 * math.pi / 8) * slot + 3.5 * degtorad(d_amp))],
+#                         [l_amp * math.sin((math.pi / 8) * slot + 3 * degtorad(l_amp))],
+#                         [d_amp * math.sin((2 * math.pi / 8) * slot + 4.5 * degtorad(d_amp))],
+#                         [l_amp * math.sin((math.pi / 8) * slot + 4 * degtorad(l_amp))],
+#                         [d_amp * math.sin((2 * math.pi / 8) * slot + 5.5 * degtorad(d_amp))],
+#                         [l_amp * math.sin((math.pi / 8) * slot + 5 * degtorad(l_amp))],
+#                         [d_amp * math.sin((2 * math.pi / 8) * slot + 6.5 * degtorad(d_amp))],
+#                         [l_amp * math.sin((math.pi / 8) * slot + 6 * degtorad(l_amp))],
+#                         [d_amp * math.sin((2 * math.pi / 8) * slot + 7.5 * degtorad(d_amp))],
+#                         ],dtype='float')
+
+def P_sidewind(slot):    #20210715 P함수 변형 테스트
+    return np.array([[d_amp * math.sin((2 * math.pi / 8) * slot + 0 * degtorad(d_amp))],
+                        [l_amp * math.sin((math.pi / 8) * slot + 1.5 * degtorad(l_amp))],
+                        [d_amp * math.sin((2 * math.pi / 8) * slot + 2 * degtorad(d_amp))],
+                        [l_amp * math.sin((math.pi / 8) * slot + 2.5 * degtorad(l_amp))],
+                        [d_amp * math.sin((2 * math.pi / 8) * slot + 4 * degtorad(d_amp))],
+                        [l_amp * math.sin((math.pi / 8) * slot + 3.5 * degtorad(l_amp))],
+                        [d_amp * math.sin((2 * math.pi / 8) * slot + 6 * degtorad(d_amp))],
+                        [l_amp * math.sin((math.pi / 8) * slot + 4.5 * degtorad(l_amp))],
+                        [d_amp * math.sin((2 * math.pi / 8) * slot + 8 * degtorad(d_amp))],
+                        [l_amp * math.sin((math.pi / 8) * slot + 5.5 * degtorad(l_amp))],
+                        [d_amp * math.sin((2 * math.pi / 8) * slot + 10 * degtorad(d_amp))],
+                        [l_amp * math.sin((math.pi / 8) * slot + 6.5 * degtorad(l_amp))],
+                        [d_amp * math.sin((2 * math.pi / 8) * slot + 12 * degtorad(d_amp))],
+                        [l_amp * math.sin((math.pi / 8) * slot + 7.5 * degtorad(l_amp))],
+                        [d_amp * math.sin((2 * math.pi / 8) * slot + 14 * degtorad(d_amp))],
                         ],dtype='float')
 
 def calculte_P(gait, slot):
@@ -165,8 +201,8 @@ sim_viewer = mujoco_py.MjViewer(simulator)
 # Select gait if we select vertical -> gait slot is 8.
 t = 0
 k = 0
-tau = 1 # time coefficient larger -> slower motion 0 < tau < inf
-gait = 1 # Vertical -> 0, Sinuous -> 1, Sidewind -> 2
+tau = 2 # time coefficient larger -> slower motion 0 < tau < inf
+gait = 0 # Vertical -> 0, Sinuous -> 1, Sidewind -> 2
 
 # Variable for cost(loss) function
 delta_x = 0
@@ -183,15 +219,18 @@ while True:
     #     P = calculte_P(gait,k/10) # Calculate joint angles for this gait stride.
 
     m_k = getMotionCol(gait,(k%getNumofSlot(gait))).T
-    g = np.round(np.diagonal((np.dot(P,m_k))),decimals=2).reshape((15,1))
+    g = np.round(np.diagonal((np.dot(P,m_k))),decimals=2).reshape((15,1)).flatten()
 
-    #For just debugging
-    # os.system('clear')
-    # print(g)
-    # sleep(0.8)
-
+    spec_motor = []
     ### Control specificated motor by M matrix.
     spec_motor = np.nonzero(g)
+
+    # For just debugging
+    # os.system('clear')
+    # print(g)
+    # print(spec_motor[0])
+    # print(type(spec_motor))
+    # sleep(0.8)
 
     for idx in spec_motor:
         # Commnad motor here
@@ -240,4 +279,3 @@ while True:
         break
 
     t = t + 1
-

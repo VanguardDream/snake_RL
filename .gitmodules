@@ -7,3 +7,6 @@
 [submodule "spinningup"]
 	path = spinningup
 	url = https://github.com/openai/spinningup.git
+[submodule "scripts/v-hacd"]
+	path = scripts/v-hacd
+	url = https://github.com/kmammou/v-hacd.git

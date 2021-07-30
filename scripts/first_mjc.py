@@ -43,8 +43,8 @@ def randomize_param():
 snake = mujoco_py.load_model_from_path("../description/mujoco/snake_allign.xml")
 
 #Gait parameters 37.9, 269.6,
-d_amp = 33.6; # dorsal amplitude
-d_phase = 187.9; # dorsal phase
+d_amp = 47.7; # dorsal amplitude
+d_phase = 175.8; # dorsal phase
 l_amp = 24.0; # lateral amplitude
 l_phase = 91.5; # lateral phase
 
@@ -131,7 +131,7 @@ def P_vertical(slot):    #20210715 P함수 변형 테스트
                         [d_amp * math.sin((2 * math.pi / 8) * slot + 14 * degtorad(d_amp))],
                         ],dtype='float')
 
-def P_sinuous(slot):
+def P_sinuous(slot): #Original P
     return np.array([[d_amp * math.sin((2 * math.pi / 8) * slot + 0 * degtorad(d_amp))],
                         [l_amp * math.sin((math.pi / 8) * slot + 1.5 * degtorad(l_amp))],
                         [d_amp * math.sin((2 * math.pi / 8) * slot + 2 * degtorad(d_amp))],
@@ -148,8 +148,26 @@ def P_sinuous(slot):
                         [l_amp * math.sin((math.pi / 8) * slot + 7.5 * degtorad(l_amp))],
                         [d_amp * math.sin((2 * math.pi / 8) * slot + 14 * degtorad(d_amp))],
                         ],dtype='float')
-                        
-# def P_sidewind(slot):
+
+# def P_sinuous(slot): # Original P - side - P함수 변형 테스트 20210728
+#     return np.array([[d_amp * math.sin((2 * math.pi / 8) * slot + 0.5 * degtorad(d_amp))],
+#                         [l_amp * math.sin((math.pi / 8) * slot + 0 * degtorad(l_amp))],
+#                         [d_amp * math.sin((2 * math.pi / 8) * slot + 1.5 * degtorad(d_amp))],
+#                         [l_amp * math.sin((math.pi / 8) * slot + 1 * degtorad(l_amp))],
+#                         [d_amp * math.sin((2 * math.pi / 8) * slot + 2.5 * degtorad(d_amp))],
+#                         [l_amp * math.sin((math.pi / 8) * slot + 2 * degtorad(l_amp))],
+#                         [d_amp * math.sin((2 * math.pi / 8) * slot + 3.5 * degtorad(d_amp))],
+#                         [l_amp * math.sin((math.pi / 8) * slot + 3 * degtorad(l_amp))],
+#                         [d_amp * math.sin((2 * math.pi / 8) * slot + 4.5 * degtorad(d_amp))],
+#                         [l_amp * math.sin((math.pi / 8) * slot + 4 * degtorad(l_amp))],
+#                         [d_amp * math.sin((2 * math.pi / 8) * slot + 5.5 * degtorad(d_amp))],
+#                         [l_amp * math.sin((math.pi / 8) * slot + 5 * degtorad(l_amp))],
+#                         [d_amp * math.sin((2 * math.pi / 8) * slot + 6.5 * degtorad(d_amp))],
+#                         [l_amp * math.sin((math.pi / 8) * slot + 6 * degtorad(l_amp))],
+#                         [d_amp * math.sin((2 * math.pi / 8) * slot + 7.5 * degtorad(d_amp))],
+#                         ],dtype='float')
+
+# def P_sidewind(slot): # Original P side
 #     return np.array([[d_amp * math.sin((2 * math.pi / 8) * slot + 0.5 * degtorad(d_amp))],
 #                         [l_amp * math.sin((math.pi / 8) * slot + 0 * degtorad(l_amp))],
 #                         [d_amp * math.sin((2 * math.pi / 8) * slot + 1.5 * degtorad(d_amp))],
@@ -202,7 +220,7 @@ sim_viewer = mujoco_py.MjViewer(simulator)
 t = 0
 k = 0
 tau = 2 # time coefficient larger -> slower motion 0 < tau < inf
-gait = 0 # Vertical -> 0, Sinuous -> 1, Sidewind -> 2
+gait = 2 # Vertical -> 0, Sinuous -> 1, Sidewind -> 2
 
 # Variable for cost(loss) function
 delta_x = 0

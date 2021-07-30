@@ -48,6 +48,7 @@ def J(g,d_a,d_p,l_a,l_p,tau):
 
     simulator.reset()
     #Calculate Cost here
+
     if not(g == 2):
         J_value = 100 * delta_x - 25 * delta_y - 0.00003 * accum_theta
     else:
@@ -126,7 +127,7 @@ def optimizeGait(eps = 1, l = 1, local_minima = 0):
     j_k = 0
 
     while True:
-        gradient_vector, j_k1 = getGradient(g=0,d_a = param[0], d_p = param[1], l_a = param[2], l_p = param[3], tau = param[4])
+        gradient_vector, j_k1 = getGradient(g=1,d_a = param[0], d_p = param[1], l_a = param[2], l_p = param[3], tau = param[4])
 
         if (j_k1 - j_k) < eps:
             return hist, j_k1

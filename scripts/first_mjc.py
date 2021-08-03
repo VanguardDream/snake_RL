@@ -10,6 +10,7 @@ import os
 import math
 import random
 import numpy as np
+import datetime
 
 def radtodeg(rad):
     return rad * 180/math.pi
@@ -84,6 +85,23 @@ m_sidewind = np.array([[0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
                         [0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,1], 
                         [0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0]
                         ],dtype='float')
+
+# m_sidewind = np.array([[0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+#                         [1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0],
+#                         [0,0,0,1,0,0,0,0,0,1,0,0,0,0,0,0],
+#                         [0,0,1,0,0,0,0,0,1,0,0,0,0,0,0,0],
+#                         [0,0,0,0,0,1,0,0,0,0,0,1,0,0,0,0],
+#                         [0,0,0,0,1,0,0,0,0,0,1,0,0,0,0,0],
+#                         [0,1,0,0,0,0,0,1,0,0,0,0,0,1,0,0],
+#                         [1,0,0,0,0,0,1,0,0,0,0,0,1,0,0,0],
+#                         [0,0,0,1,0,0,0,0,0,1,0,0,0,0,0,1],
+#                         [0,0,1,0,0,0,0,0,1,0,0,0,0,0,1,0],
+#                         [0,0,0,0,0,1,0,0,0,0,0,1,0,0,0,0],
+#                         [0,0,0,0,1,0,0,0,0,0,1,0,0,0,0,0],
+#                         [0,0,0,0,0,0,0,1,0,0,0,0,0,1,0,0],
+#                         [0,0,0,0,0,0,1,0,0,0,0,0,1,0,0,1], 
+#                         [0,0,0,0,0,0,0,0,0,1,0,0,0,0,1,0]
+#                         ],dtype='float')
 
 def getMotionCol(gait,i):
     if gait == 0:
@@ -167,41 +185,41 @@ def P_sinuous(slot): #Original P
 #                         [d_amp * math.sin((2 * math.pi / 8) * slot + 7.5 * degtorad(d_amp))],
 #                         ],dtype='float')
 
-# def P_sidewind(slot): # Original P side
-#     return np.array([[d_amp * math.sin((2 * math.pi / 8) * slot + 0.5 * degtorad(d_amp))],
-#                         [l_amp * math.sin((math.pi / 8) * slot + 0 * degtorad(l_amp))],
-#                         [d_amp * math.sin((2 * math.pi / 8) * slot + 1.5 * degtorad(d_amp))],
-#                         [l_amp * math.sin((math.pi / 8) * slot + 1 * degtorad(l_amp))],
-#                         [d_amp * math.sin((2 * math.pi / 8) * slot + 2.5 * degtorad(d_amp))],
-#                         [l_amp * math.sin((math.pi / 8) * slot + 2 * degtorad(l_amp))],
-#                         [d_amp * math.sin((2 * math.pi / 8) * slot + 3.5 * degtorad(d_amp))],
-#                         [l_amp * math.sin((math.pi / 8) * slot + 3 * degtorad(l_amp))],
-#                         [d_amp * math.sin((2 * math.pi / 8) * slot + 4.5 * degtorad(d_amp))],
-#                         [l_amp * math.sin((math.pi / 8) * slot + 4 * degtorad(l_amp))],
-#                         [d_amp * math.sin((2 * math.pi / 8) * slot + 5.5 * degtorad(d_amp))],
-#                         [l_amp * math.sin((math.pi / 8) * slot + 5 * degtorad(l_amp))],
-#                         [d_amp * math.sin((2 * math.pi / 8) * slot + 6.5 * degtorad(d_amp))],
-#                         [l_amp * math.sin((math.pi / 8) * slot + 6 * degtorad(l_amp))],
-#                         [d_amp * math.sin((2 * math.pi / 8) * slot + 7.5 * degtorad(d_amp))],
-#                         ],dtype='float')
-
-def P_sidewind(slot):    #20210715 P함수 변형 테스트
-    return np.array([[d_amp * math.sin((2 * math.pi / 8) * slot + 0 * degtorad(d_amp))],
-                        [l_amp * math.sin((math.pi / 8) * slot + 1.5 * degtorad(l_amp))],
-                        [d_amp * math.sin((2 * math.pi / 8) * slot + 2 * degtorad(d_amp))],
-                        [l_amp * math.sin((math.pi / 8) * slot + 2.5 * degtorad(l_amp))],
-                        [d_amp * math.sin((2 * math.pi / 8) * slot + 4 * degtorad(d_amp))],
-                        [l_amp * math.sin((math.pi / 8) * slot + 3.5 * degtorad(l_amp))],
-                        [d_amp * math.sin((2 * math.pi / 8) * slot + 6 * degtorad(d_amp))],
-                        [l_amp * math.sin((math.pi / 8) * slot + 4.5 * degtorad(l_amp))],
-                        [d_amp * math.sin((2 * math.pi / 8) * slot + 8 * degtorad(d_amp))],
-                        [l_amp * math.sin((math.pi / 8) * slot + 5.5 * degtorad(l_amp))],
-                        [d_amp * math.sin((2 * math.pi / 8) * slot + 10 * degtorad(d_amp))],
-                        [l_amp * math.sin((math.pi / 8) * slot + 6.5 * degtorad(l_amp))],
-                        [d_amp * math.sin((2 * math.pi / 8) * slot + 12 * degtorad(d_amp))],
-                        [l_amp * math.sin((math.pi / 8) * slot + 7.5 * degtorad(l_amp))],
-                        [d_amp * math.sin((2 * math.pi / 8) * slot + 14 * degtorad(d_amp))],
+def P_sidewind(slot): # Original P side
+    return np.array([[d_amp * math.sin((2 * math.pi / 8) * slot + 0.5 * degtorad(d_amp))],
+                        [l_amp * math.sin((math.pi / 8) * slot + 0 * degtorad(l_amp))],
+                        [d_amp * math.sin((2 * math.pi / 8) * slot + 1.5 * degtorad(d_amp))],
+                        [l_amp * math.sin((math.pi / 8) * slot + 1 * degtorad(l_amp))],
+                        [d_amp * math.sin((2 * math.pi / 8) * slot + 2.5 * degtorad(d_amp))],
+                        [l_amp * math.sin((math.pi / 8) * slot + 2 * degtorad(l_amp))],
+                        [d_amp * math.sin((2 * math.pi / 8) * slot + 3.5 * degtorad(d_amp))],
+                        [l_amp * math.sin((math.pi / 8) * slot + 3 * degtorad(l_amp))],
+                        [d_amp * math.sin((2 * math.pi / 8) * slot + 4.5 * degtorad(d_amp))],
+                        [l_amp * math.sin((math.pi / 8) * slot + 4 * degtorad(l_amp))],
+                        [d_amp * math.sin((2 * math.pi / 8) * slot + 5.5 * degtorad(d_amp))],
+                        [l_amp * math.sin((math.pi / 8) * slot + 5 * degtorad(l_amp))],
+                        [d_amp * math.sin((2 * math.pi / 8) * slot + 6.5 * degtorad(d_amp))],
+                        [l_amp * math.sin((math.pi / 8) * slot + 6 * degtorad(l_amp))],
+                        [d_amp * math.sin((2 * math.pi / 8) * slot + 7.5 * degtorad(d_amp))],
                         ],dtype='float')
+
+# def P_sidewind(slot):    #20210715 P함수 변형 테스트
+#     return np.array([[d_amp * math.sin((2 * math.pi / 8) * slot + 0 * degtorad(d_amp))],
+#                         [l_amp * math.sin((math.pi / 8) * slot + 1.5 * degtorad(l_amp))],
+#                         [d_amp * math.sin((2 * math.pi / 8) * slot + 2 * degtorad(d_amp))],
+#                         [l_amp * math.sin((math.pi / 8) * slot + 2.5 * degtorad(l_amp))],
+#                         [d_amp * math.sin((2 * math.pi / 8) * slot + 4 * degtorad(d_amp))],
+#                         [l_amp * math.sin((math.pi / 8) * slot + 3.5 * degtorad(l_amp))],
+#                         [d_amp * math.sin((2 * math.pi / 8) * slot + 6 * degtorad(d_amp))],
+#                         [l_amp * math.sin((math.pi / 8) * slot + 4.5 * degtorad(l_amp))],
+#                         [d_amp * math.sin((2 * math.pi / 8) * slot + 8 * degtorad(d_amp))],
+#                         [l_amp * math.sin((math.pi / 8) * slot + 5.5 * degtorad(l_amp))],
+#                         [d_amp * math.sin((2 * math.pi / 8) * slot + 10 * degtorad(d_amp))],
+#                         [l_amp * math.sin((math.pi / 8) * slot + 6.5 * degtorad(l_amp))],
+#                         [d_amp * math.sin((2 * math.pi / 8) * slot + 12 * degtorad(d_amp))],
+#                         [l_amp * math.sin((math.pi / 8) * slot + 7.5 * degtorad(l_amp))],
+#                         [d_amp * math.sin((2 * math.pi / 8) * slot + 14 * degtorad(d_amp))],
+#                         ],dtype='float')
 
 def calculte_P(gait, slot):
     if gait == 0: #Vertical
@@ -230,8 +248,11 @@ accum_theta = 0
 # Simulation model info
 joint_names = simulator.model.joint_names[1:]
 
+t_before = datetime.datetime.now()
+
 while True:
    
+
     P = calculte_P(gait,float(k)/10)
     # if(k % getNumofSlot(gait) == 0): # Very first of gait step.
     #     P = calculte_P(gait,k/10) # Calculate joint angles for this gait stride.
@@ -263,7 +284,7 @@ while True:
         accum_theta = accum_theta + abs(simulator.data.get_joint_qpos(name))
 
     simulator.step()
-    sim_viewer.render()
+    # sim_viewer.render()
 
     if t%tau == 0:
         k = k + 1
@@ -292,6 +313,12 @@ while True:
         delta_x = 0
         delta_y = 0
         accum_theta = 0
+
+        t_after = datetime.datetime.now()
+        print('excution time : ')
+        print(t_after - t_before)
+
+        t_before = t_after
 
     if t > 100 and os.getenv('TESTING') is not None:
         break

@@ -44,10 +44,10 @@ def randomize_param():
 snake = mujoco_py.load_model_from_path("../description/mujoco/snake_allign.xml")
 
 #Gait parameters 37.9, 269.6,
-d_amp = 47.7; # dorsal amplitude
-d_phase = 175.8; # dorsal phase
-l_amp = 24.0; # lateral amplitude
-l_phase = 91.5; # lateral phase
+d_amp = 19.7; # dorsal amplitude
+d_phase = 347.4; # dorsal phase
+l_amp = 83.9; # lateral amplitude
+l_phase = 184.0; # lateral phase
 
 #Gait motion matirces
 m_vertical = np.array([[1,0,0,0,0,0,0,0],
@@ -237,8 +237,8 @@ sim_viewer = mujoco_py.MjViewer(simulator)
 # Select gait if we select vertical -> gait slot is 8.
 t = 0
 k = 0
-tau = 2 # time coefficient larger -> slower motion 0 < tau < inf
-gait = 2 # Vertical -> 0, Sinuous -> 1, Sidewind -> 2
+tau = 4 # time coefficient larger -> slower motion 0 < tau < inf
+gait = 1 # Vertical -> 0, Sinuous -> 1, Sidewind -> 2
 
 # Variable for cost(loss) function
 delta_x = 0
@@ -284,7 +284,7 @@ while True:
         accum_theta = accum_theta + abs(simulator.data.get_joint_qpos(name))
 
     simulator.step()
-    # sim_viewer.render()
+    sim_viewer.render()
 
     if t%tau == 0:
         k = k + 1

@@ -153,7 +153,7 @@ def optimizeGait(eps = 1, l = 1, local_minima = 0):
             else:
                 param[i] = param[i] + gradient_vector[i]
 
-def optimizeSci(gait = 1, options={'xatol': 1e-2, 'disp': True}):
+def optimizeSci(gait = 1, options={'xatol': 1e-8, 'disp': True}):
     pass
     d_amp = random.randint(0, 900) / 10
     d_phase = random.randint(0,3600) / 10

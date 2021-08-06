@@ -25,7 +25,9 @@ def J(g,d_a,d_p,l_a,l_p,tau):
     accum_theta = 0
 
     # Simulation model info
-    joint_names = simulator.model.joint_names[1:] 
+    # joint_names = simulator.model.joint_names[1:] 
+    # For generalized xml code!
+    joint_names = ['joint1','joint2','joint3','joint4','joint5','joint6','joint7','joint8','joint9','joint10','joint11','joint12','joint13','joint14','joint15']
 
     for i in range(0,5001):
         goal = gen.generate(i)
@@ -42,6 +44,10 @@ def J(g,d_a,d_p,l_a,l_p,tau):
 
         simulator.step()
         # sim_viewer.render()
+
+        # Write step iteration state retrieve code here.
+        # s_y = appent(body_xpos('head')[1]) like this.
+
 
     delta_x = simulator.data.get_body_xpos('head')[0]
     delta_y = simulator.data.get_body_xpos('head')[1]

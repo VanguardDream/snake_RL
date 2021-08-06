@@ -8,7 +8,7 @@ import random
 import gait
 import math
 import numpy as np
-import scipy
+from scipy.optimize import minimize
 
 #load model from path
 snake = mujoco_py.load_model_from_path("../description/mujoco/snake_allign.xml")
@@ -167,7 +167,7 @@ def optimizeSci(gait = 1, options={'xatol': 1e-2, 'disp': True}):
         return -1
 
     elif gait == 1:
-        res = scipy.opimize.minimize(J_sci_sin, x0, options)
+        res = minimize(J_sci_sin, x0, method='nelder-mead', options=options)
 
     elif gait == 2:
         return -1
@@ -180,6 +180,7 @@ def optimizeSci(gait = 1, options={'xatol': 1e-2, 'disp': True}):
 def J_sci_sin(ndarray):
     gen = gait.gait(1,ndarray[0],ndarray[1],ndarray[2],ndarray[3],ndarray[4])
 
+    print('Start new gait optimize senario with gait params : [ %f, %f, %f, %f, %d]' %(ndarray[0],ndarray[1],ndarray[2],ndarray[3],ndarray[4]))
     # Variable for cost(loss) function
     delta_x = 0
     delta_y = 0
@@ -216,13 +217,10 @@ def J_sci_sin(ndarray):
     simulator.reset()
     #Calculate Cost here
 
-    if not(g == 2):
-        J_value = 100 * delta_x - 25 * delta_y - 0.00003 * accum_theta
-    else:
-        J_value = 100 * abs(delta_y) - 60 * delta_x - 0.00003 * accum_theta
+    J_value = 100 * abs(delta_y) - 60 * delta_x - 0.00003 * accum_theta
 
     # print("%f : %f : %f : %f : %d : %lf" %(d_a,d_p,l_a,l_p,tau,J_value))
-    return J_value
+    return -1 * J_value
 
 def main():
     print('Gait optimizing Start...')

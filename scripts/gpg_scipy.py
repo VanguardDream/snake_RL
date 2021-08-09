@@ -23,14 +23,16 @@ def J(g,d_a,d_p,l_a,l_p,tau):
     # Variable for cost(loss) function
     delta_x = 0
     delta_y = 0
-    accum_theta = 0
+    accum_theta = 0 # accumulated joint displacements for all joint.
+    x_of_t = np.array([]) # Head link x values of the time t
+    y_of_t = np.array([]) # Head link y values of the time t
 
     # Simulation model info
     # joint_names = simulator.model.joint_names[1:] 
     # For generalized xml code!
     joint_names = ['joint1','joint2','joint3','joint4','joint5','joint6','joint7','joint8','joint9','joint10','joint11','joint12','joint13','joint14','joint15']
 
-    for i in range(0,5001):
+    for i in range(0,5000):
         goal = gen.generate(i)
 
         spec_motor = np.nonzero(goal)
@@ -49,10 +51,15 @@ def J(g,d_a,d_p,l_a,l_p,tau):
         # Write step iteration state retrieve code here.
         # s_y = appent(body_xpos('head')[1]) like this.
 
+        x_of_t = np.append(x_of_t, simulator.data.get_body_xpos('head')[0])
+        y_of_t = np.append(x_of_t, simulator.data.get_body_xpos('head')[1])
+
 
     delta_x = simulator.data.get_body_xpos('head')[0]
     delta_y = simulator.data.get_body_xpos('head')[1]
 
+    print(x_of_t)
+    
     simulator.reset()
     #Calculate Cost here
 

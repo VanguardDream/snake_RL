@@ -59,7 +59,7 @@ def J(g,d_a,d_p,l_a,l_p,tau):
     delta_y = simulator.data.get_body_xpos('head')[1]
 
     print(x_of_t)
-    
+
     simulator.reset()
     #Calculate Cost here
 
@@ -193,6 +193,9 @@ def J_sci_sin(ndarray):
     delta_y = 0
     accum_theta = 0
 
+    x_of_t = np.array([]) # Head link x values of the time t
+    y_of_t = np.array([]) # Head link y values of the time t
+
     # Simulation model info
     # joint_names = simulator.model.joint_names[1:] 
     # For generalized xml code!
@@ -217,9 +220,14 @@ def J_sci_sin(ndarray):
         # Write step iteration state retrieve code here.
         # s_y = appent(body_xpos('head')[1]) like this.
 
+        x_of_t = np.append(x_of_t, simulator.data.get_body_xpos('head')[0])
+        y_of_t = np.append(x_of_t, simulator.data.get_body_xpos('head')[1])
+
 
     delta_x = simulator.data.get_body_xpos('head')[0]
     delta_y = simulator.data.get_body_xpos('head')[1]
+
+    print(x_of_t)
 
     simulator.reset()
     #Calculate Cost here

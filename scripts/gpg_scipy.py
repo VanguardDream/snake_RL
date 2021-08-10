@@ -160,7 +160,7 @@ def optimizeGait(eps = 1, l = 1, local_minima = 0):
             else:
                 param[i] = param[i] + gradient_vector[i]
 
-def optimizeSci(gait = 1, options={'xatol': 1e-8, 'disp': True}):
+def optimizeSci(gait = 1, options={'xatol': 0.1, 'fatol' : 0.5, 'disp': True}):
     pass
     d_amp = random.randint(0, 900) / 10
     d_phase = random.randint(0,3600) / 10
@@ -174,7 +174,7 @@ def optimizeSci(gait = 1, options={'xatol': 1e-8, 'disp': True}):
         return -1
 
     elif gait == 1:
-        res = minimize(J_sci_sin, x0, method='nelder-mead', options=options)
+        res = minimize(J_sci_sin, x0, method='powell', options=options)
 
     elif gait == 2:
         return -1
@@ -185,9 +185,9 @@ def optimizeSci(gait = 1, options={'xatol': 1e-8, 'disp': True}):
     return res
 
 def J_sci_sin(ndarray):
-    gen = gait.gait(1,ndarray[0],ndarray[1],ndarray[2],ndarray[3],ndarray[4])
+    gen = gait.gait(1,ndarray[0],ndarray[1],ndarray[2],ndarray[3],int(ndarray[4]))
 
-    print('Start new gait optimize senario with gait params : [ %f, %f, %f, %f, %d]' %(ndarray[0],ndarray[1],ndarray[2],ndarray[3],ndarray[4]))
+    # print('Start new gait optimize senario with gait params : [ %f, %f, %f, %f, %d]' %(ndarray[0],ndarray[1],ndarray[2],ndarray[3],ndarray[4]))
     # Variable for cost(loss) function
     delta_x = 0
     delta_y = 0
@@ -201,7 +201,7 @@ def J_sci_sin(ndarray):
     # For generalized xml code!
     joint_names = ['joint1','joint2','joint3','joint4','joint5','joint6','joint7','joint8','joint9','joint10','joint11','joint12','joint13','joint14','joint15']
 
-    for i in range(0,5001):
+    for i in range(0,1000):
         goal = gen.generate(i)
 
         spec_motor = np.nonzero(goal)
@@ -227,14 +227,13 @@ def J_sci_sin(ndarray):
     delta_x = simulator.data.get_body_xpos('head')[0]
     delta_y = simulator.data.get_body_xpos('head')[1]
 
-    print(x_of_t)
-
     simulator.reset()
     #Calculate Cost here
 
-    J_value = 100 * abs(delta_y) - 60 * delta_x - 0.00003 * accum_theta
+    J_value = 100 * abs(delta_x) - 60 * delta_y - 0.00003 * accum_theta
 
-    # print("%f : %f : %f : %f : %d : %lf" %(d_a,d_p,l_a,l_p,tau,J_value))
+    print('End gait optimize senario with gait params : [ %f, %f, %f, %f, %d -> reward : %f]' %(ndarray[0],ndarray[1],ndarray[2],ndarray[3],ndarray[4],J_value))
+    
     return -1 * J_value
 
 def main():

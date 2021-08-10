@@ -15,7 +15,7 @@ class gait:
         self.l_phase = l_phase; # lateral phase
         self.d_amp = d_amp; # dorsal amplitude
         self.d_phase = d_phase; # dorsal phase
-        self.tau = tau; #time coefficient
+        self.tau = int(tau); #time coefficient
 
         #Gait motion matirces
         self.m_vertical = np.array([[1,0,0,0,0,0,0,0],

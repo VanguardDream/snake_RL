@@ -65,7 +65,7 @@ def J(g,d_a,d_p,l_a,l_p,tau):
 
 def main():
     gait_type = 1
-    gait_params = [ 88.318680, 149.475858, 70.091854, 119.160065, 1]
+    gait_params = [42.47405867,  47.00794359,  15.20922555, 172.54013368, 1]
 
     reward = J(gait_type, gait_params[0], gait_params[1], gait_params[2], gait_params[3], gait_params[4])
 

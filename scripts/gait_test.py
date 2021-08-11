@@ -30,12 +30,11 @@ def J(g,d_a,d_p,l_a,l_p,tau):
     for i in range(0,5000):
         goal = gen.generate(i)
 
-        spec_motor = np.nonzero(goal)
+        spec_motor = np.nonzero(goal)[0]
 
         for idx in spec_motor:
             # Commnad motor here
-            if not(len(idx) == 0):
-                simulator.data.ctrl[idx] = gen.degtorad(goal[idx])
+            simulator.data.ctrl[idx] = gen.degtorad(goal[idx])
         
         for name in joint_names:
             accum_theta = accum_theta + abs(simulator.data.get_joint_qpos(name))
@@ -66,7 +65,7 @@ def J(g,d_a,d_p,l_a,l_p,tau):
 
 def main():
     gait_type = 1
-    gait_params = [ 68.318680, 149.475858, 70.091854, 119.160065, 1]
+    gait_params = [ 88.318680, 149.475858, 70.091854, 119.160065, 1]
 
     reward = J(gait_type, gait_params[0], gait_params[1], gait_params[2], gait_params[3], gait_params[4])
 

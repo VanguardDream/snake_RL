@@ -166,15 +166,16 @@ def optimizeSci(gait = 1, options={'xatol': 0.1, 'fatol' : 0.5, 'disp': True}):
     d_phase = random.randint(0,3600) / 10
     l_amp = random.randint(0, 900) / 10
     l_phase = random.randint(0,3600) / 10
-    tau = random.randint(1,10)
+    tau = random.randint(1,3)
 
     x0 = np.array([d_amp,d_phase,l_amp,l_phase,tau])
+    xbound = ((0,90), (0,360), (0,90), (0,360), (1,3))
 
     if gait == 0:
         return -1
 
     elif gait == 1:
-        res = minimize(J_sci_sin, x0, method='powell', options=options)
+        res = minimize(J_sci_sin, x0, method='Nelder-Mead', bounds=xbound,options=options)
 
     elif gait == 2:
         return -1
@@ -228,7 +229,7 @@ def J_sci_sin(ndarray):
     simulator.reset()
     #Calculate Cost here
 
-    J_value = 100 * abs(delta_x) - 60 * delta_y - 0.00003 * accum_theta
+    J_value = 1500 * delta_x - 60 * abs(delta_y) - 900 * (abs(delta_y) / delta_x)
 
     print('End gait optimize senario with gait params : [ %f, %f, %f, %f, %d -> reward : %f]' %(ndarray[0],ndarray[1],ndarray[2],ndarray[3],ndarray[4],J_value))
     
@@ -237,7 +238,9 @@ def J_sci_sin(ndarray):
 def main():
     print('Gait optimizing Start...')
 
-    optimizeSci()
+    res = optimizeSci()
+
+    print(res)
 
 
 if __name__ == "__main__":

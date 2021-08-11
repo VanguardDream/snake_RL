@@ -204,12 +204,10 @@ def J_sci_sin(ndarray):
     for i in range(0,1000):
         goal = gen.generate(i)
 
-        spec_motor = np.nonzero(goal)
+        spec_motor = np.nonzero(goal)[0]
 
         for idx in spec_motor:
-            # Commnad motor here
-            if not(len(idx) == 0):
-                simulator.data.ctrl[idx] = gen.degtorad(goal[idx])
+            simulator.data.ctrl[idx] = gen.degtorad(goal[idx])
         
         for name in joint_names:
             accum_theta = accum_theta + abs(simulator.data.get_joint_qpos(name))

@@ -2,3 +2,4 @@ resources/*
 .venv/*
 .vscode/*
 .DS_store
+torch/data/*

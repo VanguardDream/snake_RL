@@ -13,7 +13,7 @@ simulator = mujoco_py.MjSim(snake)
 sim_viewer = mujoco_py.MjViewer(simulator)
 
 def J(g,d_a,d_p,l_a,l_p,tau):
-    gen = gait_kiro.gait(g,d_a,d_p,l_a,l_p,tau)
+    gen = gait_kiro.gait(g,d_a,d_p,l_a,l_p,int(tau))
 
     # Variable for cost(loss) function
     delta_x = 0
@@ -27,7 +27,7 @@ def J(g,d_a,d_p,l_a,l_p,tau):
     # For generalized xml code!
     joint_names = ['joint1','joint2','joint3','joint4','joint5','joint6','joint7','joint8','joint9','joint10','joint11','joint12','joint13','joint14']
 
-    for i in range(0,5000):
+    for i in range(0,2000):
         goal = gen.generate(i)
 
         spec_motor = np.nonzero(goal)[0]
@@ -55,18 +55,17 @@ def J(g,d_a,d_p,l_a,l_p,tau):
     simulator.reset()
     #Calculate Cost here
 
-    if not(g == 2):
-        J_value = 100 * delta_x - 25 * delta_y - 0.00003 * accum_theta
+    if (g == 1):
+        J_value = 1500 * delta_x - 60 * abs(delta_y) - 900 * abs(delta_y / delta_x)
     else:
-        J_value = 100 * abs(delta_y) - 60 * delta_x - 0.00003 * accum_theta
+        J_value = 1500 * delta_x - 60 * abs(delta_y) - 900 * abs(delta_y / delta_x)
 
     # print("%f : %f : %f : %f : %d : %lf" %(d_a,d_p,l_a,l_p,tau,J_value))
     return J_value
 
 def main():
     gait_type = 1
-    gait_params = [42.47405867,  47.00794359,  15.20922555, 172.54013368, 1]
-
+    gait_params = [ 48.0, 233.0,  48.6,  39.3,  2]
     reward = J(gait_type, gait_params[0], gait_params[1], gait_params[2], gait_params[3], gait_params[4])
 
     print('Gait\'s reward : %f'  %(reward))

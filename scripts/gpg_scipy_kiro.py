@@ -160,7 +160,7 @@ def optimizeGait(eps = 1, l = 1, local_minima = 0):
             else:
                 param[i] = param[i] + gradient_vector[i]
 
-def optimizeSci(gait = 1, options={'xatol': 0.1, 'fatol' : 0.5, 'disp': True}):
+def optimizeSci(gait = 1, options={'xatol': 0.1, 'fatol' : 0.5, 'disp': True, 'eps': 0.5}):
     pass
     d_amp = random.randint(0, 900) / 10
     d_phase = random.randint(0,3600) / 10
@@ -202,7 +202,7 @@ def J_sci_sin(ndarray):
     # For generalized xml code!
     joint_names = ['joint1','joint2','joint3','joint4','joint5','joint6','joint7','joint8','joint9','joint10','joint11','joint12','joint13','joint14','joint15']
 
-    for i in range(0,1000):
+    for i in range(0,2000):
         goal = gen.generate(i)
 
         spec_motor = np.nonzero(goal)[0]
@@ -229,18 +229,32 @@ def J_sci_sin(ndarray):
     simulator.reset()
     #Calculate Cost here
 
-    J_value = 1500 * delta_x - 60 * abs(delta_y) - 900 * (abs(delta_y) / delta_x)
+    J_value = 1500 * delta_x - 60 * abs(delta_y) - 900 * abs(delta_y / delta_x)
 
     print('End gait optimize senario with gait params : [ %f, %f, %f, %f, %d -> reward : %f]' %(ndarray[0],ndarray[1],ndarray[2],ndarray[3],ndarray[4],J_value))
     
     return -1 * J_value
 
 def main():
+
+    # optimal_reward = 2816;
+
+    optimal_reward = 150;
+
     print('Gait optimizing Start...')
 
-    res = optimizeSci()
+    while True:
+        res = optimizeSci()
 
-    print(res)
+        temp_result = res.get('fun')
+
+        if temp_result * -1 > optimal_reward:
+            print('new optimal found! terminate iteration.\n')
+            print(res)
+            break
+        else:
+            print('local found continue iteration...')
+            continue
 
 
 if __name__ == "__main__":

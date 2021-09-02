@@ -168,22 +168,80 @@ def optimizeSci(gait = 1, options={'xatol': 0.1, 'fatol' : 0.5, 'disp': True, 'e
     l_phase = random.randint(0,3600) / 10
     tau = random.randint(1,3)
 
+    #vertical vector
+    xv0 = np.array([d_amp,d_phase,tau])
+    xvbound = ((0,90), (0,360), (1,3))
+
+    # Sinuous or Sidewind vector
     x0 = np.array([d_amp,d_phase,l_amp,l_phase,tau])
-    xbound = ((0,90), (0,360), (0,90), (0,360), (1,3))
+    xbound = ((0,90), (0,360), (0,90), (0,360), (1,6))
 
     if gait == 0:
-        return -1
+        res = minimize(J_sci_ver, xv0, method='Nelder-Mead', bounds=xvbound,options=options)
 
     elif gait == 1:
         res = minimize(J_sci_sin, x0, method='Nelder-Mead', bounds=xbound,options=options)
 
     elif gait == 2:
-        return -1
+        res = minimize(J_sci_side, x0, method='Nelder-Mead', bounds=xbound,options=options)
 
     else:
         return -1
 
     return res
+
+def J_sci_ver(ndarray):
+    gen = gait_kiro.gait(0,ndarray[0],ndarray[1],0,0,int(ndarray[2]))
+
+    # print('Start new gait optimize senario with gait params : [ %f, %f, %f, %f, %d]' %(ndarray[0],ndarray[1],ndarray[2],ndarray[3],ndarray[4]))
+    # Variable for cost(loss) function
+    delta_x = 0
+    delta_y = 0
+    accum_theta = 0
+
+    x_of_t = np.array([]) # Head link x values of the time t
+    y_of_t = np.array([]) # Head link y values of the time t
+
+    # Simulation model info
+    # joint_names = simulator.model.joint_names[1:] 
+    # For generalized xml code!
+    joint_names = ['joint1','joint2','joint3','joint4','joint5','joint6','joint7','joint8','joint9','joint10','joint11','joint12','joint13','joint14','joint15']
+
+    for i in range(0,1000):
+        goal = gen.generate(i)
+
+        spec_motor = np.nonzero(goal)
+
+        for idx in spec_motor:
+            # Commnad motor here
+            if not(len(idx) == 0):
+                simulator.data.ctrl[idx] = gen.degtorad(goal[idx])
+        
+        for name in joint_names:
+            accum_theta = accum_theta + abs(simulator.data.get_joint_qpos(name))
+
+        simulator.step()
+        # sim_viewer.render()
+
+        # Write step iteration state retrieve code here.
+        # s_y = appent(body_xpos('head')[1]) like this.
+
+        x_of_t = np.append(x_of_t, simulator.data.get_body_xpos('head')[0])
+        y_of_t = np.append(y_of_t, simulator.data.get_body_xpos('head')[1])
+
+
+    delta_x = simulator.data.get_body_xpos('head')[0]
+    delta_y = simulator.data.get_body_xpos('head')[1]
+
+    simulator.reset()
+    #Calculate Cost here
+
+    # Vertical or Sinuous Utility function
+    J_value = 1500 * delta_x - 60 * abs(delta_y) - 900 * abs(delta_y / delta_x)
+
+    print('End gait optimize senario with gait params : [ %f, %f, %d -> reward : %f]' %(ndarray[0],ndarray[1],ndarray[2],J_value))
+    
+    return -1 * J_value
 
 def J_sci_sin(ndarray):
     gen = gait_kiro.gait(1,ndarray[0],ndarray[1],ndarray[2],ndarray[3],int(ndarray[4]))
@@ -235,16 +293,66 @@ def J_sci_sin(ndarray):
     
     return -1 * J_value
 
+def J_sci_side(ndarray):
+    gen = gait_kiro.gait(2,ndarray[0],ndarray[1],ndarray[2],ndarray[3],int(ndarray[4]))
+
+    # print('Start new gait optimize senario with gait params : [ %f, %f, %f, %f, %d]' %(ndarray[0],ndarray[1],ndarray[2],ndarray[3],ndarray[4]))
+    # Variable for cost(loss) function
+    delta_x = 0
+    delta_y = 0
+    accum_theta = 0
+
+    x_of_t = np.array([]) # Head link x values of the time t
+    y_of_t = np.array([]) # Head link y values of the time t
+
+    # Simulation model info
+    # joint_names = simulator.model.joint_names[1:] 
+    # For generalized xml code!
+    joint_names = ['joint1','joint2','joint3','joint4','joint5','joint6','joint7','joint8','joint9','joint10','joint11','joint12','joint13','joint14','joint15']
+
+    for i in range(0,2000):
+        goal = gen.generate(i)
+
+        spec_motor = np.nonzero(goal)[0]
+
+        for idx in spec_motor:
+            simulator.data.ctrl[idx] = gen.degtorad(goal[idx])
+        
+        for name in joint_names:
+            accum_theta = accum_theta + abs(simulator.data.get_joint_qpos(name))
+
+        simulator.step()
+        # sim_viewer.render()
+
+        # Write step iteration state retrieve code here.
+        # s_y = appent(body_xpos('head')[1]) like this.
+
+        x_of_t = np.append(x_of_t, simulator.data.get_body_xpos('head')[0])
+        y_of_t = np.append(x_of_t, simulator.data.get_body_xpos('head')[1])
+
+
+    delta_x = simulator.data.get_body_xpos('head')[0]
+    delta_y = simulator.data.get_body_xpos('head')[1]
+
+    simulator.reset()
+    #Calculate Cost here
+
+    J_value = 3500 * delta_y
+
+    print('End gait optimize senario with gait params : [ %f, %f, %f, %f, %d -> reward : %f]' %(ndarray[0],ndarray[1],ndarray[2],ndarray[3],ndarray[4],J_value))
+    
+    return -1 * J_value
+
 def main():
 
     # optimal_reward = 2816;
 
-    optimal_reward = 150;
+    optimal_reward = 1500;
 
     print('Gait optimizing Start...')
 
     while True:
-        res = optimizeSci()
+        res = optimizeSci(gait=2)
 
         temp_result = res.get('fun')
 

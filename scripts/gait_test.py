@@ -55,8 +55,8 @@ def J(g,d_a,d_p,l_a,l_p,tau):
     simulator.reset()
     #Calculate Cost here
 
-    if (g == 1):
-        J_value = 1500 * delta_x - 60 * abs(delta_y) - 900 * abs(delta_y / delta_x)
+    if (g == 2):
+        J_value = 3500 * delta_y
     else:
         J_value = 1500 * delta_x - 60 * abs(delta_y) - 900 * abs(delta_y / delta_x)
 
@@ -64,8 +64,8 @@ def J(g,d_a,d_p,l_a,l_p,tau):
     return J_value
 
 def main():
-    gait_type = 1
-    gait_params = [ 48.0, 233.0,  48.6,  39.3,  2]
+    gait_type = 2
+    gait_params = [ 42.9,  63.8,  76.2, 254.4, 1  ]
     reward = J(gait_type, gait_params[0], gait_params[1], gait_params[2], gait_params[3], gait_params[4])
 
     print('Gait\'s reward : %f'  %(reward))

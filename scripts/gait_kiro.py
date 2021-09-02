@@ -116,40 +116,40 @@ class gait:
                             [self.l_amp * math.sin((math.pi / 8) * slot + 7.5 * self.degtorad(self.l_amp))]
                             ],dtype='float')
                         
-    # def P_sidewind(self,slot):
-    #     return np.array([[self.d_amp * math.sin((2 * math.pi / 8) * slot + 0.5 * self.degtorad(self.d_amp))],
-    #                         [self.l_amp * math.sin((math.pi / 8) * slot + 0 * self.degtorad(self.l_amp))],
-    #                         [self.d_amp * math.sin((2 * math.pi / 8) * slot + 1.5 * self.degtorad(self.d_amp))],
-    #                         [self.l_amp * math.sin((math.pi / 8) * slot + 1 * self.degtorad(self.l_amp))],
-    #                         [self.d_amp * math.sin((2 * math.pi / 8) * slot + 2.5 * self.degtorad(self.d_amp))],
-    #                         [self.l_amp * math.sin((math.pi / 8) * slot + 2 * self.degtorad(self.l_amp))],
-    #                         [self.d_amp * math.sin((2 * math.pi / 8) * slot + 3.5 * self.degtorad(self.d_amp))],
-    #                         [self.l_amp * math.sin((math.pi / 8) * slot + 3 * self.degtorad(self.l_amp))],
-    #                         [self.d_amp * math.sin((2 * math.pi / 8) * slot + 4.5 * self.degtorad(self.d_amp))],
-    #                         [self.l_amp * math.sin((math.pi / 8) * slot + 4 * self.degtorad(self.l_amp))],
-    #                         [self.d_amp * math.sin((2 * math.pi / 8) * slot + 5.5 * self.degtorad(self.d_amp))],
-    #                         [self.l_amp * math.sin((math.pi / 8) * slot + 5 * self.degtorad(self.l_amp))],
-    #                         [self.d_amp * math.sin((2 * math.pi / 8) * slot + 6.5 * self.degtorad(self.d_amp))],
-    #                         [self.l_amp * math.sin((math.pi / 8) * slot + 6 * self.degtorad(self.l_amp))],
-    #                         [self.d_amp * math.sin((2 * math.pi / 8) * slot + 7.5 * self.degtorad(self.d_amp))],
-    #                         ],dtype='float')
-
-    def P_sidewind(self, slot):    #20210715 P함수 변형 테스트
-        return np.array([[self.d_amp * math.sin((2 * math.pi / 8) * slot + 0 * self.degtorad(self.d_amp))],
-                            [self.l_amp * math.sin((math.pi / 8) * slot + 1.5 * self.degtorad(self.l_amp))],
-                            [self.d_amp * math.sin((2 * math.pi / 8) * slot + 2 * self.degtorad(self.d_amp))],
-                            [self.l_amp * math.sin((math.pi / 8) * slot + 2.5 * self.degtorad(self.l_amp))],
-                            [self.d_amp * math.sin((2 * math.pi / 8) * slot + 4 * self.degtorad(self.d_amp))],
-                            [self.l_amp * math.sin((math.pi / 8) * slot + 3.5 * self.degtorad(self.l_amp))],
-                            [self.d_amp * math.sin((2 * math.pi / 8) * slot + 6 * self.degtorad(self.d_amp))],
-                            [self.l_amp * math.sin((math.pi / 8) * slot + 4.5 * self.degtorad(self.l_amp))],
-                            [self.d_amp * math.sin((2 * math.pi / 8) * slot + 8 * self.degtorad(self.d_amp))],
-                            [self.l_amp * math.sin((math.pi / 8) * slot + 5.5 * self.degtorad(self.l_amp))],
-                            [self.d_amp * math.sin((2 * math.pi / 8) * slot + 10 * self.degtorad(self.d_amp))],
-                            [self.l_amp * math.sin((math.pi / 8) * slot + 6.5 * self.degtorad(self.l_amp))],
-                            [self.d_amp * math.sin((2 * math.pi / 8) * slot + 12 * self.degtorad(self.d_amp))],
-                            [self.l_amp * math.sin((math.pi / 8) * slot + 7.5 * self.degtorad(self.l_amp))]
+    def P_sidewind(self,slot):
+        return np.array([[self.d_amp * math.sin((2 * math.pi / 8) * slot + 0.5 * self.degtorad(self.d_amp))],
+                            [self.l_amp * math.sin((math.pi / 8) * slot + 0 * self.degtorad(self.l_amp))],
+                            [self.d_amp * math.sin((2 * math.pi / 8) * slot + 1.5 * self.degtorad(self.d_amp))],
+                            [self.l_amp * math.sin((math.pi / 8) * slot + 1 * self.degtorad(self.l_amp))],
+                            [self.d_amp * math.sin((2 * math.pi / 8) * slot + 2.5 * self.degtorad(self.d_amp))],
+                            [self.l_amp * math.sin((math.pi / 8) * slot + 2 * self.degtorad(self.l_amp))],
+                            [self.d_amp * math.sin((2 * math.pi / 8) * slot + 3.5 * self.degtorad(self.d_amp))],
+                            [self.l_amp * math.sin((math.pi / 8) * slot + 3 * self.degtorad(self.l_amp))],
+                            [self.d_amp * math.sin((2 * math.pi / 8) * slot + 4.5 * self.degtorad(self.d_amp))],
+                            [self.l_amp * math.sin((math.pi / 8) * slot + 4 * self.degtorad(self.l_amp))],
+                            [self.d_amp * math.sin((2 * math.pi / 8) * slot + 5.5 * self.degtorad(self.d_amp))],
+                            [self.l_amp * math.sin((math.pi / 8) * slot + 5 * self.degtorad(self.l_amp))],
+                            [self.d_amp * math.sin((2 * math.pi / 8) * slot + 6.5 * self.degtorad(self.d_amp))],
+                            [self.l_amp * math.sin((math.pi / 8) * slot + 6 * self.degtorad(self.l_amp))],
+                            [self.d_amp * math.sin((2 * math.pi / 8) * slot + 7.5 * self.degtorad(self.d_amp))],
                             ],dtype='float')
+
+    # def P_sidewind(self, slot):    #20210715 P함수 변형 테스트
+    #     return np.array([[self.d_amp * math.sin((2 * math.pi / 8) * slot + 0 * self.degtorad(self.d_amp))],
+    #                         [self.l_amp * math.sin((math.pi / 8) * slot + 1.5 * self.degtorad(self.l_amp))],
+    #                         [self.d_amp * math.sin((2 * math.pi / 8) * slot + 2 * self.degtorad(self.d_amp))],
+    #                         [self.l_amp * math.sin((math.pi / 8) * slot + 2.5 * self.degtorad(self.l_amp))],
+    #                         [self.d_amp * math.sin((2 * math.pi / 8) * slot + 4 * self.degtorad(self.d_amp))],
+    #                         [self.l_amp * math.sin((math.pi / 8) * slot + 3.5 * self.degtorad(self.l_amp))],
+    #                         [self.d_amp * math.sin((2 * math.pi / 8) * slot + 6 * self.degtorad(self.d_amp))],
+    #                         [self.l_amp * math.sin((math.pi / 8) * slot + 4.5 * self.degtorad(self.l_amp))],
+    #                         [self.d_amp * math.sin((2 * math.pi / 8) * slot + 8 * self.degtorad(self.d_amp))],
+    #                         [self.l_amp * math.sin((math.pi / 8) * slot + 5.5 * self.degtorad(self.l_amp))],
+    #                         [self.d_amp * math.sin((2 * math.pi / 8) * slot + 10 * self.degtorad(self.d_amp))],
+    #                         [self.l_amp * math.sin((math.pi / 8) * slot + 6.5 * self.degtorad(self.l_amp))],
+    #                         [self.d_amp * math.sin((2 * math.pi / 8) * slot + 12 * self.degtorad(self.d_amp))],
+    #                         [self.l_amp * math.sin((math.pi / 8) * slot + 7.5 * self.degtorad(self.l_amp))]
+    #                         ],dtype='float')
     
     def calculate_P(self, slot):
         if self.gait == 0: #Vertical

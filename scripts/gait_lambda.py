@@ -6,15 +6,18 @@ import math
 import numpy as np
 
 class gait:
-    def __init__(self, gait,d_amp = 30, d_phase = 150, l_amp = 30, l_phase = 150, tau = 1):
+    def __init__(self, gait,d_amp = 30, d_phase = 150, d_lam = 1,l_amp = 30, l_phase = 150, l_lam = 1, tau = 1):
         #Gait selection
         self.gait = gait
         
         #Gait parameters
-        self.l_amp = l_amp; # lateral amplitude
-        self.l_phase = l_phase; # lateral phase
-        self.d_amp = d_amp; # dorsal amplitude
-        self.d_phase = d_phase; # dorsal phase
+        self.d_amp = d_amp # dorsal amplitude
+        self.d_phase = d_phase # dorsal phase
+        self.d_lam = d_lam
+
+        self.l_amp = l_amp # lateral amplitude
+        self.l_phase = l_phase # lateral phase
+        self.l_lam = l_lam
         self.tau = int(tau); #time coefficient
 
         #Gait motion matirces
@@ -83,37 +86,37 @@ class gait:
     #                     ], dtype='float')
 
     def P_vertical(self, slot):    #20210715 P함수 변형 테스트
-        return np.array([[self.d_amp * math.sin((2 * math.pi / 8) * slot + 0 * self.degtorad(self.d_amp))],
-                            [self.l_amp * math.sin((math.pi / 8) * slot + 1.5 * self.degtorad(self.l_amp))],
-                            [self.d_amp * math.sin((2 * math.pi / 8) * slot + 2 * self.degtorad(self.d_amp))],
-                            [self.l_amp * math.sin((math.pi / 8) * slot + 2.5 * self.degtorad(self.l_amp))],
-                            [self.d_amp * math.sin((2 * math.pi / 8) * slot + 4 * self.degtorad(self.d_amp))],
-                            [self.l_amp * math.sin((math.pi / 8) * slot + 3.5 * self.degtorad(self.l_amp))],
-                            [self.d_amp * math.sin((2 * math.pi / 8) * slot + 6 * self.degtorad(self.d_amp))],
-                            [self.l_amp * math.sin((math.pi / 8) * slot + 4.5 * self.degtorad(self.l_amp))],
-                            [self.d_amp * math.sin((2 * math.pi / 8) * slot + 8 * self.degtorad(self.d_amp))],
-                            [self.l_amp * math.sin((math.pi / 8) * slot + 5.5 * self.degtorad(self.l_amp))],
-                            [self.d_amp * math.sin((2 * math.pi / 8) * slot + 10 * self.degtorad(self.d_amp))],
-                            [self.l_amp * math.sin((math.pi / 8) * slot + 6.5 * self.degtorad(self.l_amp))],
-                            [self.d_amp * math.sin((2 * math.pi / 8) * slot + 12 * self.degtorad(self.d_amp))],
-                            [self.l_amp * math.sin((math.pi / 8) * slot + 7.5 * self.degtorad(self.l_amp))]
+        return np.array([[self.d_amp * math.sin((2 * math.pi / 8) * slot + self.d_lam * self.degtorad(self.d_phase))],
+                            [self.l_amp * math.sin((math.pi / 8) * slot + 1 * self.l_lam * self.degtorad(self.l_phase))],
+                            [self.d_amp * math.sin((2 * math.pi / 8) * slot + 2 * self.d_lam * self.degtorad(self.d_phase))],
+                            [self.l_amp * math.sin((math.pi / 8) * slot + 2 * self.l_lam  * self.degtorad(self.l_phase))],
+                            [self.d_amp * math.sin((2 * math.pi / 8) * slot + 3 * self.d_lam * self.degtorad(self.d_phase))],
+                            [self.l_amp * math.sin((math.pi / 8) * slot + 3 * self.l_lam  * self.degtorad(self.l_phase))],
+                            [self.d_amp * math.sin((2 * math.pi / 8) * slot + 4 * self.d_lam * self.degtorad(self.d_phase))],
+                            [self.l_amp * math.sin((math.pi / 8) * slot + 4 * self.l_lam  * self.degtorad(self.l_phase))],
+                            [self.d_amp * math.sin((2 * math.pi / 8) * slot + 5 * self.d_lam * self.degtorad(self.d_phase))],
+                            [self.l_amp * math.sin((math.pi / 8) * slot + 5 * self.l_lam * self.degtorad(self.l_phase))],
+                            [self.d_amp * math.sin((2 * math.pi / 8) * slot + 6 * self.d_lam * self.degtorad(self.d_phase))],
+                            [self.l_amp * math.sin((math.pi / 8) * slot + 6 * self.l_lam * self.degtorad(self.l_phase))],
+                            [self.d_amp * math.sin((2 * math.pi / 8) * slot + 7 * self.d_lam * self.degtorad(self.d_phase))],
+                            [self.l_amp * math.sin((math.pi / 8) * slot + 7 * self.l_lam * self.degtorad(self.l_phase))]
                             ],dtype='float')
 
     def P_sinuous(self,slot):
-        return np.array([[self.d_amp * math.sin((2 * math.pi / 8) * slot + 0 * self.degtorad(self.d_amp))],
-                            [self.l_amp * math.sin((math.pi / 8) * slot + 1.5 * self.degtorad(self.l_amp))],
-                            [self.d_amp * math.sin((2 * math.pi / 8) * slot + 2 * self.degtorad(self.d_amp))],
-                            [self.l_amp * math.sin((math.pi / 8) * slot + 2.5 * self.degtorad(self.l_amp))],
-                            [self.d_amp * math.sin((2 * math.pi / 8) * slot + 4 * self.degtorad(self.d_amp))],
-                            [self.l_amp * math.sin((math.pi / 8) * slot + 3.5 * self.degtorad(self.l_amp))],
-                            [self.d_amp * math.sin((2 * math.pi / 8) * slot + 6 * self.degtorad(self.d_amp))],
-                            [self.l_amp * math.sin((math.pi / 8) * slot + 4.5 * self.degtorad(self.l_amp))],
-                            [self.d_amp * math.sin((2 * math.pi / 8) * slot + 8 * self.degtorad(self.d_amp))],
-                            [self.l_amp * math.sin((math.pi / 8) * slot + 5.5 * self.degtorad(self.l_amp))],
-                            [self.d_amp * math.sin((2 * math.pi / 8) * slot + 10 * self.degtorad(self.d_amp))],
-                            [self.l_amp * math.sin((math.pi / 8) * slot + 6.5 * self.degtorad(self.l_amp))],
-                            [self.d_amp * math.sin((2 * math.pi / 8) * slot + 12 * self.degtorad(self.d_amp))],
-                            [self.l_amp * math.sin((math.pi / 8) * slot + 7.5 * self.degtorad(self.l_amp))]
+        return np.array([[self.d_amp * math.sin((2 * math.pi / 8) * slot + self.d_lam * self.degtorad(self.d_phase))],
+                            [self.l_amp * math.sin((math.pi / 8) * slot + 1 * self.l_lam * self.degtorad(self.l_phase))],
+                            [self.d_amp * math.sin((2 * math.pi / 8) * slot + 2 * self.d_lam * self.degtorad(self.d_phase))],
+                            [self.l_amp * math.sin((math.pi / 8) * slot + 2 * self.l_lam * self.degtorad(self.l_phase))],
+                            [self.d_amp * math.sin((2 * math.pi / 8) * slot + 3 * self.d_lam * self.degtorad(self.d_phase))],
+                            [self.l_amp * math.sin((math.pi / 8) * slot + 3 * self.l_lam * self.degtorad(self.l_phase))],
+                            [self.d_amp * math.sin((2 * math.pi / 8) * slot + 4 * self.d_lam * self.degtorad(self.d_phase))],
+                            [self.l_amp * math.sin((math.pi / 8) * slot + 4 * self.l_lam * self.degtorad(self.l_phase))],
+                            [self.d_amp * math.sin((2 * math.pi / 8) * slot + 5 * self.d_lam * self.degtorad(self.d_phase))],
+                            [self.l_amp * math.sin((math.pi / 8) * slot + 5 * self.l_lam * self.degtorad(self.l_phase))],
+                            [self.d_amp * math.sin((2 * math.pi / 8) * slot + 6 * self.d_lam * self.degtorad(self.d_phase))],
+                            [self.l_amp * math.sin((math.pi / 8) * slot + 6 * self.l_lam * self.degtorad(self.l_phase))],
+                            [self.d_amp * math.sin((2 * math.pi / 8) * slot + 7 * self.d_lam * self.degtorad(self.d_phase))],
+                            [self.l_amp * math.sin((math.pi / 8) * slot + 7 * self.l_lam * self.degtorad(self.l_phase))]
                             ],dtype='float')
                         
     # def P_sidewind(self,slot):
@@ -135,21 +138,20 @@ class gait:
     #                         ],dtype='float')
 
     def P_sidewind(self,slot): #Gazebo에서 썼던 함수와 똑같이...
-        return np.array([[self.d_amp * math.cos(slot + 0.5 * self.degtorad(self.d_amp))],
-                            [self.l_amp * math.cos(slot)],
-                            [self.d_amp * math.cos(slot + 1.5 * self.degtorad(self.d_amp))],
-                            [self.l_amp * math.cos(slot + 1 * self.degtorad(self.l_amp))],
-                            [self.d_amp * math.cos(slot + 2.5 * self.degtorad(self.d_amp))],
-                            [self.l_amp * math.cos(slot + 2 * self.degtorad(self.l_amp))],
-                            [self.d_amp * math.cos(slot + 3.5 * self.degtorad(self.d_amp))],
-                            [self.l_amp * math.cos(slot + 3 * self.degtorad(self.l_amp))],
-                            [self.d_amp * math.cos(slot + 4.5 * self.degtorad(self.d_amp))],
-                            [self.l_amp * math.cos(slot + 4 * self.degtorad(self.l_amp))],
-                            [self.d_amp * math.cos(slot + 5.5 * self.degtorad(self.d_amp))],
-                            [self.l_amp * math.cos(slot + 5 * self.degtorad(self.l_amp))],
-                            [self.d_amp * math.cos(slot + 6.5 * self.degtorad(self.d_amp))],
-                            [self.l_amp * math.cos(slot + 6 * self.degtorad(self.l_amp))],
-                            [self.d_amp * math.cos(slot + 7.5 * self.degtorad(self.d_amp))],
+        return np.array([[self.d_amp * math.cos(slot + 1 * self.d_lam * self.degtorad(self.d_phase))],
+                            [self.l_amp * math.cos(slot + 1 * self.l_lam * self.degtorad(self.l_phase))],
+                            [self.d_amp * math.cos(slot + 2 * self.d_lam * self.degtorad(self.d_phase))],
+                            [self.l_amp * math.cos(slot + 2 * self.l_lam * self.degtorad(self.l_phase))],
+                            [self.d_amp * math.cos(slot + 3 * self.d_lam * self.degtorad(self.d_phase))],
+                            [self.l_amp * math.cos(slot + 3 * self.l_lam * self.degtorad(self.l_phase))],
+                            [self.d_amp * math.cos(slot + 4 * self.d_lam * self.degtorad(self.d_phase))],
+                            [self.l_amp * math.cos(slot + 4 * self.l_lam * self.degtorad(self.l_phase))],
+                            [self.d_amp * math.cos(slot + 5 * self.d_lam * self.degtorad(self.d_phase))],
+                            [self.l_amp * math.cos(slot + 5 * self.l_lam * self.degtorad(self.l_phase))],
+                            [self.d_amp * math.cos(slot + 6 * self.d_lam * self.degtorad(self.d_phase))],
+                            [self.l_amp * math.cos(slot + 6 * self.l_lam * self.degtorad(self.l_phase))],
+                            [self.d_amp * math.cos(slot + 7 * self.d_lam * self.degtorad(self.d_phase))],
+                            [self.l_amp * math.cos(slot + 7 * self.l_lam * self.degtorad(self.l_phase))]
                             ],dtype='float')
 
     # def P_sidewind(self, slot):    #20210715 P함수 변형 테스트

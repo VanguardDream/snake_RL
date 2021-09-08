@@ -3,3 +3,5 @@ resources/*
 .vscode/*
 .DS_store
 torch/data/*
+
+*.pyc

@@ -6,9 +6,11 @@
 
     <compiler inertiafromgeom="true" angle="degree" convexhull="false"/>
 
-    <option timestep="0.005" iterations="50" tolerance="1e-10" solver="Newton" jacobian="dense" cone="pyramidal"/>
+    <option timestep="0.01" iterations="50" tolerance="1e-10" solver="Newton" jacobian="dense" cone="pyramidal"/>
+    <!-- <option timestep="0.001" iterations="50" tolerance="1e-10" solver="Newton" jacobian="dense" cone="pyramidal"/> -->
 
-    <size nconmax="500" njmax="2000" nstack="10000"/>
+    <!-- <size nconmax="5000" njmax="20000" nstack="50000"/> -->
+     <size nconmax="500" njmax="2000" nstack="10000"/>
 
     <visual>
         <map force="0.1" zfar="30"/>

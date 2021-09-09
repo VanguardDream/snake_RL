@@ -137,5 +137,62 @@ def main2():
     csv_writer.writerow(x_t)
     csv_writer.writerow(y_t)
 
+def main3():
+    gait_type = 1
+    # gait_params = [56.0, 57.7, -9.5, 71.0, 76.2, 10, 1]
+    #대왕 sin
+    gait_params = [55.7, 57.2, -9.5, 70.5, 76.5, 10, 1]
+    
+    # gait_type = 2
+    # # gait_params = [37.2, 37.4, -8, 61.9, 61.7, 1 ,  3]
+    # #대왕 side 
+    # gait_params = [38.2, 43.4, -8, 66, 51.6, 1 ,  3]
+
+
+    count = 0
+
+    csv_log = open('sin_dor_a_p_gradient.csv','w')
+    csv_writer = csv.writer(csv_log)
+
+    for i0 in range(-5,6): # d_a
+        for i1 in range(-5,6): # d_p
+            test_params = [gait_params[0] - i0 * 0.1, gait_params[1] - i1 * 0.1, gait_params[2], gait_params[3], gait_params[4], gait_params[5], gait_params[6] ]
+
+            reward = J(gait_type, test_params[0], test_params[1], test_params[2], test_params[3], 
+                                        test_params[4],test_params[5],test_params[6])
+
+            csv_writer.writerow(test_params[0:2] + [reward])
+            print('Iteration : (%d) reward : %f'  %(count,reward))
+            count = count + 1
+
+def main4():
+    gait_type = 1
+    # gait_params = [56.0, 57.7, -9.5, 71.0, 76.2, 10, 1]
+    #대왕 sin
+    gait_params = [55.7, 57.2, -9.5, 70.5, 76.5, 10, 1]
+
+    # gait_type = 2
+    # # gait_params = [37.2, 37.4, -8, 61.9, 61.7, 1 ,  3]
+    # #대왕 side 
+    # gait_params = [38.2, 43.4, -8, 66, 51.6, 1 ,  3]
+
+
+    count = 0
+
+    csv_log = open('sin_lat_a_p_gradient.csv','w')
+    csv_writer = csv.writer(csv_log)
+
+    for i0 in range(-5,6): # d_a
+        for i1 in range(-5,6): # d_p
+            test_params = [gait_params[0], gait_params[1], gait_params[2], gait_params[3] - i0 * 0.1, gait_params[4] - i1 * 0.1, gait_params[5], gait_params[6] ]
+
+            reward = J(gait_type, test_params[0], test_params[1], test_params[2], test_params[3], 
+                                        test_params[4],test_params[5],test_params[6])
+
+            csv_writer.writerow(test_params[3:5] + [reward])
+            print('Iteration : (%d) reward : %f'  %(count,reward))
+            count = count + 1
+
 if __name__ == "__main__":
-        main2()
+        main3()
+        main4()

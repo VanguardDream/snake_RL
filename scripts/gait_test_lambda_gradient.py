@@ -65,12 +65,15 @@ def J(g, d_a, d_p, d_l, l_a, l_p, l_l, tau):
     return J_value
 
 def main():
-    gait_type = 2
-    gait_params = [58.3,    344.4,  -9.4,   72.1,   193,    10.6,   1]
+    gait_type = 1
+    gait_params = [56.0, 57.7, -9.5, 71.0, 76.2, 10, 1]
+    
+    # gait_type = 2
+    # gait_params = [37.2, 37.4, -8, 61.9, 61.7, 1 ,  3]
 
     count = 0
 
-    csv_log = open('gradient_side_10E4.csv','a')
+    csv_log = open('gradient_sin_10E4.csv','a')
     csv_writer = csv.writer(csv_log)
 
     for i0 in range(-5,6): # d_a

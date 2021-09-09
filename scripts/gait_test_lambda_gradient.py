@@ -11,7 +11,7 @@ snake = mujoco_py.load_model_from_path("../description/mujoco/snake_kiro.xml")
 
 # mujoco-py
 simulator = mujoco_py.MjSim(snake)
-sim_viewer = mujoco_py.MjViewer(simulator)
+# sim_viewer = mujoco_py.MjViewer(simulator)
 
 def J(g, d_a, d_p, d_l, l_a, l_p, l_l, tau):
     gen = gait_lambda.gait(g, d_a, d_p, d_l, l_a, l_p, l_l, int(tau))
@@ -19,14 +19,6 @@ def J(g, d_a, d_p, d_l, l_a, l_p, l_l, tau):
     # Variable for cost(loss) function
     delta_x = 0
     delta_y = 0
-    accum_theta = 0 # accumulated joint displacements for all joint.
-    x_of_t = np.array([]) # Head link x values of the time t
-    y_of_t = np.array([]) # Head link y values of the time t
-
-    # Simulation model info
-    # joint_names = simulator.model.joint_names[1:] 
-    # For generalized xml code!
-    joint_names = ['joint1','joint2','joint3','joint4','joint5','joint6','joint7','joint8','joint9','joint10','joint11','joint12','joint13','joint14']
 
     for i in range(0,1000):
         goal = gen.generate(i)
@@ -38,9 +30,6 @@ def J(g, d_a, d_p, d_l, l_a, l_p, l_l, tau):
             simulator.data.ctrl[idx] = gen.degtorad(goal[idx])
         
         simulator.step()
-
-        x_of_t = np.append(x_of_t, simulator.data.get_body_xpos('head')[0])
-        y_of_t = np.append(x_of_t, simulator.data.get_body_xpos('head')[1])
 
 
     delta_x = simulator.data.get_body_xpos('head')[0]
@@ -149,5 +138,4 @@ def main2():
     csv_writer.writerow(y_t)
 
 if __name__ == "__main__":
-    while True:
-        main()
+        main2()

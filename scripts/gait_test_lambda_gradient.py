@@ -75,7 +75,7 @@ def J_t(g, d_a, d_p, d_l, l_a, l_p, l_l, tau):
         simulator.step()
 
         x_of_t = np.append(x_of_t, simulator.data.get_body_xpos('head')[0])
-        y_of_t = np.append(x_of_t, simulator.data.get_body_xpos('head')[1])
+        y_of_t = np.append(y_of_t, simulator.data.get_body_xpos('head')[1])
 
 
     delta_x = simulator.data.get_body_xpos('head')[0]
@@ -123,16 +123,16 @@ def main():
                     count = count + 1
 
 def main2():
-    gait_type = 1
-    gait_params = [56.0, 57.7, -9.5, 71.0, 76.2, 10, 1]
+    # gait_type = 1
+    # gait_params = [56.0, 57.7, -9.5, 71.0, 76.2, 10, 1]
     
-    # gait_type = 2
-    # gait_params = [37.2, 37.4, -8, 61.9, 61.7, 1 ,  3]
+    gait_type = 2
+    gait_params = [37.2, 37.4, -8, 61.9, 61.7, 1 ,  3]
 
-    csv_log = open('xy_plane_position_sin.csv','a')
+    csv_log = open('xy_plane_position_side.csv','a')
     csv_writer = csv.writer(csv_log)
 
-    reward, x_t, y_t = J_t(gait_type, gait_params[0], gait_params[1], gait_params[2], gait_params[33], gait_params[4], gait_params[5], gait_params[6])
+    reward, x_t, y_t = J_t(gait_type, gait_params[0], gait_params[1], gait_params[2], gait_params[3], gait_params[4], gait_params[5], gait_params[6])
 
     csv_writer.writerow(x_t)
     csv_writer.writerow(y_t)

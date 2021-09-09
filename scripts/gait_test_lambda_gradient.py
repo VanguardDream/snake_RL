@@ -1,3 +1,4 @@
+from re import X
 import mujoco_py
 import os
 import random
@@ -54,16 +55,19 @@ def J_t(g, d_a, d_p, d_l, l_a, l_p, l_l, tau):
     # Variable for cost(loss) function
     delta_x = 0
     delta_y = 0
-    accum_theta = 0 # accumulated joint displacements for all joint.
-    x_of_t = np.array([]) # Head link x values of the time t
-    y_of_t = np.array([]) # Head link y values of the time t
+    
+    p_of_7 = np.empty((3,))
+
+    com =np.empty((3,))
+
 
     # Simulation model info
     # joint_names = simulator.model.joint_names[1:] 
     # For generalized xml code!
     joint_names = ['joint1','joint2','joint3','joint4','joint5','joint6','joint7','joint8','joint9','joint10','joint11','joint12','joint13','joint14']
+    link_names = ['head','body1','body2','body3','body4','body5','body6','body7','body8','body9','body10','body11','body12','body13','tail']
 
-    for i in range(0,1000):
+    for i in range(0,3000):
         goal = gen.generate(i)
 
         spec_motor = np.nonzero(goal)[0]
@@ -74,8 +78,18 @@ def J_t(g, d_a, d_p, d_l, l_a, l_p, l_l, tau):
         
         simulator.step()
 
-        x_of_t = np.append(x_of_t, simulator.data.get_body_xpos('head')[0])
-        y_of_t = np.append(y_of_t, simulator.data.get_body_xpos('head')[1])
+        total = np.array([0,0,0])
+
+        for link in link_names:
+            total = np.add(total, simulator.data.get_body_xpos(link))
+
+        total = total /14
+
+        com = np.vstack((com,total))
+
+        # x_of_t = np.append(x_of_t, simulator.data.get_body_xpos('head')[0])
+        # y_of_t = np.append(y_of_t, simulator.data.get_body_xpos('head')[1])
+        p_of_7 = np.vstack((p_of_7,simulator.data.get_body_xpos('body7')))
 
 
     delta_x = simulator.data.get_body_xpos('head')[0]
@@ -90,7 +104,7 @@ def J_t(g, d_a, d_p, d_l, l_a, l_p, l_l, tau):
         J_value = 1500 * delta_x - 60 * abs(delta_y) - 900 * abs(delta_y / delta_x)
 
     # print("%f : %f : %f : %f : %d : %lf" %(d_a,d_p,l_a,l_p,tau,J_value))
-    return J_value, x_of_t, y_of_t
+    return J_value, p_of_7
 
 
 
@@ -124,18 +138,20 @@ def main():
 
 def main2():
     # gait_type = 1
-    # gait_params = [56.0, 57.7, -9.5, 71.0, 76.2, 10, 1]
+    # gait_params = [55.7, 57.2, -9.5, 70.5, 76.5, 10, 1]
     
     gait_type = 2
-    gait_params = [37.2, 37.4, -8, 61.9, 61.7, 1 ,  3]
+    gait_params = [38.2, 43.4, -8, 66, 51.6, 1 ,  3]
 
-    csv_log = open('xy_plane_position_side.csv','a')
+    csv_log = open('link_side.csv','w')
     csv_writer = csv.writer(csv_log)
 
-    reward, x_t, y_t = J_t(gait_type, gait_params[0], gait_params[1], gait_params[2], gait_params[3], gait_params[4], gait_params[5], gait_params[6])
+    reward, com = J_t(gait_type, gait_params[0], gait_params[1], gait_params[2], gait_params[3], gait_params[4], gait_params[5], gait_params[6])
 
-    csv_writer.writerow(x_t)
-    csv_writer.writerow(y_t)
+    for t in range(0, len(com)):
+        csv_writer.writerow(com[t])
+
+    csv_log.close()
 
 def main3():
     gait_type = 1
@@ -194,5 +210,4 @@ def main4():
             count = count + 1
 
 if __name__ == "__main__":
-        main3()
-        main4()
+        main2()

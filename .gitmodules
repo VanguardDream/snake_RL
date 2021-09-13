@@ -10,3 +10,6 @@
 [submodule "scripts/v-hacd"]
 	path = scripts/v-hacd
 	url = https://github.com/kmammou/v-hacd.git
+[submodule "scripts/icra/DynamixelSDK"]
+	path = scripts/icra/DynamixelSDK
+	url = https://github.com/ROBOTIS-GIT/DynamixelSDK.git

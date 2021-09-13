@@ -18,7 +18,7 @@ snake = mujoco_py.load_model_from_path("../description/mujoco/snake_allign.xml")
 
 # mujoco-py
 simulator = mujoco_py.MjSim(snake)
-sim_viewer = mujoco_py.MjViewer(simulator)
+# sim_viewer = mujoco_py.MjViewer(simulator)
 
 def J(g,d_a,d_p,d_l,l_a,l_p,l_l,tau):
     gen = gait_lambda.gait(g,d_a,d_p,d_l,l_a,l_p,l_l,tau)
@@ -164,12 +164,12 @@ def optimizeGait(eps = 1, l = 1, local_minima = 0):
                 param[i] = param[i] + gradient_vector[i]
 
 def optimizeSci(gait = 1, options={'xatol': 0.1, 'fatol' : 0.5, 'disp': True, 'eps': 0.5}):
-    d_amp = random.randint(0, 900) / 10
-    d_phase = random.randint(0,3600) / 10
+    d_amp = random.randint(0, 90)
+    d_phase = random.randint(0,360)
     d_lambda = random.randint(-10,10)
 
-    l_amp = random.randint(0, 900) / 10
-    l_phase = random.randint(0,3600) / 10
+    l_amp = random.randint(0, 90)
+    l_phase = random.randint(0,360)
     l_lambda = random.randint(-10,10)
 
     tau = random.randint(1,3)
@@ -277,7 +277,7 @@ def J_sci_sin(ndarray):
         
         # for name in joint_names:
         #     accum_theta = accum_theta + abs(simulator.data.get_joint_qpos(name))
-        
+
         simulator.step()
         # sim_viewer.render()
 
@@ -328,8 +328,7 @@ def J_sci_side(ndarray):
         
         # for name in joint_names:
         #     accum_theta = accum_theta + abs(simulator.data.get_joint_qpos(name))
-
-        time.sleep(0.0002)
+        
         simulator.step()
         # sim_viewer.render()
 
@@ -363,10 +362,10 @@ def main():
     # while True:
     for i in range(200):
 
-        csv_log = open('optimization log-lambda-0-01.csv','a')
+        csv_log = open('wsl_optimization_2.csv','a')
         csv_writer = csv.writer(csv_log)
 
-        gait_type = 1
+        gait_type = 2
         res = optimizeSci(gait=gait_type)
 
         temp_result = res.get('fun')

@@ -1,19 +1,19 @@
 import mujoco_py
 import os
 import random
-import gait_kiro
+import gait_lambda
 import math
 import numpy as np
 
 #load model from path
-snake = mujoco_py.load_model_from_path("../description/mujoco/snake_kiro.xml")
+snake = mujoco_py.load_model_from_path("../description/mujoco/snake_dgist.xml")
 
 # mujoco-py
 simulator = mujoco_py.MjSim(snake)
 sim_viewer = mujoco_py.MjViewer(simulator)
 
-def J(g,d_a,d_p,d_l,l_a,l_p,l_l,tau):
-    gen = gait_kiro.gait(g,d_a,d_p,d_l,l_a,l_p,l_l,int(tau))
+def J(g, d_a, d_p, d_l, l_a, l_p, l_l, tau):
+    gen = gait_lambda.gait(g,d_a,d_p,d_l,l_a,l_p,l_l,int(tau))
 
     # Variable for cost(loss) function
     delta_x = 0

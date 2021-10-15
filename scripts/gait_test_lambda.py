@@ -6,7 +6,7 @@ import math
 import numpy as np
 
 #load model from path
-snake = mujoco_py.load_model_from_path("../description/mujoco/snake_kiro.xml")
+snake = mujoco_py.load_model_from_path("../description/mujoco/snake_dgist.xml")
 
 # mujoco-py
 simulator = mujoco_py.MjSim(snake)

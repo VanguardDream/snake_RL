@@ -18,6 +18,9 @@ class mainFrame(QWidget):
     model_xml = ""
     con_type = 0
     damping_value = 1
+    kp = 4
+    ki = 0
+    kd = 0
 
     def __init__(self) -> None:
         super().__init__()
@@ -31,9 +34,19 @@ class mainFrame(QWidget):
         self.tb_con = QLineEdit("0",self)
 
         label2 = QLabel("Damping value")
-        self.tb_damp = QLineEdit("1",self)
+        self.tb_damp = QLineEdit("0.37",self)
+
+        label3 = QLabel("gain P")
+        self.tb_kp = QLineEdit("4",self)
+
+        label4 = QLabel("gain I")
+        self.tb_ki = QLineEdit("0",self)
+
+        label5 = QLabel("gain D")
+        self.tb_kd = QLineEdit("0",self)
 
         self.label_status = QLabel("Controller : , Damping : ")
+        self.label_status2 = QLabel("Kp : Ki : Kd : ")
 
         bt_conf = QPushButton("set",self)
         bt_run = QPushButton("run",self)
@@ -46,7 +59,14 @@ class mainFrame(QWidget):
         vlayout.addWidget(self.tb_con)
         vlayout.addWidget(label2)
         vlayout.addWidget(self.tb_damp)
+        vlayout.addWidget(label3)
+        vlayout.addWidget(self.tb_kp)
+        vlayout.addWidget(label4)
+        vlayout.addWidget(self.tb_ki)
+        vlayout.addWidget(label5)
+        vlayout.addWidget(self.tb_kd)
         vlayout.addWidget(self.label_status)
+        vlayout.addWidget(self.label_status2)
         vlayout.addWidget(bt_conf)
         vlayout.addWidget(bt_run)
 
@@ -68,6 +88,10 @@ class mainFrame(QWidget):
         type = self.tb_con.text()
         damp = self.tb_damp.text()
 
+        self.kp = float(self.tb_kp.text())
+        self.ki = float(self.tb_ki.text())
+        self.kd = float(self.tb_kd.text())
+
         self.con_type = int(type)
         self.damping_value = str(damp)
 
@@ -75,9 +99,14 @@ class mainFrame(QWidget):
 
         info = info.format(type=int(type),damp=str(damp))
 
+        info2 = "Kp : {P} Ki : {I} Kd : {D}"
+
+        info2 = info2.format(P = self.kp, I = self.ki, D = self.kd)
+
         self.model_xml = sim_config(int(type),damp)
 
         self.label_status.setText(info)
+        self.label_status2.setText(info2)
 
     def bt_run_clicked(self):
         model = mujoco_py.load_model_from_xml(sim_config(self.con_type,self.damping_value))
@@ -114,7 +143,14 @@ class mainFrame(QWidget):
         log_file.close()
 
         ax = self.canvas.figure.subplots()
-        ax.plot(list(range(0,2500)), log_qvel, log_qpos, '-')
+        # ax.plot(list(range(0,2500)), log_qvel, log_qpos, '-')
+        ax.plot(list(range(0,2500)), log_qvel, label = 'Velocity')
+        ax.plot(list(range(0,2500)), log_qpos, label = 'Position')
+        ax.legend(loc='upper right')
+        ax.grid()
+        ax.set_ylim([-10,10])
+        ax.set_xlabel("miliseconds (ms)")
+        ax.set_ylabel("rad ? rad/s")
         self.canvas.draw()
 
 
@@ -128,7 +164,7 @@ def main():
     frame = mainFrame()
     sys.exit(app.exec_())
 
-def sim_config(type, damping):
+def sim_config(type, damping, kp, ki, kd):
 
     # 0 -> p controller, 1 -> pid controller
 

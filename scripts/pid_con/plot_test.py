@@ -33,8 +33,6 @@ model_xml = \
 
             <material name="matgeom" texture="texgeom" texuniform="true" rgba="0.8 0.6 .4 1"/>
 
-            <!-- Pipe Meshes -->
-            <mesh name="pipe100" file="./asset/Pipe-100mm-3T_low.stl"/>
         </asset>
 
         <worldbody>
@@ -44,11 +42,11 @@ model_xml = \
             <light directional="false" diffuse=".2 .2 .2" specular="0 0 0" pos="0 0 5" dir="0 0 -1" castshadow="false"/>
 
         <!-- Snake -->
-            <body name="base" pos="0 0 0"> <!--홀-->
+            <body name="base" pos="0 0 0">
                 <geom type="cylinder" size="0.0325 0.01" rgba="0.1 0.1 0.1 1" mass="0.04"/>
                 <geom type="box" size="0.017 0.01425 0.02525" pos="0 0 0.01525" mass="0.1"/>
 
-                <body name="link1" pos="0 0 0.0685"> <!--짝-->
+                <body name="link1" pos="0 0 0.0685">
                     <joint name="joint1" type="hinge" pos="0 0 -0.02925" axis="0 1 0" limited="true" range="-90 90" damping="{damping}" stiffness="0" armature="0.05" />
                     <geom type="cylinder" size="0.0325 0.01" rgba="0.1 0.1 0.1 1" mass="0.04"/>
                     <geom type="box" size="0.01425 0.017 0.02525" pos="0 0 0.01525" mass="0.1"/>
@@ -60,8 +58,6 @@ model_xml = \
             {actuator}
         </actuator>
     </mujoco>
-
-
     """
 
 p_controller = \
@@ -78,7 +74,8 @@ def main():
     #import model xml
     # model = mujoco_py.load_model_from_path("../description/mujoco/2link_dynamixel_test.xml")
 
-    sim = mujoco_py.MjSim(sim_config(0,1))
+    model = mujoco_py.load_model_from_xml(sim_config(0,1))
+    sim = mujoco_py.MjSim(model)
     simgui = mujoco_py.MjViewer(sim)
 
 def sim_config(type, damping):

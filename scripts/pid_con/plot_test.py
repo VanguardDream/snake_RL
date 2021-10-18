@@ -1,6 +1,9 @@
 import sys
 import mujoco_py
-import matplotlib
+
+from matplotlib.backends.backend_qt5agg import FigureCanvas as FigureCanvas
+from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
+from matplotlib.figure import Figure
 
 from PyQt5 import QtGui, QtCore
 from PyQt5.QtWidgets import QApplication, QHBoxLayout, QLabel, QLineEdit, QPushButton, QTextEdit, QVBoxLayout, QWidget
@@ -35,6 +38,8 @@ class mainFrame(QWidget):
         bt_conf = QPushButton("set",self)
         bt_run = QPushButton("run",self)
 
+        self.canvas = FigureCanvas(Figure(figsise=(4,3)))
+
         # Layouts
         vlayout = QVBoxLayout()
         vlayout.addWidget(label1)
@@ -46,6 +51,7 @@ class mainFrame(QWidget):
         vlayout.addWidget(bt_run)
 
         hlayout = QHBoxLayout()
+        hlayout.addWidget(self.canvas)
         hlayout.addStretch(1)
         hlayout.addLayout(vlayout)
 
@@ -107,6 +113,11 @@ class mainFrame(QWidget):
             log_writer.writerow([log_qpos[n_raws]] + [log_qvel[n_raws]])
 
         log_file.close()
+
+        ax = self.canvas.figure.subplots()
+        ax.plot(list(range(0,2500)), log_qvel, log_qpos, '-')
+        self.canvas.draw()
+
 
 def main():
     

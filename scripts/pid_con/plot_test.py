@@ -1,5 +1,5 @@
 import sys
-# import mujoco_py
+import mujoco_py
 import matplotlib
 
 from PyQt5 import QtGui, QtCore
@@ -53,6 +53,7 @@ class mainFrame(QWidget):
 
         # Slot and Connects
         bt_conf.clicked.connect(self.bt_con_clicked)
+        bt_run.clicked.connect(self.bt_run_clicked)
 
         self.move(400,400)
         self.resize(600,400)
@@ -74,8 +75,8 @@ class mainFrame(QWidget):
         self.label_status.setText(info)
 
     def bt_run_clicked(self):
-        # model = mujoco_py.load_model_from_xml(sim_config(0,1))
-        # sim = mujoco_py.MjSim(model)
+        model = mujoco_py.load_model_from_xml(sim_config(self.con_type,self.damping_value))
+        sim = mujoco_py.MjSim(model)
         # simgui = mujoco_py.MjViewer(sim)
 
         log_qpos = []
@@ -92,17 +93,20 @@ class mainFrame(QWidget):
                 sim.data.ctrl[0] = -1.0472
 
             log_qpos.append(sim.data.get_joint_qpos('joint1'))
-            log_qpos.append(sim.data.get_joint_qvel('joint1'))
+            log_qvel.append(sim.data.get_joint_qvel('joint1'))
+
+            sim.step()
+            # simgui.render()
 
         log_file = open('logs.csv','a')
         log_writer = csv.writer(log_file)
 
-        log_writer.writerow([time.ctime(time.time())])
+        log_writer.writerow([time.ctime(time.time())] + ["type : "] + [self.con_type] + [self.damping_value])
 
-        for n_raws in len(log_qpos):
-            log_writer.writerow[log_qpos[n_raws], log_qvel[n_raws]]
+        for n_raws in range(0, len(log_qpos) -1):
+            log_writer.writerow([log_qpos[n_raws]] + [log_qvel[n_raws]])
 
-
+        log_file.close()
 
 def main():
     

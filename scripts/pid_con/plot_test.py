@@ -49,7 +49,7 @@ model_xml = \
                 <geom type="box" size="0.017 0.01425 0.02525" pos="0 0 0.01525" mass="0.1"/>
 
                 <body name="link1" pos="0 0 0.0685"> <!--짝-->
-                    <joint name="joint1" type="hinge" pos="0 0 -0.02925" axis="0 1 0" limited="true" range="-90 90" damping="1" stiffness="0" armature="0.05" />
+                    <joint name="joint1" type="hinge" pos="0 0 -0.02925" axis="0 1 0" limited="true" range="-90 90" damping="{damping}" stiffness="0" armature="0.05" />
                     <geom type="cylinder" size="0.0325 0.01" rgba="0.1 0.1 0.1 1" mass="0.04"/>
                     <geom type="box" size="0.01425 0.017 0.02525" pos="0 0 0.01525" mass="0.1"/>
                 </body>
@@ -76,11 +76,20 @@ pid_controller = \
 
 def main():
     #import model xml
-    model = mujoco_py.load_model_from_path("../description/mujoco/2link_dynamixel_test.xml")
+    # model = mujoco_py.load_model_from_path("../description/mujoco/2link_dynamixel_test.xml")
 
-    sim = mujoco_py.MjSim(model)
+    sim = mujoco_py.MjSim(sim_config(0,1))
+    simgui = mujoco_py.MjViewer(sim)
 
-def sim_config():
-    p_gain = 4
-    i_gain = 0
-    d_gain = 0
+def sim_config(type, damping):
+
+    # 0 -> p controller, 1 -> pid controller
+
+    if type == 0:
+        model = model_xml.format(actuator = p_controller, damping = damping)
+
+    return model
+
+
+if __name__ == "__main__":
+    main()

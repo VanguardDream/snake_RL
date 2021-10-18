@@ -38,7 +38,7 @@ class mainFrame(QWidget):
         bt_conf = QPushButton("set",self)
         bt_run = QPushButton("run",self)
 
-        self.canvas = FigureCanvas(Figure(figsise=(4,3)))
+        self.canvas = FigureCanvas(Figure(figsize=(5,3)))
 
         # Layouts
         vlayout = QVBoxLayout()
@@ -52,7 +52,6 @@ class mainFrame(QWidget):
 
         hlayout = QHBoxLayout()
         hlayout.addWidget(self.canvas)
-        hlayout.addStretch(1)
         hlayout.addLayout(vlayout)
 
         self.setLayout(hlayout)
@@ -62,7 +61,7 @@ class mainFrame(QWidget):
         bt_run.clicked.connect(self.bt_run_clicked)
 
         self.move(400,400)
-        self.resize(600,400)
+        self.resize(800,400)
         self.show()
 
     def bt_con_clicked(self):

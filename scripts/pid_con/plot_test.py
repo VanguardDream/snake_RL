@@ -1,89 +1,127 @@
-import mujoco_py
+import sys
+# import mujoco_py
 import matplotlib
 
-model_xml = \
-    """
+from PyQt5 import QtGui, QtCore
+from PyQt5.QtWidgets import QApplication, QHBoxLayout, QLabel, QLineEdit, QPushButton, QTextEdit, QVBoxLayout, QWidget
 
-    <mujoco model="2link-test">
+import time
+import csv
 
-        <compiler inertiafromgeom="true" angle="degree" convexhull="false"/>
+import description as des
 
-        <option timestep="0.01" iterations="50" tolerance="1e-10" solver="Newton" jacobian="dense" cone="pyramidal"/>
-        <!-- <option timestep="0.001" iterations="50" tolerance="1e-10" solver="Newton" jacobian="dense" cone="pyramidal"/> -->
 
-        <!-- <size nconmax="5000" njmax="20000" nstack="50000"/> -->
-        <size nconmax="500" njmax="2000" nstack="10000"/>
+class mainFrame(QWidget):
+    model_xml = ""
+    con_type = 0
+    damping_value = 1
 
-        <visual>
-            <map force="0.1" zfar="30"/>
-            <rgba haze="0.15 0.25 0.35 1"/>
-            <quality shadowsize="2048"/>
-            <global offwidth="800" offheight="800"/>
-        </visual>
+    def __init__(self) -> None:
+        super().__init__()
+        self.initUI()
 
-        <asset>
-            <texture type="skybox" builtin="gradient" rgb1="0.3 0.5 0.7" rgb2="0 0 0" width="512" height="512"/> 
+    def initUI(self):
+        self.setWindowTitle("pid simulator")
 
-            <texture name="texplane" type="2d" builtin="checker" rgb1=".2 .3 .4" rgb2=".1 0.15 0.2" width="512" height="512" mark="cross" markrgb=".8 .8 .8"/>  
+        # Component Declare
+        label1 = QLabel("Controller type")
+        self.tb_con = QLineEdit("0",self)
 
-            <texture name="texgeom" type="cube" builtin="flat" mark="cross" width="127" height="1278" 
-                rgb1="0.8 0.6 0.4" rgb2="0.8 0.6 0.4" markrgb="1 1 1" random="0.01"/>  
+        label2 = QLabel("Damping value")
+        self.tb_damp = QLineEdit("1",self)
 
-            <material name="matplane" reflectance="0.3" texture="texplane" texrepeat="1 1" texuniform="true"/>
+        self.label_status = QLabel("Controller : , Damping : ")
 
-            <material name="matgeom" texture="texgeom" texuniform="true" rgba="0.8 0.6 .4 1"/>
+        bt_conf = QPushButton("set",self)
+        bt_run = QPushButton("run",self)
 
-        </asset>
+        # Layouts
+        vlayout = QVBoxLayout()
+        vlayout.addWidget(label1)
+        vlayout.addWidget(self.tb_con)
+        vlayout.addWidget(label2)
+        vlayout.addWidget(self.tb_damp)
+        vlayout.addWidget(self.label_status)
+        vlayout.addWidget(bt_conf)
+        vlayout.addWidget(bt_run)
 
-        <worldbody>
+        hlayout = QHBoxLayout()
+        hlayout.addStretch(1)
+        hlayout.addLayout(vlayout)
 
-            <geom name="floor" pos="0 0 0" size="0 0 .25" type="plane" material="matplane" condim="3" />
+        self.setLayout(hlayout)
 
-            <light directional="false" diffuse=".2 .2 .2" specular="0 0 0" pos="0 0 5" dir="0 0 -1" castshadow="false"/>
+        # Slot and Connects
+        bt_conf.clicked.connect(self.bt_con_clicked)
 
-        <!-- Snake -->
-            <body name="base" pos="0 0 0">
-                <geom type="cylinder" size="0.0325 0.01" rgba="0.1 0.1 0.1 1" mass="0.04"/>
-                <geom type="box" size="0.017 0.01425 0.02525" pos="0 0 0.01525" mass="0.1"/>
+        self.move(400,400)
+        self.resize(600,400)
+        self.show()
 
-                <body name="link1" pos="0 0 0.0685">
-                    <joint name="joint1" type="hinge" pos="0 0 -0.02925" axis="0 1 0" limited="true" range="-90 90" damping="{damping}" stiffness="0" armature="0.05" />
-                    <geom type="cylinder" size="0.0325 0.01" rgba="0.1 0.1 0.1 1" mass="0.04"/>
-                    <geom type="box" size="0.01425 0.017 0.02525" pos="0 0 0.01525" mass="0.1"/>
-                </body>
-            </body>
-        </worldbody>
+    def bt_con_clicked(self):
+        type = self.tb_con.text()
+        damp = self.tb_damp.text()
 
-        <actuator>
-            {actuator}
-        </actuator>
-    </mujoco>
-    """
+        self.con_type = int(type)
+        self.damping_value = str(damp)
 
-p_controller = \
-    """
-    <position name="servo_1" ctrllimited="true" ctrlrange="-1.5708 1.5708" forcelimited="true" forcerange="-3 3" gear="1" joint="joint1" kp="3.77"/>
-    """
+        info = "Controller : {type} , Damping : {damp}"
 
-pid_controller = \
-    """
-    <general ctrlrange='-1 1' gaintype="user" biastype="user" forcerange="-3 3" gainprm="200 10 10.0 0.1 0.1 0" joint="joint1" name="servo_1"/>
-    """
+        info = info.format(type=int(type),damp=str(damp))
+
+        self.model_xml = sim_config(int(type),damp)
+
+        self.label_status.setText(info)
+
+    def bt_run_clicked(self):
+        # model = mujoco_py.load_model_from_xml(sim_config(0,1))
+        # sim = mujoco_py.MjSim(model)
+        # simgui = mujoco_py.MjViewer(sim)
+
+        log_qpos = []
+        log_qvel = []
+
+        for t in range(0,2500):
+            if t == 500:
+                sim.data.ctrl[0] = 1.0472
+            if t == 1000:
+                sim.data.ctrl[0] = -1.0472
+            if t == 1500:
+                sim.data.ctrl[0] = 1.0472
+            if t == 2000:
+                sim.data.ctrl[0] = -1.0472
+
+            log_qpos.append(sim.data.get_joint_qpos('joint1'))
+            log_qpos.append(sim.data.get_joint_qvel('joint1'))
+
+        log_file = open('logs.csv','a')
+        log_writer = csv.writer(log_file)
+
+        log_writer.writerow([time.ctime(time.time())])
+
+        for n_raws in len(log_qpos):
+            log_writer.writerow[log_qpos[n_raws], log_qvel[n_raws]]
+
+
 
 def main():
-    #import model xml
-    # model = mujoco_py.load_model_from_path("../description/mujoco/2link_dynamixel_test.xml")
+    
+    # model = mujoco_py.load_model_from_xml(sim_config(0,1))
+    # sim = mujoco_py.MjSim(model)
+    # simgui = mujoco_py.MjViewer(sim)
 
-    model = mujoco_py.load_model_from_xml(sim_config(0,1))
-    sim = mujoco_py.MjSim(model)
-    simgui = mujoco_py.MjViewer(sim)
+    app = QApplication(sys.argv)
+    frame = mainFrame()
+    sys.exit(app.exec_())
 
 def sim_config(type, damping):
 
     # 0 -> p controller, 1 -> pid controller
 
     if type == 0:
-        model = model_xml.format(actuator = p_controller, damping = damping)
+        model = des.model_xml.format(actuator = des.p_controller, damping = damping)
+    else:
+        model = des.model_xml.format(actuator = des.pid_controller, damping = damping)
 
     return model
 

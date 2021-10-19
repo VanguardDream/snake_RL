@@ -109,9 +109,11 @@ class mainFrame(QWidget):
         self.label_status2.setText(info2)
 
     def bt_run_clicked(self):
-        model = mujoco_py.load_model_from_xml(sim_config(self.con_type,self.damping_value))
+        model = mujoco_py.load_model_from_xml(self.model_xml)
         sim = mujoco_py.MjSim(model)
         # simgui = mujoco_py.MjViewer(sim)
+
+        mujoco_py.cymj.set_pid_control(model,sim.data)
 
         log_qpos = []
         log_qvel = []
@@ -172,6 +174,8 @@ def sim_config(type, damping, kp, ki, kd):
         model = des.model_xml.format(actuator = des.p_controller.format(kp=kp), damping = damping)
     else:
         model = des.model_xml.format(actuator = des.pid_controller.format(kp=kp, ki=ki, kd=kd), damping = damping)
+
+    print(model)
 
     return model
 

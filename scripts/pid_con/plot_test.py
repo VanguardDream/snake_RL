@@ -103,7 +103,7 @@ class mainFrame(QWidget):
 
         info2 = info2.format(P = self.kp, I = self.ki, D = self.kd)
 
-        self.model_xml = sim_config(int(type),damp)
+        self.model_xml = sim_config(int(type),damp, self.kp, self.ki, self.kd)
 
         self.label_status.setText(info)
         self.label_status2.setText(info2)
@@ -169,9 +169,9 @@ def sim_config(type, damping, kp, ki, kd):
     # 0 -> p controller, 1 -> pid controller
 
     if type == 0:
-        model = des.model_xml.format(actuator = des.p_controller, damping = damping)
+        model = des.model_xml.format(actuator = des.p_controller.format(kp=kp), damping = damping)
     else:
-        model = des.model_xml.format(actuator = des.pid_controller, damping = damping)
+        model = des.model_xml.format(actuator = des.pid_controller.format(kp=kp, ki=ki, kd=kd), damping = damping)
 
     return model
 

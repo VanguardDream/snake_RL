@@ -3,6 +3,7 @@ model_xml = \
 
     <mujoco model="2link-test">
 
+        <size nuserdata="100" nuser_actuator="1"/>
         <compiler inertiafromgeom="true" angle="degree" convexhull="false"/>
 
         <option timestep="0.01" iterations="50" tolerance="1e-10" solver="Newton" jacobian="dense" cone="pyramidal"/>
@@ -59,10 +60,10 @@ model_xml = \
 
 p_controller = \
     """
-            <position name="servo_1" ctrllimited="true" ctrlrange="-1.5708 1.5708" forcelimited="true" forcerange="-3.7 3.7" gear="1" joint="joint1" kp="{kp}}"/>
+            <position name="servo_1" ctrllimited="true" ctrlrange="-1.5708 1.5708" forcelimited="true" forcerange="-3.7 3.7" gear="1" joint="joint1" kp="{kp}"/>
     """
 
 pid_controller = \
     """
-            <general ctrlrange='-1 1' gaintype="user" biastype="user" forcerange="-3.7 3.7" gainprm="{kp} {ki} {kd} 0.1 0.1 0" joint="joint1" name="servo_1"/>
+            <general ctrlrange='-1 1' gaintype="user" biastype="user" forcerange="-3.7 3.7" gainprm="{kp} {ki} {ki} {kd} {kd} 0" joint="joint1" name="servo_1"/>
     """

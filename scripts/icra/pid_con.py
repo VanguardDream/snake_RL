@@ -5,6 +5,7 @@ import numpy as np
 from dynamixel_sdk import *
 import matplotlib.pyplot as plt
 import os
+import csv
 
 if os.name == 'nt':
     import msvcrt
@@ -23,44 +24,51 @@ else:
         return ch
 
 def main():
-    start_main = datetime.datetime.now()
+    # start_main = datetime.datetime.now()
+    start_main = time.time()
     end_main = 0
     t_s = start_main
     timestep = 0
     accum_pos = []
 
     while(True):
-        dt = datetime.datetime.now() - t_s
+        dt = time.time() - t_s
+        # dt = datetime.datetime.now() - t_s
 
-        if dt.microseconds > 10000:
+        if dt > 0.001:
             timestep = timestep + 1
 
             if timestep == 500:
                 #Move to 60 degree (for dynamixel -> 682)
                 packetHandler.write4ByteTxOnly(portHandler, JOINT_ID, ADDR_GOAL_POSITION, 2048 + 682)
+                pass
 
             if timestep == 1000:
                 #Move to -60 degree
                 packetHandler.write4ByteTxOnly(portHandler, JOINT_ID, ADDR_GOAL_POSITION, 2048 - 682)
+                pass
 
             if timestep == 1500:
                 #Move to 60 degree
                 packetHandler.write4ByteTxOnly(portHandler, JOINT_ID, ADDR_GOAL_POSITION, 2048 + 682)
+                pass
 
             if timestep == 2000:
                 #Move to -60 degree
                 packetHandler.write4ByteTxOnly(portHandler, JOINT_ID, ADDR_GOAL_POSITION, 2048 - 682)
+                pass
 
             #Log Data Code Below
-            # now_pos, results, error = packetHandler.read4ByteTxRx(portHandler,JOINT_ID,ADDR_PRESENT_POSITION)
+            now_pos, results, error = packetHandler.read2ByteTxRx(portHandler,JOINT_ID,ADDR_PRESENT_POSITION)
 
-            # accum_pos.append(now_pos)
+            accum_pos.append(int(now_pos))
 
-            t_s = datetime.datetime.now()
+            # t_s = datetime.datetime.now()
+            t_s = time.time()
 
         else:
             if timestep >= 2500:
-                end_main = datetime.datetime.now()
+                end_main = time.time()
                 break
             continue
 
@@ -78,13 +86,13 @@ if __name__ == "__main__":
 
     DXL_MINIMUM_POSITION_VALUE  = 0         # Refer to the Minimum Position Limit of product eManual
     DXL_MAXIMUM_POSITION_VALUE  = 4095      # Refer to the Maximum Position Limit of product eManual
-    BAUDRATE                    = 3000000 # -> 통신 속도 조절
+    BAUDRATE                    = 4000000 # -> 통신 속도 조절
 
     PROTOCOL_VERSION            = 2.0
 
     # ex) Windows: "COM*", Linux: "/dev/ttyUSB*", Mac: "/dev/tty.usbserial-*"
-    # DEVICENAME                  = 'COM4'
-    DEVICENAME                  = '/dev/tty.usbserial-FT3FSNN5'
+    DEVICENAME                  = 'COM11'
+    # DEVICENAME                  = '/dev/tty.usbserial-FT3FSNN5'
 
     JOINT_ID = 13
 
@@ -131,11 +139,23 @@ if __name__ == "__main__":
 
     data, duration = main()
 
-    # plt.plot(list(range(0,2500)), data,'-*')
-    # plt.show()
+    plt.plot(list(range(0,2500)), data,'-*')
+    plt.show()
 
-    print(duration.seconds)
+    # print(data)
+
+    print(duration)
 
     packetHandler.write1ByteTxRx(portHandler, JOINT_ID, ADDR_TORQUE_ENABLE, 0)
 
     portHandler.closePort()
+
+    f = open('logs.csv','a')
+    writer = csv.writer(f)
+    
+    writer.writerow([datetime.datetime.now()])
+
+    for idx in range(0,len(data)):
+        writer.writerow([data[idx]])
+
+    f.close()

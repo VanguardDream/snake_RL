@@ -51,7 +51,7 @@ class mainFrame(QWidget):
         bt_conf = QPushButton("set",self)
         bt_run = QPushButton("run",self)
 
-        self.canvas = FigureCanvas(Figure(figsize=(5,3)))
+        self.canvas = FigureCanvas(Figure(figsize=(8,3)))
 
         # Layouts
         vlayout = QVBoxLayout()
@@ -81,7 +81,7 @@ class mainFrame(QWidget):
         bt_run.clicked.connect(self.bt_run_clicked)
 
         self.move(400,400)
-        self.resize(800,400)
+        self.resize(960,400)
         self.show()
 
     def bt_con_clicked(self):
@@ -174,8 +174,6 @@ def sim_config(type, damping, kp, ki, kd):
         model = des.model_xml.format(actuator = des.p_controller.format(kp=kp), damping = damping)
     else:
         model = des.model_xml.format(actuator = des.pid_controller.format(kp=kp, ki=ki, kd=kd), damping = damping)
-
-    print(model)
 
     return model
 

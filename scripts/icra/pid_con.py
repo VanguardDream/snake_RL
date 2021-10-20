@@ -23,42 +23,48 @@ else:
         return ch
 
 def main():
-    t_s = datetime.datetime.now()
+    start_main = datetime.datetime.now()
+    end_main = 0
+    t_s = start_main
     timestep = 0
     accum_pos = []
+
     while(True):
         dt = datetime.datetime.now() - t_s
 
         if dt.microseconds > 10000:
             timestep = timestep + 1
 
-            #Do Something
-        
             if timestep == 500:
                 #Move to 60 degree (for dynamixel -> 682)
-                packetHandler.write4ByteTxOnly(portHandler, 1, ADDR_GOAL_POSITION, 2048 + 682)
+                packetHandler.write4ByteTxOnly(portHandler, JOINT_ID, ADDR_GOAL_POSITION, 2048 + 682)
 
             if timestep == 1000:
                 #Move to -60 degree
-                packetHandler.write4ByteTxOnly(portHandler, 1, ADDR_GOAL_POSITION, 2048 - 682)
+                packetHandler.write4ByteTxOnly(portHandler, JOINT_ID, ADDR_GOAL_POSITION, 2048 - 682)
 
             if timestep == 1500:
                 #Move to 60 degree
-                packetHandler.write4ByteTxOnly(portHandler, 1, ADDR_GOAL_POSITION, 2048 + 682)
+                packetHandler.write4ByteTxOnly(portHandler, JOINT_ID, ADDR_GOAL_POSITION, 2048 + 682)
 
             if timestep == 2000:
                 #Move to -60 degree
-                packetHandler.write4ByteTxOnly(portHandler, 1, ADDR_GOAL_POSITION, 2048 - 682)
+                packetHandler.write4ByteTxOnly(portHandler, JOINT_ID, ADDR_GOAL_POSITION, 2048 - 682)
 
             #Log Data Code Below
-            now_pos, results, error = packetHandler.read4ByteTxRx(portHandler,1,ADDR_PRESENT_POSITION)
+            # now_pos, results, error = packetHandler.read4ByteTxRx(portHandler,JOINT_ID,ADDR_PRESENT_POSITION)
 
-            accum_pos.append(now_pos)
+            # accum_pos.append(now_pos)
 
+            t_s = datetime.datetime.now()
 
         else:
             if timestep >= 2500:
+                end_main = datetime.datetime.now()
                 break
+            continue
+
+    return accum_pos, end_main - start_main
 
 
 if __name__ == "__main__":
@@ -72,12 +78,15 @@ if __name__ == "__main__":
 
     DXL_MINIMUM_POSITION_VALUE  = 0         # Refer to the Minimum Position Limit of product eManual
     DXL_MAXIMUM_POSITION_VALUE  = 4095      # Refer to the Maximum Position Limit of product eManual
-    BAUDRATE                    = 4000000 # -> 통신 속도 조절
+    BAUDRATE                    = 3000000 # -> 통신 속도 조절
 
     PROTOCOL_VERSION            = 2.0
 
     # ex) Windows: "COM*", Linux: "/dev/ttyUSB*", Mac: "/dev/tty.usbserial-*"
-    DEVICENAME                  = 'COM4'
+    # DEVICENAME                  = 'COM4'
+    DEVICENAME                  = '/dev/tty.usbserial-FT3FSNN5'
+
+    JOINT_ID = 13
 
 
     # Initialize PortHandler instance
@@ -109,18 +118,24 @@ if __name__ == "__main__":
         getch()
         quit()
 
-    packetHandler.write1ByteTxRx(portHandler, 1, ADDR_TORQUE_ENABLE, 1)
+    packetHandler.write1ByteTxRx(portHandler, JOINT_ID, ADDR_TORQUE_ENABLE, 1)
 
     # GroupBW = GroupBulkWrite(portHandler,packetHandler)
 
 #모터 세팅 프로세스 끝!
 
     print('Ready for moving! press any key to move')
+    
     getch()
-    main()
+    packetHandler.write4ByteTxOnly(portHandler, JOINT_ID, ADDR_GOAL_POSITION, 2048)
 
-    # print('done!')
+    data, duration = main()
 
-    packetHandler.write1ByteTxRx(portHandler, 1, ADDR_TORQUE_ENABLE, 0)
+    # plt.plot(list(range(0,2500)), data,'-*')
+    # plt.show()
+
+    print(duration.seconds)
+
+    packetHandler.write1ByteTxRx(portHandler, JOINT_ID, ADDR_TORQUE_ENABLE, 0)
 
     portHandler.closePort()

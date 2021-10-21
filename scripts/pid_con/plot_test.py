@@ -4,6 +4,7 @@ import mujoco_py
 from matplotlib.backends.backend_qt5agg import FigureCanvas as FigureCanvas
 from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
 from matplotlib.figure import Figure
+from matplotlib import pyplot as plt
 
 from PyQt5 import QtGui, QtCore
 from PyQt5.QtWidgets import QApplication, QHBoxLayout, QLabel, QLineEdit, QPushButton, QTextEdit, QVBoxLayout, QWidget
@@ -51,7 +52,13 @@ class mainFrame(QWidget):
         bt_conf = QPushButton("set",self)
         bt_run = QPushButton("run",self)
 
-        self.canvas = FigureCanvas(Figure(figsize=(8,3)))
+        # # Using ax style plot
+        # self.canvas = FigureCanvas(Figure(figsize=(8,3)))
+
+        # Using pyplot style plot
+        self.fig = plt.figure()
+        self.canvas = FigureCanvas(self.fig)
+        self.toolbar = NavigationToolbar(self.canvas,self)
 
         # Layouts
         vlayout = QVBoxLayout()
@@ -144,16 +151,25 @@ class mainFrame(QWidget):
 
         log_file.close()
 
-        ax = self.canvas.figure.subplots()
-        # ax.plot(list(range(0,2500)), log_qvel, log_qpos, '-')
-        ax.plot(list(range(0,2500)), log_qvel, label = 'Velocity')
-        ax.plot(list(range(0,2500)), log_qpos, label = 'Position')
-        ax.legend(loc='upper right')
-        ax.grid()
-        ax.set_ylim([-10,10])
-        ax.set_xlabel("miliseconds (ms)")
-        ax.set_ylabel("rad ? rad/s")
-        self.canvas.draw()
+        # # Using ax style plot
+        # ax = self.canvas.figure.subplots()
+        # # ax.plot(list(range(0,2500)), log_qvel, log_qpos, '-')
+        # ax.plot(list(range(0,2500)), log_qvel, label = 'Velocity')
+        # ax.plot(list(range(0,2500)), log_qpos, label = 'Position')
+        # ax.legend(loc='upper right')
+        # ax.grid()
+        # ax.set_ylim([-10,10])
+        # ax.set_xlabel("miliseconds (ms)")
+        # ax.set_ylabel("rad ? rad/s")
+        # self.canvas.draw()
+
+        # Using pyplot style plot
+        plt.close()
+        plt.plot(list(range(0,2500)), log_qvel, label = 'Velocity')
+        plt.plot(list(range(0,2500)), log_qpos, label = 'Position')
+        plt.legend(loc='upper right')
+        plt.grid()
+        plt.show()
 
 
 def main():

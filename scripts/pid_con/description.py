@@ -45,7 +45,7 @@ model_xml = \
                 <geom type="box" size="0.017 0.01425 0.02525" pos="0 0 0.01525" mass="0.1"/>
 
                 <body name="link1" pos="0 0 0.0685">
-                    <joint name="joint1" type="hinge" pos="0 0 -0.02925" axis="0 1 0" limited="true" range="-90 90" damping="{damping}" stiffness="0" armature="0.05" />
+                    <joint name="joint1" type="hinge" pos="0 0 -0.02925" axis="0 1 0" limited="true" range="-90 90" damping="{damping}" armature="0.01"/>
                     <geom type="cylinder" size="0.0325 0.01" rgba="0.1 0.1 0.1 1" mass="0.04"/>
                     <geom type="box" size="0.01425 0.017 0.02525" pos="0 0 0.01525" mass="0.1"/>
                 </body>

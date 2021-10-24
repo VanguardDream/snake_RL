@@ -60,7 +60,7 @@ model_xml = \
 
 p_controller = \
     """
-            <position name="servo_1" ctrllimited="true" ctrlrange="-1.5708 1.5708" forcelimited="true" forcerange="-3.7 3.7" joint="joint1" kp="{kp}"/>
+            <position name="servo_1" ctrllimited="true" ctrlrange="-1.5708 1.5708" forcelimited="true" forcerange="-3.0 3.0" joint="joint1" kp="{kp}"/>
     """
 
 pid_controller = \

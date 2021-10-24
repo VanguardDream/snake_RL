@@ -58,7 +58,6 @@ class mainFrame(QWidget):
         # Using pyplot style plot
         self.fig = plt.figure()
         self.canvas = FigureCanvas(self.fig)
-        self.toolbar = NavigationToolbar(self.canvas,self)
 
         # Layouts
         vlayout = QVBoxLayout()
@@ -78,7 +77,6 @@ class mainFrame(QWidget):
         vlayout.addWidget(bt_run)
 
         hlayout = QHBoxLayout()
-        hlayout.addWidget(self.canvas)
         hlayout.addLayout(vlayout)
 
         self.setLayout(hlayout)
@@ -88,7 +86,7 @@ class mainFrame(QWidget):
         bt_run.clicked.connect(self.bt_run_clicked)
 
         self.move(400,400)
-        self.resize(960,400)
+        self.resize(500,300)
         self.show()
 
     def bt_con_clicked(self):

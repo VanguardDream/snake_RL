@@ -27,7 +27,7 @@ def J(g, d_a, d_p, d_l, l_a, l_p, l_l, tau):
     # For generalized xml code!
     joint_names = ['joint1','joint2','joint3','joint4','joint5','joint6','joint7','joint8','joint9','joint10','joint11','joint12','joint13','joint14']
 
-    for i in range(0,2000):
+    for i in range(0,1500):
         goal = gen.generate(i)
 
         spec_motor = np.nonzero(goal)[0]
@@ -64,9 +64,9 @@ def J(g, d_a, d_p, d_l, l_a, l_p, l_l, tau):
     return J_value
 
 def main():
-    gait_type = 2
+    gait_type = 1
     
-    gait_params = [42.77249038, 51.4363522,	10,	48.22207185,	359.8425441,	-6.32340765,	1]
+    gait_params = [55.7, 70.5,	-9.5,	57.2,	75.5,	10,	1]
     reward = J(gait_type, gait_params[0], gait_params[1], gait_params[2], gait_params[3], gait_params[4], gait_params[5], gait_params[6])
 
     print('Gait\'s reward : %f'  %(reward))

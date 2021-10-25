@@ -14,7 +14,7 @@ import numpy as np
 from scipy.optimize import minimize
 
 #load model from path
-snake = mujoco_py.load_model_from_path("../description/mujoco/snake_allign.xml")
+snake = mujoco_py.load_model_from_path("../description/mujoco/snake_dgist.xml")
 
 # mujoco-py
 simulator = mujoco_py.MjSim(snake)
@@ -213,7 +213,7 @@ def J_sci_ver(ndarray):
     # For generalized xml code!
     joint_names = ['joint1','joint2','joint3','joint4','joint5','joint6','joint7','joint8','joint9','joint10','joint11','joint12','joint13','joint14']
 
-    for i in range(0,1000):
+    for i in range(0,1500):
         goal = gen.generate(i)
 
         spec_motor = np.nonzero(goal)[0]
@@ -267,7 +267,7 @@ def J_sci_sin(ndarray):
     # For generalized xml code!
     joint_names = ['joint1','joint2','joint3','joint4','joint5','joint6','joint7','joint8','joint9','joint10','joint11','joint12','joint13','joint14']
 
-    for i in range(0,1000):
+    for i in range(0,1500):
         goal = gen.generate(i)
 
         spec_motor = np.nonzero(goal)[0]
@@ -318,7 +318,7 @@ def J_sci_side(ndarray):
     # For generalized xml code!
     joint_names = ['joint1','joint2','joint3','joint4','joint5','joint6','joint7','joint8','joint9','joint10','joint11','joint12','joint13','joint14']
 
-    for i in range(0,1000):
+    for i in range(0,1500):
         goal = gen.generate(i)
 
         spec_motor = np.nonzero(goal)[0]
@@ -362,10 +362,10 @@ def main():
     # while True:
     for i in range(200):
 
-        csv_log = open('wsl_optimization_2.csv','a')
+        csv_log = open('mark3model.csv','a')
         csv_writer = csv.writer(csv_log)
 
-        gait_type = 2
+        gait_type = 1
         res = optimizeSci(gait=gait_type)
 
         temp_result = res.get('fun')

@@ -72,7 +72,7 @@ def main():
 
     print('Gait\'s reward : %f'  %(reward))
 
-    plt.plot(list(range(0,1500)),x_t)
+    plt.plot(x_t,y_t)
     plt.show()
 
 if __name__ == "__main__":

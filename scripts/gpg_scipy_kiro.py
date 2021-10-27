@@ -163,7 +163,7 @@ def optimizeGait(eps = 1, l = 1, local_minima = 0):
             else:
                 param[i] = param[i] + gradient_vector[i]
 
-def optimizeSci(gait = 1, options={'xatol': 0.1, 'fatol' : 0.5, 'disp': True, 'eps': 0.5}):
+def optimizeSci(gait = 1, exoptimal = 0,options={'xtol': 0.1, 'ftol' : 0.5, 'disp': True, 'eps': 0.5}):
     d_amp = random.randint(0, 90)
     d_phase = random.randint(0,360)
     d_lambda = random.randint(-10,10)
@@ -174,6 +174,8 @@ def optimizeSci(gait = 1, options={'xatol': 0.1, 'fatol' : 0.5, 'disp': True, 'e
 
     tau = random.randint(1,3)
 
+    origin = [d_amp,d_phase,d_lambda,l_amp,l_phase,l_lambda,tau]
+
     #vertical vector
     xv0 = np.array([d_amp,d_phase,d_lambda,tau])
     xvbound = ((0,90), (0,360), (-10,10), (1,3))
@@ -183,18 +185,30 @@ def optimizeSci(gait = 1, options={'xatol': 0.1, 'fatol' : 0.5, 'disp': True, 'e
     xbound = ((0,90), (0,360), (-10,10), (0,90), (0,360), (-10,10), (1,6))
 
     if gait == 0:
-        res = minimize(J_sci_ver, xv0, method='Nelder-Mead', bounds=xvbound,options=options)
+        if exoptimal > J_sci_ver(xv0):
+            print('Random vector result is less than ex_optimal value retrying...')
+            return origin, -1
+        else:
+            res = minimize(J_sci_ver, xv0, method='Nelder-Mead', bounds=xvbound,options=options)
 
     elif gait == 1:
-        res = minimize(J_sci_sin, x0, method='Nelder-Mead', bounds=xbound,options=options)
+        if exoptimal > J_sci_sin(x0):
+            print('Random vector result is less than ex_optimal value retrying...')
+            return origin, -1
+        else:
+            res = minimize(J_sci_sin, x0, method='Nelder-Mead', bounds=xbound,options=options)
 
     elif gait == 2:
-        res = minimize(J_sci_side, x0, method='Nelder-Mead', bounds=xbound,options=options)
+        if exoptimal > J_sci_side(x0):
+            print('Random vector result is less than ex_optimal value retrying...')
+            return origin, -1
+        else:
+            res = minimize(J_sci_side, x0, method='Nelder-Mead', bounds=xbound,options=options)
 
     else:
         return -1
 
-    return res
+    return origin, res
 
 def J_sci_ver(ndarray):
     gen = gait_lambda.gait(0,ndarray[0],ndarray[1],ndarray[2],0,0,0,int(ndarray[2]))
@@ -354,26 +368,39 @@ def J_sci_side(ndarray):
 def main():
 
     # optimal_reward = 2816;
+    global optimal_reward
+    optimal_reward = 1600;
 
-    optimal_reward = 1500;
 
     print('Gait optimizing Start...')
 
-    # while True:
-    for i in range(200):
-
-        csv_log = open('mark3model.csv','a')
+    while True:
+    # for i in range(200):
+        csv_log = open('mark5.csv','a')
         csv_writer = csv.writer(csv_log)
 
         gait_type = 1
-        res = optimizeSci(gait=gait_type)
+        origin, res = optimizeSci(gait=gait_type,exoptimal=optimal_reward)
 
-        temp_result = res.get('fun')
-        x_star = res.get('x')
+        if res != -1:
+            temp_result = res.get('fun')
 
-        csv_writer.writerow([time.ctime(time.time())] + [gait_type] + x_star.tolist() + [ -1 * temp_result])
+            if (temp_result * -1) < optimal_reward:
+                csv_writer.writerow([time.ctime(time.time())] + [gait_type] + ["Origin : "] + origin)
+                csv_writer.writerow(['Wrong optimization value'] + [ -1 * temp_result])
+
+            else:
+                x_star = res.get('x')
+                x_result = x_star.tolist()
+                x_result = [round(num, 2) for num in x_result]
+
+                csv_writer.writerow([time.ctime(time.time())] + [gait_type] + ["Origin : "] + origin)
+                csv_writer.writerow(x_result + [ -1 * temp_result])
+
+                optimal_reward = -1 * temp_result
 
         csv_log.close()
+
 
         # if temp_result * -1 > optimal_reward:
         #     print('new optimal found! terminate iteration.\n')

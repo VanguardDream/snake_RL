@@ -308,7 +308,7 @@ def J_sci_sin(ndarray):
     simulator.reset()
     #Calculate Cost here
 
-    J_value = 1500 * delta_x - 60 * abs(delta_y) - 900 * abs(delta_y / delta_x)
+    J_value = 1500 * delta_x - 800 * abs(delta_y) - 900 * abs(delta_y / delta_x)
 
     print('End gait optimize senario with gait params : [ %f, %f, %f, %f, %f, %f, %d -> reward : %f]' %(ndarray[0],ndarray[1],ndarray[2],ndarray[3],ndarray[4],ndarray[5],ndarray[6],J_value))
     
@@ -376,7 +376,7 @@ def main():
 
     while True:
     # for i in range(200):
-        csv_log = open('mark5.csv','a')
+        csv_log = open('mark6.csv','a')
         csv_writer = csv.writer(csv_log)
 
         gait_type = 1

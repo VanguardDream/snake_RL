@@ -59,7 +59,7 @@ def J(g, d_a, d_p, d_l, l_a, l_p, l_l, tau):
     if (g == 2):
         J_value = 3500 * delta_y
     else:
-        J_value = 1500 * delta_x - 60 * abs(delta_y) - 900 * abs(delta_y / delta_x)
+        J_value = 1500 * delta_x - 800 * abs(delta_y) - 900 * abs(delta_y / delta_x)
 
     # print("%f : %f : %f : %f : %d : %lf" %(d_a,d_p,l_a,l_p,tau,J_value))
     return J_value, x_of_t, y_of_t
@@ -67,12 +67,20 @@ def J(g, d_a, d_p, d_l, l_a, l_p, l_l, tau):
 def main():
     gait_type = 1
     
-    gait_params = [55.7, 70.5,	-9.5,	57.2,	75.5,	10,	1]
+    # gait_params = [55.7, 70.5,	-9.5,	57.2,	75.5,	10,	1]
+    # gait_params = [55.7, 57.2, -9.5, 70.5, 76.5, 10, 1] #-> optimal serpenoid
+
+    gait_params = [39.8, 189.9, -9.1, 66.5, 160.9, 7.0, 1]
+
+    # gait_params = [61.03, 10.9, 2.8, 15.71, 26.21, 1.05, 1]
+    
     reward, x_t, y_t = J(gait_type, gait_params[0], gait_params[1], gait_params[2], gait_params[3], gait_params[4], gait_params[5], gait_params[6])
 
     print('Gait\'s reward : %f'  %(reward))
 
     plt.plot(x_t,y_t)
+    # plt.xlim([-0.7, 1.5])
+    # plt.ylim([-0.6,0.4])
     plt.show()
 
 if __name__ == "__main__":

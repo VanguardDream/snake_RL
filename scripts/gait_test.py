@@ -65,15 +65,21 @@ def J(g, d_a, d_p, d_l, l_a, l_p, l_l, tau):
     return J_value, x_of_t, y_of_t
 
 def main():
-    gait_type = 1
+    # gait_type = 1
+    # gait_params = [39.8, 189.9, -9.1, 66.5, 160.9, 7.0, 1] # -> new serpenoid param
     
+    gait_type = 2
+    # gait_params = [55.7, 57.2, -9.5, 70.5, 76.5, 10, 1]
+    # gait_params = [38.2, 41.4, -8, 66.0, 51.6, 1 ,  3] # -> icra2022 sidewind gait
+    gait_params = [87, 	40.16,	2.02,	13.87,	267.47,	-1.02,	1] # For now best? sidewind
+    
+
     # gait_params = [55.7, 70.5,	-9.5,	57.2,	75.5,	10,	1]
     # gait_params = [55.7, 57.2, -9.5, 70.5, 76.5, 10, 1] #-> optimal serpenoid
-
-    gait_params = [39.8, 189.9, -9.1, 66.5, 160.9, 7.0, 1]
-
     # gait_params = [61.03, 10.9, 2.8, 15.71, 26.21, 1.05, 1]
     
+    
+
     reward, x_t, y_t = J(gait_type, gait_params[0], gait_params[1], gait_params[2], gait_params[3], gait_params[4], gait_params[5], gait_params[6])
 
     print('Gait\'s reward : %f'  %(reward))

@@ -119,15 +119,20 @@ def J_t(g, d_a, d_p, d_l, l_a, l_p, l_l, tau):
 
 
 def main():
-    gait_type = 1
-    gait_params = [56.0, 57.7, -9.5, 71.0, 76.2, 10, 1]
+    # gait_type = 1
+    # gait_params = [56.0, 57.7, -9.5, 71.0, 76.2, 10, 1]
     
     # gait_type = 2
     # gait_params = [37.2, 37.4, -8, 61.9, 61.7, 1 ,  3]
 
+    #EAAI
+
+    gait_type = 2
+    gait_params = [52.76,	319.65,	1.99,	72.07,	262.95,	7.91,	1] #EAAI Op
+
     count = 0
 
-    csv_log = open('gradient_sin_10E4.csv','a')
+    csv_log = open('gradient_side_.csv','a')
     csv_writer = csv.writer(csv_log)
 
     for i0 in range(-5,6): # d_a
@@ -146,13 +151,19 @@ def main():
                     count = count + 1
 
 def main2():
-    gait_type = 1
-    gait_params = [39.8, 189.9, -9.1, 66.5, 160.9, 7.0, 1] #EAAI Serp
+    # gait_type = 1
+    # gait_params = [39.8, 189.9, -9.1, 66.5, 160.9, 7.0, 1] #EAAI Serp
+    # gait_params = [40.7, 191.1, -9.1, 66.5, 160.9, 7.0, 1] #EAAI serp c1 group
+    # gait_params = [39.8, 189.9, -9.1, 67.1, 160.3, 7.0, 1] #EAAI serp c2 group
     
-    # gait_type = 2
-    # gait_params = [87, 	40.16,	2.02,	13.87,	267.47,	-1.02,	1] #EAAI side
+    gait_type = 2
+    # gait_params = [87, 	40.16,	2.02,	13.87,	267.47,	-1.02,	1] #EAAI side 1st try
 
-    csv_log = open('serp_xy_trajactory.csv','w')
+    # gait_params = [52.76,	319.65,	1.99,	72.07,	262.95,	7.91,	1] #EAAI side 2nd try op
+    # gait_params = [52.16,	318.15,	1.99,	72.07,	262.95,	7.91,	1] #EAAI side c1
+    gait_params = [52.76,	319.65,	1.99,	72.67,	261.75,	7.91,	1] #EAAI side c2
+
+    csv_log = open('side_xy_trajactory_c2.csv','w')
     csv_writer = csv.writer(csv_log)
 
     reward, com = J_t(gait_type, gait_params[0], gait_params[1], gait_params[2], gait_params[3], gait_params[4], gait_params[5], gait_params[6])
@@ -213,4 +224,4 @@ def main4():
             count = count + 1
 
 if __name__ == "__main__":
-        main3()
+        main()

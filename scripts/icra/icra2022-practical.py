@@ -1,10 +1,11 @@
-
 import datetime
 import time
 import gait_lambda
 import numpy as np
 from dynamixel_sdk import *
 import os
+
+# from scripts.icra.pid_con import DEVICENAME
 
 if os.name == 'nt':
     import msvcrt
@@ -35,7 +36,8 @@ def J(g, d_a, d_p, d_l, l_a, l_p, l_l, tau):
 
         spec_motor = np.nonzero(goal)[0]
 
-        commandQ = datetime.datetime.now()
+        # commandQ = datetime.datetime.now()
+        commandQ = time.time()
         for idx in spec_motor:
             # Commnad motor here
             
@@ -44,10 +46,10 @@ def J(g, d_a, d_p, d_l, l_a, l_p, l_l, tau):
 
             # GroupBW.addParam((14-(idx+1)),ADDR_GOAL_POSITION,4,goalP)
             while(True):
-                t_period = datetime.datetime.now() - commandQ
+                t_period = time.time() - commandQ
 
-                if t_period.microseconds > 8300 :
-                    packetHandler.write4ByteTxOnly(portHandler, (14-(idx+1)), ADDR_GOAL_POSITION, goalP)
+                if t_period > 0.01 :
+                    packetHandler.write4ByteTxOnly(portHandler, (idx), ADDR_GOAL_POSITION, goalP)
                     break
 
 
@@ -56,20 +58,34 @@ def J(g, d_a, d_p, d_l, l_a, l_p, l_l, tau):
 
 
 def main():
+
     # gait_type = 1
-    # gait_params = [55.7, 57.2, -9.5, 70.5, 76.5, 10, 1] # Optimal
+    # Optimal
+    # gait_params = [39.8, 189.9, -9.1, 66.5, 160.9, 7.0, 1]  #EAAI
+
+
+
+    # gait_params = [55.7, 57.2, -9.5, 70.5, 76.5, 10, 1] 
+    
     # gait_params = [55.7, 57.2, -9.5, 70.5, 74.5, 10, 1] # Poor minus
     # gait_params = [55.7, 57.2, -9.5, 70.5, 78.5, 10, 1] # Poor plus
     
     gait_type = 2
-    # [37.2, 37.4, -8, 61.9, 61.7, 1 ,  3] # 옵티말
+    # gait_params = [52.76,	319.65,	1.99,	72.07,	263.95,	7.91,	1] # EAAI
+
+    # gait_params = [52.76,	319.65,	1.99,	72.07,	262.95,	7.91,	1] #EAAI Op
+    gait_params = [52.16,	318.15,	1.99,	72.07,	262.95,	7.91,	1] #EAAI c1
+    # gait_params = [52.76,	319.65,	1.99,	72.67,	261.75,	7.91,	1] #EAAI c2
+
+
+    # [37.2, 37.4, -8, 61.9, 61.7, 1 ,  3] # op
 
     # gait_params = [38.2, 43.4, -8, 66.0, 51.6, 1 ,  3] 
-    # gait_params = [38.2, 43.4, -8, 66.0, 51.6, 1 ,  3] # Poor 원래 옵티말
+    # gait_params = [38.2, 43.4, -8, 66.0, 51.6, 1 ,  3] # Poor original op
 
-    # gait_params = [38.2, 41.4, -8, 66.0, 51.6, 1 ,  3] # 뉴 옵티말
+    # gait_params = [38.2, 41.4, -8, 66.0, 51.6, 1 ,  3] # new optimal
     # gait_params = [38.2, 39.4, -8, 66.0, 51.6, 1 ,  3] # Poor -
-    gait_params = [38.2, 43.4, -8, 66.0, 51.6, 1 ,  3] # Poor +
+    # gait_params = [38.2, 43.4, -8, 66.0, 51.6, 1 ,  3] # Poor +
 
     
 
@@ -96,12 +112,13 @@ if __name__ == "__main__":
 
     DXL_MINIMUM_POSITION_VALUE  = 0         # Refer to the Minimum Position Limit of product eManual
     DXL_MAXIMUM_POSITION_VALUE  = 4095      # Refer to the Maximum Position Limit of product eManual
-    BAUDRATE                    = 4000000 # -> 통신 속도 조절
+    BAUDRATE                    = 3000000 # -> 통신 속도 조절
 
     PROTOCOL_VERSION            = 2.0
 
     # ex) Windows: "COM*", Linux: "/dev/ttyUSB*", Mac: "/dev/tty.usbserial-*"
-    DEVICENAME                  = 'COM4'
+    # DEVICENAME                  = 'COM4'
+    DEVICENAME                    = '/dev/tty.usbserial-FT3M9YHP'
 
 
     # Initialize PortHandler instance
@@ -134,7 +151,7 @@ if __name__ == "__main__":
         quit()
 
     for i in range(14):
-        packetHandler.write1ByteTxRx(portHandler, (i+1), ADDR_TORQUE_ENABLE, 1)
+        packetHandler.write1ByteTxRx(portHandler, (i), ADDR_TORQUE_ENABLE, 1)
 
     # GroupBW = GroupBulkWrite(portHandler,packetHandler)
 
@@ -147,6 +164,26 @@ if __name__ == "__main__":
     # print('done!')
 
     for i in range(14):
-        packetHandler.write1ByteTxRx(portHandler, (i+1), ADDR_TORQUE_ENABLE, 0)
+        packetHandler.write1ByteTxRx(portHandler, (i), ADDR_TORQUE_ENABLE, 0)
+
+    time.sleep(0.1)
+
+    for i in range(14):
+        packetHandler.write1ByteTxRx(portHandler, (i), ADDR_TORQUE_ENABLE, 0)
+
+    time.sleep(0.1)
+
+    for i in range(14):
+        packetHandler.write1ByteTxRx(portHandler, (i), ADDR_TORQUE_ENABLE, 0)
+
+    time.sleep(0.1)
+
+    for i in range(14):
+        packetHandler.write1ByteTxRx(portHandler, (i), ADDR_TORQUE_ENABLE, 0)
+
+    time.sleep(0.1)
+
+    for i in range(14):
+        packetHandler.write1ByteTxRx(portHandler, (i), ADDR_TORQUE_ENABLE, 0)
 
     portHandler.closePort()

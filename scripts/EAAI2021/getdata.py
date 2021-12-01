@@ -146,13 +146,14 @@ def main():
                     count = count + 1
 
 def main2():
-    gait_type = 1
-    gait_params = [39.8, 189.9, -9.1, 66.5, 160.9, 7.0, 1] #EAAI Serp
+    # gait_type = 1
+    # gait_params = [39.8, 189.9, -9.1, 66.5, 160.9, 7.0, 1] #EAAI Serp
     
-    # gait_type = 2
-    # gait_params = [87, 	40.16,	2.02,	13.87,	267.47,	-1.02,	1] #EAAI side
+    gait_type = 2
+    # gait_params = [87, 	40.16,	2.02,	13.87,	267.47,	-1.02,	1] #EAAI side 1st try
+    gait_params = [52.76,319.65,1.99,72.07,262.95,7.91,1] #EAAI side 2nd try
 
-    csv_log = open('serp_xy_trajactory.csv','w')
+    csv_log = open('side_xy_trajactory_2.csv','w')
     csv_writer = csv.writer(csv_log)
 
     reward, com = J_t(gait_type, gait_params[0], gait_params[1], gait_params[2], gait_params[3], gait_params[4], gait_params[5], gait_params[6])
@@ -163,22 +164,25 @@ def main2():
     csv_log.close()
 
 def main3(): # Grid search code all params
-    gait_type = 1
-    gait_params = [39.8, 189.9, -9.1, 66.5, 160.9, 7.0, 1] #EAAI Serp
+    # gait_type = 1
+    # gait_params = [39.8, 189.9, -9.1, 66.5, 160.9, 7.0, 1] #EAAI Serp
+
+    gait_type = 2
+    gait_params = [52.76,319.65,1.99,72.07,262.95,7.91,1] #EAAI side 2nd try
     
     count = 0
 
-    csv_log = open('serp_gridsearch.csv','w')
+    csv_log = open('side_grid_11_3_3.csv','w')
     csv_writer = csv.writer(csv_log)
 
-    for i0 in range(-8,9): # d_a
-        for i1 in range(-8,9): # d_p
-            for i2 in range (-8,9):
-                for i3 in range(-8,9):
-                    test_params = [gait_params[0] + i0 * 0.4, gait_params[1] + i1 * 0.4, gait_params[2], gait_params[3] + i2 * 0.4, gait_params[4] + i3 * 0.4, gait_params[5], gait_params[6] ]
+    for i0 in range(-5,6): # d_a
+        for i1 in range(-5,6): # d_p
+            for i2 in range (-5,6):
+                for i3 in range(-5,6):
+                    test_params = [gait_params[0] + i0 * 0.3, gait_params[1] + i1 * 0.3, gait_params[2], gait_params[3] + i2 * 0.3, gait_params[4] + i3 * 0.3, gait_params[5], gait_params[6] ]
 
-                    reward = J(gait_type, test_params[0], test_params[1], test_params[2], test_params[3], 
-                                                test_params[4],test_params[5],test_params[6])
+                    reward = J(gait_type, round(test_params[0],2), round(test_params[1],2), test_params[2], round(test_params[3],2), 
+                                                round(test_params[4],2),test_params[5],test_params[6])
 
                     csv_writer.writerow(test_params[0:6] + [reward])
                     print('Iteration : (%d) reward : %f'  %(count,reward))

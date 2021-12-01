@@ -163,7 +163,7 @@ def optimizeGait(eps = 1, l = 1, local_minima = 0):
             else:
                 param[i] = param[i] + gradient_vector[i]
 
-def optimizeSci(gait = 1, exoptimal = 0,options={'xtol': 0.1, 'ftol' : 0.5, 'disp': True, 'eps': 0.5}):
+def optimizeSci(gait = 1, exoptimal = 0,options={'xatol': 3, 'fatol' : 15, 'disp': True, 'eps': 0.5}):
     d_amp = random.randint(0, 90)
     d_phase = random.randint(0,360)
     d_lambda = random.randint(-10,10)
@@ -359,7 +359,8 @@ def J_sci_side(ndarray):
     simulator.reset()
     #Calculate Cost here
 
-    J_value = 3500 * abs(delta_y) - 1000 * abs(delta_x / delta_y)
+    # J_value = 3500 * abs(delta_y) - 1000 * abs(delta_x / delta_y)
+    J_value = 1500 * delta_y - 800 * abs(delta_x) - 900 * abs(delta_x / delta_y)
 
     print('End gait optimize senario with gait params : [ %f, %f, %f, %f, %f, %f, %d -> reward : %f]' %(ndarray[0],ndarray[1],ndarray[2],ndarray[3],ndarray[4],ndarray[5],ndarray[6],J_value))
     
@@ -376,10 +377,10 @@ def main():
 
     while True:
     # for i in range(200):
-        csv_log = open('mark6.csv','a')
+        csv_log = open('mark8.csv','a')
         csv_writer = csv.writer(csv_log)
 
-        gait_type = 1
+        gait_type = 2
         origin, res = optimizeSci(gait=gait_type,exoptimal=optimal_reward)
 
         if res != -1:

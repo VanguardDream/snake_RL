@@ -66,7 +66,7 @@ def J(g,d_a,d_p,d_l,l_a,l_p,l_l,tau):
 def main():
     gait_type = 1
     
-    gait_params = [88.28950152,	118.4684103,	10,	64.3157035,	54.24590232,	6.122704765,	1.015997785]
+    gait_params = [39.8, 189.9, -9.1, 66.5, 160.9, 7.0, 1]
     reward = J(gait_type, gait_params[0], gait_params[1], gait_params[2], gait_params[3], gait_params[4],gait_params[5],gait_params[6])
 
     print('Gait\'s reward : %f'  %(reward))

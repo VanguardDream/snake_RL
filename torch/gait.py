@@ -54,6 +54,16 @@ class gait:
                                     [0,0,0,0,0,0,0,0,0,0,0,0,0,1],
                                     [0,0,0,0,0,0,0,0,0,0,0,0,1,0]],dtype='int')
 
+    def setParams(self, gait,d_amp = 30, d_phase = 150, d_lam = 1,l_amp = 30, l_phase = 150, l_lam = 1, tau = 1):
+        self.gait =gait
+        self.d_amp = d_amp
+        self.d_phase = d_phase
+        self.d_lam = d_lam
+        self.l_amp = l_amp
+        self.l_phase = l_phase
+        self.l_lam = l_lam
+        self.tau = tau
+
     def radtodeg(self, rad):
         return rad * 180/math.pi
 

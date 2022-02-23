@@ -88,8 +88,49 @@ class SimpleCorridor(gym.Env):
     def seed(self, seed=None):
         random.seed(seed)
 
+class bongSnake(gym.Env):
+    """Example of a custom env in which you have to walk down a corridor.
+    You can configure the length of the corridor via the env config."""
 
-class bongSnakeEnv(TorchModelV2, nn.Module):
+    def __init__(self, config: EnvContext):
+        self.end_k = config["sim_length"]
+        self.action_space = Box(low=np.array([-800, 0, 100, -800, 0, 1]),high=np.array([800, 3600, 100, 800, 3600, 10]),dtype=int)
+
+        # Obs space : k, theta, theta_dot, position(x,y,z), quaternion(r,p,y,w) -> total 36
+        obs_lim_low = np.array([0,\
+                    -np.pi, -np.pi, -np.pi, -np.pi, -np.pi, -np.pi, -np.pi, -np.pi, -np.pi, -np.pi, -np.pi, -np.pi, -np.pi, -np.pi,\
+                        -np.pi, -np.pi, -np.pi, -np.pi, -np.pi, -np.pi, -np.pi, -np.pi, -np.pi, -np.pi, -np.pi, -np.pi, -np.pi, -np.pi,\
+                            -np.inf,-np.inf,-np.inf,\
+                                -1, -1, -1, -1])
+
+        obs_lim_low = np.array([np.inf,\
+            np.pi, np.pi, np.pi, np.pi, np.pi, np.pi, np.pi, np.pi, np.pi, np.pi, np.pi, np.pi, np.pi, np.pi,\
+                np.pi, np.pi, np.pi, np.pi, np.pi, np.pi, np.pi, np.pi, np.pi, np.pi, np.pi, np.pi, np.pi, np.pi,\
+                    -np.inf,-np.inf,-np.inf,\
+                        -1, -1, -1, -1])
+                        
+        self.observation_space = Box(0.0, self.end_pos, shape=(1,), dtype=np.float32)
+        # Set the seed. This is only used for the final (reach goal) reward.
+        self.seed(config.worker_index * config.num_workers)
+
+    def reset(self):
+        self.cur_pos = 0
+        return [self.cur_pos]
+
+    def step(self, action):
+        assert action in [0, 1], action
+        if action == 0 and self.cur_pos > 0:
+            self.cur_pos -= 1
+        elif action == 1:
+            self.cur_pos += 1
+        done = self.cur_pos >= self.end_pos
+        # Produce a random reward when we reach the goal.
+        return [self.cur_pos], random.random() * 2 if done else -0.1, done, {}
+
+    def seed(self, seed=None):
+        random.seed(seed)
+
+class bongSnakeModel(TorchModelV2, nn.Module):
     """Example of a PyTorch custom model that just delegates to a fc-net."""
 
     def __init__(self, obs_space, action_space, num_outputs, model_config, name):
@@ -120,7 +161,7 @@ if __name__ == "__main__":
     # Can also register the env creator function explicitly with:
     # register_env("corridor", lambda config: SimpleCorridor(config))
     ModelCatalog.register_custom_model(
-        "my_model", bongSnakeEnv if args.framework == "torch" else CustomModel
+        "my_model", bongSnakeModel if args.framework == "torch" else CustomModel
     )
 
     config = {

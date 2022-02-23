@@ -103,13 +103,13 @@ class bongSnake(gym.Env):
                             -np.inf,-np.inf,-np.inf,\
                                 -1, -1, -1, -1])
 
-        obs_lim_low = np.array([np.inf,\
+        obs_lim_high = np.array([np.inf,\
             np.pi, np.pi, np.pi, np.pi, np.pi, np.pi, np.pi, np.pi, np.pi, np.pi, np.pi, np.pi, np.pi, np.pi,\
                 np.pi, np.pi, np.pi, np.pi, np.pi, np.pi, np.pi, np.pi, np.pi, np.pi, np.pi, np.pi, np.pi, np.pi,\
                     -np.inf,-np.inf,-np.inf,\
                         -1, -1, -1, -1])
                         
-        self.observation_space = Box(0.0, self.end_pos, shape=(1,), dtype=np.float32)
+        self.observation_space = Box(low=obs_lim_low, high=obs_lim_high, dtype=np.float32)
         # Set the seed. This is only used for the final (reach goal) reward.
         self.seed(config.worker_index * config.num_workers)
 

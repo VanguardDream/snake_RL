@@ -1,5 +1,13 @@
+# © 2022 Bongsub Song <doorebong@gmail.com>
+# All right reserved
+# Date : 2022-03-04 (YYYYMMDD)
+# Description : Bong Snake Env for Gym
+
+from socket import gaierror
 import numpy as np
+import gait
 from gym import utils
+from gym.spaces import *
 from gym.envs.mujoco import mujoco_env
 
 
@@ -8,10 +16,76 @@ DEFAULT_CAMERA_CONFIG = {
 }
 
 
-class AntEnv(mujoco_env.MujocoEnv, utils.EzPickle):
+class bongEnv(mujoco_env.MujocoEnv, utils.EzPickle):
+    """
+    Description
+
+    Actoin space:
+    | Num | Action               | Control Min   | Control Max    | Name (in corresponding gait class) | Joint | Unit |
+    |-----|----------------------|---------------|----------------|---------------------------------------|-------|------|
+    | 0   | dorsal amplitute     | -85  | 85    | d_amp           | hinge | degree |
+    | 1   | dorsal phase         |   0  | 360   | d_phase         | hinge | degree |
+    | 2   | dorsal lambda        | -10  | 10    | d_lam           | hinge | dimensionless |
+    | 3   | lateral amplitude    | -85  | 85    | l_amp           | hinge | degree |
+    | 4   | lateral phase        |   0  | 360   | l_phase         | hinge | degree |
+    | 5   | lateral lambda       | -10  | 10    | l_lam           | hinge | dimensionless |
+    | 6   | tau                  |   1  | 6     | tau             | hinge | dimensionless |
+
+
+    Observation space:
+    | Num | Observation                                                     | Min                | Max                | Name (in corresponding XML file) | Joint | Unit |
+    |-----|-----------------------------------------------------------------|----------------|-----------------|----------------------------------------|-------|------|
+    | 0   | x-coordinate of the body CoM                                    | -Inf                 | Inf                | head      | free | position (m) |
+    | 1   | y-coordinate of the body CoM                                    | -Inf                 | Inf                | head      | free | position (m) |
+    | 2   | x-coordinate velocity of the body CoM                           | -Inf                 | Inf                | head      | free | angle (rad) |
+    | 3   | y-orientation velocity of the body CoM                          | -Inf                 | Inf                | head      | free | angle (rad) |
+    | 4   | x-orientation of the head link                                  | -Inf                 | Inf                | head      | free | angle (rad) |
+    | 5   | y-orientation of the head link                                  | -Inf                 | Inf                | head      | free | angle (rad) |
+    | 6   | z-orientation of the head link                                  | -Inf                 | Inf                | head       | free | angle (rad) |
+    | 7   | w-orientation of the head link                                  | -Inf                 | Inf                | head       | free | angle (rad) |
+    | 8   | x-orientation of the body CoM                                   | -Inf                 | Inf                | head      | free | angle (rad) |
+    | 9   | y-orientation of the body CoM                                   | -Inf                 | Inf                | head      | free | angle (rad) |
+    | 10  | z-orientation of the body CoM                                   | -Inf                 | Inf                | head       | free | angle (rad) |
+    | 11  | w-orientation of the body CoM                                   | -Inf                 | Inf                | head       | free | angle (rad) |
+    | 12  | roll angular velocity of the head link                          | -Inf                 | Inf                | head       | free | angle (rad) |
+    | 13  | pitch angular velocity of the head link                         | -Inf                 | Inf                | head       | free | angle (rad) |
+    | 14  | yaw angular velocity of the head link                           | -Inf                 | Inf                | head      | free | angle (rad) | 
+    | 15  | roll angular velocity of the body CoM                           | -Inf                 | Inf                | head      | free | angle (rad) |
+    | 16  | pitch angular velocity of the body CoM                          | -Inf                 | Inf                | head       | free | angle (rad) |
+    | 17  | yaw angular velocity of the body CoM                            | -Inf                 | Inf                | head       | free | angle (rad) |   
+    | 18  | angle of the joint1                                             | -Inf                 | Inf                | joint1 | hinge | angle (rad) |
+    | 19  | angle of the joint2                                             | -Inf                 | Inf               | ankle_1 (front_left_leg) | hinge | angle (rad) |
+    | 20  | angle of the joint3                                             | -Inf                 | Inf               | hip_2 (front_right_leg) | hinge | angle (rad) |
+    | 21  | angle of the joint4                                             | -Inf                 | Inf               | ankle_2 (front_right_leg) | hinge | angle (rad) |
+    | 22  | angle of the joint5                                             | -Inf                 | Inf               | hip_3 (back_leg) | hinge | angle (rad) |
+    | 23  | angle of the joint6                                             | -Inf                 | Inf               | ankle_3 (back_leg) | hinge | angle (rad) |
+    | 24  | angle of the joint7                                             | -Inf                 | Inf               | hip_4 (right_back_leg) | hinge | angle (rad) |
+    | 25  | angle of the joint8                                             | -Inf                 | Inf               | ankle_4 (right_back_leg) | hinge | angle (rad) |
+    | 26  | angle of the joint9                                             | -Inf                 | Inf                | torso      | free | velocity (m/s) |
+    | 27  | angle of the joint10                                            | -Inf                 | Inf                | torso      | free | velocity (m/s) |
+    | 28  | angle of the joint11                                            | -Inf                 | Inf                | torso      | free | velocity (m/s) |
+    | 29  | angle of the joint12                                            | -Inf                 | Inf                | torso      | free | angular velocity (rad/s) |
+    | 30  | angle of the joint13                                            | -Inf                 | Inf                | torso      | free | angular velocity (rad/s) |
+    | 31  | angle of the joint14                                            | -Inf                 | Inf                | torso      | free | angular velocity (rad/s) | 
+    | 32  | angular velocity of the joint1                                  | -Inf                 | Inf               | hip_1 (front_left_leg) | hinge | angle (rad) |
+    | 33  | angular velocity of the joint2                                  | -Inf                 | Inf               | ankle_1 (front_left_leg) | hinge | angle (rad) |
+    | 34  | angular velocity of the joint3                                  | -Inf                 | Inf               | hip_2 (front_right_leg) | hinge | angle (rad) |
+    | 35  | angular velocity of the joint4                                  | -Inf                 | Inf               | ankle_2 (front_right_leg) | hinge | angle (rad) |
+    | 36  | angular velocity of the joint5                                  | -Inf                 | Inf               | hip_3 (back_leg) | hinge | angle (rad) |
+    | 37  | angular velocity of the joint6                                  | -Inf                 | Inf               | ankle_3 (back_leg) | hinge | angle (rad) |
+    | 38  | angular velocity of the joint7                                  | -Inf                 | Inf               | hip_4 (right_back_leg) | hinge | angle (rad) |
+    | 39  | angular velocity of the joint8                                  | -Inf                 | Inf               | ankle_4 (right_back_leg) | hinge | angle (rad) |
+    | 40  | angular velocity of the joint9                                  | -Inf                 | Inf                | torso      | free | velocity (m/s) |
+    | 41  | angular velocity of the joint10                                 | -Inf                 | Inf                | torso      | free | velocity (m/s) |
+    | 42  | angular velocity of the joint11                                 | -Inf                 | Inf                | torso      | free | velocity (m/s) |
+    | 43  | angular velocity of the joint12                                 | -Inf                 | Inf                | torso      | free | angular velocity (rad/s) |
+    | 44  | angular velocity of the joint13                                 | -Inf                 | Inf                | torso      | free | angular velocity (rad/s) |
+    | 45  | angular velocity of the joint14                                 | -Inf                 | Inf                | torso      | free | angular velocity (rad/s) |
+    """
+
     def __init__(
         self,
-        xml_file="snake.xml",
+        xml_file="/Users/bong/project/snake_RL/rllib/bong-snake/asset/snake.xml",
         ctrl_cost_weight=0.5,
         contact_cost_weight=5e-4,
         healthy_reward=1.0,
@@ -20,6 +94,7 @@ class AntEnv(mujoco_env.MujocoEnv, utils.EzPickle):
         contact_force_range=(-1.0, 1.0),
         reset_noise_scale=0.1,
         exclude_current_positions_from_observation=True,
+        gait_params=(1, 39.8, 189.9, -9.1, 66.5, 160.9, 7.0, 1)
     ):
         utils.EzPickle.__init__(**locals())
 
@@ -38,6 +113,22 @@ class AntEnv(mujoco_env.MujocoEnv, utils.EzPickle):
             exclude_current_positions_from_observation
         )
 
+        ## For custom env
+        self.gait = gait.gait(gait_params[0] 
+            ,gait_params[1] 
+            ,gait_params[2] 
+            ,gait_params[3] 
+            ,gait_params[4] 
+            ,gait_params[5] 
+            ,gait_params[6] 
+            ,gait_params[7]
+        )
+        limit_min = [-85,0,-10,-85,0,-10,1]
+        limit_max = [85,360,10,85,360,10,6]
+
+        self.action_space = Box(np.array(limit_min),np.array(limit_max), dtype=np.integer)
+
+        ##
         mujoco_env.MujocoEnv.__init__(self, xml_file, 5)
 
     @property
@@ -78,9 +169,20 @@ class AntEnv(mujoco_env.MujocoEnv, utils.EzPickle):
         return done
 
     def step(self, action):
-        xy_position_before = self.get_body_com("torso")[:2].copy()
+        # write custom code below
+        joint_names = ['joint1','joint2','joint3','joint4','joint5','joint6','joint7','joint8','joint9','joint10','joint11','joint12','joint13','joint14']
+        link_names = ['head','link1','link2','link3','link4','link5','link6','link7','link8','link9','link10','link11','link12','link13','tail']
+
+        theta = np.array([self.data.get_joint_qpos(x) for x in joint_names]).copy()
+        dtheta = np.array([self.data.get_joint_qvel(x) for x in joint_names]).copy()
+
+        xy_position_before = np.array([self.get_body_com(x) for x in link_names]).mean(axis=0)[:2].copy()
+
+        # write action exporter code here
+
         self.do_simulation(action, self.frame_skip)
-        xy_position_after = self.get_body_com("torso")[:2].copy()
+
+        xy_position_after = np.array([self.get_body_com(x) for x in link_names]).mean(axis=0)[:2].copy()
 
         xy_velocity = (xy_position_after - xy_position_before) / self.dt
         x_velocity, y_velocity = xy_velocity

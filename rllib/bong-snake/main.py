@@ -5,3 +5,4 @@ from gym.spaces import *
 
 if __name__ == '__main__':
     env = bongSnake.bongEnv()
+    

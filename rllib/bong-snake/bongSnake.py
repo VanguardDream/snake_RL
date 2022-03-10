@@ -34,54 +34,57 @@ class bongEnv(mujoco_env.MujocoEnv, utils.EzPickle):
 
 
     Observation space:
-    | Num | Observation                                                     | Min                | Max                | Name (in corresponding XML file) | Joint | Unit |
-    |-----|-----------------------------------------------------------------|----------------|-----------------|----------------------------------------|-------|------|
-    | 0   | x-coordinate of the body CoM                                    | -Inf                 | Inf                | head      | free | position (m)   |
-    | 1   | y-coordinate of the body CoM                                    | -Inf                 | Inf                | head      | free | position (m)   |
-    | 2   | x-coordinate velocity of the body CoM                           | -Inf                 | Inf                | head      | free | velocity (m/s) |
-    | 3   | y-orientation velocity of the body CoM                          | -Inf                 | Inf                | head      | free | velocity (m/s) |
-    | 4   | x-orientation of the head link                                  | -Inf                 | Inf                | head      | free | angle (rad) |
-    | 5   | y-orientation of the head link                                  | -Inf                 | Inf                | head      | free | angle (rad) |
-    | 6   | z-orientation of the head link                                  | -Inf                 | Inf                | head      | free | angle (rad) |
-    | 7   | w-orientation of the head link                                  | -Inf                 | Inf                | head      | free | angle (rad) |
-    | 8   | x-orientation of the body CoM                                   | -Inf                 | Inf                | head      | free | angle (rad) |
-    | 9   | y-orientation of the body CoM                                   | -Inf                 | Inf                | head      | free | angle (rad) |
-    | 10  | z-orientation of the body CoM                                   | -Inf                 | Inf                | head      | free | angle (rad) |
-    | 11  | w-orientation of the body CoM                                   | -Inf                 | Inf                | head      | free | angle (rad) |
-    | 12  | roll angular velocity of the head link                          | -Inf                 | Inf                | head      | free | angular velocity (rad/s) |
-    | 13  | pitch angular velocity of the head link                         | -Inf                 | Inf                | head      | free | angular velocity (rad/s) |
-    | 14  | yaw angular velocity of the head link                           | -Inf                 | Inf                | head      | free | angular velocity (rad/s) | 
-    | 15  | roll angular velocity of the body CoM                           | -Inf                 | Inf                | head      | free | angular velocity (rad/s) |
-    | 16  | pitch angular velocity of the body CoM                          | -Inf                 | Inf                | head      | free | angular velocity (rad/s) |
-    | 17  | yaw angular velocity of the body CoM                            | -Inf                 | Inf                | head      | free | angular velocity (rad/s) |   
-    | 18  | angle of the joint1                                             | -Inf                 | Inf                | joint1    | hinge | angle (rad) |
-    | 19  | angle of the joint2                                             | -Inf                 | Inf                | joint2    | hinge | angle (rad) |
-    | 20  | angle of the joint3                                             | -Inf                 | Inf                | joint3    | hinge | angle (rad) |
-    | 21  | angle of the joint4                                             | -Inf                 | Inf                | joint4    | hinge | angle (rad) |
-    | 22  | angle of the joint5                                             | -Inf                 | Inf                | joint5    | hinge | angle (rad) |
-    | 23  | angle of the joint6                                             | -Inf                 | Inf                | joint6    | hinge | angle (rad) |
-    | 24  | angle of the joint7                                             | -Inf                 | Inf                | joint7    | hinge | angle (rad) |
-    | 25  | angle of the joint8                                             | -Inf                 | Inf                | joint8    | hinge | angle (rad) |
-    | 26  | angle of the joint9                                             | -Inf                 | Inf                | joint9    | hinge | angle (rad) |
-    | 27  | angle of the joint10                                            | -Inf                 | Inf                | joint10   | hinge | angle (rad) |
-    | 28  | angle of the joint11                                            | -Inf                 | Inf                | joint11   | hinge | angle (rad) |
-    | 29  | angle of the joint12                                            | -Inf                 | Inf                | joint12   | hinge | angle (rad) |
-    | 30  | angle of the joint13                                            | -Inf                 | Inf                | joint13   | hinge | angle (rad) |
-    | 31  | angle of the joint14                                            | -Inf                 | Inf                | joint14   | hinge | angle (rad) | 
-    | 32  | angular velocity of the joint1                                  | -Inf                 | Inf                | joint1    | hinge | angle (rad) |
-    | 33  | angular velocity of the joint2                                  | -Inf                 | Inf                | joint2    | hinge | angle (rad) |
-    | 34  | angular velocity of the joint3                                  | -Inf                 | Inf                | joint3    | hinge | angle (rad) |
-    | 35  | angular velocity of the joint4                                  | -Inf                 | Inf                | joint4    | hinge | angle (rad) |
-    | 36  | angular velocity of the joint5                                  | -Inf                 | Inf                | joint5    | hinge | angle (rad) |
-    | 37  | angular velocity of the joint6                                  | -Inf                 | Inf                | joint6    | hinge | angle (rad) |
-    | 38  | angular velocity of the joint7                                  | -Inf                 | Inf                | joint7    | hinge | angle (rad) |
-    | 39  | angular velocity of the joint8                                  | -Inf                 | Inf                | joint8    | hinge | angle (rad) |
-    | 40  | angular velocity of the joint9                                  | -Inf                 | Inf                | joint9    | hinge | angle (rad) |
-    | 41  | angular velocity of the joint10                                 | -Inf                 | Inf                | joint10   | hinge | angle (rad) |
-    | 42  | angular velocity of the joint11                                 | -Inf                 | Inf                | joint11   | hinge | angle (rad) |
-    | 43  | angular velocity of the joint12                                 | -Inf                 | Inf                | joint12   | hinge | angle (rad) |
-    | 44  | angular velocity of the joint13                                 | -Inf                 | Inf                | joint13   | hinge | angle (rad) |
-    | 45  | angular velocity of the joint14                                 | -Inf                 | Inf                | joint14   | hinge | angle (rad) |
+    | Num | Observation                                                     | Min                   | Max                | Name (in corresponding XML file) | Joint | Unit |
+    |-----|-----------------------------------------------------------------|----------------------|--------------------|-----------|------|----------------|
+    | 0   | x-coordinate of the body CoM                                    | -Inf                 | Inf                | all       | free | position (m)   |
+    | 1   | y-coordinate of the body CoM                                    | -Inf                 | Inf                | all       | free | position (m)   |
+    | 2   | x-coordinate velocity of the body CoM                           | -Inf                 | Inf                | all       | free | velocity (m/s) |
+    | 3   | y-coordinate velocity of the body CoM                           | -Inf                 | Inf                | all       | free | velocity (m/s) |
+    | 4   | x-coordinate velocity of the head link                          | -Inf                 | Inf                | head      | free | velocity (m/s) |
+    | 5   | y-coordinate velocity of the head link                          | -Inf                 | Inf                | head      | free | velocity (m/s) |
+    | 6   | x-orientation of the head link                                  | -Inf                 | Inf                | head      | free | angle (rad) |
+    | 7   | y-orientation of the head link                                  | -Inf                 | Inf                | head      | free | angle (rad) |
+    | 8   | z-orientation of the head link                                  | -Inf                 | Inf                | head      | free | angle (rad) |
+    | 9   | w-orientation of the head link                                  | -Inf                 | Inf                | head      | free | angle (rad) |
+    | 10  | x-orientation of the body CoM                                   | -Inf                 | Inf                | all       | free | angle (rad) |
+    | 11  | y-orientation of the body CoM                                   | -Inf                 | Inf                | all       | free | angle (rad) |
+    | 12  | z-orientation of the body CoM                                   | -Inf                 | Inf                | all       | free | angle (rad) |
+    | 13  | w-orientation of the body CoM                                   | -Inf                 | Inf                | all       | free | angle (rad) |
+    | 14  | roll angular velocity of the head link                          | -Inf                 | Inf                | head      | free | angular velocity (rad/s) |
+    | 15  | pitch angular velocity of the head link                         | -Inf                 | Inf                | head      | free | angular velocity (rad/s) |
+    | 16  | yaw angular velocity of the head link                           | -Inf                 | Inf                | head      | free | angular velocity (rad/s) | 
+    | 17  | roll angular velocity of the body CoM                           | -Inf                 | Inf                | all       | free | angular velocity (rad/s) |
+    | 18  | pitch angular velocity of the body CoM                          | -Inf                 | Inf                | all       | free | angular velocity (rad/s) |
+    | 19  | yaw angular velocity of the body CoM                            | -Inf                 | Inf                | all       | free | angular velocity (rad/s) |   
+    | 20  | angle of the joint1                                             | -Inf                 | Inf                | joint1    | hinge | angle (rad) |
+    | 21  | angle of the joint2                                             | -Inf                 | Inf                | joint2    | hinge | angle (rad) |
+    | 22  | angle of the joint3                                             | -Inf                 | Inf                | joint3    | hinge | angle (rad) |
+    | 23  | angle of the joint4                                             | -Inf                 | Inf                | joint4    | hinge | angle (rad) |
+    | 24  | angle of the joint5                                             | -Inf                 | Inf                | joint5    | hinge | angle (rad) |
+    | 25  | angle of the joint6                                             | -Inf                 | Inf                | joint6    | hinge | angle (rad) |
+    | 26  | angle of the joint7                                             | -Inf                 | Inf                | joint7    | hinge | angle (rad) |
+    | 27  | angle of the joint8                                             | -Inf                 | Inf                | joint8    | hinge | angle (rad) |
+    | 28  | angle of the joint9                                             | -Inf                 | Inf                | joint9    | hinge | angle (rad) |
+    | 29  | angle of the joint10                                            | -Inf                 | Inf                | joint10   | hinge | angle (rad) |
+    | 30  | angle of the joint11                                            | -Inf                 | Inf                | joint11   | hinge | angle (rad) |
+    | 31  | angle of the joint12                                            | -Inf                 | Inf                | joint12   | hinge | angle (rad) |
+    | 32  | angle of the joint13                                            | -Inf                 | Inf                | joint13   | hinge | angle (rad) |
+    | 33  | angle of the joint14                                            | -Inf                 | Inf                | joint14   | hinge | angle (rad) | 
+    | 34  | angular velocity of the joint1                                  | -Inf                 | Inf                | joint1    | hinge | angle (rad) |
+    | 35  | angular velocity of the joint2                                  | -Inf                 | Inf                | joint2    | hinge | angle (rad) |
+    | 36  | angular velocity of the joint3                                  | -Inf                 | Inf                | joint3    | hinge | angle (rad) |
+    | 37  | angular velocity of the joint4                                  | -Inf                 | Inf                | joint4    | hinge | angle (rad) |
+    | 38  | angular velocity of the joint5                                  | -Inf                 | Inf                | joint5    | hinge | angle (rad) |
+    | 39  | angular velocity of the joint6                                  | -Inf                 | Inf                | joint6    | hinge | angle (rad) |
+    | 40  | angular velocity of the joint7                                  | -Inf                 | Inf                | joint7    | hinge | angle (rad) |
+    | 41  | angular velocity of the joint8                                  | -Inf                 | Inf                | joint8    | hinge | angle (rad) |
+    | 42  | angular velocity of the joint9                                  | -Inf                 | Inf                | joint9    | hinge | angle (rad) |
+    | 43  | angular velocity of the joint10                                 | -Inf                 | Inf                | joint10   | hinge | angle (rad) |
+    | 44  | angular velocity of the joint11                                 | -Inf                 | Inf                | joint11   | hinge | angle (rad) |
+    | 45  | angular velocity of the joint12                                 | -Inf                 | Inf                | joint12   | hinge | angle (rad) |
+    | 46  | angular velocity of the joint13                                 | -Inf                 | Inf                | joint13   | hinge | angle (rad) |
+    | 47  | angular velocity of the joint14                                 | -Inf                 | Inf                | joint14   | hinge | angle (rad) |
+
 
     Agent State Space
     * Gait Parameters (+ k-value, - gait type) -> 8
@@ -143,7 +146,8 @@ class bongEnv(mujoco_env.MujocoEnv, utils.EzPickle):
 
 
         self.state_k = 0
-        # self.state_gait = np.array(gait_params[1:])
+        self.state_gait = np.array(gait_params[1:])
+        self.custom_state = 0
 
         self.action_space = Box(np.array(limit_min),np.array(limit_max), dtype=np.integer)
 
@@ -221,6 +225,8 @@ class bongEnv(mujoco_env.MujocoEnv, utils.EzPickle):
 
         obs_after = self._get_obs()
 
+        self.custom_state = self._get_custom_state(obs_after).copy()
+
         # ctrl_cost = self.control_cost(action)
         # contact_cost = self.contact_cost
 
@@ -235,7 +241,9 @@ class bongEnv(mujoco_env.MujocoEnv, utils.EzPickle):
         reward = rewards - costs
 
         done = self.done
-        # done = False
+        # done = 
+        
+        self.state_k = self.state_k + 1 # Gait k slot increase
 
         observation = self._get_obs()
         info = {
@@ -283,6 +291,11 @@ class bongEnv(mujoco_env.MujocoEnv, utils.EzPickle):
 
         return observations
 
+    def _get_custom_state(self, obs:np.ndarray) -> np.ndarray:
+        gaits = np.append(self.state_k,self.state_gait)
+        states = np.concatenate([gaits.flat, obs[4:10].flat, obs[14:17], obs[20::]])
+        return states
+
     def _quat2euler(self, w, x, y, z):
         t0 = +2.0 * (w * x + y * z)
         t1 = +1.0 - 2.0 * (x * x + y * y)
@@ -324,5 +337,4 @@ class bongEnv(mujoco_env.MujocoEnv, utils.EzPickle):
                 setattr(self.viewer.cam, key, value)
 
     def state_vector(self):
-
-        return super().state_vector()
+        return self.custom_state

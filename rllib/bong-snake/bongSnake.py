@@ -82,6 +82,18 @@ class bongEnv(mujoco_env.MujocoEnv, utils.EzPickle):
     | 43  | angular velocity of the joint12                                 | -Inf                 | Inf                | joint12   | hinge | angle (rad) |
     | 44  | angular velocity of the joint13                                 | -Inf                 | Inf                | joint13   | hinge | angle (rad) |
     | 45  | angular velocity of the joint14                                 | -Inf                 | Inf                | joint14   | hinge | angle (rad) |
+
+    Agent State Space
+    * Gait Parameters (+ k-value, - gait type) -> 8
+    * Head Link x-y velocity -> 2
+    * Head Link Orientation -> 4
+    * Head Link Angular Velocity -> 3
+    * Joint Position -> 14
+    * Joint Angular Velocity -> 14
+    = Total = 45 elements
+
+    !! Environment space and Agent state space are not subset of the any env sets. !!
+
     """
 
     def __init__(
@@ -92,9 +104,11 @@ class bongEnv(mujoco_env.MujocoEnv, utils.EzPickle):
         healthy_reward=1.0,
         terminate_when_unhealthy=True,
         healthy_z_range=(0.2, 1.0),
+        healthy_r_range=(-120,120),
+        healthy_y_range=(-45,45),
         contact_force_range=(-1.0, 1.0),
         reset_noise_scale=0.1,
-        exclude_current_positions_from_observation=True,
+        exclude_current_positions_from_observation=False,
         gait_params=(1, 39.8, 189.9, -9.1, 66.5, 160.9, 7.0, 1)
     ):
         utils.EzPickle.__init__(**locals())
@@ -127,8 +141,11 @@ class bongEnv(mujoco_env.MujocoEnv, utils.EzPickle):
         limit_min = [-85,0,-10,-85,0,-10,1]
         limit_max = [85,360,10,85,360,10,6]
 
-        self.action_space = Box(np.array(limit_min),np.array(limit_max), dtype=np.integer)
 
+        self.state_k = 0
+        # self.state_gait = np.array(gait_params[1:])
+
+        self.action_space = Box(np.array(limit_min),np.array(limit_max), dtype=np.integer)
 
         self.observation_space = Box(np.ones(46,) * -np.inf, np.ones(46,) * np.inf, dtype=np.float32)
 
@@ -163,8 +180,7 @@ class bongEnv(mujoco_env.MujocoEnv, utils.EzPickle):
     @property
     def is_healthy(self):
         state = self.state_vector()
-        min_z, max_z = self._healthy_z_range
-        is_healthy = np.isfinite(state).all() and min_z <= state[2] <= max_z
+
         return is_healthy
 
     @property
@@ -173,28 +189,44 @@ class bongEnv(mujoco_env.MujocoEnv, utils.EzPickle):
         return done
 
     def step(self, action):
-        # write custom code below
-        joint_names = ['joint1','joint2','joint3','joint4','joint5','joint6','joint7','joint8','joint9','joint10','joint11','joint12','joint13','joint14']
-        link_names = ['head','link1','link2','link3','link4','link5','link6','link7','link8','link9','link10','link11','link12','link13','tail']
+        # joint_names = ['joint1','joint2','joint3','joint4','joint5','joint6','joint7','joint8','joint9','joint10','joint11','joint12','joint13','joint14']
+        # link_names = ['head','link1','link2','link3','link4','link5','link6','link7','link8','link9','link10','link11','link12','link13','tail']
 
-        theta = np.array([self.data.get_joint_qpos(x) for x in joint_names]).copy()
-        dtheta = np.array([self.data.get_joint_qvel(x) for x in joint_names]).copy()
+        # xy_position = np.array([self.get_body_com(x) for x in link_names]).mean(axis=0)[:2].copy()
+        # xy_velocity = np.array([self.data.get_body_xvelp(x) for x in link_names]).mean(axis=0)[:2].copy()
 
-        xy_position_before = np.array([self.get_body_com(x) for x in link_names]).mean(axis=0)[:2].copy()
+        # orientaion_head = np.array([self.data.get_body_xquat('head')]).copy()
+        # orientaion_com = np.array([self.data.get_body_xquat(x) for x in link_names]).mean(axis=0).copy()
+        
+        # rpy_head = np.array([self.data.get_body_xvelr('head')]).copy()
+        # rpy_com = np.array([self.data.get_body_xvelr(x) for x in link_names]).mean(axis=0).copy()
+
+        # theta = np.array([self.data.get_joint_qpos(x) for x in joint_names]).copy()
+        # dtheta = np.array([self.data.get_joint_qvel(x) for x in joint_names]).copy()
+
+        # obs_before = np.concatenate([xy_position.flat,
+        #                             xy_velocity.flat,
+        #                             orientaion_head.flat,
+        #                             orientaion_com.flat,
+        #                             rpy_head.flat,
+        #                             rpy_com,
+        #                             theta.flat,
+        #                             dtheta.flat])
+
+        obs_before = self._get_obs()
 
         # write action exporter code here
 
         self.do_simulation(action, self.frame_skip)
 
-        xy_position_after = np.array([self.get_body_com(x) for x in link_names]).mean(axis=0)[:2].copy()
+        obs_after = self._get_obs()
 
-        xy_velocity = (xy_position_after - xy_position_before) / self.dt
-        x_velocity, y_velocity = xy_velocity
+        # ctrl_cost = self.control_cost(action)
+        # contact_cost = self.contact_cost
 
-        ctrl_cost = self.control_cost(action)
-        contact_cost = self.contact_cost
-
-        forward_reward = x_velocity
+        #Reward Calculation
+        x_vel, y_vel = (obs_after - obs_before)[0:1]
+        forward_reward = x_vel + y_vel
         healthy_reward = self.healthy_reward
 
         rewards = forward_reward + healthy_reward
@@ -222,16 +254,50 @@ class bongEnv(mujoco_env.MujocoEnv, utils.EzPickle):
         return observation, reward, done, info
 
     def _get_obs(self):
-        position = self.sim.data.qpos.flat.copy()
-        velocity = self.sim.data.qvel.flat.copy()
-        contact_force = self.contact_forces.flat.copy()
+        joint_names = ['joint1','joint2','joint3','joint4','joint5','joint6','joint7','joint8','joint9','joint10','joint11','joint12','joint13','joint14']
+        link_names = ['head','link1','link2','link3','link4','link5','link6','link7','link8','link9','link10','link11','link12','link13','tail']
+
+        xy_position = np.array([self.get_body_com(x) for x in link_names]).mean(axis=0)[:2].copy()
+        xy_velocity = np.array([self.data.get_body_xvelp(x) for x in link_names]).mean(axis=0)[:2].copy()
+
+        orientaion_head = np.array([self.data.get_body_xquat('head')]).copy()
+        orientaion_com = np.array([self.data.get_body_xquat(x) for x in link_names]).mean(axis=0).copy()
+        
+        rpy_head = np.array([self.data.get_body_xvelr('head')]).copy()
+        rpy_com = np.array([self.data.get_body_xvelr(x) for x in link_names]).mean(axis=0).copy()
+
+        theta = np.array([self.data.get_joint_qpos(x) for x in joint_names]).copy()
+        dtheta = np.array([self.data.get_joint_qvel(x) for x in joint_names]).copy()
 
         if self._exclude_current_positions_from_observation:
-            position = position[2:]
+            pass
 
-        observations = np.concatenate((position, velocity, contact_force))
+        observations = np.concatenate([xy_position.flat,
+                                    xy_velocity.flat,
+                                    orientaion_head.flat,
+                                    orientaion_com.flat,
+                                    rpy_head.flat,
+                                    rpy_com,
+                                    theta.flat,
+                                    dtheta.flat])
 
         return observations
+
+    def _quat2euler(self, w, x, y, z):
+        t0 = +2.0 * (w * x + y * z)
+        t1 = +1.0 - 2.0 * (x * x + y * y)
+        roll_x = np.arctan2(t0, t1)
+    
+        t2 = +2.0 * (w * y - z * x)
+        t2 = +1.0 if t2 > +1.0 else t2
+        t2 = -1.0 if t2 < -1.0 else t2
+        pitch_y = np.arcsin(t2)
+    
+        t3 = +2.0 * (w * z + x * y)
+        t4 = +1.0 - 2.0 * (y * y + z * z)
+        yaw_z = np.arctan2(t3, t4)
+
+        return roll_x, pitch_y, yaw_z
 
     def reset_model(self):
         noise_low = -self._reset_noise_scale
@@ -256,3 +322,7 @@ class bongEnv(mujoco_env.MujocoEnv, utils.EzPickle):
                 getattr(self.viewer.cam, key)[:] = value
             else:
                 setattr(self.viewer.cam, key, value)
+
+    def state_vector(self):
+
+        return super().state_vector()

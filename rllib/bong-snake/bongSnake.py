@@ -225,8 +225,8 @@ class bongEnv(mujoco_env.MujocoEnv, utils.EzPickle):
         # contact_cost = self.contact_cost
 
         #Reward Calculation
-        x_vel, y_vel = (obs_after - obs_before)[0:1]
-        forward_reward = x_vel + y_vel
+        x_vel, y_vel = (obs_after - obs_before)[0:2]
+        forward_reward = x_vel - 0.4 * y_vel # 추후 계수 추가할 것
         healthy_reward = self.healthy_reward
 
         rewards = forward_reward + healthy_reward

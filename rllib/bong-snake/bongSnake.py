@@ -4,6 +4,7 @@
 # Description : Bong Snake Env for Gym
 
 from curses import flash
+import math
 from socket import gaierror
 import numpy as np
 import gait
@@ -183,9 +184,19 @@ class bongEnv(mujoco_env.MujocoEnv, utils.EzPickle):
 
     @property
     def is_healthy(self):
+        healthy_check = True
         state = self.state_vector()
 
-        return is_healthy
+        qCoM_x, qCoM_y, qCoM_z, qCoM_w = state[6], state[7], state[8], state[9]
+        roll, pitch, yaw = self._quat2euler(qCoM_w, qCoM_x, qCoM_y, qCoM_z)
+
+        if roll > math.radians(75):
+            healthy_check = False
+
+        if yaw > math.radians(60):
+            healthy_check = False
+
+        return healthy_check
 
     @property
     def done(self):
@@ -293,7 +304,7 @@ class bongEnv(mujoco_env.MujocoEnv, utils.EzPickle):
 
     def _get_custom_state(self, obs:np.ndarray) -> np.ndarray:
         gaits = np.append(self.state_k,self.state_gait)
-        states = np.concatenate([gaits.flat, obs[4:10].flat, obs[14:17], obs[20::]])
+        states = np.concatenate([gaits.flat, obs[4:17].flat, obs[20::]])
         return states
 
     def _quat2euler(self, w, x, y, z):

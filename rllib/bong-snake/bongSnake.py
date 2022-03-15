@@ -3,11 +3,11 @@
 # Date : 2022-03-04 (YYYYMMDD)
 # Description : Bong Snake Env for Gym
 
-from curses import flash
-import math
-from socket import gaierror
+from turtle import st
+import mujoco_py
 import numpy as np
 import gait
+import math
 from gym import utils
 from gym.spaces import *
 from gym.envs.mujoco import mujoco_env
@@ -102,7 +102,7 @@ class bongEnv(mujoco_env.MujocoEnv, utils.EzPickle):
 
     def __init__(
         self,
-        xml_file="/Users/bong/project/snake_RL/rllib/bong-snake/asset/snake.xml",
+        xml_file="/home/bong/projects/snake_RL/rllib/bong-snake/asset/snake.xml",
         ctrl_cost_weight=0.5,
         contact_cost_weight=5e-4,
         healthy_reward=1.0,
@@ -147,16 +147,21 @@ class bongEnv(mujoco_env.MujocoEnv, utils.EzPickle):
 
 
         self.state_k = 0
+        self.gait_type = gait_params[0]
         self.state_gait = np.array(gait_params[1:])
         self.custom_state = 0
 
         self.action_space = Box(np.array(limit_min),np.array(limit_max), dtype=np.integer)
 
         self.observation_space = Box(np.ones(46,) * -np.inf, np.ones(46,) * np.inf, dtype=np.float32)
-
-        ##
+        
         mujoco_env.MujocoEnv.__init__(self, xml_file, 5)
 
+        ##
+        #Render setting
+        self.viewer = mujoco_py.MjViewer(self.sim)
+        ##
+        
     @property
     def healthy_reward(self):
         return (
@@ -164,9 +169,16 @@ class bongEnv(mujoco_env.MujocoEnv, utils.EzPickle):
             * self._healthy_reward
         )
 
-    def control_cost(self, action):
-        control_cost = self._ctrl_cost_weight * np.sum(np.square(action))
+    def control_cost(self, obs:np.ndarray, ctrls:np.ndarray):
+        control_cost = np.linalg.norm((obs[20:34] - ctrls))
         return control_cost
+
+    def makeAction(self, action):
+        self.gait.setParams(self.gait_type, action[0], action[1], action[2], action[3], action[4], action[5], action[6])
+        ctrls = self.gait.generate(self.state_k)
+        
+        self.state_k = self.state_k + 1
+        return ctrls
 
     @property
     def contact_forces(self):
@@ -187,59 +199,38 @@ class bongEnv(mujoco_env.MujocoEnv, utils.EzPickle):
         healthy_check = True
         state = self.state_vector()
 
-        qCoM_x, qCoM_y, qCoM_z, qCoM_w = state[6], state[7], state[8], state[9]
+        qCoM_x, qCoM_y, qCoM_z, qCoM_w = state[14], state[15], state[16], state[17]
         roll, pitch, yaw = self._quat2euler(qCoM_w, qCoM_x, qCoM_y, qCoM_z)
 
-        if roll > math.radians(75):
-            healthy_check = False
+        # if abs(roll) > math.radians(75):
+        #     healthy_check = False
 
-        if yaw > math.radians(60):
+        if abs(yaw) > math.radians(60):
             healthy_check = False
 
         return healthy_check
 
     @property
     def done(self):
-        done = not self.is_healthy if self._terminate_when_unhealthy else False
+        # done = not self.is_healthy if self._terminate_when_unhealthy else False
+        done = not self.is_healthy
         return done
 
     def step(self, action):
-        # joint_names = ['joint1','joint2','joint3','joint4','joint5','joint6','joint7','joint8','joint9','joint10','joint11','joint12','joint13','joint14']
-        # link_names = ['head','link1','link2','link3','link4','link5','link6','link7','link8','link9','link10','link11','link12','link13','tail']
-
-        # xy_position = np.array([self.get_body_com(x) for x in link_names]).mean(axis=0)[:2].copy()
-        # xy_velocity = np.array([self.data.get_body_xvelp(x) for x in link_names]).mean(axis=0)[:2].copy()
-
-        # orientaion_head = np.array([self.data.get_body_xquat('head')]).copy()
-        # orientaion_com = np.array([self.data.get_body_xquat(x) for x in link_names]).mean(axis=0).copy()
-        
-        # rpy_head = np.array([self.data.get_body_xvelr('head')]).copy()
-        # rpy_com = np.array([self.data.get_body_xvelr(x) for x in link_names]).mean(axis=0).copy()
-
-        # theta = np.array([self.data.get_joint_qpos(x) for x in joint_names]).copy()
-        # dtheta = np.array([self.data.get_joint_qvel(x) for x in joint_names]).copy()
-
-        # obs_before = np.concatenate([xy_position.flat,
-        #                             xy_velocity.flat,
-        #                             orientaion_head.flat,
-        #                             orientaion_com.flat,
-        #                             rpy_head.flat,
-        #                             rpy_com,
-        #                             theta.flat,
-        #                             dtheta.flat])
-
         obs_before = self._get_obs()
-
         # write action exporter code here
+        # ctrl_cost = self.control_cost(obs_before, mujoco_ctrl)
 
-        self.do_simulation(action, self.frame_skip)
+        self.do_simulation(action, self.frame_skip * 14 * 3)
 
         obs_after = self._get_obs()
 
+
         self.custom_state = self._get_custom_state(obs_after).copy()
 
-        # ctrl_cost = self.control_cost(action)
-        # contact_cost = self.contact_cost
+
+        # later, could apply contact cost here
+        ###
 
         #Reward Calculation
         x_vel, y_vel = (obs_after - obs_before)[0:2]
@@ -247,26 +238,23 @@ class bongEnv(mujoco_env.MujocoEnv, utils.EzPickle):
         healthy_reward = self.healthy_reward
 
         rewards = forward_reward + healthy_reward
-        costs = ctrl_cost + contact_cost
+        # costs = 0.01 * ctrl_cost
 
-        reward = rewards - costs
+        reward = rewards
 
         done = self.done
-        # done = 
-        
-        self.state_k = self.state_k + 1 # Gait k slot increase
 
         observation = self._get_obs()
         info = {
             "reward_forward": forward_reward,
-            "reward_ctrl": -ctrl_cost,
-            "reward_contact": -contact_cost,
+            "reward_ctrl": 0,
+            "reward_contact": 0,
             "reward_survive": healthy_reward,
-            "x_position": xy_position_after[0],
-            "y_position": xy_position_after[1],
-            "distance_from_origin": np.linalg.norm(xy_position_after, ord=2),
-            "x_velocity": x_velocity,
-            "y_velocity": y_velocity,
+            "x_position": obs_after[0],
+            "y_position": obs_after[1],
+            "distance_from_origin": np.linalg.norm(obs_after[0:2], ord=2),
+            "x_velocity": obs_after[2],
+            "y_velocity": obs_after[3],
             "forward_reward": forward_reward,
         }
 
@@ -279,10 +267,12 @@ class bongEnv(mujoco_env.MujocoEnv, utils.EzPickle):
         xy_position = np.array([self.get_body_com(x) for x in link_names]).mean(axis=0)[:2].copy()
         xy_velocity = np.array([self.data.get_body_xvelp(x) for x in link_names]).mean(axis=0)[:2].copy()
 
-        orientaion_head = np.array([self.data.get_body_xquat('head')]).copy()
+        xy_velocity_head = np.array(self.data.get_body_xvelp('head'))[:2].copy()
+
+        orientaion_head = np.array(self.data.get_body_xquat('head')).copy()
         orientaion_com = np.array([self.data.get_body_xquat(x) for x in link_names]).mean(axis=0).copy()
         
-        rpy_head = np.array([self.data.get_body_xvelr('head')]).copy()
+        rpy_head = np.array(self.data.get_body_xvelr('head')).copy()
         rpy_com = np.array([self.data.get_body_xvelr(x) for x in link_names]).mean(axis=0).copy()
 
         theta = np.array([self.data.get_joint_qpos(x) for x in joint_names]).copy()
@@ -293,10 +283,11 @@ class bongEnv(mujoco_env.MujocoEnv, utils.EzPickle):
 
         observations = np.concatenate([xy_position.flat,
                                     xy_velocity.flat,
+                                    xy_velocity_head.flat,
                                     orientaion_head.flat,
                                     orientaion_com.flat,
                                     rpy_head.flat,
-                                    rpy_com,
+                                    rpy_com.flat,
                                     theta.flat,
                                     dtheta.flat])
 
@@ -304,7 +295,8 @@ class bongEnv(mujoco_env.MujocoEnv, utils.EzPickle):
 
     def _get_custom_state(self, obs:np.ndarray) -> np.ndarray:
         gaits = np.append(self.state_k,self.state_gait)
-        states = np.concatenate([gaits.flat, obs[4:17].flat, obs[20::]])
+
+        states = np.concatenate([gaits.flat, obs[4:17].flat, obs[20::].flat])
         return states
 
     def _quat2euler(self, w, x, y, z):
@@ -349,3 +341,14 @@ class bongEnv(mujoco_env.MujocoEnv, utils.EzPickle):
 
     def state_vector(self):
         return self.custom_state
+
+    def do_simulation(self, action, n_frames):
+        for _ in range(n_frames):
+            mujoco_ctrl = self.makeAction(action)
+            self.sim.data.ctrl[:] = mujoco_ctrl.flat
+
+            self.sim.step()
+
+    def reset(self):
+        self.state_k = 0
+        return super().reset()

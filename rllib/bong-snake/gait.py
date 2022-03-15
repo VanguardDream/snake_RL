@@ -55,7 +55,7 @@ class gait:
                                     [0,0,0,0,0,0,0,0,0,0,0,0,1,0]],dtype='int')
 
     def setParams(self, gait = 1,d_amp = 30, d_phase = 150, d_lam = 1,l_amp = 30, l_phase = 150, l_lam = 1, tau = 1):
-        self.gait =gait
+        self.gait = gait
         self.d_amp = d_amp
         self.d_phase = d_phase
         self.d_lam = d_lam
@@ -148,7 +148,7 @@ class gait:
         else:
             return self.m_sidewind[:,i].reshape(self.m_sidewind.shape[0],1)
 
-    def generate(self, i):
+    def generate(self, i) -> np.ndarray:
 
         k = math.floor(i/self.tau)
         P = self.calculate_P(float(k)/10) # Calculate joint angles for this gait stride.

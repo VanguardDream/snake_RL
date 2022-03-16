@@ -132,6 +132,7 @@ class bongEnv(mujoco_env.MujocoEnv, utils.EzPickle):
             exclude_current_positions_from_observation
         )
 
+
         ## For custom env
         self.gait = gait.gait(gait_params[0] 
             ,gait_params[1] 
@@ -151,16 +152,12 @@ class bongEnv(mujoco_env.MujocoEnv, utils.EzPickle):
         self.state_gait = np.array(gait_params[1:])
         self.custom_state = 0
 
-        self.action_space = Box(np.array(limit_min),np.array(limit_max), dtype=np.integer)
-
-        self.observation_space = Box(np.ones(46,) * -np.inf, np.ones(46,) * np.inf, dtype=np.float32)
-        
         mujoco_env.MujocoEnv.__init__(self, xml_file, 5)
 
-        ##
-        #Render setting
+        self.action_space = Box(np.array(limit_min),np.array(limit_max), dtype=np.integer)
+        self.observation_space = Box(np.ones(46,) * -np.inf, np.ones(46,) * np.inf, dtype=np.float32)
+
         self.viewer = mujoco_py.MjViewer(self.sim)
-        ##
         
     @property
     def healthy_reward(self):
@@ -221,7 +218,7 @@ class bongEnv(mujoco_env.MujocoEnv, utils.EzPickle):
         # write action exporter code here
         # ctrl_cost = self.control_cost(obs_before, mujoco_ctrl)
 
-        self.do_simulation(action, self.frame_skip * 14 * 3)
+        self.do_simulation(action, self.frame_skip)
 
         obs_after = self._get_obs()
 
@@ -348,6 +345,8 @@ class bongEnv(mujoco_env.MujocoEnv, utils.EzPickle):
             self.sim.data.ctrl[:] = mujoco_ctrl.flat
 
             self.sim.step()
+            if self.viewer is not None:
+                self.viewer.render()
 
     def reset(self):
         self.state_k = 0

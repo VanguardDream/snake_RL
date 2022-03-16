@@ -10,8 +10,8 @@ if __name__ == '__main__':
 
     for _ in range(1000):
         #renders the environment
-        # env.render()
         #Takes a random action from its action space 
         # aka the number of unique actions an agent can perform
         env.step(env.action_space.sample())
+        # print(env.action_space.sample())
     

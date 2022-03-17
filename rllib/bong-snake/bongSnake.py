@@ -156,7 +156,7 @@ class bongEnv(mujoco_env.MujocoEnv, utils.EzPickle):
 
     def __init__(
         self,
-        xml_file="/home/bong/projects/snake_RL/rllib/bong-snake/asset/snake.xml",
+        xml_file="snake.xml",
         ctrl_cost_weight=0.5,
         contact_cost_weight=5e-4,
         healthy_reward=1.0,
@@ -371,6 +371,8 @@ class bongEnv(mujoco_env.MujocoEnv, utils.EzPickle):
         return roll_x, pitch_y, yaw_z
 
     def reset_model(self):
+        self.state_k = 0
+
         noise_low = -self._reset_noise_scale
         noise_high = self._reset_noise_scale
 
@@ -421,8 +423,3 @@ class bongEnv(mujoco_env.MujocoEnv, utils.EzPickle):
                 self.viewer.render()
 
         return accum_qvels
-
-    def reset(self):
-        self.state_k = 0
-        self.sim.reset()
-        return super().reset()

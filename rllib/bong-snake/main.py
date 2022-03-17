@@ -1,7 +1,9 @@
 import gym
-import numpy as np
+from gym import spaces
+from gym.utils import seeding
 import bongSnake
-from gym.spaces import *
+import numpy as np
+
 
 if __name__ == '__main__':
     env = bongSnake.bongEnv()

@@ -1,8 +1,10 @@
 # © 2022 Bongsub Song <doorebong@gmail.com>
 # All right reserved
 # Date : 2022-03-04 (YYYYMMDD)
+# Version : 2022-03-18
 # Description : Bong Snake Env for Gym
 
+from curses.ascii import ctrl
 from turtle import st
 import mujoco_py
 import numpy as np
@@ -228,7 +230,7 @@ class bongEnv(mujoco_env.MujocoEnv, utils.EzPickle):
         ctrls = self.gait.generate(self.state_k)
         
         self.state_k = self.state_k + 1
-        return ctrls
+        return np.radians(ctrls)
 
     @property
     def contact_forces(self):
@@ -268,12 +270,10 @@ class bongEnv(mujoco_env.MujocoEnv, utils.EzPickle):
 
     def step(self, action):
         obs_before = self._get_obs()
-        # write action exporter code here
-        # ctrl_cost = self.control_cost(obs_before, mujoco_ctrl)
 
         skip_tau_scale = int(action[-1])
 
-        self.do_simulation(action, self.frame_skip * 14 * skip_tau_scale)
+        ctrl_cost = self.do_simulation(action, self.frame_skip * 14 * skip_tau_scale)
 
         obs_after = self._get_obs()
 
@@ -290,9 +290,9 @@ class bongEnv(mujoco_env.MujocoEnv, utils.EzPickle):
         healthy_reward = self.healthy_reward
 
         rewards = forward_reward + healthy_reward
-        # costs = 0.01 * ctrl_cost
+        costs = 0.001 * ctrl_cost
 
-        reward = rewards
+        reward = rewards + costs
 
         if '_healthy_roll_range' in locals():
             done = self.done
@@ -302,7 +302,7 @@ class bongEnv(mujoco_env.MujocoEnv, utils.EzPickle):
         observation = self._get_obs()
         info = {
             "reward_forward": forward_reward,
-            "reward_ctrl": 0,
+            "reward_ctrl": ctrl_cost,
             "reward_contact": 0,
             "reward_survive": healthy_reward,
             "x_position": obs_after[0],
@@ -401,13 +401,26 @@ class bongEnv(mujoco_env.MujocoEnv, utils.EzPickle):
         return self.custom_state
 
     def do_simulation(self, action, n_frames):
+        joint_names = ['joint1','joint2','joint3','joint4','joint5','joint6','joint7','joint8','joint9','joint10','joint11','joint12','joint13','joint14']
+        accum_qvels = 0
+
         for _ in range(n_frames):
             mujoco_ctrl = self.makeAction(action)
-            self.sim.data.ctrl[:] = mujoco_ctrl.flat
+
+            spec_motor = np.nonzero(mujoco_ctrl)[0]
+
+            for idx in spec_motor:
+                # Commnad motor here
+                self.sim.data.ctrl[idx] = mujoco_ctrl[idx]
+            
+            for name in joint_names:
+                accum_qvels = accum_qvels + abs(self.sim.data.get_joint_qpos(name))
 
             self.sim.step()
             if self.viewer is not None:
                 self.viewer.render()
+
+        return accum_qvels
 
     def reset(self):
         self.state_k = 0

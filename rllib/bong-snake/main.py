@@ -8,7 +8,7 @@ if __name__ == '__main__':
 
     env.reset()
 
-    for _ in range(30):
+    for _ in range(10):
         #renders the environment
         #Takes a random action from its action space 
         # aka the number of unique actions an agent can perform

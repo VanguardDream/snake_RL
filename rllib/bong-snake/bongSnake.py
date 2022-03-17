@@ -91,10 +91,62 @@ class bongEnv(mujoco_env.MujocoEnv, utils.EzPickle):
     * Gait Parameters (+ k-value, - gait type) -> 8
     * Head Link x-y velocity -> 2
     * Head Link Orientation -> 4
+    * Body Orientation -> 4
     * Head Link Angular Velocity -> 3
     * Joint Position -> 14
     * Joint Angular Velocity -> 14
-    = Total = 45 elements
+    = Total = 49 elements
+
+    | Num | Description                                                     | Min                  | Max                | Name (in corresponding XML file) | Joint | Unit |
+    | 0   | Time step k                                                     |   0                  | Inf                | simulation time step
+    | 1   | Dorsal Amplitude                                                |  -85                 | 85                 | Gait Params
+    | 2   | Dorsal Phase                                                    |   0                  | 360                | Gait Params
+    | 3   | Dorsal Lambda                                                   |  -10                 | 10                 | Gait Params
+    | 4   | Lateral Amplitude                                               |  -85                 | 85                 | Gait Params
+    | 5   | Lateral Phase                                                   |   0                  | 360                | Gait Params
+    | 6   | Lateral Lambda                                                  |  -10                 | 10                 | Gait Params
+    | 7   | tau                                                             |   1                  | 6                  | Gait Params
+    | 8   | x-coordinate velocity of the head link                          | -Inf                 | Inf                | head      | free | velocity (m/s) |
+    | 9   | y-coordinate velocity of the head link                          | -Inf                 | Inf                | head      | free | velocity (m/s) |
+    | 10  | x-orientation of the head link                                  | -Inf                 | Inf                | head      | free | angle (rad) |
+    | 11  | y-orientation of the head link                                  | -Inf                 | Inf                | head      | free | angle (rad) |
+    | 12  | z-orientation of the head link                                  | -Inf                 | Inf                | head      | free | angle (rad) |
+    | 13  | w-orientation of the head link                                  | -Inf                 | Inf                | head      | free | angle (rad) |
+    | 14  | x-orientation of the body CoM                                   | -Inf                 | Inf                | all       | free | angle (rad) |
+    | 15  | y-orientation of the body CoM                                   | -Inf                 | Inf                | all       | free | angle (rad) |
+    | 16  | z-orientation of the body CoM                                   | -Inf                 | Inf                | all       | free | angle (rad) |
+    | 17  | w-orientation of the body CoM                                   | -Inf                 | Inf                | all       | free | angle (rad) |
+    | 18  | roll angular velocity of the head link                          | -Inf                 | Inf                | head      | free | angular velocity (rad/s) |
+    | 19  | pitch angular velocity of the head link                         | -Inf                 | Inf                | head      | free | angular velocity (rad/s) |
+    | 20  | yaw angular velocity of the head link                           | -Inf                 | Inf                | head      | free | angular velocity (rad/s) | 
+    | 21  | angle of the joint1                                             | -Inf                 | Inf                | joint1    | hinge | angle (rad) | 
+    | 22  | angle of the joint2                                             | -Inf                 | Inf                | joint2    | hinge | angle (rad) |
+    | 23  | angle of the joint3                                             | -Inf                 | Inf                | joint3    | hinge | angle (rad) |
+    | 24  | angle of the joint4                                             | -Inf                 | Inf                | joint4    | hinge | angle (rad) |
+    | 25  | angle of the joint5                                             | -Inf                 | Inf                | joint5    | hinge | angle (rad) |
+    | 26  | angle of the joint6                                             | -Inf                 | Inf                | joint6    | hinge | angle (rad) |
+    | 27  | angle of the joint7                                             | -Inf                 | Inf                | joint7    | hinge | angle (rad) |
+    | 28  | angle of the joint8                                             | -Inf                 | Inf                | joint8    | hinge | angle (rad) |
+    | 29  | angle of the joint9                                             | -Inf                 | Inf                | joint9    | hinge | angle (rad) |
+    | 30  | angle of the joint10                                            | -Inf                 | Inf                | joint10   | hinge | angle (rad) |
+    | 31  | angle of the joint11                                            | -Inf                 | Inf                | joint11   | hinge | angle (rad) |
+    | 32  | angle of the joint12                                            | -Inf                 | Inf                | joint12   | hinge | angle (rad) |
+    | 33  | angle of the joint13                                            | -Inf                 | Inf                | joint13   | hinge | angle (rad) |
+    | 34  | angle of the joint14                                            | -Inf                 | Inf                | joint14   | hinge | angle (rad) | 
+    | 35  | angular velocity of the joint1                                  | -Inf                 | Inf                | joint1    | hinge | angle (rad) |
+    | 36  | angular velocity of the joint2                                  | -Inf                 | Inf                | joint2    | hinge | angle (rad) |
+    | 37  | angular velocity of the joint3                                  | -Inf                 | Inf                | joint3    | hinge | angle (rad) |
+    | 38  | angular velocity of the joint4                                  | -Inf                 | Inf                | joint4    | hinge | angle (rad) |
+    | 39  | angular velocity of the joint5                                  | -Inf                 | Inf                | joint5    | hinge | angle (rad) |
+    | 40  | angular velocity of the joint6                                  | -Inf                 | Inf                | joint6    | hinge | angle (rad) |
+    | 41  | angular velocity of the joint7                                  | -Inf                 | Inf                | joint7    | hinge | angle (rad) |
+    | 42  | angular velocity of the joint8                                  | -Inf                 | Inf                | joint8    | hinge | angle (rad) |
+    | 43  | angular velocity of the joint9                                  | -Inf                 | Inf                | joint9    | hinge | angle (rad) |
+    | 44  | angular velocity of the joint10                                 | -Inf                 | Inf                | joint10   | hinge | angle (rad) |
+    | 45  | angular velocity of the joint11                                 | -Inf                 | Inf                | joint11   | hinge | angle (rad) |
+    | 46  | angular velocity of the joint12                                 | -Inf                 | Inf                | joint12   | hinge | angle (rad) |
+    | 47  | angular velocity of the joint13                                 | -Inf                 | Inf                | joint13   | hinge | angle (rad) |
+    | 48  | angular velocity of the joint14                                 | -Inf                 | Inf                | joint14   | hinge | angle (rad) |
 
     !! Environment space and Agent state space are not subset of the any env sets. !!
 
@@ -107,9 +159,9 @@ class bongEnv(mujoco_env.MujocoEnv, utils.EzPickle):
         contact_cost_weight=5e-4,
         healthy_reward=1.0,
         terminate_when_unhealthy=True,
-        healthy_z_range=(0.2, 1.0),
-        healthy_r_range=(-120,120),
-        healthy_y_range=(-45,45),
+        healthy_roll_range=(-45,45),
+        healthy_pitch_range=(-30,30),
+        healthy_yaw_range=(-45,45),
         contact_force_range=(-1.0, 1.0),
         reset_noise_scale=0.1,
         exclude_current_positions_from_observation=False,
@@ -122,7 +174,9 @@ class bongEnv(mujoco_env.MujocoEnv, utils.EzPickle):
 
         self._healthy_reward = healthy_reward
         self._terminate_when_unhealthy = terminate_when_unhealthy
-        self._healthy_z_range = healthy_z_range
+        self._healthy_roll_range = healthy_roll_range
+        self._healthy_pitch_range = healthy_pitch_range
+        self._healthy_yaw_range = healthy_yaw_range
 
         self._contact_force_range = contact_force_range
 
@@ -131,7 +185,6 @@ class bongEnv(mujoco_env.MujocoEnv, utils.EzPickle):
         self._exclude_current_positions_from_observation = (
             exclude_current_positions_from_observation
         )
-
 
         ## For custom env
         self.gait = gait.gait(gait_params[0] 
@@ -199,8 +252,8 @@ class bongEnv(mujoco_env.MujocoEnv, utils.EzPickle):
         qCoM_x, qCoM_y, qCoM_z, qCoM_w = state[14], state[15], state[16], state[17]
         roll, pitch, yaw = self._quat2euler(qCoM_w, qCoM_x, qCoM_y, qCoM_z)
 
-        # if abs(roll) > math.radians(75):
-        #     healthy_check = False
+        if abs(roll) > math.radians(75):
+            healthy_check = False
 
         if abs(yaw) > math.radians(60):
             healthy_check = False
@@ -218,7 +271,9 @@ class bongEnv(mujoco_env.MujocoEnv, utils.EzPickle):
         # write action exporter code here
         # ctrl_cost = self.control_cost(obs_before, mujoco_ctrl)
 
-        self.do_simulation(action, self.frame_skip)
+        skip_tau_scale = int(action[-1])
+
+        self.do_simulation(action, self.frame_skip * 14 * skip_tau_scale)
 
         obs_after = self._get_obs()
 
@@ -239,7 +294,10 @@ class bongEnv(mujoco_env.MujocoEnv, utils.EzPickle):
 
         reward = rewards
 
-        done = self.done
+        if '_healthy_roll_range' in locals():
+            done = self.done
+        else:
+            done = False
 
         observation = self._get_obs()
         info = {
@@ -316,13 +374,16 @@ class bongEnv(mujoco_env.MujocoEnv, utils.EzPickle):
         noise_low = -self._reset_noise_scale
         noise_high = self._reset_noise_scale
 
-        qpos = self.init_qpos + self.np_random.uniform(
-            low=noise_low, high=noise_high, size=self.model.nq
-        )
-        qvel = (
-            self.init_qvel
-            + self._reset_noise_scale * self.np_random.standard_normal(self.model.nv)
-        )
+        # qpos = self.init_qpos + self.np_random.uniform(
+        #     low=noise_low, high=noise_high, size=self.model.nq
+        # )
+        # qvel = (
+        #     self.init_qvel
+        #     + self._reset_noise_scale * self.np_random.standard_normal(self.model.nv)
+        # )
+
+        qpos = self.init_qpos
+        qvel = self.init_qvel
         self.set_state(qpos, qvel)
 
         observation = self._get_obs()
@@ -350,4 +411,5 @@ class bongEnv(mujoco_env.MujocoEnv, utils.EzPickle):
 
     def reset(self):
         self.state_k = 0
+        self.sim.reset()
         return super().reset()

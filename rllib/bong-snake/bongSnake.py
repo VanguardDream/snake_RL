@@ -209,7 +209,7 @@ class bongEnv(mujoco_env.MujocoEnv, utils.EzPickle):
 
         mujoco_env.MujocoEnv.__init__(self, xml_file, 5)
 
-        self.action_space = Box(np.array(limit_min),np.array(limit_max), dtype=np.integer)
+        self.action_space = Box(np.array(limit_min),np.array(limit_max), dtype=np.int32)
         self.observation_space = Box(np.ones(46,) * -np.inf, np.ones(46,) * np.inf, dtype=np.float32)
 
         self.viewer = mujoco_py.MjViewer(self.sim)

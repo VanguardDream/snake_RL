@@ -210,9 +210,9 @@ class bongEnv(mujoco_env.MujocoEnv, utils.EzPickle):
         mujoco_env.MujocoEnv.__init__(self, xml_file, 5)
 
         self.action_space = Box(np.array(limit_min),np.array(limit_max), dtype=np.int32)
-        self.observation_space = Box(np.ones(46,) * -np.inf, np.ones(46,) * np.inf, dtype=np.float32)
+        self.observation_space = Box(np.ones(48,) * -np.inf, np.ones(48,) * np.inf, dtype=np.float32)
 
-        self.viewer = mujoco_py.MjViewer(self.sim)
+        # self.viewer = mujoco_py.MjViewer(self.sim)
         
     @property
     def healthy_reward(self):
@@ -299,7 +299,8 @@ class bongEnv(mujoco_env.MujocoEnv, utils.EzPickle):
         else:
             done = False
 
-        observation = self._get_obs()
+        observation = obs_after
+
         info = {
             "reward_forward": forward_reward,
             "reward_ctrl": ctrl_cost,
@@ -419,7 +420,7 @@ class bongEnv(mujoco_env.MujocoEnv, utils.EzPickle):
                 accum_qvels = accum_qvels + abs(self.sim.data.get_joint_qpos(name))
 
             self.sim.step()
-            if self.viewer is not None:
-                self.viewer.render()
+            # if self.viewer is not None:
+            #     self.viewer.render()
 
         return accum_qvels

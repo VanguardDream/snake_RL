@@ -26,7 +26,6 @@ DEFAULT_CONFIG = with_common_config({
     # PG is the first algo (experimental) to not use the distr. exec API
     # anymore.
     "_disable_execution_plan_api": True,
-    "framework":"torch",
 })
 
 # trainer = ppo.PPOTrainer(env="bongsnake",config={"framework": "torch"})

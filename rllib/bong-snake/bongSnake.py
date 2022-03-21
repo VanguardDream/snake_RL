@@ -4,8 +4,6 @@
 # Version : 2022-03-18
 # Description : Bong Snake Env for Gym
 
-from curses.ascii import ctrl
-from turtle import st
 import mujoco_py
 import numpy as np
 import gait
@@ -167,7 +165,8 @@ class bongEnv(mujoco_env.MujocoEnv, utils.EzPickle):
         contact_force_range=(-1.0, 1.0),
         reset_noise_scale=0.1,
         exclude_current_positions_from_observation=False,
-        gait_params=(1, 39.8, 189.9, -9.1, 66.5, 160.9, 7.0, 1)
+        gait_params=(1, 39.8, 189.9, -9.1, 66.5, 160.9, 7.0, 1),
+        render_option = False
     ):
         utils.EzPickle.__init__(**locals())
 
@@ -212,7 +211,11 @@ class bongEnv(mujoco_env.MujocoEnv, utils.EzPickle):
         self.action_space = Box(np.array(limit_min),np.array(limit_max), dtype=np.int32)
         self.observation_space = Box(np.ones(48,) * -np.inf, np.ones(48,) * np.inf, dtype=np.float32)
 
-        # self.viewer = mujoco_py.MjViewer(self.sim)
+        #Render Option
+        self.render_option = render_option
+
+        if self.render_option:
+            self.viewer = mujoco_py.MjViewer(self.sim)
         
     @property
     def healthy_reward(self):
@@ -273,7 +276,9 @@ class bongEnv(mujoco_env.MujocoEnv, utils.EzPickle):
 
         skip_tau_scale = int(action[-1])
 
-        ctrl_cost = self.do_simulation(action, self.frame_skip * 14 * skip_tau_scale)
+        ctrl_cost = 0
+
+        self.do_simulation(action, self.frame_skip * 14 * skip_tau_scale)
 
         obs_after = self._get_obs()
 
@@ -405,6 +410,8 @@ class bongEnv(mujoco_env.MujocoEnv, utils.EzPickle):
 
     def do_simulation(self, action, n_frames):
         joint_names = ['joint1','joint2','joint3','joint4','joint5','joint6','joint7','joint8','joint9','joint10','joint11','joint12','joint13','joint14']
+        
+        global ctrl_cost
         accum_qvels = 0
 
         for _ in range(n_frames):
@@ -420,7 +427,9 @@ class bongEnv(mujoco_env.MujocoEnv, utils.EzPickle):
                 accum_qvels = accum_qvels + abs(self.sim.data.get_joint_qpos(name))
 
             self.sim.step()
-            # if self.viewer is not None:
-            #     self.viewer.render()
 
-        return accum_qvels
+            if self.render_option:
+                if self.viewer is not None:
+                    self.viewer.render()
+
+        ctrl_cost =  accum_qvels

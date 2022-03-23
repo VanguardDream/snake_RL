@@ -157,7 +157,7 @@ class bongEnv(mujoco_env.MujocoEnv, utils.EzPickle):
         healthy_yaw_range=(-45,45),
         reset_noise_scale=0.1,
         gait_params=(1, 39.8, 189.9, -9.1, 66.5, 160.9, 7.0, 1),
-        render_option = True
+        render_option = False
     ):
 
         self._ctrl_cost_weight = ctrl_cost_weight
@@ -190,8 +190,6 @@ class bongEnv(mujoco_env.MujocoEnv, utils.EzPickle):
         self.custom_state = 0
 
 
-        self.action_space = Box(np.array(limit_min),np.array(limit_max), dtype=np.int32)
-        self.observation_space = Box(np.ones(48,) * -np.inf, np.ones(48,) * np.inf, dtype=np.float32)
 
         #Render Option
         self.render_option = render_option
@@ -203,6 +201,8 @@ class bongEnv(mujoco_env.MujocoEnv, utils.EzPickle):
         if self.render_option:
             self.viewer = mujoco_py.MjViewer(self.sim)
         
+        self.action_space = Box(np.array(limit_min),np.array(limit_max), dtype=np.int32)
+        self.observation_space = Box(np.ones(48,) * -np.inf, np.ones(48,) * np.inf, dtype=np.float32)
         
 
 
@@ -253,7 +253,7 @@ class bongEnv(mujoco_env.MujocoEnv, utils.EzPickle):
 
         ctrl_cost = 0
 
-        self.do_simulation(action, self.frame_skip * 14 * skip_tau_scale)
+        self.do_simulation(action, self.frame_skip * 14 * skip_tau_scale * 2)
 
         obs_after = self._get_obs()
 
@@ -266,7 +266,7 @@ class bongEnv(mujoco_env.MujocoEnv, utils.EzPickle):
 
         #Reward Calculation
         x_vel, y_vel = (obs_after - obs_before)[0:2]
-        forward_reward = x_vel - 0.4 * y_vel # 추후 계수 추가할 것
+        forward_reward = 8 * x_vel - 3 * y_vel # 추후 계수 추가할 것
         healthy_reward = self.healthy_reward
 
         rewards = forward_reward + healthy_reward

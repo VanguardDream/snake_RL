@@ -6,7 +6,7 @@ import numpy as np
 
 
 if __name__ == '__main__':
-    env = bongSnake.bongEnv()
+    env = bongSnake.bongEnv(render_option=True)
 
     env.reset()
 
@@ -14,7 +14,13 @@ if __name__ == '__main__':
         #renders the environment
         #Takes a random action from its action space 
         # aka the number of unique actions an agent can perform
-        env.step(env.action_space.sample())
+        _, reward, done, _ = env.step((env.action_space.sample()))
+        if done:
+            env.reset_model()
+            continue
+        
+        print(reward)
+
         # print(env.action_space.sample())
         env.reset_model()
     

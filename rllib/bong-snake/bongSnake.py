@@ -12,12 +12,6 @@ from gym import utils
 from gym.spaces import *
 from gym.envs.mujoco import mujoco_env
 
-
-DEFAULT_CAMERA_CONFIG = {
-    "distance": 4.0,
-}
-
-
 class bongEnv(mujoco_env.MujocoEnv, utils.EzPickle):
     """
     Description
@@ -151,7 +145,6 @@ class bongEnv(mujoco_env.MujocoEnv, utils.EzPickle):
     !! Environment space and Agent state space are not subset of the any env sets. !!
 
     """
-
     def __init__(
         self,
         xml_file="snake.xml",
@@ -162,30 +155,20 @@ class bongEnv(mujoco_env.MujocoEnv, utils.EzPickle):
         healthy_roll_range=(-45,45),
         healthy_pitch_range=(-30,30),
         healthy_yaw_range=(-45,45),
-        contact_force_range=(-1.0, 1.0),
         reset_noise_scale=0.1,
-        exclude_current_positions_from_observation=False,
         gait_params=(1, 39.8, 189.9, -9.1, 66.5, 160.9, 7.0, 1),
-        render_option = False
+        render_option = True
     ):
-        utils.EzPickle.__init__(**locals())
 
         self._ctrl_cost_weight = ctrl_cost_weight
         self._contact_cost_weight = contact_cost_weight
-
         self._healthy_reward = healthy_reward
         self._terminate_when_unhealthy = terminate_when_unhealthy
         self._healthy_roll_range = healthy_roll_range
         self._healthy_pitch_range = healthy_pitch_range
         self._healthy_yaw_range = healthy_yaw_range
 
-        self._contact_force_range = contact_force_range
-
         self._reset_noise_scale = reset_noise_scale
-
-        self._exclude_current_positions_from_observation = (
-            exclude_current_positions_from_observation
-        )
 
         ## For custom env
         self.gait = gait.gait(gait_params[0] 
@@ -206,7 +189,6 @@ class bongEnv(mujoco_env.MujocoEnv, utils.EzPickle):
         self.state_gait = np.array(gait_params[1:])
         self.custom_state = 0
 
-        mujoco_env.MujocoEnv.__init__(self, xml_file, 5)
 
         self.action_space = Box(np.array(limit_min),np.array(limit_max), dtype=np.int32)
         self.observation_space = Box(np.ones(48,) * -np.inf, np.ones(48,) * np.inf, dtype=np.float32)
@@ -214,9 +196,16 @@ class bongEnv(mujoco_env.MujocoEnv, utils.EzPickle):
         #Render Option
         self.render_option = render_option
 
+        #Parent class initialize
+        utils.EzPickle.__init__(**locals())
+        mujoco_env.MujocoEnv.__init__(self, xml_file, 5)
+        
         if self.render_option:
             self.viewer = mujoco_py.MjViewer(self.sim)
         
+        
+
+
     @property
     def healthy_reward(self):
         return (
@@ -234,20 +223,6 @@ class bongEnv(mujoco_env.MujocoEnv, utils.EzPickle):
         
         self.state_k = self.state_k + 1
         return np.radians(ctrls)
-
-    @property
-    def contact_forces(self):
-        raw_contact_forces = self.sim.data.cfrc_ext
-        min_value, max_value = self._contact_force_range
-        contact_forces = np.clip(raw_contact_forces, min_value, max_value)
-        return contact_forces
-
-    @property
-    def contact_cost(self):
-        contact_cost = self._contact_cost_weight * np.sum(
-            np.square(self.contact_forces)
-        )
-        return contact_cost
 
     @property
     def is_healthy(self):
@@ -339,9 +314,6 @@ class bongEnv(mujoco_env.MujocoEnv, utils.EzPickle):
         theta = np.array([self.data.get_joint_qpos(x) for x in joint_names]).copy()
         dtheta = np.array([self.data.get_joint_qvel(x) for x in joint_names]).copy()
 
-        if self._exclude_current_positions_from_observation:
-            pass
-
         observations = np.concatenate([xy_position.flat,
                                     xy_velocity.flat,
                                     xy_velocity_head.flat,
@@ -398,20 +370,12 @@ class bongEnv(mujoco_env.MujocoEnv, utils.EzPickle):
 
         return observation
 
-    def viewer_setup(self):
-        for key, value in DEFAULT_CAMERA_CONFIG.items():
-            if isinstance(value, np.ndarray):
-                getattr(self.viewer.cam, key)[:] = value
-            else:
-                setattr(self.viewer.cam, key, value)
-
     def state_vector(self):
         return self.custom_state
 
     def do_simulation(self, action, n_frames):
         joint_names = ['joint1','joint2','joint3','joint4','joint5','joint6','joint7','joint8','joint9','joint10','joint11','joint12','joint13','joint14']
         
-        global ctrl_cost
         accum_qvels = 0
 
         for _ in range(n_frames):
@@ -431,5 +395,3 @@ class bongEnv(mujoco_env.MujocoEnv, utils.EzPickle):
             if self.render_option:
                 if self.viewer is not None:
                     self.viewer.render()
-
-        ctrl_cost =  accum_qvels

@@ -229,13 +229,13 @@ class bongEnv(mujoco_env.MujocoEnv, utils.EzPickle):
         healthy_check = True
         state = self.state_vector()
 
-        qCoM_x, qCoM_y, qCoM_z, qCoM_w = state[14], state[15], state[16], state[17]
+        qCoM_w, qCoM_x, qCoM_y, qCoM_z = state[14], state[15], state[16], state[17]
         roll, pitch, yaw = self._quat2euler(qCoM_w, qCoM_x, qCoM_y, qCoM_z)
 
-        if abs(roll) > math.radians(75):
+        if abs(roll) > math.radians(45):
             healthy_check = False
 
-        if abs(yaw) > math.radians(60):
+        if abs(yaw) > math.radians(30):
             healthy_check = False
 
         return healthy_check

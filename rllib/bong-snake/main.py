@@ -6,9 +6,10 @@ import numpy as np
 
 
 if __name__ == '__main__':
-    env = bongSnake.bongEnv(render_option=True)
-
+    # env = bongSnake.bongEnv(render_option=True)
+    env = gym.make("bongEnv-v0",render_option = True)
     env.reset()
+
 
     for _ in range(10):
         #renders the environment

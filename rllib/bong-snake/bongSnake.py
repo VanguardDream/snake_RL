@@ -180,7 +180,7 @@ class bongEnv(mujoco_env.MujocoEnv, utils.EzPickle):
             ,gait_params[6] 
             ,gait_params[7]
         )
-        limit_min = [-85,0,-10,-85,0,-10,1]
+        limit_min = [5,0,-10,5,0,-10,1]
         limit_max = [85,360,10,85,360,10,6]
 
 
@@ -242,7 +242,6 @@ class bongEnv(mujoco_env.MujocoEnv, utils.EzPickle):
 
     @property
     def done(self):
-        # done = not self.is_healthy if self._terminate_when_unhealthy else False
         done = not self.is_healthy
         return done
 
@@ -274,10 +273,7 @@ class bongEnv(mujoco_env.MujocoEnv, utils.EzPickle):
 
         reward = rewards + costs
 
-        if '_healthy_roll_range' in locals():
-            done = self.done
-        else:
-            done = False
+        done = self.done
 
         observation = obs_after
 

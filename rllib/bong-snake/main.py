@@ -14,13 +14,19 @@ if __name__ == '__main__':
         #renders the environment
         #Takes a random action from its action space 
         # aka the number of unique actions an agent can perform
-        _, reward, done, _ = env.step((env.action_space.sample()))
-        if done:
-            env.reset_model()
-            continue
-        
-        print(reward)
+        done = False
 
-        # print(env.action_space.sample())
-        env.reset_model()
+        action = env.action_space.sample()
+
+        while not done:
+            _, reward, done, _ = env.step(action)
+
+            if done:
+                env.reset()
+                print(done)
+                break
+        
+            print(reward)
+
+        env.reset()
     

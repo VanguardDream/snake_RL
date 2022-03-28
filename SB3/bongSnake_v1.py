@@ -173,6 +173,7 @@ class bongEnv_v1(mujoco_env.MujocoEnv, utils.EzPickle):
             ,gait_params[6] 
             ,gait_params[7]
         )
+        
         limit_min = [5,0,-10,5,0,-10,1]
         limit_max = [85,360,10,85,360,10,6]
 
@@ -194,7 +195,7 @@ class bongEnv_v1(mujoco_env.MujocoEnv, utils.EzPickle):
         if self.render_option:
             self.viewer = mujoco_py.MjViewer(self.sim)
         
-        self.action_space = Box(np.array(limit_min),np.array(limit_max), dtype=np.int32)
+        self.action_space = Box(np.array(limit_min),np.array(limit_max), dtype=np.float32)
         self.observation_space = Box(np.ones(48,) * -np.inf, np.ones(48,) * np.inf, dtype=np.float32)
         
 
@@ -245,7 +246,7 @@ class bongEnv_v1(mujoco_env.MujocoEnv, utils.EzPickle):
 
         ctrl_cost = 0
 
-        self.do_simulation(action, self.frame_skip * 14 * skip_tau_scale * 2)
+        self.do_simulation(action, self.frame_skip * 14 * skip_tau_scale)
 
         obs_after = self._get_obs()
 
@@ -339,17 +340,6 @@ class bongEnv_v1(mujoco_env.MujocoEnv, utils.EzPickle):
 
     def reset_model(self):
         self.state_k = 0
-
-        noise_low = -self._reset_noise_scale
-        noise_high = self._reset_noise_scale
-
-        # qpos = self.init_qpos + self.np_random.uniform(
-        #     low=noise_low, high=noise_high, size=self.model.nq
-        # )
-        # qvel = (
-        #     self.init_qvel
-        #     + self._reset_noise_scale * self.np_random.standard_normal(self.model.nv)
-        # )
 
         qpos = self.init_qpos
         qvel = self.init_qvel

@@ -16,32 +16,32 @@ class SaveCheckpoint(BaseCallback):
 
 	def _on_step(self):
 		if self.num_timesteps % self.save_freq == 0:
-			self.model.save("model.zip")
-			self.training_env.save("stats.pkl")
+			self.model.save("model_v1.zip")
+			self.training_env.save("stats_v1.pkl")
 
 		return True
 
 if __name__ == '__main__':
 
 	# inits
-	env = gym.make('bongEnv-v0')
+	env = gym.make('bongEnv-v1')
 	# env = Monitor(env)
 
 	env = DummyVecEnv([lambda: Monitor(env)])
 	model = None
 
 	# load recent checkpoint
-	if os.path.isfile("model.zip") and os.path.isfile("stats.pkl"):
-		env = VecNormalize.load("stats.pkl", env)
+	if os.path.isfile("model_v1.zip") and os.path.isfile("stats_v1.pkl"):
+		env = VecNormalize.load("stats_v1.pkl", env)
 		env.reset()
-		model = A2C.load("model.zip", env)
+		model = A2C.load("model_v1.zip", env)
 	else:
 		env = VecNormalize(env)
-		model = A2C('MlpPolicy', env, verbose = 1, tensorboard_log = "./A2C/")
+		model = A2C('MlpPolicy', env, verbose = 1, tensorboard_log = "./A2C_v1/", learning_rate=0.001, gamma= 0.9)
 
 	# replay buffer
-	if os.path.isfile("replay_buffer.pkl"):
-		model.load_replay_buffer("replay_buffer.pkl")
+	if os.path.isfile("replay_buffer_v1.pkl"):
+		model.load_replay_buffer("replay_buffer_v1.pkl")
 
 	# train
 	model.learn(500000,

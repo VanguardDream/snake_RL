@@ -3,6 +3,7 @@
 # Date : 2022-01-04 (YYYYMMDD)
 # Description : Gait class for snake RL jupyter notebook this gait code is forked from "Gait-lambda.py" on 4th Jan. 
 
+from decimal import DivisionByZero
 import math
 import numpy as np
 
@@ -53,6 +54,14 @@ class gait:
                                     [0,0,0,0,0,0,0,0,0,0,1,0,0,0],
                                     [0,0,0,0,0,0,0,0,0,0,0,0,0,1],
                                     [0,0,0,0,0,0,0,0,0,0,0,0,1,0]],dtype='int')
+        if gait == 0:
+            self.m_columns = self.m_vertical.shape[1]
+        elif gait == 1:
+            self.m_columns = self.m_sinuous.shape[1]
+        elif gait == 2:
+            self.m_columns = self.m_sidewind.shape[1]
+        else:
+            self.m_columns = -1
 
     def setParams(self, gait = 1,d_amp = 30, d_phase = 150, d_lam = 1,l_amp = 30, l_phase = 150, l_lam = 1, tau = 1):
         self.gait = gait
@@ -168,3 +177,16 @@ class gait:
 
         return m_k.nonzero()[0]
 
+    def get_stride_ratio(self, i) -> float:
+        i_step = i % (self.tau * self.m_columns)
+        try:
+            if self.m_columns == 0:
+                raise ValueError("Maybe the gait class should not be initiated correctly check gait class again (m_column value is zero now)")
+            
+            stride_ratio = (i_step + 1) / (self.tau * self.m_columns)
+        except DivisionByZero:
+            exit()
+        except ValueError:
+            exit()
+
+        return stride_ratio

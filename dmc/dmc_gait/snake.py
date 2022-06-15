@@ -38,7 +38,6 @@ def make_model():
 
     return etree.tostring(mjcf, pretty_print=True)
 
-<<<<<<< HEAD
 @SUITE.add()
 def crawl(time_limit=_DEFAULT_TIME_LIMIT, random=None, environment_kwargs=None):
     """Returns the crawl task."""
@@ -68,6 +67,10 @@ class Physics(mujoco.Physics):
             self._sensor_types_to_names[sensor_types] = sensor_names
         return sensor_names
 
+    def imu(self):
+        """Return imu data on xml"""
+        imu_sensors = self._get_sensor_names(enums.mjtSensor.mjSENS_GYRO,enums.mjtSensor.mjSENS_ACCELEROMETER)
+
 
 class Move(base.Task):
     """A quadruped task solved by moving forward at a designated speed."""
@@ -90,10 +93,10 @@ class Move(base.Task):
         Args:
             physics: An instance of `Physics`.
         """
-        # Initial configuration.
-        orientation = self.random.randn(4)
-        orientation /= np.linalg.norm(orientation)
-        _find_non_contacting_height(physics, orientation)
+        # # Initial configuration.
+        # orientation = self.random.randn(4)
+        # orientation /= np.linalg.norm(orientation)
+        # _find_non_contacting_height(physics, orientation)
         super().initialize_episode(physics)
 
     def get_observation(self, physics):
@@ -112,24 +115,3 @@ class Move(base.Task):
             sigmoid='linear')
 
         return _upright_reward(physics) * move_reward
-=======
-class Physics(mujoco.Physics):
-    """Physics simulation with additional features for the Cartpole domain."""
-
-    def cart_position(self):
-        """Returns the position of the cart."""
-        return self.named.data.qpos['slider'][0]
-
-    def angular_vel(self):
-        """Returns the angular velocity of the pole."""
-        return self.data.qvel[1:]
-
-    def pole_angle_cosine(self):
-        """Returns the cosine of the pole angle."""
-        return self.named.data.xmat[2:, 'zz']
-
-    def bounded_position(self):
-        """Returns the state, with pole angle split into sin/cos."""
-        return np.hstack((self.cart_position(),
-                            self.named.data.xmat[2:, ['zz', 'xz']].ravel()))
->>>>>>> 6ca823b2315c10bfdef089385cf38f39b1db15b0

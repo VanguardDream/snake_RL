@@ -1,5 +1,5 @@
 from dm_control import mujoco
-from dm_control import viewer
+# from dm_control import viewer
 
 # Load a model from an MJCF XML string.
 xml_string = """

@@ -2,7 +2,7 @@ from dm_control import suite
 from dm_control import viewer
 import numpy as np
 
-# =====================================
+# # =====================================
 
 # env = suite.load(domain_name="humanoid", task_name="stand")
 # action_spec = env.action_spec()
@@ -18,4 +18,4 @@ import numpy as np
 # viewer.launch(env, policy=random_policy)
 
 
-# =====================================
+# # =====================================

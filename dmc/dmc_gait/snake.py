@@ -38,6 +38,7 @@ def make_model():
 
     return etree.tostring(mjcf, pretty_print=True)
 
+<<<<<<< HEAD
 @SUITE.add()
 def crawl(time_limit=_DEFAULT_TIME_LIMIT, random=None, environment_kwargs=None):
     """Returns the crawl task."""
@@ -111,3 +112,24 @@ class Move(base.Task):
             sigmoid='linear')
 
         return _upright_reward(physics) * move_reward
+=======
+class Physics(mujoco.Physics):
+    """Physics simulation with additional features for the Cartpole domain."""
+
+    def cart_position(self):
+        """Returns the position of the cart."""
+        return self.named.data.qpos['slider'][0]
+
+    def angular_vel(self):
+        """Returns the angular velocity of the pole."""
+        return self.data.qvel[1:]
+
+    def pole_angle_cosine(self):
+        """Returns the cosine of the pole angle."""
+        return self.named.data.xmat[2:, 'zz']
+
+    def bounded_position(self):
+        """Returns the state, with pole angle split into sin/cos."""
+        return np.hstack((self.cart_position(),
+                            self.named.data.xmat[2:, ['zz', 'xz']].ravel()))
+>>>>>>> 6ca823b2315c10bfdef089385cf38f39b1db15b0

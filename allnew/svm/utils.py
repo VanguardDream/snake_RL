@@ -11,7 +11,7 @@ def writeToCSV(gait : list, data : np.ndarray):
     _now = datetime.datetime.now()
     _now_string = _now.strftime('%Y-%m-%d-%H:%M:%S')
 
-    _file = open('data.csv','a',newline='')
+    _file = open('data_t.csv','a',newline='')
     _writer = csv.writer(_file)
 
     for _ in range(data.shape[0]):

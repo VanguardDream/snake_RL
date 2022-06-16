@@ -99,6 +99,7 @@ def sim_start(iter:int = 10, iter_timesteps:int = 100)->None:
             # sim_viewer.render()
 
         accum_obs_data = np.reshape(accum_obs_data, (_total_time,-1))
+        print(accum_obs_data.shape)
 
         # make data array to decimal 4 places
         accum_obs_data = np.around(accum_obs_data, decimals=4)

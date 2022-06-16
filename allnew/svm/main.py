@@ -19,7 +19,7 @@ simulator = mujoco_py.MjSim(snake)
 
 #Simulation Setup
 _total_time = 1400
-_num_iter = 4000
+_num_iter = 40000
 
 gait_type = 1
 gait_param = np.array([39.8, 189.9, -9.1, 66.5, 160.9, 7.0, 1]) #initial params
@@ -101,7 +101,7 @@ for _ in range(_num_iter):
             break
         # sim_viewer.render()
 
-    accum_obs_data = np.reshape(accum_obs_data, (_total_time,-1))
+    accum_obs_data = np.reshape(accum_obs_data, (-1,64))
 
     # make data array to decimal 4 places
     accum_obs_data = np.around(accum_obs_data, decimals=4)

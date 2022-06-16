@@ -2,7 +2,6 @@
 # All right reserved
 # Description : Snake robot dynamics SVM code
 
-from unicodedata import decimal
 import gait
 import mujoco_py
 import numpy as np
@@ -42,10 +41,10 @@ for _ in range(_num_iter):
     _tic_iter.tic()
     
     gait_vector = [gait_type, gait_param[0], gait_param[1], gait_param[2], gait_param[3], gait_param[4], gait_param[5], gait_param[6]]
-    gait_vector[1] = random.randint(-85,85) # Dorsal Amp
+    gait_vector[1] = random.randint(0,85) # Dorsal Amp
     gait_vector[2] = random.randint(0,359)  # Dorsal Phase
     gait_vector[3] = random.randint(-10,10) # Dorsal Nu
-    gait_vector[4] = random.randint(-85,85) # Lateral Amp
+    gait_vector[4] = random.randint(0,85) # Lateral Amp
     gait_vector[5] = random.randint(0,359)  # Lateral Phase
     gait_vector[6] = random.randint(-10,10) # Lateral Nu
     gait_vector[7] = random.randint(1,5) # Tau

@@ -1,3 +1,7 @@
+# © 2021 Bongsub Song <doorebong@gmail.com>
+# All right reserved
+# Description : Snake robot dynamics SVM-util code
+
 import numpy as np
 
 def writeToCSV(gait : list, data : np.ndarray):

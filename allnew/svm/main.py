@@ -94,6 +94,7 @@ for _ in range(_num_iter):
         orientaion_com = np.array([simulator.data.get_body_xquat(x) for x in link_names]).mean(axis=0)
         accum_obs_data = np.append(accum_obs_data, orientaion_com)
 
+            
         simulator.step()
         # sim_viewer.render()
 

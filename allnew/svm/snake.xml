@@ -5,6 +5,9 @@
 
 <mujoco model="snake-dgist">
 
+    <option timestep="0.01" iterations="50" tolerance="1e-5" solver="Newton" cone="elliptic"/>
+    <size nconmax="3000" njmax="1000" nstack="500000"/>
+
     <!-- <include file="./common/skybox.xml"/>
     <include file="./common/visual.xml"/>
     <include file="./common/materials.xml"/> -->

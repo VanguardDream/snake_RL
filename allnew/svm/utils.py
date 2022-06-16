@@ -1,6 +1,6 @@
 import numpy as np
 
-def writeToCSV(data : np.ndarray):
+def writeToCSV(gait : list, data : np.ndarray):
     import csv
     import datetime
 
@@ -12,8 +12,8 @@ def writeToCSV(data : np.ndarray):
 
     for _ in range(data.shape[0]):
         if _ == 0:
-            _writer.writerow([_now_string] + data[_,:].tolist())
+            _writer.writerow([_now_string] + gait + data[_,:].tolist())
         else:
-            _writer.writerow(["----"] + data[_,:].tolist())
+            _writer.writerow(["----"] + gait + data[_,:].tolist())
 
     _file.close()

@@ -6,7 +6,9 @@ from unicodedata import decimal
 import gait
 import mujoco_py
 import numpy as np
-import write_datas
+import utils
+import random
+import pytictoc as tictoc
 
 #load model from path
 snake = mujoco_py.load_model_from_path("./snake.xml")
@@ -18,7 +20,10 @@ simulator = mujoco_py.MjSim(snake)
 
 #Simulation Setup
 gait_type = 1
-gait_param = np.array([39.8, 189.9, -9.1, 66.5, 160.9, 7.0, 1])
+gait_param = np.array([39.8, 189.9, -9.1, 66.5, 160.9, 7.0, 1]) #initial params
+# Running time measure
+_tic_proc = tictoc.TicToc()
+_tic_iter = tictoc.TicToc()
 
 # gait_param = np.array([52.76,	319.65,	1.99,	72.07,	262.95,	7.91,	1])
 gait_gen = gait.gait(gait_type, gait_param[0], gait_param[1], gait_param[2], gait_param[3], gait_param[4], gait_param[5], gait_param[6])
@@ -26,10 +31,31 @@ joint_names = ['joint1','joint2','joint3','joint4','joint5','joint6','joint7','j
 link_names = ['head','link1','link2','link3','link4','link5','link6','link7','link8','link9','link10','link11','link12','link13','tail']
 _total_time = 1400
 
+#Initiation
+_tic_proc.tic()
+
 
 # while(True):
-for _ in range(1):
+for _ in range(40):
+    _tic_iter.tic()
+    
+    gait_vector = [gait_type, gait_param[0], gait_param[1], gait_param[2], gait_param[3], gait_param[4], gait_param[5], gait_param[6]]
+    gait_vector[1] = random.randint(-85,85) # Dorsal Amp
+    gait_vector[2] = random.randint(0,359)  # Dorsal Phase
+    gait_vector[3] = random.randint(-10,10) # Dorsal Nu
+    gait_vector[4] = random.randint(-85,85) # Lateral Amp
+    gait_vector[5] = random.randint(0,359)  # Lateral Phase
+    gait_vector[6] = random.randint(-10,10) # Lateral Nu
+    gait_vector[7] = random.randint(1,5) # Tau
+
+    if 'gait_gen' in locals():
+        del gait_gen
+
+
+    gait_gen = gait.gait(gait_vector[0], gait_vector[1], gait_vector[2], gait_vector[3], gait_vector[4], gait_vector[5], gait_vector[6], gait_vector[7])
+
     simulator.reset()
+    # simulator.forward()
     simulator.step()
     # sim_viewer.render()
 
@@ -75,7 +101,12 @@ for _ in range(1):
     # make data array to decimal 4 places
     accum_obs_data = np.around(accum_obs_data, decimals=4)
 
-    write_datas.writeToCSV(accum_obs_data)
+    utils.writeToCSV(gait_vector,accum_obs_data)
+
+    _tic_iter.toc(msg="Simulation iteration time is")
+
+    print("%d Iteration Done! - "%(_+1),end="")
+    _tic_proc.toc(msg="Total elapsed time is")
 
 
 

@@ -3,6 +3,8 @@ resources/*
 .vscode/*
 .DS_store
 torch/data/*
+allnew/svm/data.csv
+
 
 *.pyc
 *.zip

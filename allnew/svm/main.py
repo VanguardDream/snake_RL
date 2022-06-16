@@ -19,6 +19,9 @@ simulator = mujoco_py.MjSim(snake)
 # sim_viewer = mujoco_py.MjViewer(simulator)
 
 #Simulation Setup
+_total_time = 1400
+_num_iter = 4000
+
 gait_type = 1
 gait_param = np.array([39.8, 189.9, -9.1, 66.5, 160.9, 7.0, 1]) #initial params
 # Running time measure
@@ -29,14 +32,13 @@ _tic_iter = tictoc.TicToc()
 gait_gen = gait.gait(gait_type, gait_param[0], gait_param[1], gait_param[2], gait_param[3], gait_param[4], gait_param[5], gait_param[6])
 joint_names = ['joint1','joint2','joint3','joint4','joint5','joint6','joint7','joint8','joint9','joint10','joint11','joint12','joint13','joint14']
 link_names = ['head','link1','link2','link3','link4','link5','link6','link7','link8','link9','link10','link11','link12','link13','tail']
-_total_time = 1400
 
 #Initiation
 _tic_proc.tic()
 
 
 # while(True):
-for _ in range(40):
+for _ in range(_num_iter):
     _tic_iter.tic()
     
     gait_vector = [gait_type, gait_param[0], gait_param[1], gait_param[2], gait_param[3], gait_param[4], gait_param[5], gait_param[6]]
@@ -103,10 +105,11 @@ for _ in range(40):
 
     utils.writeToCSV(gait_vector,accum_obs_data)
 
-    _tic_iter.toc(msg="Simulation iteration time is")
+    _tic_iter.toc()
+    _tic_proc.toc()
+    print("%d Iteration Done! - (Total elapsed time is %3f) "%(_+1, _tic_proc.tocvalue()),end="\r")
 
-    print("%d Iteration Done! - "%(_+1),end="")
-    _tic_proc.toc(msg="Total elapsed time is")
+print("Simulation is terminated correctly.")
 
 
 

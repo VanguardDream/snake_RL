@@ -8,5 +8,6 @@ allnew/svm/data.csv
 
 *.pyc
 *.zip
-allnew/svm/data.csv
-allnew/svm/ex_data.csv
+allnew/svm/*.csv
+allnew/svm/*.mat
+allnew/svm/MAT-data/*.mat

@@ -22,7 +22,8 @@ _total_time = 1400
 _num_iter = 40000
 
 gait_type = 1
-gait_param = np.array([39.8, 189.9, -9.1, 66.5, 160.9, 7.0, 1]) #initial params
+# gait_param = np.array([39.8, 189.9, -9.1, 66.5, 160.9, 7.0, 1]) #initial params
+gait_param = np.array([39, 258, 0, 28, 86, 0, 1])
 # Running time measure
 _tic_proc = tictoc.TicToc()
 _tic_iter = tictoc.TicToc()
@@ -56,9 +57,7 @@ for _ in range(_num_iter):
     gait_gen = gait.gait(gait_vector[0], gait_vector[1], gait_vector[2], gait_vector[3], gait_vector[4], gait_vector[5], gait_vector[6], gait_vector[7])
 
     simulator.reset()
-    # simulator.forward()
     simulator.step()
-    # sim_viewer.render()
 
     if 'accum_obs_data' in locals():
         try:
@@ -106,7 +105,7 @@ for _ in range(_num_iter):
     # make data array to decimal 4 places
     accum_obs_data = np.around(accum_obs_data, decimals=4)
 
-    utils.writeToCSV(gait_vector,accum_obs_data)
+    utils.writeToMATeach(gait_vector,accum_obs_data)
 
     _tic_iter.toc()
     _tic_proc.toc()

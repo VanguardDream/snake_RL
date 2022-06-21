@@ -5,9 +5,16 @@ resources/*
 torch/data/*
 allnew/svm/data.csv
 
-
 *.pyc
 *.zip
+*.pkl
+
 allnew/svm/*.csv
 allnew/svm/*.mat
 allnew/svm/MAT-data/*.mat
+SB3/A2C/A2C_0/*
+SB3/A2C_v2/A2C_0/*
+SB3/merged/A2C_0/*
+SB3/merged/SAC_0/*
+SB3/SAC/SAC_0/*
+SB3/PPO/PPO_0/*

@@ -198,6 +198,9 @@
         <actuatorfrc name="torque_joint12" actuator="servo_12"/>
         <actuatorfrc name="torque_joint13" actuator="servo_13"/>
         <actuatorfrc name="torque_joint14" actuator="servo_14"/>
+
+        <framequat name="head_quat" objtype="site" objname="head"/>
+        <!-- <framequat name="head_quat" objtype="geom" objname="floor" reftype="site" refname="head"/> -->
     </sensor>
 
 </mujoco>

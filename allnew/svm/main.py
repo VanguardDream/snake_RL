@@ -18,8 +18,8 @@ simulator = mujoco_py.MjSim(snake)
 # sim_viewer = mujoco_py.MjViewer(simulator)
 
 #Simulation Setup
-_total_time = 1400
-_num_iter = 1
+_total_time = 1680
+_num_iter = 20
 
 gait_type = 1
 # gait_param = np.array([39.8, 189.9, -9.1, 66.5, 160.9, 7.0, 1]) #initial params
@@ -78,7 +78,7 @@ for _ in range(_num_iter):
         # MJCF Sensor data
         accum_obs_data = np.append(accum_obs_data, t)
         accum_obs_data = np.append(accum_obs_data, [gait_gen.get_stride_ratio(t)])
-        accum_obs_data = np.append(accum_obs_data, simulator.data.sensordata)
+        accum_obs_data = np.append(accum_obs_data, simulator.data.sensordata[:-4]) # If use frame orientation sensor (this sensor is allign to global frame)
 
         # Additional data
         position_head = np.array(simulator.data.get_body_xpos('head'))
@@ -87,7 +87,8 @@ for _ in range(_num_iter):
         position_com = np.array([simulator.data.get_body_xpos(x) for x in link_names]).mean(axis=0)
         accum_obs_data = np.append(accum_obs_data, position_com)
 
-        orientaion_head = np.array(simulator.data.get_body_xquat('head'))
+        # orientaion_head = np.array(simulator.data.get_body_xquat('head')) # If use just head link frame (this sensor is not allign to global frame)
+        orientaion_head = np.array(simulator.data.sensordata[-4:]) # If use frame orientation sensor (this sensor is allign to global frame)
         accum_obs_data = np.append(accum_obs_data, orientaion_head)
 
         orientaion_com = np.array([simulator.data.get_body_xquat(x) for x in link_names]).mean(axis=0)

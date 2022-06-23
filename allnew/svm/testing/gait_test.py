@@ -26,7 +26,7 @@ gait_type = 1
 # gait_param = np.array([39, 258, 0, 28, 86, 0, 1])
 
 #################### From Matlab gait param ###############
-gait_param = np.array([11,   323,   -10,    39,   222,   -10,     3])
+gait_param = np.array([0,   344,     3,    11,   344,    -1,     4])
 
 
 
@@ -84,7 +84,7 @@ for _ in range(_num_iter):
         # MJCF Sensor data
         accum_obs_data = np.append(accum_obs_data, t)
         accum_obs_data = np.append(accum_obs_data, [gait_gen.get_stride_ratio(t)])
-        accum_obs_data = np.append(accum_obs_data, simulator.data.sensordata)
+        accum_obs_data = np.append(accum_obs_data, simulator.data.sensordata[:-4]) # If use frame orientation sensor (this sensor is allign to global frame)
 
         # Additional data
         position_head = np.array(simulator.data.get_body_xpos('head'))
@@ -93,7 +93,8 @@ for _ in range(_num_iter):
         position_com = np.array([simulator.data.get_body_xpos(x) for x in link_names]).mean(axis=0)
         accum_obs_data = np.append(accum_obs_data, position_com)
 
-        orientaion_head = np.array(simulator.data.get_body_xquat('head'))
+        # orientaion_head = np.array(simulator.data.get_body_xquat('head')) # If use just head link frame (this sensor is not allign to global frame)
+        orientaion_head = np.array(simulator.data.sensordata[-4:]) # If use frame orientation sensor (this sensor is allign to global frame)
         accum_obs_data = np.append(accum_obs_data, orientaion_head)
 
         orientaion_com = np.array([simulator.data.get_body_xquat(x) for x in link_names]).mean(axis=0)
@@ -110,6 +111,8 @@ for _ in range(_num_iter):
 
     # make data array to decimal 4 places
     accum_obs_data = np.around(accum_obs_data, decimals=4)
+
+    # print(np.shape(accum_obs_data))
 
     _tic_iter.toc()
     _tic_proc.toc()

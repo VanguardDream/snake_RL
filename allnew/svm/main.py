@@ -78,7 +78,7 @@ for _ in range(_num_iter):
         # MJCF Sensor data
         accum_obs_data = np.append(accum_obs_data, t)
         accum_obs_data = np.append(accum_obs_data, [gait_gen.get_stride_ratio(t)])
-        accum_obs_data = np.append(accum_obs_data, simulator.data.sensordata[:-4]) # If use frame orientation sensor (this sensor is allign to global frame)
+        accum_obs_data = np.append(accum_obs_data, simulator.data.sensordata[:48])  # If use frame orientation sensor (this sensor is allign to global frame)
 
         # Additional data
         position_head = np.array(simulator.data.get_body_xpos('head'))

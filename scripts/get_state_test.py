@@ -1,7 +1,7 @@
 import mujoco_py
 
 #load model from path
-snake = mujoco_py.load_model_from_path("../description/mujoco/snake_dgistV2.xml")
+snake = mujoco_py.load_model_from_path("../description/mujoco/snake_dgistV3.xml")
 
 sim = mujoco_py.MjSim(snake)
 # sim_view = mujoco_py.MjViewer(sim)

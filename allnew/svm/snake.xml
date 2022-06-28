@@ -42,10 +42,10 @@
 
     <!-- Snake -->
         <body name="head" pos="0 0 0.033" euler="0 -90 0"> <!--홀-->
+            <site name="head" euler="0 90 0"/>
             <freejoint name="root"/>    
             <geom type="cylinder" size="0.0325 0.01" rgba="0.1 0.1 0.1 1" mass="0.04" condim="6" friction="0.55 0.01 0.01"/>
             <geom type="box" size="0.017 0.01425 0.02525" pos="0 0 0.01525" mass="0.1"/>
-            <site name="head" euler="0 90 0"/>
 
             <body name="link1" pos="0 0 0.0685"> <!--짝-->
                 <site name="link1" euler="0 90 0"/>
@@ -165,9 +165,11 @@
     </actuator>
 
     <sensor>
+        <!-- index 0 - 5 -->
         <accelerometer name="imu_accel" site="head"/>
         <gyro name="imu_gyro" site="head"/>
 
+        <!-- index 6 - 19 -->
         <jointpos name="pos_joint1" joint="joint1"/>
         <jointpos name="pos_joint2" joint="joint2"/>
         <jointpos name="pos_joint3" joint="joint3"/>
@@ -183,6 +185,7 @@
         <jointpos name="pos_joint13" joint="joint13"/>
         <jointpos name="pos_joint14" joint="joint14"/>
 
+        <!-- index 20 - 33 -->
         <actuatorvel name="vel_joint1" actuator="servo_1"/>
         <actuatorvel name="vel_joint2" actuator="servo_2"/>
         <actuatorvel name="vel_joint3" actuator="servo_3"/>
@@ -198,6 +201,7 @@
         <actuatorvel name="vel_joint13" actuator="servo_13"/>
         <actuatorvel name="vel_joint14" actuator="servo_14"/>
 
+        <!-- index 34 - 47 -->
         <actuatorfrc name="torque_joint1" actuator="servo_1"/>
         <actuatorfrc name="torque_joint2" actuator="servo_2"/>
         <actuatorfrc name="torque_joint3" actuator="servo_3"/>
@@ -213,6 +217,7 @@
         <actuatorfrc name="torque_joint13" actuator="servo_13"/>
         <actuatorfrc name="torque_joint14" actuator="servo_14"/>
 
+        <!-- index 48 - 51 -->
         <framequat name="head_quat" objtype="site" objname="head"/>
 
 

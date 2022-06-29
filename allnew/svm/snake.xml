@@ -220,8 +220,22 @@
         <!-- index 48 - 51 -->
         <framequat name="head_quat" objtype="site" objname="head"/>
 
+        <!-- index 52 - 107 -->
+        <framequat name="link1_quat" objtype="site" objname="link1"/>
+        <framequat name="link2_quat" objtype="site" objname="link2"/>
+        <framequat name="link3_quat" objtype="site" objname="link3"/>
+        <framequat name="link4_quat" objtype="site" objname="link4"/>
+        <framequat name="link5_quat" objtype="site" objname="link5"/>
+        <framequat name="link6_quat" objtype="site" objname="link6"/>
+        <framequat name="link7_quat" objtype="site" objname="link7"/>
+        <framequat name="link8_quat" objtype="site" objname="link8"/>
+        <framequat name="link9_quat" objtype="site" objname="link9"/>
+        <framequat name="link10_quat" objtype="site" objname="link10"/>
+        <framequat name="link11_quat" objtype="site" objname="link11"/>
+        <framequat name="link12_quat" objtype="site" objname="link12"/>
+        <framequat name="link13_quat" objtype="site" objname="link13"/>
+        <framequat name="tail_quat" objtype="site" objname="tail"/>
 
-        <!-- <framequat name="head_quat" objtype="geom" objname="floor" reftype="site" refname="head"/> -->
     </sensor>
 
 </mujoco>

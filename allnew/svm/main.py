@@ -21,7 +21,8 @@ simulator = mujoco_py.MjSim(snake)
 
 #Simulation Setup
 _total_time = 1680
-_num_iter = 1
+# _total_time = 10
+_num_iter = 20
 
 gait_type = 1
 # gait_param = np.array([39.8, 189.9, -9.1, 66.5, 160.9, 7.0, 1]) #initial params
@@ -42,6 +43,7 @@ _tic_proc.tic()
 # while(True):
 for _ in range(_num_iter):
     _tic_iter.tic()
+    _rolled_check = False
     
     gait_vector = [gait_type, gait_param[0], gait_param[1], gait_param[2], gait_param[3], gait_param[4], gait_param[5], gait_param[6]]
     gait_vector[1] = random.randint(0,85) # Dorsal Amp
@@ -102,13 +104,13 @@ for _ in range(_num_iter):
         orientaion_com[0], orientaion_com[1], orientaion_com[2], orientaion_com[3] = orientaion_com[3], orientaion_com[0], orientaion_com[1], orientaion_com[2]
         accum_obs_data = np.append(accum_obs_data, orientaion_com)
 
-        # ## Healthy check
-        # [_roll, _pitch, _yaw] = rot_com.mean().as_euler('XYZ',degrees=True)
 
-        # if(abs(_roll) > 165):
-        #     print("Unhealy(Over rolling) is occured! at gait vector : " + str(gait_vector))
-        #     _unhealth = True
-        #     break
+        ## Healthy check
+        [_roll, _pitch, _yaw] = rot_com.mean().as_euler('XYZ',degrees=True)
+
+        if(abs(_roll) > 170 and (not _rolled_check)):
+            print("(Roll axis turned) ",end='')
+            _rolled_check = True
 
         try:
             simulator.step()
@@ -123,18 +125,19 @@ for _ in range(_num_iter):
     # make data array to decimal 4 places
     accum_obs_data = np.around(accum_obs_data, decimals=4)
 
-
-    accum_quat_com =  accum_obs_data[:,-4:]
-    accum_quat_com[:, [0, 3]] = accum_quat_com[:, [3, 0]]
+    accum_quat_com =  accum_obs_data[:,-4:].copy()
+    accum_quat_com[:, [0, 1, 2, 3]] = accum_quat_com[:, [1, 2, 3, 0]]
 
     accum_rot = Rot.from_quat(accum_quat_com)
     avg_angle = accum_rot.mean().as_euler('XYZ',degrees=True)
 
-    if(abs(avg_angle[0]) > 7):
+    if(abs(avg_angle[0]) > 7 or _rolled_check):
         print("Rolling unhealthy! Gait Params : ",end='')
-        print(str(gait_vector) + "\t Average euler : " ,end=' ')
-        print(accum_rot.mean().as_euler('XYZ',degrees=True),end='\n')
-        
+        print(str(gait_vector) + "\t \t Average euler : " ,end=' ')
+
+        print(np.around(accum_rot.mean().as_euler('XYZ',degrees=True),decimals=2),end='\n')
+        continue
+
     utils.writeToMATeach(gait_vector,accum_obs_data)
 
     _tic_iter.toc()

@@ -9,26 +9,26 @@ import gait
 import mujoco_py
 import numpy as np
 import random
+from scipy.spatial.transform import Rotation as Rot
 import pytictoc as tictoc
 
 snake = mujoco_py.load_model_from_path("../snake.xml")
 
 simulator = mujoco_py.MjSim(snake)
-sim_viewer = mujoco_py.MjViewer(simulator)
 
 #Simulation Setup
+_render = True
+if _render:
+    sim_viewer = mujoco_py.MjViewer(simulator)
+
 _total_time = 1400
-_num_iter = 10
+_num_iter = 3
 
 gait_type = 1
 
-# gait_param = np.array([39.8, 189.9, -9.1, 66.5, 160.9, 7.0, 1]) #initial params
-# gait_param = np.array([39, 258, 0, 28, 86, 0, 1])
-
 #################### From Matlab gait param ###############
-gait_param = np.array([0,   344,     3,    11,   344,    -1,     4])
-
-
+gait_param = np.array([79, 242, 9, 65, 287, -1, 3])
+# gait_param = np.array([0, 0, 0, 0, 0, 0, 1])
 
 # Running time measure
 _tic_proc = tictoc.TicToc()
@@ -48,13 +48,6 @@ for _ in range(_num_iter):
     _tic_iter.tic()
     
     gait_vector = [gait_type, gait_param[0], gait_param[1], gait_param[2], gait_param[3], gait_param[4], gait_param[5], gait_param[6]]
-    # gait_vector[1] = random.randint(0,85) # Dorsal Amp
-    # gait_vector[2] = random.randint(0,359)  # Dorsal Phase
-    # gait_vector[3] = random.randint(-10,10) # Dorsal Nu
-    # gait_vector[4] = random.randint(0,85) # Lateral Amp
-    # gait_vector[5] = random.randint(0,359)  # Lateral Phase
-    # gait_vector[6] = random.randint(-10,10) # Lateral Nu
-    # gait_vector[7] = random.randint(1,5) # Tau
 
     if 'gait_gen' in locals():
         del gait_gen
@@ -84,7 +77,7 @@ for _ in range(_num_iter):
         # MJCF Sensor data
         accum_obs_data = np.append(accum_obs_data, t)
         accum_obs_data = np.append(accum_obs_data, [gait_gen.get_stride_ratio(t)])
-        accum_obs_data = np.append(accum_obs_data, simulator.data.sensordata[:-4]) # If use frame orientation sensor (this sensor is allign to global frame)
+        accum_obs_data = np.append(accum_obs_data, simulator.data.sensordata[:48])  # If use frame orientation sensor (this sensor is allign to global frame)
 
         # Additional data
         position_head = np.array(simulator.data.get_body_xpos('head'))
@@ -97,7 +90,13 @@ for _ in range(_num_iter):
         orientaion_head = np.array(simulator.data.sensordata[-4:]) # If use frame orientation sensor (this sensor is allign to global frame)
         accum_obs_data = np.append(accum_obs_data, orientaion_head)
 
-        orientaion_com = np.array([simulator.data.get_body_xquat(x) for x in link_names]).mean(axis=0)
+        # orientaion_com = np.array([simulator.data.get_body_xquat(x) for x in link_names]).mean(axis=0) # Do not use! this code just averaging coefficients of quaternion.
+        orientaions_com = np.reshape(simulator.data.sensordata[52:],(-1,4))
+        
+        orientaions_com[:, [0, 1, 2, 3]] = orientaions_com[:, [1, 2, 3, 0]]
+        rot_com = Rot.from_quat(orientaions_com)
+        orientaion_com = rot_com.mean().as_quat()
+        orientaion_com[0], orientaion_com[1], orientaion_com[2], orientaion_com[3] = orientaion_com[1], orientaion_com[2], orientaion_com[3], orientaion_com[0]
         accum_obs_data = np.append(accum_obs_data, orientaion_com)
 
         try:
@@ -105,12 +104,20 @@ for _ in range(_num_iter):
         except:
             print("Mujoco Exception raised! at gait vector : " + str(gait_vector))
             break
-        sim_viewer.render()
+
+        if _render:
+            sim_viewer.render()
 
     accum_obs_data = np.reshape(accum_obs_data, (-1,64))
 
     # make data array to decimal 4 places
     accum_obs_data = np.around(accum_obs_data, decimals=4)
+
+    accum_quat_com =  accum_obs_data[:,-4:]
+    accum_quat_com[:, [0, 3]] = accum_quat_com[:, [3, 0]]
+
+    accum_rot = Rot.from_quat(accum_quat_com)
+    avg_angle = accum_rot.mean().as_euler('XYZ',degrees=True)
 
     # print(np.shape(accum_obs_data))
 

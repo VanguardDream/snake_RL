@@ -42,10 +42,10 @@
         <light directional="false" diffuse=".2 .2 .2" specular="0 0 0" pos="0 0 5" dir="0 0 -1" castshadow="false"/>
 
     <!-- Pipes -->
-        <!-- <body pos="0.500 0 0.03">
+        <body pos="-0.025 0 0.0">
             <freejoint name="pipe1"/>
             <geom type="mesh" mesh="pipe100"/>
-        </body> -->
+        </body>
 
     <!-- Snake -->
         <body name="head" pos="0 0 0.1">

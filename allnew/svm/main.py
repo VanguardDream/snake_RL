@@ -7,7 +7,9 @@ import mujoco_py
 import numpy as np
 import utils
 import random
+from scipy.spatial.transform import Rotation as Rot
 import pytictoc as tictoc
+
 
 #load model from path
 snake = mujoco_py.load_model_from_path("./snake.xml")
@@ -19,7 +21,7 @@ simulator = mujoco_py.MjSim(snake)
 
 #Simulation Setup
 _total_time = 1680
-_num_iter = 20
+_num_iter = 1
 
 gait_type = 1
 # gait_param = np.array([39.8, 189.9, -9.1, 66.5, 160.9, 7.0, 1]) #initial params
@@ -91,8 +93,22 @@ for _ in range(_num_iter):
         orientaion_head = np.array(simulator.data.sensordata[-4:]) # If use frame orientation sensor (this sensor is allign to global frame)
         accum_obs_data = np.append(accum_obs_data, orientaion_head)
 
-        orientaion_com = np.array([simulator.data.get_body_xquat(x) for x in link_names]).mean(axis=0)
+        # orientaion_com = np.array([simulator.data.get_body_xquat(x) for x in link_names]).mean(axis=0) # Do not use! this code just averaging coefficients of quaternion.
+        orientaions_com = np.reshape(simulator.data.sensordata[52:],(-1,4))
+
+        orientaions_com[:, [0, 1, 2, 3]] = orientaions_com[:, [1, 2, 3, 0]]
+        rot_com = Rot.from_quat(orientaions_com)
+        orientaion_com = rot_com.mean().as_quat()
+        orientaion_com[0], orientaion_com[1], orientaion_com[2], orientaion_com[3] = orientaion_com[3], orientaion_com[0], orientaion_com[1], orientaion_com[2]
         accum_obs_data = np.append(accum_obs_data, orientaion_com)
+
+        # ## Healthy check
+        # [_roll, _pitch, _yaw] = rot_com.mean().as_euler('XYZ',degrees=True)
+
+        # if(abs(_roll) > 165):
+        #     print("Unhealy(Over rolling) is occured! at gait vector : " + str(gait_vector))
+        #     _unhealth = True
+        #     break
 
         try:
             simulator.step()
@@ -102,17 +118,30 @@ for _ in range(_num_iter):
         # sim_viewer.render()
 
     accum_obs_data = np.reshape(accum_obs_data, (-1,64))
+    # print(np.shape(accum_obs_data))
 
     # make data array to decimal 4 places
     accum_obs_data = np.around(accum_obs_data, decimals=4)
 
+
+    accum_quat_com =  accum_obs_data[:,-4:]
+    accum_quat_com[:, [0, 3]] = accum_quat_com[:, [3, 0]]
+
+    accum_rot = Rot.from_quat(accum_quat_com)
+    avg_angle = accum_rot.mean().as_euler('XYZ',degrees=True)
+
+    if(abs(avg_angle[0]) > 7):
+        print("Rolling unhealthy! Gait Params : ",end='')
+        print(str(gait_vector) + "\t Average euler : " ,end=' ')
+        print(accum_rot.mean().as_euler('XYZ',degrees=True),end='\n')
+        
     utils.writeToMATeach(gait_vector,accum_obs_data)
 
     _tic_iter.toc()
     _tic_proc.toc()
     print("%d Iteration Done! - (Total elapsed time is %3f) "%(_+1, _tic_proc.tocvalue()),end="\r")
 
-print("Simulation is terminated correctly.")
+print("\n Simulation is terminated correctly.")
 
 
 

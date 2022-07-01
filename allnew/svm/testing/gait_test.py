@@ -27,7 +27,7 @@ _num_iter = 3
 gait_type = 1
 
 #################### From Matlab gait param ###############
-gait_param = np.array([18,    84,    -1,    66,   349,     3,     2])
+gait_param = np.array([82,   141,     3,     0,    61,     5,     2])
 # gait_param = np.array([0, 0, 0, 0, 0, 0, 1])
 
 # Running time measure

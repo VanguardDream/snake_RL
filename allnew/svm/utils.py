@@ -84,6 +84,6 @@ def writeToMATeach(gait : list, data : np.ndarray):
 
     datadic["g"+key_str] = key_paired_data
 
-    io.savemat("./MAT-data/" + "g" + key_str +".mat",datadic)
+    io.savemat("./data/" + "g" + key_str +".mat",datadic)
 
 

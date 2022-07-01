@@ -22,7 +22,7 @@ simulator = mujoco_py.MjSim(snake)
 #Simulation Setup
 _total_time = 1680
 # _total_time = 10
-_num_iter = 20
+_num_iter = 30
 
 gait_type = 1
 # gait_param = np.array([39.8, 189.9, -9.1, 66.5, 160.9, 7.0, 1]) #initial params
@@ -96,7 +96,7 @@ for _ in range(_num_iter):
         accum_obs_data = np.append(accum_obs_data, orientaion_head)
 
         # orientaion_com = np.array([simulator.data.get_body_xquat(x) for x in link_names]).mean(axis=0) # Do not use! this code just averaging coefficients of quaternion.
-        orientaions_com = np.reshape(simulator.data.sensordata[52:],(-1,4))
+        orientaions_com = np.reshape(simulator.data.sensordata[48:],(-1,4)).copy()
 
         orientaions_com[:, [0, 1, 2, 3]] = orientaions_com[:, [1, 2, 3, 0]]
         rot_com = Rot.from_quat(orientaions_com)
@@ -111,6 +111,7 @@ for _ in range(_num_iter):
         if(abs(_roll) > 170 and (not _rolled_check)):
             print("(Roll axis turned) ",end='')
             _rolled_check = True
+            break
 
         try:
             simulator.step()
@@ -136,7 +137,7 @@ for _ in range(_num_iter):
         print(str(gait_vector) + "\t \t Average euler : " ,end=' ')
 
         print(np.around(accum_rot.mean().as_euler('XYZ',degrees=True),decimals=2),end='\n')
-        continue
+        # continue
 
     utils.writeToMATeach(gait_vector,accum_obs_data)
 

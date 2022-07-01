@@ -22,7 +22,7 @@ simulator = mujoco_py.MjSim(snake)
 #Simulation Setup
 _total_time = 1680
 # _total_time = 10
-_num_iter = 30
+_num_iter = 10
 
 gait_type = 1
 # gait_param = np.array([39.8, 189.9, -9.1, 66.5, 160.9, 7.0, 1]) #initial params
@@ -109,7 +109,7 @@ for _ in range(_num_iter):
         [_roll, _pitch, _yaw] = rot_com.mean().as_euler('XYZ',degrees=True)
 
         if(abs(_roll) > 170 and (not _rolled_check)):
-            print("(Roll axis turned) ",end='')
+            # print("(Roll axis turned) ",end='')
             _rolled_check = True
             break
 
@@ -133,11 +133,21 @@ for _ in range(_num_iter):
     avg_angle = accum_rot.mean().as_euler('XYZ',degrees=True)
 
     if(abs(avg_angle[0]) > 7 or _rolled_check):
-        print("Rolling unhealthy! Gait Params : ",end='')
-        print(str(gait_vector) + "\t \t Average euler : " ,end=' ')
+        # print("Rolling unhealthy! Gait Params : ",end='')
+        # print(str(gait_vector) + "\t \t Average euler : " ,end=' ')
 
-        print(np.around(accum_rot.mean().as_euler('XYZ',degrees=True),decimals=2),end='\n')
-        # continue
+        # print(np.around(accum_rot.mean().as_euler('XYZ',degrees=True),decimals=2),end='\n')
+
+        f = open("./error_log.txt",'a')
+        _log = str()
+        if _rolled_check:
+            _log = _log + "(Roll axis turned) "
+
+        _log = _log + "Rolling unhealthy! Gait Params : " + str(gait_vector) + "\t \t Average euler : " + str(np.around(accum_rot.mean().as_euler('XYZ',degrees=True),decimals=2)) + "\n"
+
+        f.write(_log)
+        f.close()
+        continue
 
     utils.writeToMATeach(gait_vector,accum_obs_data)
 

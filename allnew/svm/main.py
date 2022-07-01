@@ -132,6 +132,10 @@ for _ in range(_num_iter):
     accum_rot = Rot.from_quat(accum_quat_com)
     avg_angle = accum_rot.mean().as_euler('XYZ',degrees=True)
 
+    _tic_iter.toc()
+    _tic_proc.toc()
+    print("%d Iteration Done! - (Total elapsed time is %3f) "%(_+1, _tic_proc.tocvalue()),end="\r")
+
     if(abs(avg_angle[0]) > 7 or _rolled_check):
         # print("Rolling unhealthy! Gait Params : ",end='')
         # print(str(gait_vector) + "\t \t Average euler : " ,end=' ')
@@ -150,10 +154,6 @@ for _ in range(_num_iter):
         continue
 
     utils.writeToMATeach(gait_vector,accum_obs_data)
-
-    _tic_iter.toc()
-    _tic_proc.toc()
-    print("%d Iteration Done! - (Total elapsed time is %3f) "%(_+1, _tic_proc.tocvalue()),end="\r")
 
 print("\n Simulation is terminated correctly.")
 

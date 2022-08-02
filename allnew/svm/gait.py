@@ -138,6 +138,23 @@ class gait:
                             [self.l_amp * math.cos(slot + 7 * self.l_lam * self.degtorad(self.l_phase))]
                             ],dtype='float')
 
+    # def P_sidewind(self,slot): # 2022년 7월 3일 벡터 속도 평면에서 모션 행렬의 차이 비교를 위해서 곡선함수 변경 Onenote참조
+    #     return np.array([[self.d_amp * math.sin((2 * math.pi / 8) * slot + self.d_lam * self.degtorad(self.d_phase))],
+    #                         [self.l_amp * math.sin((math.pi / 8) * slot + 1 * self.l_lam * self.degtorad(self.l_phase))],
+    #                         [self.d_amp * math.sin((2 * math.pi / 8) * slot + 2 * self.d_lam * self.degtorad(self.d_phase))],
+    #                         [self.l_amp * math.sin((math.pi / 8) * slot + 2 * self.l_lam * self.degtorad(self.l_phase))],
+    #                         [self.d_amp * math.sin((2 * math.pi / 8) * slot + 3 * self.d_lam * self.degtorad(self.d_phase))],
+    #                         [self.l_amp * math.sin((math.pi / 8) * slot + 3 * self.l_lam * self.degtorad(self.l_phase))],
+    #                         [self.d_amp * math.sin((2 * math.pi / 8) * slot + 4 * self.d_lam * self.degtorad(self.d_phase))],
+    #                         [self.l_amp * math.sin((math.pi / 8) * slot + 4 * self.l_lam * self.degtorad(self.l_phase))],
+    #                         [self.d_amp * math.sin((2 * math.pi / 8) * slot + 5 * self.d_lam * self.degtorad(self.d_phase))],
+    #                         [self.l_amp * math.sin((math.pi / 8) * slot + 5 * self.l_lam * self.degtorad(self.l_phase))],
+    #                         [self.d_amp * math.sin((2 * math.pi / 8) * slot + 6 * self.d_lam * self.degtorad(self.d_phase))],
+    #                         [self.l_amp * math.sin((math.pi / 8) * slot + 6 * self.l_lam * self.degtorad(self.l_phase))],
+    #                         [self.d_amp * math.sin((2 * math.pi / 8) * slot + 7 * self.d_lam * self.degtorad(self.d_phase))],
+    #                         [self.l_amp * math.sin((math.pi / 8) * slot + 7 * self.l_lam * self.degtorad(self.l_phase))]
+    #                         ],dtype='float')
+
     
     def calculate_P(self, slot):
         if self.gait == 0: #Vertical

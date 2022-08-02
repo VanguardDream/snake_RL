@@ -24,10 +24,10 @@ if _render:
 _total_time = 1400
 _num_iter = 3
 
-gait_type = 1
+gait_type = 2
 
 #################### From Matlab gait param ###############
-gait_param = np.array([82,   141,     3,     0,    61,     5,     2])
+gait_param = np.array([50,   208,     0,    67,   263,     8,     1])
 # gait_param = np.array([0, 0, 0, 0, 0, 0, 1])
 
 # Running time measure

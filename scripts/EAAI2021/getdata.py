@@ -4,9 +4,10 @@ import os
 import random
 import sys
 
-sys.path.append('../')
+sys.path.append('../') # 상위 폴더의 Gait 객체를 불러오기 위해서...
+# import gait_lambda # 이전 Gait 객체
+import gait as gait_lambda # SVM을 위해서 새롭게 개선된 Gait 객체
 
-import gait_lambda
 import math
 import numpy as np
 import csv

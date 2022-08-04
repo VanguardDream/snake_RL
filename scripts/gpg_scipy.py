@@ -237,7 +237,7 @@ def J_sci_ver(ndarray):
     # Vertical or Sinuous Utility function
     J_value = 100 * abs(delta_x) - 60 * delta_y - 0.00003 * accum_theta
 
-    print('End gait optimize senario with gait params : [ %f, %f, %f, %f, %d -> reward : %f]' %(ndarray[0],ndarray[1],ndarray[2],J_value))
+    print('End gait optimize senario with gait params : [ %f, %f, %f, %f, %d -> reward : %f]' %(ndarray[0],ndarray[1],ndarray[2],ndarray[3],ndarray[4], J_value))
     
     return -1 * J_value
 

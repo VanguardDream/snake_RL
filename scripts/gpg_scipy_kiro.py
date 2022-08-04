@@ -18,7 +18,7 @@ snake = mujoco_py.load_model_from_path("../description/mujoco/snake_dgist.xml")
 
 # mujoco-py
 simulator = mujoco_py.MjSim(snake)
-# sim_viewer = mujoco_py.MjViewer(simulator)
+sim_viewer = mujoco_py.MjViewer(simulator)
 
 def J(g,d_a,d_p,d_l,l_a,l_p,l_l,tau):
     gen = gait_lambda.gait(g,d_a,d_p,d_l,l_a,l_p,l_l,tau)
@@ -49,7 +49,7 @@ def J(g,d_a,d_p,d_l,l_a,l_p,l_l,tau):
             accum_theta = accum_theta + abs(simulator.data.get_joint_qpos(name))
 
         simulator.step()
-        # sim_viewer.render()
+        sim_viewer.render()
 
         # Write step iteration state retrieve code here.
         # s_y = appent(body_xpos('head')[1]) like this.
@@ -241,7 +241,7 @@ def J_sci_ver(ndarray):
         #     accum_theta = accum_theta + abs(simulator.data.get_joint_qpos(name))
 
         simulator.step()
-        # sim_viewer.render()
+        sim_viewer.render()
 
         # Write step iteration state retrieve code here.
         # s_y = appent(body_xpos('head')[1]) like this.
@@ -293,7 +293,7 @@ def J_sci_sin(ndarray):
         #     accum_theta = accum_theta + abs(simulator.data.get_joint_qpos(name))
 
         simulator.step()
-        # sim_viewer.render()
+        sim_viewer.render()
 
         # Write step iteration state retrieve code here.
         # s_y = appent(body_xpos('head')[1]) like this.
@@ -344,7 +344,7 @@ def J_sci_side(ndarray):
         #     accum_theta = accum_theta + abs(simulator.data.get_joint_qpos(name))
         
         simulator.step()
-        # sim_viewer.render()
+        sim_viewer.render()
 
         # Write step iteration state retrieve code here.
         # s_y = appent(body_xpos('head')[1]) like this.

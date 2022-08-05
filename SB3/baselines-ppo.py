@@ -24,7 +24,7 @@ class SaveCheckpoint(BaseCallback):
 if __name__ == '__main__':
 
 	# inits
-	env = gym.make('bongEnv-v0')
+	env = gym.make('bongSnake-v3')
 	# env = Monitor(env)
 
 	env = DummyVecEnv([lambda: Monitor(env)])

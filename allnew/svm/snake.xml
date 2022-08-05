@@ -8,10 +8,6 @@
     <option timestep="0.01" iterations="50" tolerance="1e-5" solver="Newton" cone="elliptic"/>
     <size nconmax="3000" njmax="1000" nstack="500000"/>
 
-    <!-- <include file="./common/skybox.xml"/>
-    <include file="./common/visual.xml"/>
-    <include file="./common/materials.xml"/> -->
-
     <visual>
         <!-- <rgba rangefinder="1 1 0.1 0.1"/> -->
         <map force="0.005" zfar="20"/>
@@ -24,8 +20,6 @@
 
         <texture name="texgeom" type="cube" builtin="flat" mark="cross" width="127" height="1278" 
             rgb1="0.8 0.6 0.4" rgb2="0.8 0.6 0.4" markrgb="1 1 1" random="0.01"/>  
-
-        <!-- <texture name="grass" type="2d" file="./asset/grass_v1.jpg"/> -->
 
         <material name="matplane" reflectance="0.3" texture="texplane" texrepeat="2 2" texuniform="true"/>
 

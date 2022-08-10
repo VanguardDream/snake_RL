@@ -5,8 +5,9 @@
 
 <mujoco model="snake-dgist">
 
-    <option timestep="0.01" iterations="50" tolerance="1e-5" solver="Newton" cone="elliptic"/>
-    <size nconmax="3000" njmax="1000" nstack="500000"/>
+    <option timestep="0.001" iterations="50" tolerance="1e-5" solver="Newton" cone="elliptic"/>
+    <!-- <option timestep="0.005"/> -->
+    <size nconmax="3000" njmax="1000" nstack="50000"/>
 
     <visual>
         <!-- <rgba rangefinder="1 1 0.1 0.1"/> -->
@@ -27,8 +28,6 @@
 
         <hfield name="terrain" ncol="201" nrow="201" size="30 30 5 .1"/>
     </asset>
-
-    <option timestep="0.01"/>
 
     <worldbody>
 
@@ -231,7 +230,6 @@
         <framequat name="link12_quat" objtype="site" objname="link12"/>
         <framequat name="link13_quat" objtype="site" objname="link13"/>
         <framequat name="tail_quat" objtype="site" objname="tail"/>
-
     </sensor>
 
 </mujoco>

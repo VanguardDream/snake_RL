@@ -23,8 +23,8 @@ BAUDRATE                    = 3000000 # -> 통신 속도 조절
 PROTOCOL_VERSION            = 2.0
 
 # ex) Windows: "COM*", Linux: "/dev/ttyUSB*", Mac: "/dev/tty.usbserial-*"
-DEVICENAME                  = 'COM1'
-# DEVICENAME                    = '/dev/tty.usbserial-FT3M9YHP'
+# DEVICENAME                  = 'COM1'
+DEVICENAME                    = '/dev/tty.usbserial-FT3M9YHP'
 
 portHandler = dyn.PortHandler(DEVICENAME)
 packetHandler = dyn.PacketHandler(PROTOCOL_VERSION)
@@ -59,6 +59,9 @@ class TextPrint(object):
         self.x -= 10
 
 def tx_thread(idx:int, degree:float)->None:
+    # goalP = int(2048 + (degree * (1/0.088)))
+    # packetHandler.write4ByteTxOnly(portHandler, (idx), ADDR_GOAL_POSITION, goalP)
+
     print("idx: {} degree: {:3.3f}   ".format(idx,degree),end="\r")
 
 def tx_en_thread(en:int)->None:
@@ -99,13 +102,13 @@ def pthread():
                     k = k - 1
 
             if ax_idx == 0:
-                motor_comand = rot_gait.generate(k)
+                motor_comand = rot_gait.generate(k) * abs(gait_comm[ax_idx])
                 motor_idx = rot_gait.commandIdx(k)
             elif ax_idx == 1:
-                motor_comand = serp_gait.generate(k)
+                motor_comand = serp_gait.generate(k) * abs(gait_comm[ax_idx])
                 motor_idx = serp_gait.commandIdx(k)
             elif ax_idx == 2:
-                motor_comand = side_gait.generate(k)
+                motor_comand = side_gait.generate(k) * abs(gait_comm[ax_idx])
                 motor_idx = side_gait.commandIdx(k)
             else:
                 pass
@@ -124,8 +127,8 @@ def pthread():
                 tx_en.run()
                 print("Diable")
             else:
-                # tx_th = threading.Thread(target=tx_thread, args=(motor_idx, float(motor_comand[motor_idx])))
-                # tx_th.run()
+                tx_th = threading.Thread(target=tx_thread, args=(motor_idx, float(motor_comand[motor_idx])))
+                tx_th.run()
                 pass
 
 

@@ -1,14 +1,33 @@
-from distutils.cmd import Command
+from xmlrpc.client import Boolean
 import pygame
 import gait as g
 import threading
 import datetime
 import numpy as np
+import dynamixel_sdk as dyn
 
-# Define some colors.
+# Define Variables
 BLACK = pygame.Color('black')
 WHITE = pygame.Color('white')
 
+ADDR_TORQUE_ENABLE          = 64
+ADDR_GOAL_POSITION          = 116
+ADDR_PRESENT_POSITION       = 132
+
+LEN_GOAL_POSITION           = 4
+
+DXL_MINIMUM_POSITION_VALUE  = 0         # Refer to the Minimum Position Limit of product eManual
+DXL_MAXIMUM_POSITION_VALUE  = 4095      # Refer to the Maximum Position Limit of product eManual
+BAUDRATE                    = 3000000 # -> 통신 속도 조절
+
+PROTOCOL_VERSION            = 2.0
+
+# ex) Windows: "COM*", Linux: "/dev/ttyUSB*", Mac: "/dev/tty.usbserial-*"
+DEVICENAME                  = 'COM1'
+# DEVICENAME                    = '/dev/tty.usbserial-FT3M9YHP'
+
+portHandler = dyn.PortHandler(DEVICENAME)
+packetHandler = dyn.PacketHandler(PROTOCOL_VERSION)
 
 # This is a simple class that will help us print to the screen.
 # It has nothing to do with the joysticks, just outputting the
@@ -39,17 +58,28 @@ class TextPrint(object):
     def unindent(self):
         self.x -= 10
 
+def tx_thread(idx:int, degree:float)->None:
+    print("idx: {} degree: {:3.3f}   ".format(idx,degree),end="\r")
+
+def tx_en_thread(en:int)->None:
+    for i in range(14):
+        packetHandler.write1ByteTxRx(portHandler, (i), ADDR_TORQUE_ENABLE, en)
+
 done = False
-controller = [0, 0, 0, 0] # axis 0 ~ 2 and bt5
+controller = [0, 0, 0, 0, 0, 0] # axis 0 ~ 2 and bt5
+bt_flip = False
 
 side_gait = g.gait(2, 37.2, 37.4, -8, 61.9, 61.7, 1, 1)
 serp_gait = g.gait(1, 55.7, 57.2, -9.5, 70.5, 76.5, 10, 1)
 rot_gait = g.gait(1, 55.7, 57.2, -9.5, 70.5, 76.5, 10, 1)
 
+# tx_th = threading.Thread(target=tx_thread)
+
 def pthread():
     o_t = datetime.datetime.now()
     p_t = o_t
     k = 0
+    global bt_flip
 
     while not done:
         n_t = datetime.datetime.now()
@@ -79,8 +109,27 @@ def pthread():
                 motor_idx = side_gait.commandIdx(k)
             else:
                 pass
+                
+            if gait_comm[3] == 1:
+                tx_en = threading.Thread(target=tx_en_thread,args=[1])
+                tx_en.run()
+                print("Enabled")
 
-            print(motor_idx)
+            elif gait_comm[4]  == 1:
+
+                print("Gait Changed")
+
+            elif gait_comm[5] == 1:
+                tx_en = threading.Thread(target=tx_en_thread,args=[0])
+                tx_en.run()
+                print("Diable")
+            else:
+                # tx_th = threading.Thread(target=tx_thread, args=(motor_idx, float(motor_comand[motor_idx])))
+                # tx_th.run()
+                pass
+
+
+            # print(motor_idx)
             # print(ax_idx)
 
             # for _ in range(len(motor_comand) -1):
@@ -163,7 +212,7 @@ while not done:
             textPrint.tprint(screen, "GUID: {}".format(guid))
 
 
-        controller = [round(joystick.get_axis(0),2), round(-joystick.get_axis(1),2), round(joystick.get_axis(2),2), joystick.get_button(5)]
+        controller = [round(joystick.get_axis(0),2), round(-joystick.get_axis(1),2), round(joystick.get_axis(2),2), joystick.get_button(4), joystick.get_button(5), joystick.get_button(6)]
     
     textPrint.tprint(screen,"Controller input: Ax1: {:2.2f}, Ax2: {:2.2f}, Ax3: {:2.2f}, BT: {}".format(controller[0],controller[1],controller[2],controller[3]))
 

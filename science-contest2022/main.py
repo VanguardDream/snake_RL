@@ -1,10 +1,29 @@
+from time import sleep
 from xmlrpc.client import Boolean
 import pygame
 import gait as g
 import threading
 import datetime
 import numpy as np
-import dynamixel_sdk as dyn
+from dynamixel_sdk import *
+import os
+
+if os.name == 'nt':
+    import msvcrt
+    def getch():
+        return msvcrt.getch().decode()
+else:
+    import sys, tty, termios
+    fd = sys.stdin.fileno()
+    old_settings = termios.tcgetattr(fd)
+    def getch():
+        try:
+            tty.setraw(sys.stdin.fileno())
+            ch = sys.stdin.read(1)
+        finally:
+            termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
+        return ch
+
 
 # Define Variables
 BLACK = pygame.Color('black')
@@ -26,8 +45,27 @@ PROTOCOL_VERSION            = 2.0
 # DEVICENAME                  = 'COM1'
 DEVICENAME                    = '/dev/tty.usbserial-FT3M9YHP'
 
-portHandler = dyn.PortHandler(DEVICENAME)
-packetHandler = dyn.PacketHandler(PROTOCOL_VERSION)
+portHandler = PortHandler(DEVICENAME)
+packetHandler = PacketHandler(PROTOCOL_VERSION)
+
+# Open port
+if portHandler.openPort():
+    print("Succeeded to open the port")
+else:
+    print("Failed to open the port")
+    print("Press any key to terminate...")
+    getch()
+    quit()
+
+
+# Set port baudrate
+if portHandler.setBaudRate(BAUDRATE):
+    print("Succeeded to change the baudrate")
+else:
+    print("Failed to change the baudrate")
+    print("Press any key to terminate...")
+    getch()
+    quit()
 
 # This is a simple class that will help us print to the screen.
 # It has nothing to do with the joysticks, just outputting the
@@ -59,17 +97,29 @@ class TextPrint(object):
         self.x -= 10
 
 def tx_thread(idx:int, degree:float)->None:
-    # goalP = int(2048 + (degree * (1/0.088)))
-    # packetHandler.write4ByteTxOnly(portHandler, (idx), ADDR_GOAL_POSITION, goalP)
+    # goalP = np.uint32(2048)
+    goalP = int(2048 + (degree * (1/0.088)))
+    packetHandler.write4ByteTxRx(portHandler, (idx), ADDR_GOAL_POSITION, (goalP))
 
-    print("idx: {} degree: {:3.3f}   ".format(idx,degree),end="\r")
+    # print("idx: {} degree: {}   ".format(idx,goalP),end="\r")
 
 def tx_en_thread(en:int)->None:
     for i in range(14):
-        packetHandler.write1ByteTxRx(portHandler, (i), ADDR_TORQUE_ENABLE, en)
+        packetHandler.write1ByteTxOnly(portHandler, (i), ADDR_TORQUE_ENABLE, en)
+
+def tx_reset()->None:
+    tx_en_thread(0)
+    sleep(0.001)
+    tx_en_thread(1)
+
+    sleep(0.001)
+    for i in range(14):
+        packetHandler.write4ByteTxOnly(portHandler, (i), ADDR_GOAL_POSITION, 2048)
+
+
 
 done = False
-controller = [0, 0, 0, 0, 0, 0] # axis 0 ~ 2 and bt5
+controller = [0, 0, 0, 0, 0, 0, 0] # axis 0 ~ 2 and bt5
 bt_flip = False
 
 side_gait = g.gait(2, 37.2, 37.4, -8, 61.9, 61.7, 1, 1)
@@ -88,49 +138,56 @@ def pthread():
         n_t = datetime.datetime.now()
         gait_comm = np.array(controller)
         motor_comand = np.array([])
+        en_move = False
 
-        if (n_t - p_t).microseconds > 100000:
+        if (n_t - p_t).microseconds > 9000:
             p_t = n_t
 
             ax_idx = np.argmax(abs(gait_comm[:3]))
 
             if abs(gait_comm[ax_idx]) > 0.1:
-
+                en_move = True
                 if gait_comm[ax_idx] > 0:
                     k = k + 1
                 else:
                     k = k - 1
 
-            if ax_idx == 0:
-                motor_comand = rot_gait.generate(k) * abs(gait_comm[ax_idx])
-                motor_idx = rot_gait.commandIdx(k)
-            elif ax_idx == 1:
-                motor_comand = serp_gait.generate(k) * abs(gait_comm[ax_idx])
-                motor_idx = serp_gait.commandIdx(k)
-            elif ax_idx == 2:
-                motor_comand = side_gait.generate(k) * abs(gait_comm[ax_idx])
-                motor_idx = side_gait.commandIdx(k)
-            else:
-                pass
-                
-            if gait_comm[3] == 1:
-                tx_en = threading.Thread(target=tx_en_thread,args=[1])
-                tx_en.run()
-                print("Enabled")
+            if en_move:
+                if ax_idx == 0:
+                    motor_comand = rot_gait.generate(k) * abs(gait_comm[ax_idx])
+                    motor_idx = rot_gait.commandIdx(k)
+                elif ax_idx == 1:
+                    motor_comand = serp_gait.generate(k) * abs(gait_comm[ax_idx])
+                    motor_idx = serp_gait.commandIdx(k)
+                elif ax_idx == 2:
+                    motor_comand = side_gait.generate(k) * abs(gait_comm[ax_idx])
+                    motor_idx = side_gait.commandIdx(k)
+                else:
+                    pass
+                    
+                if gait_comm[3] == 1:
+                    tx_en = threading.Thread(target=tx_en_thread,args=[1])
+                    tx_en.run()
+                    # tx_en_thread(1)
+                    # print("Enabled")
 
-            elif gait_comm[4]  == 1:
+                elif gait_comm[5]  == 1:
 
-                print("Gait Changed")
+                    print("Gait Changed")
 
-            elif gait_comm[5] == 1:
-                tx_en = threading.Thread(target=tx_en_thread,args=[0])
-                tx_en.run()
-                print("Diable")
-            else:
-                tx_th = threading.Thread(target=tx_thread, args=(motor_idx, float(motor_comand[motor_idx])))
-                tx_th.run()
-                pass
-
+                elif gait_comm[4] == 1:
+                    tx_en = threading.Thread(target=tx_en_thread,args=[0])
+                    tx_en.run()
+                    # tx_en_thread(0)
+                    # print("Diable")
+                elif gait_comm[6] == 1:
+                    tx_set = threading.Thread(target=tx_reset)
+                    tx_set.run()
+                    # tx_reset()
+                elif en_move:
+                    tx_th = threading.Thread(target=tx_thread, args=(int(motor_idx), float(motor_comand[motor_idx])))
+                    tx_th.run()
+                    # tx_thread(int(motor_idx),float(motor_comand[motor_idx]))
 
             # print(motor_idx)
             # print(ax_idx)
@@ -215,7 +272,7 @@ while not done:
             textPrint.tprint(screen, "GUID: {}".format(guid))
 
 
-        controller = [round(joystick.get_axis(0),2), round(-joystick.get_axis(1),2), round(joystick.get_axis(2),2), joystick.get_button(4), joystick.get_button(5), joystick.get_button(6)]
+        controller = [round(joystick.get_axis(0),2), round(-joystick.get_axis(1),2), round(joystick.get_axis(3),2), joystick.get_button(0), joystick.get_button(1), joystick.get_button(2), joystick.get_button(3)]
     
     textPrint.tprint(screen,"Controller input: Ax1: {:2.2f}, Ax2: {:2.2f}, Ax3: {:2.2f}, BT: {}".format(controller[0],controller[1],controller[2],controller[3]))
 

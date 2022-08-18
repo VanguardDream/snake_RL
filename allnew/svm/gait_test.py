@@ -27,6 +27,9 @@ gait_type = 2
 # gait_param = np.array([10,   116,     1,    48,    98,     1,     2]) # gait 2 회전
 gait_param = np.array([10,   107,     5,    55,    91,    -7,     2]) # gait 2회전 2
 
+gait_type = 1
+gait_param = np.array([16,   206,   -10,    29,   215,     5,     5]) # gait 2회전 2
+
 
 
 # gait_param = np.array([52.76,	319.65,	1.99,	72.07,	262.95,	7.91,	1])

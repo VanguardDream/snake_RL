@@ -5,12 +5,9 @@
 
 <mujoco model="snake-dgist">
 
-    <option timestep="0.01" iterations="50" tolerance="1e-5" solver="Newton" cone="elliptic"/>
-    <size nconmax="3000" njmax="1000" nstack="500000"/>
-
-    <!-- <include file="./common/skybox.xml"/>
-    <include file="./common/visual.xml"/>
-    <include file="./common/materials.xml"/> -->
+    <option timestep="0.001" iterations="50" tolerance="1e-5" solver="Newton" cone="elliptic"/>
+    <!-- <option timestep="0.005"/> -->
+    <size nconmax="3000" njmax="1000" nstack="50000"/>
 
     <visual>
         <!-- <rgba rangefinder="1 1 0.1 0.1"/> -->
@@ -25,16 +22,12 @@
         <texture name="texgeom" type="cube" builtin="flat" mark="cross" width="127" height="1278" 
             rgb1="0.8 0.6 0.4" rgb2="0.8 0.6 0.4" markrgb="1 1 1" random="0.01"/>  
 
-        <!-- <texture name="grass" type="2d" file="./asset/grass_v1.jpg"/> -->
-
         <material name="matplane" reflectance="0.3" texture="texplane" texrepeat="2 2" texuniform="true"/>
 
         <material name="matgeom" texture="texgeom" texuniform="true" rgba="0.8 0.6 .4 1"/>
 
         <hfield name="terrain" ncol="201" nrow="201" size="30 30 5 .1"/>
     </asset>
-
-    <option timestep="0.01"/>
 
     <worldbody>
 
@@ -237,7 +230,6 @@
         <framequat name="link12_quat" objtype="site" objname="link12"/>
         <framequat name="link13_quat" objtype="site" objname="link13"/>
         <framequat name="tail_quat" objtype="site" objname="tail"/>
-
     </sensor>
 
 </mujoco>

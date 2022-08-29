@@ -31,7 +31,8 @@ def J(g, d_a, d_p, d_l, l_a, l_p, l_l, tau):
     delta_x = 0
     delta_y = 0
 
-    for i in range(0,1000):
+    for i in range(0,6000):
+
         goal = gen.generate(i)
 
         spec_motor = np.nonzero(goal)[0]
@@ -48,7 +49,7 @@ def J(g, d_a, d_p, d_l, l_a, l_p, l_l, tau):
             while(True):
                 t_period = time.time() - commandQ
 
-                if t_period > 0.01 :
+                if t_period > 0.015:
                     packetHandler.write4ByteTxOnly(portHandler, (idx), ADDR_GOAL_POSITION, goalP)
                     break
 
@@ -70,11 +71,11 @@ def main():
     # gait_params = [55.7, 57.2, -9.5, 70.5, 74.5, 10, 1] # Poor minus
     # gait_params = [55.7, 57.2, -9.5, 70.5, 78.5, 10, 1] # Poor plus
     
-    gait_type = 2
+    # gait_type = 2
     # gait_params = [52.76,	319.65,	1.99,	72.07,	263.95,	7.91,	1] # EAAI
 
     # gait_params = [52.76,	319.65,	1.99,	72.07,	262.95,	7.91,	1] #EAAI Op
-    gait_params = [52.16,	318.15,	1.99,	72.07,	262.95,	7.91,	1] #EAAI c1
+    # gait_params = [52.16,	318.15,	1.99,	72.07,	262.95,	7.91,	1] #EAAI c1
     # gait_params = [52.76,	319.65,	1.99,	72.67,	261.75,	7.91,	1] #EAAI c2
 
 
@@ -86,6 +87,14 @@ def main():
     # gait_params = [38.2, 41.4, -8, 66.0, 51.6, 1 ,  3] # new optimal
     # gait_params = [38.2, 39.4, -8, 66.0, 51.6, 1 ,  3] # Poor -
     # gait_params = [38.2, 43.4, -8, 66.0, 51.6, 1 ,  3] # Poor +
+
+
+    # # # YTN 시연..
+    # gait_type = 1
+    # gait_params = [55.7, 57.2, -9.5, 70.5, 76.5, 10, 1] 
+
+    gait_type = 2
+    gait_params = [37.2, 37.4, -8, 61.9, 61.7, 1 ,  2]
 
     
 

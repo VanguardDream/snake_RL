@@ -5,7 +5,7 @@
 
 <mujoco model="snake-dgist">
 
-    <option timestep="0.001" iterations="50" tolerance="1e-5" solver="Newton" cone="elliptic"/>
+    <option timestep="0.01" iterations="50" tolerance="1e-5" solver="Newton" cone="elliptic"/>
     <!-- <option timestep="0.005"/> -->
     <size nconmax="3000" njmax="1000" nstack="50000"/>
 

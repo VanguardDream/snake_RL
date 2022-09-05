@@ -8,8 +8,8 @@ import matplotlib.pyplot as plt
 
 #load model from path
 # snake = mujoco_py.load_model_from_path("../description/mujoco/snake_dgistV3.xml")
-snake = mujoco_py.load_model_from_path("../allnew/svm/snake.xml")
-
+# snake = mujoco_py.load_model_from_path("../allnew/svm/snake.xml") # Circular frame
+snake = mujoco_py.load_model_from_path("../description/mujoco/snake_circle.xml") # Triangular frame
 
 # mujoco-py
 simulator = mujoco_py.MjSim(snake)
@@ -30,7 +30,7 @@ def J(g, d_a, d_p, d_l, l_a, l_p, l_l, tau):
     # For generalized xml code!
     joint_names = ['joint1','joint2','joint3','joint4','joint5','joint6','joint7','joint8','joint9','joint10','joint11','joint12','joint13','joint14']
 
-    for i in range(0,100000):
+    for i in range(0,10000):
         goal = gen.generate(i)
 
         spec_motor = np.nonzero(goal)[0]
@@ -74,9 +74,10 @@ def main():
     # gait_params = [39.8, 189.9, -9.1, 66.5, 160.9, 7.0, 1] # -> new serpenoid param
     # gait_params = [40.7, 191.1, -9.1, 66.5, 160.9, 7.0, 1] #EAAI serp c1 group
     # gait_params = [39.8, 189.9, -9.1, 67.1, 160.3, 7.0, 1] #EAAI serp c2 group
-    # gait_params = [40.7, 188.7, -9.1, 66.5, 159.7, 7.0, 1] #EAAI 중 값은 낮지만 엄청 잘가는 파라미터
+    # gait_params = [40.7, 188.7, -9.1, 66.5, 159.7, 7.0, 15] #EAAI 중 값은 낮지만 엄청 잘가는 파라미터
+    gait_params = [25,   190,   -1,    55,   109,    -8,     10]
 
-    gait_params = [39.8, 189.9, -9.1, 67.3, 160.9, 7.0, 10] # grid search중 튀는 값
+    # gait_params = [39.8, 189.9, -9.1, 67.3, 160.9, 7.0, 10] # grid search중 튀는 값
 
     # gait_type = 2
     # gait_params = [52.76,	319.65,	1.99,	72.07,	262.95,	7.91,	1] #EAAI Op

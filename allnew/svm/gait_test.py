@@ -8,7 +8,8 @@ import numpy as np
 
 
 #load model from path
-snake = mujoco_py.load_model_from_path("./snake.xml")
+# snake = mujoco_py.load_model_from_path("./snake.xml")
+snake = mujoco_py.load_model_from_path("./snake_circle.xml") # Triangular frame
 # -> 향 후 지형 랜덤 초기화 기능을 추가할 수 있을 것
 
 # mujoco-py
@@ -21,16 +22,14 @@ _total_time = 1680
 
 _num_iter = 3
 
-gait_type = 2
-# gait_param = np.array([39.8, 189.9, -9.1, 66.5, 160.9, 7.0, 1]) #initial params
-# gait_param = np.array([30,    69,     3,    48,   133,     2,     2]) # 우연하게 얻은 로테이션 -> 1
-# gait_param = np.array([10,   116,     1,    48,    98,     1,     2]) # gait 2 회전
-gait_param = np.array([10,   107,     5,    55,    91,    -7,     2]) # gait 2회전 2
+# gait_type = 2
+# # gait_param = np.array([39.8, 189.9, -9.1, 66.5, 160.9, 7.0, 1]) #initial params
+# # gait_param = np.array([30,    69,     3,    48,   133,     2,     2]) # 우연하게 얻은 로테이션 -> 1
+# # gait_param = np.array([10,   116,     1,    48,    98,     1,     2]) # gait 2 회전
+# gait_param = np.array([10,   107,     5,    55,    91,    -7,     2]) # gait 2회전 2
 
-gait_type = 1
-gait_param = np.array([16,   206,   -10,    29,   215,     5,     5]) # gait 2회전 2
-
-
+gait_type = 3
+gait_param = np.array([28,   0.5,    -60,    27,   1,     60,     1]) # gait 2회전 2
 
 # gait_param = np.array([52.76,	319.65,	1.99,	72.07,	262.95,	7.91,	1])
 gait_gen = gait.gait(gait_type, gait_param[0], gait_param[1], gait_param[2], gait_param[3], gait_param[4], gait_param[5], gait_param[6])
@@ -70,10 +69,15 @@ for _ in range(_num_iter):
                 # Commnad motor here
                 simulator.data.ctrl[idx] = gait_gen.degtorad(joint_goal[idx])
 
+        # print(np.around(simulator.data.ctrl, decimals=2))
         simulator.step()
         sim_viewer.render()
 
+        position_com = np.array([simulator.data.get_body_xpos(x) for x in link_names]).mean(axis=0)
 
+    cost = position_com[0] - abs(position_com[1])
+    print("J : { %f }"%(cost))
+    print(gait_gen.m_sinuous)
 print("\n Simulation is terminated correctly.")
 
 

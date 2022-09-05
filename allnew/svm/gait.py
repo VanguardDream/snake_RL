@@ -40,6 +40,27 @@ class gait:
 
         self.m_sinuous = np.eye(14)
 
+        # self.m_sinuous = np.ones((14,14))
+
+        # self.m_sinuous = np.random.randint(2, size=(14,14))
+
+        # self.m_sinuous = np.array([
+        #     [1,0,0,0,0,0,0,0,1,0,0,0,0,0],
+        #     [0,1,0,0,0,0,0,0,0,1,0,0,0,0],
+        #     [0,0,1,0,0,0,0,0,0,0,1,0,0,0],
+        #     [0,0,0,1,0,0,0,0,0,0,0,1,0,0],
+        #     [0,0,0,0,1,0,0,0,0,0,0,0,1,0],
+        #     [0,0,0,0,0,1,0,0,0,0,0,0,0,1],
+        #     [1,0,0,0,0,0,1,0,0,0,0,0,0,0],
+        #     [0,1,0,0,0,0,0,1,0,0,0,0,0,0],
+        #     [0,0,1,0,0,0,0,0,1,0,0,0,0,0],
+        #     [0,0,0,1,0,0,0,0,0,1,0,0,0,0], 
+        #     [0,0,0,0,1,0,0,0,0,0,1,0,0,0], 
+        #     [0,0,0,0,0,1,0,0,0,0,0,1,0,0], 
+        #     [0,0,0,0,0,0,1,0,0,0,0,0,1,0], 
+        #     [0,0,0,0,0,0,0,1,0,0,0,0,0,1]  
+        #     ],dtype='float')
+
         self.m_sidewind = np.array([[0,1,0,0,0,0,0,0,0,0,0,0,0,0],
                                     [1,0,0,0,0,0,0,0,0,0,0,0,0,0],
                                     [0,0,0,1,0,0,0,0,0,0,0,0,0,0],
@@ -54,12 +75,17 @@ class gait:
                                     [0,0,0,0,0,0,0,0,0,0,1,0,0,0],
                                     [0,0,0,0,0,0,0,0,0,0,0,0,0,1],
                                     [0,0,0,0,0,0,0,0,0,0,0,0,1,0]],dtype='int')
+
+        self.m_custom = np.eye(14)
+
         if gait == 0:
             self.m_columns = self.m_vertical.shape[1]
         elif gait == 1:
             self.m_columns = self.m_sinuous.shape[1]
         elif gait == 2:
             self.m_columns = self.m_sidewind.shape[1]
+        elif gait == 3:
+            self.m_columns = self.m_custom.shape[1]
         else:
             self.m_columns = -1
 
@@ -84,7 +110,11 @@ class gait:
             return int(7)
         elif gait_type == 1: #Sinuous
             return int(14)
-        else: # For now sidewind
+        elif gait_type == 2: #sidewind
+            return int(14)
+        elif gait_type == 3:
+            return int(14)
+        else:
             return int(14)
 
     def P_vertical(self, slot): 
@@ -138,6 +168,23 @@ class gait:
                             [self.l_amp * math.cos(slot + 7 * self.l_lam * self.degtorad(self.l_phase))]
                             ],dtype='float')
 
+    def P_custom(self,slot): 
+            return np.array([[self.d_amp * math.sin(slot * self.d_phase / 10 + 1 * math.radians(self.d_lam))],
+                            [self.l_amp * math.sin(slot * self.l_phase / 10 + 1 * math.radians(self.l_lam))],
+                            [self.d_amp * math.sin(slot * self.d_phase / 10 + 2 * math.radians(self.d_lam))],
+                            [self.l_amp * math.sin(slot * self.l_phase / 10 + 2 * math.radians(self.l_lam))],
+                            [self.d_amp * math.sin(slot * self.d_phase / 10 + 3 * math.radians(self.d_lam))],
+                            [self.l_amp * math.sin(slot * self.l_phase / 10 + 3 * math.radians(self.l_lam))],
+                            [self.d_amp * math.sin(slot * self.d_phase / 10 + 4 * math.radians(self.d_lam))],
+                            [self.l_amp * math.sin(slot * self.l_phase / 10 + 4 * math.radians(self.l_lam))],
+                            [self.d_amp * math.sin(slot * self.d_phase / 10 + 5 * math.radians(self.d_lam))],
+                            [self.l_amp * math.sin(slot * self.l_phase / 10 + 5 * math.radians(self.l_lam))],
+                            [self.d_amp * math.sin(slot * self.d_phase / 10 + 6 * math.radians(self.d_lam))],
+                            [self.l_amp * math.sin(slot * self.l_phase / 10 + 6 * math.radians(self.l_lam))],
+                            [self.d_amp * math.sin(slot * self.d_phase / 10 + 7 * math.radians(self.d_lam))],
+                            [self.l_amp * math.sin(slot * self.l_phase / 10 + 7 * math.radians(self.l_lam))]
+                            ],dtype='float')
+
     # def P_sidewind(self,slot): # 2022년 7월 3일 벡터 속도 평면에서 모션 행렬의 차이 비교를 위해서 곡선함수 변경 Onenote참조
     #     return np.array([[self.d_amp * math.sin((2 * math.pi / 8) * slot + self.d_lam * self.degtorad(self.d_phase))],
     #                         [self.l_amp * math.sin((math.pi / 8) * slot + 1 * self.l_lam * self.degtorad(self.l_phase))],
@@ -159,25 +206,32 @@ class gait:
     def calculate_P(self, slot):
         if self.gait == 0: #Vertical
             return self.P_vertical(slot)
-
         elif self.gait == 1: # Sinuous
             return self.P_sinuous(slot)
-
-        else :
+        elif self.gait == 2:
             return self.P_sidewind(slot)
+        elif self.gait == 3:
+            return self.P_custom(slot)
+        else:
+            return 0
 
     def getMotionCol(self,i):
         if self.gait == 0:
             return self.m_vertical[:,i].reshape(self.m_vertical.shape[0],1)
         elif self.gait == 1:
             return self.m_sinuous[:,i].reshape(self.m_sinuous.shape[0],1)
-        else:
+        elif self.gait == 2:
             return self.m_sidewind[:,i].reshape(self.m_sidewind.shape[0],1)
+        elif self.gait == 3:
+            return self.m_custom[:,i].reshape(self.m_custom.shape[0],1)
+        else:
+            return 0
 
     def generate(self, i) -> np.ndarray:
 
         k = math.floor(i/self.tau)
-        P = self.calculate_P(float(k)/10) # Calculate joint angles for this gait stride.
+        # P = self.calculate_P(float(k)/10) # Calculate joint angles for this gait stride.
+        P = self.calculate_P(float(k)) # Calculate joint angles for this gait stride.
 
         m_k = self.getMotionCol((k%self.getNumofSlot(self.gait))).T # Get motion vector for motor selection.
 

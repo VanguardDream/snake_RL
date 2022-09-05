@@ -25,9 +25,9 @@ simulator = mujoco_py.MjSim(snake)
 _total_time = 8400
 # _total_time = 10
 
-_num_iter = 600
+_num_iter = 1500
 
-gait_type = 1
+gait_type = 3
 # gait_param = np.array([39.8, 189.9, -9.1, 66.5, 160.9, 7.0, 1]) #initial params
 gait_param = np.array([39, 258, 0, 28, 86, 0, 1])
 # Running time measure
@@ -50,12 +50,12 @@ for _ in range(_num_iter):
     
     gait_vector = [gait_type, gait_param[0], gait_param[1], gait_param[2], gait_param[3], gait_param[4], gait_param[5], gait_param[6]]
     gait_vector[1] = random.randint(7,85) # Dorsal Amp
-    gait_vector[2] = random.randint(0,359)  # Dorsal Phase
-    gait_vector[3] = random.randint(-10,10) # Dorsal Nu
+    gait_vector[2] = random.randint(1,20)  # Frequency
+    gait_vector[3] = random.randint(-180,180) # Phase
     gait_vector[4] = random.randint(7,85) # Lateral Amp
-    gait_vector[5] = random.randint(0,359)  # Lateral Phase
-    gait_vector[6] = random.randint(-10,10) # Lateral Nu
-    gait_vector[7] = random.randint(1,50) # Tau
+    gait_vector[5] = random.randint(1,20)  # Frequency
+    gait_vector[6] = random.randint(-180,180) # Phase
+    gait_vector[7] = random.randint(5,50) # Tau
 
     if 'gait_gen' in locals():
         del gait_gen

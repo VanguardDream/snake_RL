@@ -11,8 +11,11 @@ allnew/svm/data.csv
 
 allnew/svm/*.csv
 allnew/svm/*.mat
-allnew/svm/data/*.mat
 allnew/svm/data_sin/*.mat
+allnew/svm/data/*.mat
+allnew/svm/data2/*.mat
+allnew/svm/data3/*.mat
+allnew/svm/data4/*.mat
 SB3/A2C/A2C_0/*
 SB3/A2C_v2/A2C_0/*
 SB3/merged/A2C_0/*

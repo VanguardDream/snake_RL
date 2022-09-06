@@ -29,7 +29,7 @@ _num_iter = 3
 # gait_param = np.array([10,   107,     5,    55,    91,    -7,     2]) # gait 2회전 2
 
 gait_type = 3
-gait_param = np.array([1,     1,    14,    12,    19,   -27,     1]) # gait 2회전 2
+gait_param = np.array([14,    11,    -6,     9,     4,    15,     1]) # gait 2회전 2
 
 # gait_param = np.array([52.76,	319.65,	1.99,	72.07,	262.95,	7.91,	1])
 gait_gen = gait.gait(gait_type, gait_param[0], gait_param[1], gait_param[2], gait_param[3], gait_param[4], gait_param[5], gait_param[6])

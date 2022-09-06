@@ -76,7 +76,8 @@ class gait:
                                     [0,0,0,0,0,0,0,0,0,0,0,0,0,1],
                                     [0,0,0,0,0,0,0,0,0,0,0,0,1,0]],dtype='int')
 
-        self.m_custom = np.eye(14)
+        # self.m_custom = np.eye(14) #m1 게이트는 Serp 모션 행렬로 실험함.
+        self.m_custom = self.m_sidewind
 
         if gait == 0:
             self.m_columns = self.m_vertical.shape[1]

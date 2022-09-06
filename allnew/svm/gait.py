@@ -169,20 +169,20 @@ class gait:
                             ],dtype='float')
 
     def P_custom(self,slot): 
-            return np.array([[self.d_amp * math.sin(slot * self.d_phase / 10 + 1 * math.radians(self.d_lam))],
-                            [self.l_amp * math.sin(slot * self.l_phase / 10 + 1 * math.radians(self.l_lam))],
-                            [self.d_amp * math.sin(slot * self.d_phase / 10 + 2 * math.radians(self.d_lam))],
-                            [self.l_amp * math.sin(slot * self.l_phase / 10 + 2 * math.radians(self.l_lam))],
-                            [self.d_amp * math.sin(slot * self.d_phase / 10 + 3 * math.radians(self.d_lam))],
-                            [self.l_amp * math.sin(slot * self.l_phase / 10 + 3 * math.radians(self.l_lam))],
-                            [self.d_amp * math.sin(slot * self.d_phase / 10 + 4 * math.radians(self.d_lam))],
-                            [self.l_amp * math.sin(slot * self.l_phase / 10 + 4 * math.radians(self.l_lam))],
-                            [self.d_amp * math.sin(slot * self.d_phase / 10 + 5 * math.radians(self.d_lam))],
-                            [self.l_amp * math.sin(slot * self.l_phase / 10 + 5 * math.radians(self.l_lam))],
-                            [self.d_amp * math.sin(slot * self.d_phase / 10 + 6 * math.radians(self.d_lam))],
-                            [self.l_amp * math.sin(slot * self.l_phase / 10 + 6 * math.radians(self.l_lam))],
-                            [self.d_amp * math.sin(slot * self.d_phase / 10 + 7 * math.radians(self.d_lam))],
-                            [self.l_amp * math.sin(slot * self.l_phase / 10 + 7 * math.radians(self.l_lam))]
+            return np.array([[self.d_amp * 5 * math.sin(slot * self.d_phase / 10 + 1 * math.radians(self.d_lam * 5))],
+                             [self.l_amp * 5 * math.sin(slot * self.l_phase / 10 + 1 * math.radians(self.l_lam * 5))],
+                             [self.d_amp * 5 * math.sin(slot * self.d_phase / 10 + 2 * math.radians(self.d_lam * 5))],
+                             [self.l_amp * 5 * math.sin(slot * self.l_phase / 10 + 2 * math.radians(self.l_lam * 5))],
+                             [self.d_amp * 5 * math.sin(slot * self.d_phase / 10 + 3 * math.radians(self.d_lam * 5))],
+                             [self.l_amp * 5 * math.sin(slot * self.l_phase / 10 + 3 * math.radians(self.l_lam * 5))],
+                             [self.d_amp * 5 * math.sin(slot * self.d_phase / 10 + 4 * math.radians(self.d_lam * 5))],
+                             [self.l_amp * 5 * math.sin(slot * self.l_phase / 10 + 4 * math.radians(self.l_lam * 5))],
+                             [self.d_amp * 5 * math.sin(slot * self.d_phase / 10 + 5 * math.radians(self.d_lam * 5))],
+                             [self.l_amp * 5 * math.sin(slot * self.l_phase / 10 + 5 * math.radians(self.l_lam * 5))],
+                             [self.d_amp * 5 * math.sin(slot * self.d_phase / 10 + 6 * math.radians(self.d_lam * 5))],
+                             [self.l_amp * 5 * math.sin(slot * self.l_phase / 10 + 6 * math.radians(self.l_lam * 5))],
+                             [self.d_amp * 5 * math.sin(slot * self.d_phase / 10 + 7 * math.radians(self.d_lam * 5))],
+                             [self.l_amp * 5 * math.sin(slot * self.l_phase / 10 + 7 * math.radians(self.l_lam * 5))]
                             ],dtype='float')
 
     # def P_sidewind(self,slot): # 2022년 7월 3일 벡터 속도 평면에서 모션 행렬의 차이 비교를 위해서 곡선함수 변경 Onenote참조

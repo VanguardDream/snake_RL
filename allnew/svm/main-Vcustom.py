@@ -21,11 +21,11 @@ simulator = mujoco_py.MjSim(snake)
 # sim_viewer = mujoco_py.MjViewer(simulator)
 
 #Simulation Setup
-# _total_time = 16800
-_total_time = 8400
+# _total_time = 1680
+_total_time = 840
 # _total_time = 10
 
-_num_iter = 1500
+_num_iter = 15
 
 gait_type = 3
 # gait_param = np.array([39.8, 189.9, -9.1, 66.5, 160.9, 7.0, 1]) #initial params

@@ -49,13 +49,13 @@ for _ in range(_num_iter):
     _rolled_check = False
     
     gait_vector = [gait_type, gait_param[0], gait_param[1], gait_param[2], gait_param[3], gait_param[4], gait_param[5], gait_param[6]]
-    gait_vector[1] = random.randint(7,85) # Dorsal Amp
+    gait_vector[1] = random.randint(1,15) # Dorsal Amp
     gait_vector[2] = random.randint(1,20)  # Frequency
-    gait_vector[3] = random.randint(-180,180) # Phase
-    gait_vector[4] = random.randint(7,85) # Lateral Amp
+    gait_vector[3] = random.randint(-36,36) # Phase
+    gait_vector[4] = random.randint(1,15) # Lateral Amp
     gait_vector[5] = random.randint(1,20)  # Frequency
-    gait_vector[6] = random.randint(-180,180) # Phase
-    gait_vector[7] = random.randint(5,50) # Tau
+    gait_vector[6] = random.randint(-36,36) # Phase
+    gait_vector[7] = random.randint(1,1) # Tau
 
     if 'gait_gen' in locals():
         del gait_gen

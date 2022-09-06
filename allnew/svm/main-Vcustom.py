@@ -38,6 +38,7 @@ _tic_iter = tictoc.TicToc()
 gait_gen = gait.gait(gait_type, gait_param[0], gait_param[1], gait_param[2], gait_param[3], gait_param[4], gait_param[5], gait_param[6])
 joint_names = ['joint1','joint2','joint3','joint4','joint5','joint6','joint7','joint8','joint9','joint10','joint11','joint12','joint13','joint14']
 link_names = ['head','link1','link2','link3','link4','link5','link6','link7','link8','link9','link10','link11','link12','link13','tail']
+site_names = ['s_head','s_link1','s_link2','s_link3','s_link4','s_link5','s_link6','s_link7','s_link8','s_link9','s_link10','s_link11','s_link12','s_link13','s_tail']
 
 #Initiation
 _tic_proc.tic()
@@ -88,10 +89,12 @@ for _ in range(_num_iter):
         accum_obs_data = np.append(accum_obs_data, simulator.data.sensordata[:48])  # If use frame orientation sensor (this sensor is allign to global frame)
 
         # Additional data
-        position_head = np.array(simulator.data.get_body_xpos('head'))
+        # position_head = np.array(simulator.data.get_body_xpos('head')) #원통 프레임 바디 축 틀어져서 사용안함!
+        position_head = np.array(simulator.data.get_site_xpos('s_head'))
         accum_obs_data = np.append(accum_obs_data, position_head)
 
-        position_com = np.array([simulator.data.get_body_xpos(x) for x in link_names]).mean(axis=0)
+        # position_com = np.array([simulator.data.get_body_xpos(x) for x in link_names]).mean(axis=0) #원통 프레임 바디 축 틀어져서 사용안함!
+        position_com = np.array([simulator.data.get_site_xpos(x) for x in site_names]).mean(axis=0)
         accum_obs_data = np.append(accum_obs_data, position_com)
 
         # orientaion_head = np.array(simulator.data.get_body_xquat('head')) # If use just head link frame (this sensor is not allign to global frame)

@@ -77,7 +77,12 @@ class gait:
                                     [0,0,0,0,0,0,0,0,0,0,0,0,1,0]],dtype='int')
 
         # self.m_custom = np.eye(14) #m1 게이트는 Serp 모션 행렬로 실험함.
-        self.m_custom = self.m_sidewind
+        # self.m_custom = self.m_sidewind #m2 게이트는 Side 모션 행렬로 실험함.
+        # self.m_custom = np.ones((14,14)) #m3 게이트는 모든원소가 1인 행렬로 실험함.
+        # self.m_custom = np.flip(np.eye(14),1) #m4 게이트는 단위행렬의 대칭으로 실험함.
+
+        self.m_custom = np.flip(self.m_sidewind,1) #m5 게이트는 Sidewind행렬의 대칭으로 실험함.
+        
 
         if gait == 0:
             self.m_columns = self.m_vertical.shape[1]

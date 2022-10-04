@@ -3,6 +3,7 @@ import numpy as np
 from gym import utils
 from gym.envs.mujoco import MujocoEnv
 from gym.spaces import Box
+from gym.spaces import MultiDiscrete
 from scipy.spatial.transform import Rotation as Rot
 
 DEFAULT_CAMERA_CONFIG = {
@@ -19,18 +20,19 @@ def mass_center(model, data):
     return (np.sum(mass * xpos, axis=0) / np.sum(mass))[0:2].copy()
 
 
-class bongEnv_v5(MujocoEnv, utils.EzPickle):
+class bongEnv(MujocoEnv, utils.EzPickle):
     metadata = {
         "render_modes": [
             "human",
             "rgb_array",
             "depth_array",
         ],
-        "render_fps": 67,
+        "render_fps": 10,
     }
     def __init__(
         self,
         forward_reward_weight=1.25,
+        ctrl_direction_weight=0.8,
         ctrl_cost_weight=0.5,
         healthy_reward=1.0,
         terminate_when_unhealthy=True,
@@ -52,6 +54,7 @@ class bongEnv_v5(MujocoEnv, utils.EzPickle):
         )
 
         self._forward_reward_weight = forward_reward_weight
+        self._ctrl_direction_weight = ctrl_direction_weight
         self._ctrl_cost_weight = ctrl_cost_weight
         self._healthy_reward = healthy_reward
         self._terminate_when_unhealthy = terminate_when_unhealthy
@@ -65,8 +68,11 @@ class bongEnv_v5(MujocoEnv, utils.EzPickle):
             low=-1, high=1, shape=(57,), dtype=np.float64
         )
 
+        self.observation_space = observation_space
+        self.action_space = MultiDiscrete(3*np.ones(14,))
+
         MujocoEnv.__init__(
-            self, "snake_circle.xml", 10, observation_space=observation_space, **kwargs
+            self, "snake_circle.xml", 10, **kwargs
         )
 
     @property
@@ -112,18 +118,18 @@ class bongEnv_v5(MujocoEnv, utils.EzPickle):
         link_names = ['head','link1','link2','link3','link4','link5','link6','link7','link8','link9','link10','link11','link12','link13','tail']
 
         # CoM position -> #3
-        position_com = np.array([self.sim.data.get_body_xpos(x) for x in link_names]).mean(axis=0)                 # 3
+        position_com = self.data.geom_xpos[1::].mean(axis=0)              # 3
 
        # CoM orientation -> #3
         orientaions_com = np.reshape(_sensor_data[48:],(-1,4)).copy()  
         orientaions_com[:, [0, 1, 2, 3]] = orientaions_com[:, [1, 2, 3, 0]]
         try:
             rot_com = Rot.from_quat(orientaions_com.copy())
-            orientaion_com = rot_com.mean().as_quat()
+            rpy_com = rot_com.mean().as_euler('XYZ')
         except:
             print('zero quat exception occured! is initialized now?')
             orientaion_com = Rot([0,0,0,1])
-        rpy_com = Rot.as_euler(orientaion_com,'XYZ')
+            rpy_com = Rot.as_euler(orientaion_com,'XYZ')
 
         # CoM velocity -> #3
         vel_com = (position_com - before_obs[0:3]) / self.dt
@@ -156,23 +162,30 @@ class bongEnv_v5(MujocoEnv, utils.EzPickle):
             )
         )
 
+
     def step(self, action):
         _before_obs = self._get_obs(controller_input=self._controller_input,c_action=action)
         self.do_simulation(action, self.frame_skip)
         observation = self._get_obs(controller_input=self._controller_input, c_action=action, before_obs=_before_obs)
 
+        xy_position_after = observation[0:3]
         xy_velocity = observation[6:8]
         x_velocity, y_velocity = xy_velocity
+        yaw_velocity = observation[11]
 
-        ctrl_cost = self.control_cost(action)
 
         forward_reward = self._forward_reward_weight * x_velocity
         healthy_reward = self.healthy_reward
 
-        rewards = forward_reward + healthy_reward
+        ctrl_cost = self.control_cost(action)
+        ctrl_direction_cost = self._ctrl_direction_weight * ((self._controller_input[0] - x_velocity) + (self._controller_input[1] - yaw_velocity) + (self._controller_input[2] - y_velocity))
 
-        observation = self._get_obs()
-        reward = rewards - ctrl_cost
+        rewards = forward_reward + healthy_reward + ctrl_direction_cost
+        costs = ctrl_cost + ctrl_direction_cost
+
+
+        reward = rewards - costs
+
         terminated = self.terminated
         info = {
             "reward_linvel": forward_reward,
@@ -186,13 +199,16 @@ class bongEnv_v5(MujocoEnv, utils.EzPickle):
             "forward_reward": forward_reward,
         }
 
-        if self.render_mode == "human":
-            self.render()
-        return observation, reward, terminated, False, info
+        # if self.render_mode == "human":
+        #     self.render()
+        return observation, reward, terminated, info
 
     def reset_model(self):
-        noise_low = -self._reset_noise_scale
-        noise_high = self._reset_noise_scale
+        # noise_low = -self._reset_noise_scale
+        # noise_high = self._reset_noise_scale
+
+        noise_low = 0
+        noise_high = 0
 
         qpos = self.init_qpos + self.np_random.uniform(
             low=noise_low, high=noise_high, size=self.model.nq
@@ -205,10 +221,15 @@ class bongEnv_v5(MujocoEnv, utils.EzPickle):
         observation = self._get_obs()
         return observation
 
-    def viewer_setup(self):
-        assert self.viewer is not None
-        for key, value in DEFAULT_CAMERA_CONFIG.items():
-            if isinstance(value, np.ndarray):
-                getattr(self.viewer.cam, key)[:] = value
-            else:
-                setattr(self.viewer.cam, key, value)
+    # def viewer_setup(self):
+    #     assert self.viewer is not None
+    #     for key, value in DEFAULT_CAMERA_CONFIG.items():
+    #         if isinstance(value, np.ndarray):
+    #             getattr(self.viewer.cam, key)[:] = value
+    #         else:
+    #             setattr(self.viewer.cam, key, value)
+
+    def do_simulation(self, ctrl, n_frames):
+        self.sim.data.ctrl[:] = 2.7 * (ctrl - 1)
+        for _ in range(n_frames):
+            self.sim.step()

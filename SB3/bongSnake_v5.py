@@ -75,6 +75,8 @@ class bongEnv(MujocoEnv, utils.EzPickle):
             self, "snake_circle.xml", 10, **kwargs
         )
 
+        print(f'Initiating bongSnake Env with ctrl : {controller_input}')
+
     @property
     def healthy_reward(self):
         return (

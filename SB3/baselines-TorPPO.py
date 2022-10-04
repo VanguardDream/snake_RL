@@ -1,7 +1,9 @@
+from curses.ascii import ctrl
 from operator import truediv
 import os
+from statistics import mode
 import gym
-import bongSnake_v5
+import numpy as np
 from stable_baselines3 import A2C
 from stable_baselines3 import PPO
 from stable_baselines3.common.vec_env import DummyVecEnv, VecNormalize
@@ -24,21 +26,24 @@ class SaveCheckpoint(BaseCallback):
 
 		return True
 
-env = gym.make('bongSnake-v5')
 
-# load recent checkpoint
-if os.path.isfile("model-Torque-PPO"+version +".zip") and os.path.isfile("stats-ppo_v"+ version +".pkl"):
-	env = VecNormalize.load("stats-ppo_v"+ version +".pkl", env)
-	env.reset()
-	model = PPO.load("model-Torque-PPO"+version +".zip", env)
-else:
-	env = VecNormalize(env)
-	model = PPO('MlpPolicy', env, verbose = 1, tensorboard_log = str("./PPO/v"+version), gamma=0.8,)
 
- # train
-model.learn(total_timesteps=500,
-    log_interval = 1,
-    reset_num_timesteps = False
-)
+for _ in range(500):
+	rand_ctrl = np.random.randint([-9,-9,-9],[9,9,9])/10
+	env = gym.make('bongSnake-v5', controller_input = rand_ctrl)
 
-model.save()
+	# load recent checkpoint
+	if os.path.isfile("model-Torque-PPO"+version +".zip"):
+		env.reset()
+		model = PPO.load("model-Torque-PPO"+version +".zip", env)
+	else:
+		model = PPO('MlpPolicy', env, verbose = 1, tensorboard_log = str("./TorquePPO/"+version), gamma=0.8,)
+
+	# train
+	model.learn(total_timesteps=10000,
+		log_interval = 1,
+		reset_num_timesteps = False
+	)
+
+	model.save("model-Torque-PPO"+version +".zip")
+	print(f'saved! iteration : {_}, ctrl : {rand_ctrl}')

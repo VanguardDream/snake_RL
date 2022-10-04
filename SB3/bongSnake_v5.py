@@ -204,11 +204,11 @@ class bongEnv(MujocoEnv, utils.EzPickle):
         return observation, reward, terminated, info
 
     def reset_model(self):
-        # noise_low = -self._reset_noise_scale
-        # noise_high = self._reset_noise_scale
+        noise_low = -self._reset_noise_scale
+        noise_high = self._reset_noise_scale
 
-        noise_low = 0
-        noise_high = 0
+        # noise_low = 0
+        # noise_high = 0
 
         qpos = self.init_qpos + self.np_random.uniform(
             low=noise_low, high=noise_high, size=self.model.nq

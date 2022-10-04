@@ -107,5 +107,6 @@ def main():
     # plt.show()
 
 if __name__ == "__main__":
-    while True:
+    # while True:
+    for _ in range(3):
         main()

@@ -122,9 +122,9 @@ done = False
 controller = np.array([0, 0, 0, 0, 0, 0, 0],dtype=np.float16) # axis 0 ~ 2 and bt5
 bt_flip = False
 
-side_gait = g.gait(2, 37.2, 37.4, -8, 61.9, 61.7, 1, 1)
+side_gait = g.gait(2, 37.2, 37.4, -8, 51.9, 61.7, 1, 1)
 # serp_gait = g.gait(1, 55.7, 57.2, -9.5, 70.5, 76.5, 10, 1) #원래
-serp_gait = g.gait(1, 39.8, 189.9, -9.1, 46.5, 160.9, 7.0, 1) #모터가 죽어서 새로운 것
+serp_gait = g.gait(1, 33.8, 189.9, -9.1, 36.5, 160.9, 7.0, 1) #모터가 죽어서 새로운 것
 rot_gait = g.gait(2, 15,   116,     1,    52,    98,     1,     1)
 rot2_gait = g.gait(2, 15,   107,     5,    52,    91,    -7,     1)
 
@@ -143,7 +143,7 @@ def pthread():
         motor_comand = np.array([])
         en_move = False
 
-        if (n_t - p_t).microseconds > 11000:
+        if (n_t - p_t).microseconds > 9000:
             p_t = n_t
 
             ax_idx = np.argmax(abs(gait_comm[:3]))

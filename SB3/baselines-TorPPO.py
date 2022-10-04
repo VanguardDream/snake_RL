@@ -26,11 +26,17 @@ class SaveCheckpoint(BaseCallback):
 
 env = gym.make('bongSnake-v5')
 
-# env = VecNormalize(env)
-model = PPO('MlpPolicy', env, verbose = 1, tensorboard_log = str("./TorquePPO/v"+version), gamma=0.8)
+# load recent checkpoint
+if os.path.isfile("model-Torque-PPO"+version +".zip") and os.path.isfile("stats-ppo_v"+ version +".pkl"):
+	env = VecNormalize.load("stats-ppo_v"+ version +".pkl", env)
+	env.reset()
+	model = PPO.load("model-Torque-PPO"+version +".zip", env)
+else:
+	env = VecNormalize(env)
+	model = PPO('MlpPolicy', env, verbose = 1, tensorboard_log = str("./PPO/v"+version), gamma=0.8,)
 
  # train
-model.learn(total_timesteps=500000,
+model.learn(total_timesteps=500,
     log_interval = 1,
     reset_num_timesteps = False
 )

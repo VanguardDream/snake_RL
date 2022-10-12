@@ -1,9 +1,12 @@
+# gym 0.23.1 compatible
+
 import numpy as np
 from typing import Optional, Union
 
 from gym import utils
 from gym.envs.mujoco import MujocoEnv
-from gym.envs.mujoco import MuJocoPyEnv
+
+
 from gym.spaces import Box
 from gym.spaces import MultiDiscrete
 from scipy.spatial.transform import Rotation as Rot
@@ -75,8 +78,10 @@ class bongEnv(MujocoEnv, utils.EzPickle):
         #     self, "snake_circle.xml", 10, observation_space=observation_space,**kwargs
         # )
 
+
+        # gym v0.23.1
         MujocoEnv.__init__(
-            self, "snake_circle.xml", 10, observation_space=observation_space,**kwargs
+            self, "snake_circle.xml", 10
         )
 
         self.action_space = MultiDiscrete([3,3,3,3,3, 3,3,3,3,3, 3,3,3,3])
@@ -209,7 +214,7 @@ class bongEnv(MujocoEnv, utils.EzPickle):
 
         # if self.render_mode == "human":
         #     self.render()
-        return observation, reward, terminated, False, info
+        return observation, reward, terminated, info
 
     def reset_model(self):
         noise_low = -self._reset_noise_scale
@@ -242,18 +247,3 @@ class bongEnv(MujocoEnv, utils.EzPickle):
         self.sim.data.ctrl[:] = 2.7 * (ctrl - 1)
         for _ in range(n_frames):
             self.sim.step()
-
-    # def reset(
-    #     self,
-    #     *,
-    #     seed: Optional[int] = None,
-    #     options: Optional[dict] = None,
-    # ):
-    #     super().reset(seed=seed)
-
-    #     self._reset_simulation()
-
-    #     ob = self.reset_model()
-    #     if self.render_mode == "human":
-    #         self.render()
-    #     return ob

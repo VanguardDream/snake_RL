@@ -2,17 +2,24 @@ import bongSnake_v5
 import gym
 import numpy as np
 import mujoco_py
+import os
 from gym import spaces
 from stable_baselines3 import PPO
 from scipy.spatial.transform import Rotation as Rot
 
+version = 'v1'
 
-
-rand_ctrl = np.random.randint([-9,-9,-9],[9,9,9])/10
+# rand_ctrl = np.random.randint([-9,-9,-9],[9,9,9])/10
+rand_ctrl = (0.0, 0.9 ,0)
 # env = bongSnake_v5.bongEnv(controller_input=rand_ctrl)
 env = gym.make('bongSnake-v5', controller_input = rand_ctrl)
 
-model = PPO('MlpPolicy', env).learn(total_timesteps=100)
+# model = PPO('MlpPolicy', env).learn(total_timesteps=100)
+
+# load recent checkpoint
+if os.path.isfile("model-Torque-PPO"+version +".zip"):
+    env.reset()
+    model = PPO.load("model-Torque-PPO"+version +".zip", env)
 
 snake = mujoco_py.load_model_from_path("../allnew/torquebasegait/snake_circle.xml")
 
@@ -87,5 +94,19 @@ for _ in range(3000):
         action = model.predict(observation=observation)[0]
 
         simulator.data.ctrl[:] = action
+
+    xy_position_after = observation[0:3]
+    xy_velocity = observation[6:8]
+    x_velocity, y_velocity = xy_velocity
+    yaw_velocity = observation[11]
+
+
+    forward_reward = 1.25 * x_velocity
+    ctrl_direction_cost = 0.5 * ((rand_ctrl[0] - x_velocity) + (rand_ctrl[1] - yaw_velocity) + (rand_ctrl[2] - y_velocity))
+    
+    rewards = forward_reward + ctrl_direction_cost
+
+
+    print(rewards)
 
 

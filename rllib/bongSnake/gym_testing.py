@@ -1,3 +1,3 @@
 import gym
 
-gym.make('bongEnv')
+env = gym.make('bongEnv')

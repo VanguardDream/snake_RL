@@ -36,9 +36,9 @@ class bongEnv(MujocoEnv, utils.EzPickle):
     }
     def __init__(
         self,
-        forward_reward_weight=1.25,
-        ctrl_direction_weight=0.8,
-        ctrl_cost_weight=0.5,
+        forward_reward_weight=2.25,
+        ctrl_direction_weight=1.5,
+        ctrl_cost_weight=0.75,
         healthy_reward=1.0,
         terminate_when_unhealthy=True,
         healthy_roll_range=(-2.1, 2.1),
@@ -186,12 +186,25 @@ class bongEnv(MujocoEnv, utils.EzPickle):
         x_velocity, y_velocity = xy_velocity
         yaw_velocity = observation[11]
 
-
-        forward_reward = self._forward_reward_weight * x_velocity
         healthy_reward = self.healthy_reward
-
         ctrl_cost = self.control_cost(action)
-        ctrl_direction_cost = self._ctrl_direction_weight * ((self._controller_input[0] - x_velocity) + (self._controller_input[1] - yaw_velocity) + (self._controller_input[2] - y_velocity))
+
+        # forward_reward = self._forward_reward_weight * x_velocity
+        # ctrl_direction_cost = self._ctrl_direction_weight * ((self._controller_input[0] - x_velocity) + (self._controller_input[1] - yaw_velocity) + (self._controller_input[2] - y_velocity))
+        
+        """
+        Direction Normalize
+        """
+        _norm_input = self._controller_input / np.linalg.norm(np.array(self._controller_input),2)
+        _norm_obsvel = np.append(xy_velocity, yaw_velocity)
+        ctrl_direction_cost = self._ctrl_cost_weight * (np.sum(np.abs(_norm_input - _norm_obsvel)))
+
+        """
+        Vector Projection
+        """
+        _proj_vector = (np.dot(_norm_input, _norm_obsvel) / np.sum(np.square(_norm_input))) * _norm_input
+        forward_reward = self._forward_reward_weight * np.sum(np.abs(_proj_vector))
+
 
         rewards = forward_reward + healthy_reward + ctrl_direction_cost
         costs = ctrl_cost + ctrl_direction_cost
@@ -231,7 +244,10 @@ class bongEnv(MujocoEnv, utils.EzPickle):
         )
         self.set_state(qpos, qvel)
 
-        observation = self._get_obs()
+        rand_input = np.random.randint([-99, -99, -99],[99, 99, 99]) / 100
+        self._controller_input = rand_input
+
+        observation = self._get_obs(controller_input=self._controller_input)
 
         return observation
 

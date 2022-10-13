@@ -1,4 +1,7 @@
 from ray.rllib.algorithms.ppo import PPO
+from ray.rllib.algorithms.sac import SAC
+
+import gym
 
 config = { "env":"bongEnv",
             "num_workers": 4,
@@ -14,6 +17,7 @@ config = { "env":"bongEnv",
 algo = PPO(config=config)
 
 for _ in range(5):
-    print(algo.train())
+    # print(algo.train())
+    algo.train()
 
 algo.evaluate()

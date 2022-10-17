@@ -19,10 +19,17 @@
 
         <hfield name="terrain" ncol="201" nrow="201" size="30 30 5 .1"/>
 
+        <!-- STL No color -->
         <mesh name="head_link" file="./asset/c_head.stl"/>
         <mesh name="v_link" file="./asset/c_link_V.stl"/>
         <mesh name="h_link" file="./asset/c_link_H.stl"/>
         <mesh name="tail_link" file="./asset/c_tail.stl"/>
+
+        <!-- OBJ with color
+        <mesh name="head_link" file="./asset/head_color.obj"/>
+        <mesh name="v_link" file="./asset/link_V_color.obj"/>
+        <mesh name="h_link" file="./asset/link_H_color.obj"/>
+        <mesh name="tail_link" file="./asset/tail_color.obj"/> -->
     </asset>
 
     <worldbody>

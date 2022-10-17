@@ -5,5 +5,5 @@ from gym.envs.registration import register
 register(
     id="bongEnv",
     entry_point="gym.envs.bongEnv:bongEnv",
-    max_episode_steps=500,
+    max_episode_steps=1500,
 )

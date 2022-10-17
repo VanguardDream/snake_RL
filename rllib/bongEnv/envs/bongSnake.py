@@ -104,19 +104,34 @@ class bongEnv(MujocoEnv, utils.EzPickle):
         """
             BongEnv 오버라이드 Roll 불안정성 검증
         """
-        # CoM orientation
+        # # CoM orientation #####
         orientaions_com = np.reshape(self.data.sensordata[48:],(-1,4)).copy()  
         orientaions_com[:, [0, 1, 2, 3]] = orientaions_com[:, [1, 2, 3, 0]]
+        min_roll, max_roll = self._healthy_roll_range
 
         try:
             rot_com = Rot.from_quat(orientaions_com.copy())
-            orientaion_com = rot_com.mean().as_quat()
+            orientaion_com = rot_com.mean().as_euler('XYZ')
         except:
             print('zero quat exception occured! is initialized now?')
-            orientaion_com = Rot([0,0,0,1])
+            orientaion_com = Rot([0,0,0,1]).as_euler('XYZ')
 
-        min_roll, max_roll = self._healthy_roll_range
         is_healthy = min_roll < orientaion_com[0] < max_roll
+        #####
+
+        # # Head orientatin #####
+        # orientaion_head = np.reshape(self.data.sensordata[48:52],(-1,4)).copy()  
+        # orientaion_head[:, [0, 1, 2, 3]] = orientaions_com[:, [1, 2, 3, 0]]
+
+        # try:
+        #     rot_com = Rot.from_quat(orientaion_head.copy())
+        #     orientaion_head = rot_com.as_euler('XYZ')
+        # except:
+        #     print('zero quat exception occured! is initialized now?')
+        #     orientaion_head = Rot([0,0,0,1]).as_euler('XYZ')
+
+        # is_healthy = min_roll < orientaion_head[0] < max_roll
+        #####
 
         return is_healthy
 

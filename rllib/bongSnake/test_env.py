@@ -24,10 +24,9 @@ config = { "env":"bongEnv",
         }
 
 algo = PPO(config=config)
-algo.restore("./tmp/checkpoint_000005")
-algo.logdir
+# algo.restore("./tmp/checkpoint_000005")
 
-for _ in range(10000):
+for _ in range(1000):
     # print(algo.train())
     step_train_result = algo.train()
 

@@ -26,13 +26,13 @@ config = { "env":"bongEnv",
 algo = PPO(config=config)
 # algo.restore("./tmp/checkpoint_000005")
 
-for _ in range(1000):
+for _ in range(100):
     # print(algo.train())
     step_train_result = algo.train()
 
-    if _ % 100 == 0:
+    if _ % 1 == 0:
         print(pretty_print(step_train_result))
-
+        print(f'Outter Loop Iteration : {_}')
 cp_path = algo.save('./tmp/')
 print(f"Check point saved!, Path : \"{cp_path}\"")
 

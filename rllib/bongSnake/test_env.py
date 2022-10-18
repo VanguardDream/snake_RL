@@ -26,7 +26,7 @@ config = { "env":"bongEnv",
 algo = PPO(config=config)
 # algo.restore("./tmp/checkpoint_000005")
 
-for _ in range(100):
+for _ in range(10):
     # print(algo.train())
     step_train_result = algo.train()
 

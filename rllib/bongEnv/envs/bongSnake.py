@@ -41,7 +41,7 @@ class bongEnv(MujocoEnv, utils.EzPickle):
         ctrl_cost_weight=0.75,
         healthy_reward=1.0,
         terminate_when_unhealthy=True,
-        healthy_roll_range=(-2.1, 2.1),
+        healthy_roll_range=(-2.6, 2.6),
         reset_noise_scale=1e-2,
         controller_input = (0.99, 0, 0),
         **kwargs
@@ -111,10 +111,10 @@ class bongEnv(MujocoEnv, utils.EzPickle):
 
         try:
             rot_com = Rot.from_quat(orientaions_com.copy())
-            orientaion_com = rot_com.mean().as_euler('XYZ')
+            orientaion_com = rot_com.mean().as_euler('XYZ',False)
         except:
             print('zero quat exception occured! is initialized now?')
-            orientaion_com = Rot([0,0,0,1]).as_euler('XYZ')
+            orientaion_com = Rot([0,0,0,1]).as_euler('XYZ',False)
 
         is_healthy = min_roll < orientaion_com[0] < max_roll
         #####
@@ -140,7 +140,7 @@ class bongEnv(MujocoEnv, utils.EzPickle):
         terminated = (not self.is_healthy) if self._terminate_when_unhealthy else False
         return terminated
 
-    def _get_obs(self, controller_input:np.ndarray = np.zeros(3), c_action:np.ndarray = np.zeros(14), before_obs:np.ndarray = np.zeros(57)):
+    def _get_obs(self, controller_input:np.ndarray = np.zeros(3), before_obs:np.ndarray = np.zeros(57)):
 
         _sensor_data = self.data.sensordata
         link_names = ['head','link1','link2','link3','link4','link5','link6','link7','link8','link9','link10','link11','link12','link13','tail']
@@ -171,8 +171,8 @@ class bongEnv(MujocoEnv, utils.EzPickle):
         # Joint velocity -> #14
         joint_vel = _sensor_data[20:34]
 
-        # Action -> #14
-        action = c_action
+        # Joint torque -> #14
+        joint_frc = _sensor_data[34:48]
 
         # Controller axis -> #3
         input = controller_input
@@ -185,16 +185,16 @@ class bongEnv(MujocoEnv, utils.EzPickle):
                 avel_com,
                 joint_position,
                 joint_vel,
-                action,
+                joint_frc,
                 input                
             ), dtype=np.float32
         )
 
 
     def step(self, action):
-        _before_obs = self._get_obs(controller_input=self._controller_input,c_action=action)
+        _before_obs = self._get_obs(controller_input=self._controller_input)
         self.do_simulation(action, self.frame_skip)
-        observation = self._get_obs(controller_input=self._controller_input, c_action=action, before_obs=_before_obs)
+        observation = self._get_obs(controller_input=self._controller_input, before_obs=_before_obs)
 
         xy_position_after = observation[0:3]
         xy_velocity = observation[6:8]

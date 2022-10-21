@@ -1,0 +1,17 @@
+Train start at 2022_10_19 Wednesday 20:07:56
+Very first train
+	Saved check point at : "/home/bong/ray_results/PPO_bongEnv_2022-10-19_20-07-45zk9ztul2/checkpoint_000001" (>> i: 0) 
+	Saved check point at : "/home/bong/ray_results/PPO_bongEnv_2022-10-19_20-07-45zk9ztul2/checkpoint_000501" (>> i: 500) -> ended 2022_11_20 01:02
+
+Train start at 2022_10_20 Thursday 02:32:50
+Env avel error chgd
+	Saved check point at : "/home/bong/ray_results/PPO_bongEnv_2022-10-20_02-32-38e3xn0cvk/checkpoint_000001" (>> i: 0) 
+	Saved check point at : "/home/bong/ray_results/PPO_bongEnv_2022-10-20_02-32-38e3xn0cvk/checkpoint_000501" (>> i: 500) 
+	Saved check point at : "/home/bong/ray_results/PPO_bongEnv_2022-10-20_02-32-38e3xn0cvk/checkpoint_001001" (>> i: 1000) 
+	
+Train start at 2022_10_20 Thursday 14:50:13
+Direc cost, crrl cost removed, forward reward increased
+	Saved check point at : "/home/bong/ray_results/PPO_bongEnv_2022-10-20_14-49-57md2dl9dg/checkpoint_000001" (>> i: 0) 
+	Saved check point at : "/home/bong/ray_results/PPO_bongEnv_2022-10-20_14-49-57md2dl9dg/checkpoint_000501" (>> i: 500) 
+	Saved check point at : "/home/bong/ray_results/PPO_bongEnv_2022-10-20_14-49-57md2dl9dg/checkpoint_001001" (>> i: 1000) 
+	Saved check point at : "/home/bong/ray_results/PPO_bongEnv_2022-10-20_14-49-57md2dl9dg/checkpoint_001501" (>> i: 1500) 

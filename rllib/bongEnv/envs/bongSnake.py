@@ -32,14 +32,14 @@ class bongEnv(MujocoEnv, utils.EzPickle):
             "rgb_array",
             "depth_array",
         ],
-        "render_fps": 10,
+        "render_fps": 60,
     }
     def __init__(
         self,
-        forward_reward_weight=2.25,
-        ctrl_direction_weight=1.5,
-        ctrl_cost_weight=0.75,
-        healthy_reward=1.0,
+        forward_reward_weight=5,
+        ctrl_direction_weight=20,
+        ctrl_cost_weight=0.05,
+        healthy_reward=5.0,
         terminate_when_unhealthy=True,
         healthy_roll_range=(-2.6, 2.6),
         reset_noise_scale=1e-2,
@@ -73,6 +73,13 @@ class bongEnv(MujocoEnv, utils.EzPickle):
             low=-np.inf, high=np.inf, shape=(57,)
         )
 
+        self._input_command_verbose = False
+        for _key, _value in kwargs.items():
+            if 'print_input_command' in kwargs.keys():
+                if  kwargs.get('print_input_command') == True:
+                    self._input_command_verbose = True
+
+
 
         # MujocoEnv.__init__(
         #     self, "snake_circle.xml", 10, observation_space=observation_space,**kwargs
@@ -81,7 +88,7 @@ class bongEnv(MujocoEnv, utils.EzPickle):
 
         # gym v0.23.1
         MujocoEnv.__init__(
-            self, "snake_circle.xml", 10
+            self, "snake_circle.xml", 5
         )
 
         self.action_space = MultiDiscrete([3,3,3,3,3, 3,3,3,3,3, 3,3,3,3])
@@ -163,7 +170,7 @@ class bongEnv(MujocoEnv, utils.EzPickle):
         vel_com = (position_com - before_obs[0:3]) / self.dt
 
         # CoM angular velocity -> #3
-        avel_com = (rpy_com - before_obs[4:7]) / self.dt
+        avel_com = (rpy_com - before_obs[3:6]) / self.dt
 
         # Joint position -> #14
         joint_position = _sensor_data[6:20]
@@ -211,21 +218,28 @@ class bongEnv(MujocoEnv, utils.EzPickle):
         Direction Normalize
         """
         _norm_input = self._controller_input / np.linalg.norm(np.array(self._controller_input),2)
-        _norm_obsvel = np.append(xy_velocity, yaw_velocity)
-        ctrl_direction_cost = self._ctrl_cost_weight * (np.sum(np.abs(_norm_input - _norm_obsvel)))
+        _obsvel = np.append(xy_velocity, yaw_velocity)
+        _norm_obsvel = _obsvel / np.linalg.norm(_obsvel, 2)
+
+        # ctrl_direction_cost = self._ctrl_cost_weight * (np.sum(np.abs(_norm_input - _norm_obsvel)))
+        ctrl_direction_cost = 0 # 아마도 Forward_reward랑 비슷한 내용이지 않을까?
 
         """
         Vector Projection
         """
-        _proj_vector = (np.dot(_norm_input, _norm_obsvel) / np.sum(np.square(_norm_input))) * _norm_input
-        forward_reward = self._forward_reward_weight * np.sum(np.abs(_proj_vector))
-
-
-        rewards = forward_reward + healthy_reward + ctrl_direction_cost
-        costs = ctrl_cost + ctrl_direction_cost
-
+        _proj_vector = (np.dot(_norm_obsvel, _norm_input) / np.dot(_norm_input, _norm_input)) * _norm_input
+        forward_reward = self._forward_reward_weight * np.dot(_norm_input, _proj_vector)
+        forward_reward = np.clip(forward_reward,-3.5, np.inf)
+        rewards = forward_reward + healthy_reward
+        # costs = ctrl_cost + ctrl_direction_cost
+        costs = ctrl_direction_cost
 
         reward = rewards - costs
+
+        if self._input_command_verbose:
+            # print(f'Reward info : _norm_input : {_norm_input}, _norm_obsvel : {_norm_obsvel}, _proj_vetor {_proj_vector}')
+            # print(f'Reward info : ctrl_direction_cost : {ctrl_direction_cost}, forward_reward : {forward_reward}, ctrl_cost {ctrl_cost}')
+            pass
 
         terminated = self.terminated
         info = {
@@ -261,6 +275,9 @@ class bongEnv(MujocoEnv, utils.EzPickle):
 
         rand_input = np.random.randint([-99, -99, -99],[99, 99, 99]) / 100
         self._controller_input = rand_input
+
+        if self._input_command_verbose:
+            print('Reset input cmd to : '+str(rand_input))
 
         observation = self._get_obs(controller_input=self._controller_input)
 

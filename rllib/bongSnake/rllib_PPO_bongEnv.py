@@ -8,7 +8,7 @@ import datetime
 from ray.tune.logger import pretty_print
 
 config = ppo.DEFAULT_CONFIG.copy()
-_short_comment = 'Direc cost, crrl cost removed, forward reward increased'
+_short_comment = 'healthy reward removed, chgd deep layer number 2 to 3, chgd step number 500 to 1000, chgd activation func'
 
 ############# Customize Hyper-Parameters
 config["num_gpus"] = 1
@@ -16,8 +16,8 @@ config["num_workers"] = 10
 config["gamma"] = 0.9
 config["framework"] = 'torch'
 config["model"] =               {
-                                    "fcnet_hiddens":[128, 64], 
-                                    "fcnet_activation": "relu",
+                                    "fcnet_hiddens":[512, 256, 128], 
+                                    "fcnet_activation": "tanh",
                                 }
 config["evaluation_num_workers"] = 1
 config["evaluation_config"] =   {
@@ -37,7 +37,7 @@ f_log.write(_short_comment+'\n')
 f_log.close()
 
 ############# Training
-for i in range(2000):
+for i in range(3001):
     result = algo.train()
     print(pretty_print(result))
     print(f'>>>>>>>>>Training...{i} th for loop...')

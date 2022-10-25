@@ -15,3 +15,15 @@ Direc cost, crrl cost removed, forward reward increased
 	Saved check point at : "/home/bong/ray_results/PPO_bongEnv_2022-10-20_14-49-57md2dl9dg/checkpoint_000501" (>> i: 500) 
 	Saved check point at : "/home/bong/ray_results/PPO_bongEnv_2022-10-20_14-49-57md2dl9dg/checkpoint_001001" (>> i: 1000) 
 	Saved check point at : "/home/bong/ray_results/PPO_bongEnv_2022-10-20_14-49-57md2dl9dg/checkpoint_001501" (>> i: 1500) 
+	
+Train start at 2022_10_24 Monday 16:59:11
+healthy reward removed, chgd deep layer number 2 to 3, chgd step number 500 to 1000, chgd activation func
+	Saved check point at : "/home/bong/ray_results/PPO_bongEnv_2022-10-24_16-58-59cnrlkswk/checkpoint_000001" (>> i: 0) 
+
+Train start at 2022_10_24 Monday 18:14:19
+healthy reward removed, chgd deep layer number 2 to 3, chgd step number 500 to 1000, chgd activation func
+	Saved check point at : "/home/bong/ray_results/PPO_bongEnv_2022-10-24_18-14-07u23s5wtk/checkpoint_000001" (>> i: 0) 
+	Saved check point at : "/home/bong/ray_results/PPO_bongEnv_2022-10-24_18-14-07u23s5wtk/checkpoint_000501" (>> i: 500) 
+	Saved check point at : "/home/bong/ray_results/PPO_bongEnv_2022-10-24_18-14-07u23s5wtk/checkpoint_001001" (>> i: 1000) 
+	Saved check point at : "/home/bong/ray_results/PPO_bongEnv_2022-10-24_18-14-07u23s5wtk/checkpoint_001501" (>> i: 1500) 
+	Saved check point at : "/home/bong/ray_results/PPO_bongEnv_2022-10-24_18-14-07u23s5wtk/checkpoint_002001" (>> i: 2000) 

@@ -17,8 +17,8 @@ config["num_workers"] = 0
 config["gamma"] = 0.9
 config["framework"] = 'torch'
 config["model"] =               {
-                                    "fcnet_hiddens":[128, 64], 
-                                    "fcnet_activation": "relu",
+                                    "fcnet_hiddens":[512, 256, 128], 
+                                    "fcnet_activation": "tanh",
                                 }
 config["evaluation_num_workers"] = 1
 config["evaluation_config"] =   {
@@ -31,6 +31,6 @@ config["evaluation_duration"] = 30
 ray.init()
 
 algo = ppo.PPO(config, 'bongEnv')
-algo.load_checkpoint("/home/bong/ray_results/PPO_bongEnv_2022-10-20_14-49-57md2dl9dg/checkpoint_001501/checkpoint-1501")
+algo.load_checkpoint("/home/bong/ray_results/PPO_bongEnv_2022-10-24_18-14-07u23s5wtk/checkpoint_002001/checkpoint-2001")
 
 algo.evaluate()

@@ -1,7 +1,6 @@
 # gym 0.23.1 compatible
 
 import numpy as np
-from typing import Optional, Union
 
 from gym import utils
 from gym.envs.mujoco import MujocoEnv
@@ -37,13 +36,13 @@ class bongEnv(MujocoEnv, utils.EzPickle):
     def __init__(
         self,
         forward_reward_weight=5,
-        ctrl_direction_weight=20,
+        ctrl_direction_weight=3,
         ctrl_cost_weight=0.05,
-        healthy_reward=5.0,
+        healthy_reward=0,
         terminate_when_unhealthy=True,
         healthy_roll_range=(-2.6, 2.6),
         reset_noise_scale=1e-2,
-        controller_input = (0.99, 0, 0),
+        controller_input = (1.0, 0, 0),
         **kwargs
     ):
         utils.EzPickle.__init__(
@@ -186,10 +185,10 @@ class bongEnv(MujocoEnv, utils.EzPickle):
 
         return np.concatenate(
             (
-                position_com,
-                rpy_com,
-                vel_com,
-                avel_com,
+                position_com, #0 1 2
+                rpy_com, # 3 4 5
+                vel_com, # 6 7 8
+                avel_com, # 9 10 11
                 joint_position,
                 joint_vel,
                 joint_frc,
@@ -203,7 +202,7 @@ class bongEnv(MujocoEnv, utils.EzPickle):
         self.do_simulation(action, self.frame_skip)
         observation = self._get_obs(controller_input=self._controller_input, before_obs=_before_obs)
 
-        xy_position_after = observation[0:3]
+        xy_position_after = observation[0:2]
         xy_velocity = observation[6:8]
         x_velocity, y_velocity = xy_velocity
         yaw_velocity = observation[11]
@@ -217,21 +216,27 @@ class bongEnv(MujocoEnv, utils.EzPickle):
         """
         Direction Normalize
         """
-        _norm_input = self._controller_input / np.linalg.norm(np.array(self._controller_input),2)
-        _obsvel = np.append(xy_velocity, yaw_velocity)
-        _norm_obsvel = _obsvel / np.linalg.norm(_obsvel, 2)
+        try:
+            _norm_input = self._controller_input / np.linalg.norm(np.array(self._controller_input),2)
+            _obsvel = np.append(xy_velocity, yaw_velocity)
+            _norm_obsvel = _obsvel / np.linalg.norm(_obsvel, 2)
 
-        # ctrl_direction_cost = self._ctrl_cost_weight * (np.sum(np.abs(_norm_input - _norm_obsvel)))
-        ctrl_direction_cost = 0 # 아마도 Forward_reward랑 비슷한 내용이지 않을까?
+            """
+            Vector Projection
+            """
+            _proj_vector = (np.dot(_norm_obsvel, _norm_input) / np.dot(_norm_input, _norm_input)) * _norm_input
+        except:
+            _norm_input = np.array([0, 0, 0])
+            _norm_obsvel = _obsvel / np.linalg.norm(_obsvel, 2)
+            _proj_vector = np.array([0, 0, 0])
 
-        """
-        Vector Projection
-        """
-        _proj_vector = (np.dot(_norm_obsvel, _norm_input) / np.dot(_norm_input, _norm_input)) * _norm_input
+        ctrl_direction_cost = self._ctrl_direction_weight * np.linalg.norm((_norm_input - _norm_obsvel),1)
+
         forward_reward = self._forward_reward_weight * np.dot(_norm_input, _proj_vector)
-        forward_reward = np.clip(forward_reward,-3.5, np.inf)
         rewards = forward_reward + healthy_reward
+
         # costs = ctrl_cost + ctrl_direction_cost
+        
         costs = ctrl_direction_cost
 
         reward = rewards - costs
@@ -251,6 +256,10 @@ class bongEnv(MujocoEnv, utils.EzPickle):
             "distance_from_origin": np.linalg.norm(xy_position_after, ord=2),
             "x_velocity": x_velocity,
             "y_velocity": y_velocity,
+            "yaw_ang_velocity" : observation[11],
+            "norm_input" : _norm_input,
+            "norm_obs_vel" : _obsvel,
+            "projection_vector" : _proj_vector,
             "forward_reward": forward_reward,
         }
 
@@ -273,7 +282,13 @@ class bongEnv(MujocoEnv, utils.EzPickle):
         )
         self.set_state(qpos, qvel)
 
-        rand_input = np.random.randint([-99, -99, -99],[99, 99, 99]) / 100
+        # rand_input = np.random.randint([-4, -4, -4],[4, 4, 4]) / 4
+
+        rand_input = np.array([0, 0, 0])
+
+        while np.linalg.norm(rand_input,2) == 0:
+            rand_input = np.random.randint([-4, -4, -4],[4, 4, 4]) / 4
+
         self._controller_input = rand_input
 
         if self._input_command_verbose:
@@ -292,6 +307,6 @@ class bongEnv(MujocoEnv, utils.EzPickle):
     #             setattr(self.viewer.cam, key, value)
 
     def do_simulation(self, ctrl, n_frames):
-        self.sim.data.ctrl[:] = 2.7 * (ctrl - 1)
+        self.sim.data.ctrl[:] = 1.9 * (ctrl - 1)
         for _ in range(n_frames):
             self.sim.step()

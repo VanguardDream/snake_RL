@@ -24,4 +24,6 @@ SB3/SAC/SAC_0/*
 SB3/PPO/PPO_0/*
 SB3/TorquePPO/*
 
+*/training_log.txt
+
 science-contest2022/DynamixelSDK/*

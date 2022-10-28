@@ -38,7 +38,6 @@ class bongEnv(MujocoEnv, utils.EzPickle):
         forward_reward_weight=5,
         ctrl_direction_weight=3,
         ctrl_cost_weight=0.05,
-        healthy_reward=0,
         terminate_when_unhealthy=True,
         healthy_roll_range=(-5.0, 5.0),
         reset_noise_scale=1e-2,
@@ -49,7 +48,6 @@ class bongEnv(MujocoEnv, utils.EzPickle):
             self,
             forward_reward_weight,
             ctrl_cost_weight,
-            healthy_reward,
             terminate_when_unhealthy,
             healthy_roll_range,
             reset_noise_scale,
@@ -60,13 +58,13 @@ class bongEnv(MujocoEnv, utils.EzPickle):
         self._forward_reward_weight = forward_reward_weight
         self._ctrl_direction_weight = ctrl_direction_weight
         self._ctrl_cost_weight = ctrl_cost_weight
-        self._healthy_reward = healthy_reward
         self._terminate_when_unhealthy = terminate_when_unhealthy
         self._healthy_roll_range = healthy_roll_range
 
         self._reset_noise_scale = reset_noise_scale
 
         self._controller_input = controller_input
+        self.is_healthy = True
 
         observation_space = Box(
             low=-np.inf, high=np.inf, shape=(57,)
@@ -94,53 +92,10 @@ class bongEnv(MujocoEnv, utils.EzPickle):
 
         print(f'Initiating bongSnake Env with ctrl : {controller_input}')
 
-    @property
-    def healthy_reward(self):
-        return (
-            float(self.is_healthy or self._terminate_when_unhealthy)
-            * self._healthy_reward
-        )
 
     def control_cost(self, action):
         control_cost = self._ctrl_cost_weight * np.sum(np.square(self.data.ctrl))
         return control_cost
-
-    @property
-    def is_healthy(self):
-        """
-            BongEnv 오버라이드 Roll 불안정성 검증
-        """
-        # # CoM orientation #####
-        orientaions_com = np.reshape(self.data.sensordata[48:],(-1,4)).copy()  
-        # orientaions_com = np.reshape(self.data.sensordata[48:52],(-1,4)).copy()  
-        orientaions_com[:, [0, 1, 2, 3]] = orientaions_com[:, [1, 2, 3, 0]]
-        min_roll, max_roll = self._healthy_roll_range
-
-        try:
-            rot_com = Rot.from_quat(orientaions_com.copy())
-            orientaion_com = rot_com.mean().as_euler('XYZ')
-        except:
-            print('zero quat exception occured! is initialized now?')
-            orientaion_com = Rot([0,0,0,1]).as_euler('XYZ')
-
-        is_healthy = min_roll < orientaion_com[0] < max_roll
-        #####
-
-        # # Head orientatin #####
-        # orientaion_head = np.reshape(self.data.sensordata[48:52],(-1,4)).copy()  
-        # orientaion_head[:, [0, 1, 2, 3]] = orientaions_com[:, [1, 2, 3, 0]]
-
-        # try:
-        #     rot_com = Rot.from_quat(orientaion_head.copy())
-        #     orientaion_head = rot_com.as_euler('XYZ')
-        # except:
-        #     print('zero quat exception occured! is initialized now?')
-        #     orientaion_head = Rot([0,0,0,1]).as_euler('XYZ')
-
-        # is_healthy = min_roll < orientaion_head[0] < max_roll
-        #####
-
-        return is_healthy
 
     @property
     def terminated(self):
@@ -244,7 +199,7 @@ class bongEnv(MujocoEnv, utils.EzPickle):
         x_velocity, y_velocity = xy_velocity
         yaw_velocity = observation[11]
 
-        healthy_reward = self.healthy_reward
+        self.is_healthy = self._healthy_roll_range[0] < observation[3] < self._healthy_roll_range[1]
         ctrl_cost = self.control_cost(action)
 
         # forward_reward = self._forward_reward_weight * x_velocity
@@ -270,7 +225,7 @@ class bongEnv(MujocoEnv, utils.EzPickle):
         ctrl_direction_cost = self._ctrl_direction_weight * np.linalg.norm((_norm_input - _norm_obsvel),1)
 
         forward_reward = self._forward_reward_weight * np.dot(_norm_input, _proj_vector)
-        rewards = forward_reward + healthy_reward
+        rewards = forward_reward
 
         # costs = ctrl_cost + ctrl_direction_cost
         
@@ -287,7 +242,6 @@ class bongEnv(MujocoEnv, utils.EzPickle):
         info = {
             "reward_linvel": forward_reward,
             "reward_quadctrl": -ctrl_cost,
-            "reward_alive": healthy_reward,
             "x_position": observation[0],
             "y_position": observation[1],
             "distance_from_origin": np.linalg.norm(xy_position_after, ord=2),

@@ -24,7 +24,7 @@ config["evaluation_duration"] = 30
 
 algo = ppo.PPO(config, 'bongEnv')
 # algo.load_checkpoint("/home/bong/ray_results/PPO_bongEnv_2022-10-24_18-14-07u23s5wtk/checkpoint_002001/checkpoint-2001")
-algo.restore("/home/bong/ray_results/PPO_bongEnv_2022-10-24_18-14-07u23s5wtk/checkpoint_002001/checkpoint-2001")
+# algo.restore("/home/bong/ray_results/PPO_bongEnv_2022-10-24_18-14-07u23s5wtk/checkpoint_002001/checkpoint-2001")
 
 
 #### Gym 빌드하기 및 시뮬레이션

@@ -40,7 +40,7 @@ class bongEnv(MujocoEnv, utils.EzPickle):
         ctrl_cost_weight=0.05,
         healthy_reward=0,
         terminate_when_unhealthy=True,
-        healthy_roll_range=(-2.6, 2.6),
+        healthy_roll_range=(-5.0, 5.0),
         reset_noise_scale=1e-2,
         controller_input = (1.0, 0, 0),
         **kwargs
@@ -112,15 +112,16 @@ class bongEnv(MujocoEnv, utils.EzPickle):
         """
         # # CoM orientation #####
         orientaions_com = np.reshape(self.data.sensordata[48:],(-1,4)).copy()  
+        # orientaions_com = np.reshape(self.data.sensordata[48:52],(-1,4)).copy()  
         orientaions_com[:, [0, 1, 2, 3]] = orientaions_com[:, [1, 2, 3, 0]]
         min_roll, max_roll = self._healthy_roll_range
 
         try:
             rot_com = Rot.from_quat(orientaions_com.copy())
-            orientaion_com = rot_com.mean().as_euler('XYZ',False)
+            orientaion_com = rot_com.mean().as_euler('XYZ')
         except:
             print('zero quat exception occured! is initialized now?')
-            orientaion_com = Rot([0,0,0,1]).as_euler('XYZ',False)
+            orientaion_com = Rot([0,0,0,1]).as_euler('XYZ')
 
         is_healthy = min_roll < orientaion_com[0] < max_roll
         #####
@@ -156,10 +157,46 @@ class bongEnv(MujocoEnv, utils.EzPickle):
 
        # CoM orientation -> #3
         orientaions_com = np.reshape(_sensor_data[48:],(-1,4)).copy()  
+        # orientaions_com = np.reshape(_sensor_data[48:52],(-1,4)).copy()  
         orientaions_com[:, [0, 1, 2, 3]] = orientaions_com[:, [1, 2, 3, 0]]
         try:
             rot_com = Rot.from_quat(orientaions_com.copy())
             rpy_com = rot_com.mean().as_euler('XYZ')
+
+
+            if np.abs(rpy_com[0] + before_obs[3]) > 5:
+                if before_obs[3] > 0:
+                    rpy_com[0] = before_obs[3] + (rpy_com[0] + np.pi)
+                else:
+                    rpy_com[0] = before_obs[3] + (rpy_com[0] - np.pi)
+            # elif np.abs(before_obs[3]) > np.pi:
+            #     if before_obs[3] > 0:
+            #         rpy_com[0] = before_obs[3] + (rpy_com[0] + 2 * np.pi)
+            #     else:
+            #         rpy_com[0] = before_obs[3] + (rpy_com[0] - 2 * np.pi)
+            
+            if np.abs(rpy_com[1] + before_obs[4]) > 5:
+                if before_obs[4] > 0:
+                    rpy_com[1] = before_obs[4] + (rpy_com[1] + np.pi)
+                else:
+                    rpy_com[1] = before_obs[4] + (rpy_com[1] - np.pi)
+            # elif np.abs(before_obs[4]) > np.pi:
+            #     if before_obs[4] > 0:
+            #         rpy_com[1] = before_obs[4] + (rpy_com[1] + 2 * np.pi)
+            #     else:
+            #         rpy_com[1] = before_obs[4] + (rpy_com[1] - 2 * np.pi)
+            
+            if np.abs(rpy_com[2] + before_obs[5]) > 5:
+                if before_obs[5] > 0:
+                    rpy_com[2] = before_obs[5] + (rpy_com[2] + np.pi)
+                else:
+                    rpy_com[2] = before_obs[5] + (rpy_com[2] - np.pi)
+            # elif np.abs(before_obs[5]) > np.pi:
+            #     if before_obs[5] > 0:
+            #         rpy_com[2] = before_obs[5] + (rpy_com[2] + 2 * np.pi)
+            #     else:
+            #         rpy_com[2] = before_obs[5] + (rpy_com[2] - 2 * np.pi)
+
         except:
             print('zero quat exception occured! is initialized now?')
             orientaion_com = Rot([0,0,0,1])
@@ -293,8 +330,8 @@ class bongEnv(MujocoEnv, utils.EzPickle):
 
         if self._input_command_verbose:
             print('Reset input cmd to : '+str(rand_input))
-
-        observation = self._get_obs(controller_input=self._controller_input)
+        before_obs = self._get_obs()
+        observation = self._get_obs(controller_input=self._controller_input, before_obs=before_obs)
 
         return observation
 

@@ -67,7 +67,7 @@ class bongEnv(MujocoEnv, utils.EzPickle):
         self.is_healthy = True
 
         observation_space = Box(
-            low=-np.inf, high=np.inf, shape=(57,)
+            low=-np.inf, high=np.inf, shape=(58,)
         )
 
         self._input_command_verbose = False
@@ -110,58 +110,28 @@ class bongEnv(MujocoEnv, utils.EzPickle):
         # CoM position -> #3
         position_com = self.data.geom_xpos[1::].mean(axis=0)              # 3
 
-       # CoM orientation -> #3
+       # CoM orientation -> #4
         orientaions_com = np.reshape(_sensor_data[48:],(-1,4)).copy()  
         # orientaions_com = np.reshape(_sensor_data[48:52],(-1,4)).copy()  
         orientaions_com[:, [0, 1, 2, 3]] = orientaions_com[:, [1, 2, 3, 0]]
         try:
             rot_com = Rot.from_quat(orientaions_com.copy())
-            rpy_com = rot_com.mean().as_euler('XYZ')
-
-
-            if np.abs(rpy_com[0] + before_obs[3]) > 5:
-                if before_obs[3] > 0:
-                    rpy_com[0] = before_obs[3] + (rpy_com[0] + np.pi)
-                else:
-                    rpy_com[0] = before_obs[3] + (rpy_com[0] - np.pi)
-            # elif np.abs(before_obs[3]) > np.pi:
-            #     if before_obs[3] > 0:
-            #         rpy_com[0] = before_obs[3] + (rpy_com[0] + 2 * np.pi)
-            #     else:
-            #         rpy_com[0] = before_obs[3] + (rpy_com[0] - 2 * np.pi)
-            
-            if np.abs(rpy_com[1] + before_obs[4]) > 5:
-                if before_obs[4] > 0:
-                    rpy_com[1] = before_obs[4] + (rpy_com[1] + np.pi)
-                else:
-                    rpy_com[1] = before_obs[4] + (rpy_com[1] - np.pi)
-            # elif np.abs(before_obs[4]) > np.pi:
-            #     if before_obs[4] > 0:
-            #         rpy_com[1] = before_obs[4] + (rpy_com[1] + 2 * np.pi)
-            #     else:
-            #         rpy_com[1] = before_obs[4] + (rpy_com[1] - 2 * np.pi)
-            
-            if np.abs(rpy_com[2] + before_obs[5]) > 5:
-                if before_obs[5] > 0:
-                    rpy_com[2] = before_obs[5] + (rpy_com[2] + np.pi)
-                else:
-                    rpy_com[2] = before_obs[5] + (rpy_com[2] - np.pi)
-            # elif np.abs(before_obs[5]) > np.pi:
-            #     if before_obs[5] > 0:
-            #         rpy_com[2] = before_obs[5] + (rpy_com[2] + 2 * np.pi)
-            #     else:
-            #         rpy_com[2] = before_obs[5] + (rpy_com[2] - 2 * np.pi)
+            rpy_com = rot_com.mean().as_quat()
 
         except:
             print('zero quat exception occured! is initialized now?')
-            orientaion_com = Rot([0,0,0,1])
-            rpy_com = Rot.as_euler(orientaion_com,'XYZ')
+            rpy_com = Rot([0,0,0,1])
 
         # CoM velocity -> #3
-        vel_com = (position_com - before_obs[0:3]) / self.dt
+        vel_com = (position_com - before_obs[0:3]) / self.dt 
 
         # CoM angular velocity -> #3
-        avel_com = (rpy_com - before_obs[3:6]) / self.dt
+        # avel_com = (rpy_com - before_obs[3:6]) / self.dt # Angular vel from euler Not recommended
+        b_quat = Rot(before_obs[4:8])
+        a_quat = Rot(rpy_com)
+
+        diff_quat = (b_quat.inv() * a_quat)
+        avel_com = diff_quat.as_euler('XYZ')
 
         # Joint position -> #14
         joint_position = _sensor_data[6:20]
@@ -178,13 +148,13 @@ class bongEnv(MujocoEnv, utils.EzPickle):
         return np.concatenate(
             (
                 position_com, #0 1 2
-                rpy_com, # 3 4 5
-                vel_com, # 6 7 8
-                avel_com, # 9 10 11
-                joint_position,
-                joint_vel,
-                joint_frc,
-                input                
+                rpy_com, # 3 4 5 6
+                vel_com, # 7 8 9
+                avel_com, # 10 11 12
+                joint_position, # 13 ~ 26
+                joint_vel, # 27 ~ 40
+                joint_frc, # 41 ~ 54
+                input # 55 ~ 57                
             ), dtype=np.float32
         )
 

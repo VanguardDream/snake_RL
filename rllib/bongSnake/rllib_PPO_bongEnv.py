@@ -8,11 +8,12 @@ import datetime
 from ray.tune.logger import pretty_print
 
 config = ppo.DEFAULT_CONFIG.copy()
-_short_comment = 'healthy reward removed, chgd deep layer number 2 to 3, chgd step number 500 to 1000, chgd activation func'
+_short_comment = 'Continue On 2022-10-28_23-31-31gbhv2yef'
+# _cp_path = "/home/bong/ray_results/PPO_bongEnv_2022-10-28_23-31-31gbhv2yef/checkpoint_003001/checkpoint-3001"
 
 ############# Customize Hyper-Parameters
 config["num_gpus"] = 1
-config["num_workers"] = 10
+config["num_workers"] = 8
 config["gamma"] = 0.9
 config["framework"] = 'torch'
 config["model"] =               {
@@ -29,6 +30,7 @@ config["evaluation_config"] =   {
 ray.init()
 
 algo = ppo.PPO(config, 'bongEnv')
+# algo.load_checkpoint(_cp_path)
 
 f_log = open('./training_log.txt','a')
 _date = datetime.datetime.now().strftime('%Y_%m_%d %A %H:%M:%S')
@@ -37,7 +39,7 @@ f_log.write(_short_comment+'\n')
 f_log.close()
 
 ############# Training
-for i in range(3001):
+for i in range(2001):
     result = algo.train()
     print(pretty_print(result))
     print(f'>>>>>>>>>Training...{i} th for loop...')

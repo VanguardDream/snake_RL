@@ -39,7 +39,7 @@ class bongEnv(MujocoEnv, utils.EzPickle):
         ctrl_direction_weight=3,
         ctrl_cost_weight=0.05,
         terminate_when_unhealthy=True,
-        healthy_roll_range=(-5.0, 5.0),
+        healthy_roll_range=(-2.0, 2.0),
         reset_noise_scale=1e-2,
         controller_input = (1.0, 0, 0),
         **kwargs
@@ -120,14 +120,18 @@ class bongEnv(MujocoEnv, utils.EzPickle):
 
         except:
             print('zero quat exception occured! is initialized now?')
-            rpy_com = Rot([0,0,0,1])
+            rpy_com = np.array([0,0,0,1])
 
         # CoM velocity -> #3
         vel_com = (position_com - before_obs[0:3]) / self.dt 
 
         # CoM angular velocity -> #3
         # avel_com = (rpy_com - before_obs[3:6]) / self.dt # Angular vel from euler Not recommended
-        b_quat = Rot(before_obs[4:8])
+        try:
+            b_quat = Rot(before_obs[3:7])
+        except:
+            b_quat = Rot([0,0,0,1])
+
         a_quat = Rot(rpy_com)
 
         diff_quat = (b_quat.inv() * a_quat)
@@ -165,11 +169,14 @@ class bongEnv(MujocoEnv, utils.EzPickle):
         observation = self._get_obs(controller_input=self._controller_input, before_obs=_before_obs)
 
         xy_position_after = observation[0:2]
-        xy_velocity = observation[6:8]
+        xy_velocity = observation[7:9]
         x_velocity, y_velocity = xy_velocity
-        yaw_velocity = observation[11]
+        yaw_velocity = observation[12]
 
-        self.is_healthy = self._healthy_roll_range[0] < observation[3] < self._healthy_roll_range[1]
+
+        _obs_rpy = Rot(observation[3:7])
+
+        self.is_healthy = self._healthy_roll_range[0] < _obs_rpy.as_euler('XYZ')[0] < self._healthy_roll_range[1]
         ctrl_cost = self.control_cost(action)
 
         # forward_reward = self._forward_reward_weight * x_velocity
@@ -198,8 +205,9 @@ class bongEnv(MujocoEnv, utils.EzPickle):
         rewards = forward_reward
 
         # costs = ctrl_cost + ctrl_direction_cost
-        
-        costs = ctrl_direction_cost
+
+        healthy_cost = not(self.is_healthy) * 500
+        costs = ctrl_direction_cost + healthy_cost
 
         reward = rewards - costs
 
@@ -217,7 +225,7 @@ class bongEnv(MujocoEnv, utils.EzPickle):
             "distance_from_origin": np.linalg.norm(xy_position_after, ord=2),
             "x_velocity": x_velocity,
             "y_velocity": y_velocity,
-            "yaw_ang_velocity" : observation[11],
+            "yaw_ang_velocity" : observation[12],
             "norm_input" : _norm_input,
             "norm_obs_vel" : _obsvel,
             "projection_vector" : _proj_vector,

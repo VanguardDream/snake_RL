@@ -1,6 +1,7 @@
 #### 학습된 신경망 로드하기
 import ray
 import ray.rllib.algorithms.ppo as ppo
+from scipy.spatial.transform import Rotation as Rot
 
 config = ppo.DEFAULT_CONFIG.copy()
 
@@ -37,7 +38,7 @@ obs = env.reset()
 accum_t = [0]
 accum_obs = obs
 
-for t in range(1000):
+for t in range(10000):
     env.render()
     # action = algo.compute_action(obs)
     action = np.random.randint(0 * np.ones(14), 3 * np.ones(14))
@@ -83,23 +84,27 @@ ax1.plot(accum_t, accum_obs[:,2],'k')
 # vel
 ax2 = fig.add_subplot(412)
 ax2.set_title("CoM Velocity")
-ax2.plot(accum_t, accum_obs[:,6],'r')
-ax2.plot(accum_t, accum_obs[:,7],'b')
-ax2.plot(accum_t, accum_obs[:,8],'k')
+ax2.plot(accum_t, accum_obs[:,7],'r')
+ax2.plot(accum_t, accum_obs[:,8],'b')
+ax2.plot(accum_t, accum_obs[:,9],'k')
 
 # orientation
 ax3 = fig.add_subplot(413)
 ax3.set_title("CoM Orientation")
-ax3.plot(accum_t, accum_obs[:,3],'r')
-ax3.plot(accum_t, accum_obs[:,4],'b')
-ax3.plot(accum_t, accum_obs[:,5],'k')
+
+accum_rot = Rot(accum_obs[:,3:7])
+accum_eul = accum_rot.as_euler('XYZ')
+
+ax3.plot(accum_t, accum_eul[:,0],'r')
+ax3.plot(accum_t, accum_eul[:,1],'b')
+ax3.plot(accum_t, accum_eul[:,2],'k')
 
 # angular vel
 ax4 = fig.add_subplot(414)
 ax4.set_title("CoM Angular Vel.")
-ax4.plot(accum_t, accum_obs[:,9],'r')
-ax4.plot(accum_t, accum_obs[:,10],'b')
-ax4.plot(accum_t, accum_obs[:,11],'k')
+ax4.plot(accum_t, accum_obs[:,10],'r')
+ax4.plot(accum_t, accum_obs[:,11],'b')
+ax4.plot(accum_t, accum_obs[:,12],'k')
 
 if done:
     print('terminated with fail state')

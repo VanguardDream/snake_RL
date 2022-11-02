@@ -8,7 +8,7 @@ import datetime
 from ray.tune.logger import pretty_print
 
 config = ppo.DEFAULT_CONFIG.copy()
-_short_comment = 'Continue On 2022-10-28_23-31-31gbhv2yef'
+_short_comment = 'Healthy cost added'
 # _cp_path = "/home/bong/ray_results/PPO_bongEnv_2022-10-28_23-31-31gbhv2yef/checkpoint_003001/checkpoint-3001"
 
 ############# Customize Hyper-Parameters

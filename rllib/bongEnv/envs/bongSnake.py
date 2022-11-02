@@ -111,8 +111,8 @@ class bongEnv(MujocoEnv, utils.EzPickle):
         position_com = self.data.geom_xpos[1::].mean(axis=0)              # 3
 
        # CoM orientation -> #4
-        orientaions_com = np.reshape(_sensor_data[48:],(-1,4)).copy()  
-        # orientaions_com = np.reshape(_sensor_data[48:52],(-1,4)).copy()  
+        # orientaions_com = np.reshape(_sensor_data[48:],(-1,4)).copy()  
+        orientaions_com = np.reshape(_sensor_data[48:52],(-1,4)).copy()  
         orientaions_com[:, [0, 1, 2, 3]] = orientaions_com[:, [1, 2, 3, 0]]
         try:
             rot_com = Rot.from_quat(orientaions_com.copy())

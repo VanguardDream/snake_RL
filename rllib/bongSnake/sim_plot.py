@@ -24,8 +24,8 @@ config["evaluation_config"] =   {
 config["evaluation_duration"] = 30
 
 algo = ppo.PPO(config, 'bongEnv')
-# algo.load_checkpoint("/home/bong/ray_results/PPO_bongEnv_2022-10-24_18-14-07u23s5wtk/checkpoint_002001/checkpoint-2001")
-# algo.restore("/home/bong/ray_results/PPO_bongEnv_2022-10-24_18-14-07u23s5wtk/checkpoint_002001/checkpoint-2001")
+# algo.load_checkpoint("/home/bong/ray_results/PPO_bongEnv_2022-11-02_19-47-44m40rff21/checkpoint_003001/checkpoint-3001")
+algo.restore("/home/bong/ray_results/PPO_bongEnv_2022-11-02_19-47-44m40rff21/checkpoint_003001/checkpoint-3001")
 
 
 #### Gym 빌드하기 및 시뮬레이션
@@ -40,8 +40,8 @@ accum_obs = obs
 
 for t in range(10000):
     env.render()
-    # action = algo.compute_action(obs)
-    action = np.random.randint(0 * np.ones(14), 3 * np.ones(14))
+    action = algo.compute_action(obs)
+    # action = np.random.randint(0 * np.ones(14), 3 * np.ones(14))
     obs, _, done, _ = env.step(action)
     
     accum_t = np.append(accum_t, (t+1))

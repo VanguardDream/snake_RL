@@ -6,7 +6,7 @@
 
 <mujoco model="snake-dgist">
 
-    <option timestep="0.001" iterations="100" tolerance="1e-8" solver="Newton" cone="elliptic"/>
+    <option timestep="0.01" iterations="100" tolerance="1e-8" solver="Newton" cone="elliptic"/>
 
     <asset>
         <texture name="texplane" type="2d" builtin="checker" rgb1=".8 .8 .8" rgb2=".1 0.15 0.2" width="512" height="512" mark="cross" markrgb=".8 .8 .8"/>  
@@ -125,20 +125,20 @@
     </worldbody>
 
     <actuator>
-        <position name="servo_1" ctrllimited="true" ctrlrange="-1.5708 1.5708" forcelimited="true" forcerange="-3.0 3.0" gear="1" joint="joint1" kp="70"/>
-        <position name="servo_2" ctrllimited="true" ctrlrange="-1.5708 1.5708" forcelimited="true" forcerange="-3.0 3.0" gear="1" joint="joint2" kp="70"/>
-        <position name="servo_3" ctrllimited="true" ctrlrange="-1.5708 1.5708" forcelimited="true" forcerange="-3.0 3.0" gear="1" joint="joint3" kp="70"/>
-        <position name="servo_4" ctrllimited="true" ctrlrange="-1.5708 1.5708" forcelimited="true" forcerange="-3.0 3.0" gear="1" joint="joint4" kp="70"/>
-        <position name="servo_5" ctrllimited="true" ctrlrange="-1.5708 1.5708" forcelimited="true" forcerange="-3.0 3.0" gear="1" joint="joint5" kp="70"/>
-        <position name="servo_6" ctrllimited="true" ctrlrange="-1.5708 1.5708" forcelimited="true" forcerange="-3.0 3.0" gear="1" joint="joint6" kp="70"/>
-        <position name="servo_7" ctrllimited="true" ctrlrange="-1.5708 1.5708" forcelimited="true" forcerange="-3.0 3.0" gear="1" joint="joint7" kp="70"/>
-        <position name="servo_8" ctrllimited="true" ctrlrange="-1.5708 1.5708" forcelimited="true" forcerange="-3.0 3.0" gear="1" joint="joint8" kp="70"/>
-        <position name="servo_9" ctrllimited="true" ctrlrange="-1.5708 1.5708" forcelimited="true" forcerange="-3.0 3.0" gear="1" joint="joint9" kp="70"/>
-        <position name="servo_10" ctrllimited="true" ctrlrange="-1.5708 1.5708" forcelimited="true" forcerange="-3.0 3.0" gear="1" joint="joint10" kp="70"/>
-        <position name="servo_11" ctrllimited="true" ctrlrange="-1.5708 1.5708" forcelimited="true" forcerange="-3.0 3.0" gear="1" joint="joint11" kp="70"/>
-        <position name="servo_12" ctrllimited="true" ctrlrange="-1.5708 1.5708" forcelimited="true" forcerange="-3.0 3.0" gear="1" joint="joint12" kp="70"/>
-        <position name="servo_13" ctrllimited="true" ctrlrange="-1.5708 1.5708" forcelimited="true" forcerange="-3.0 3.0" gear="1" joint="joint13" kp="70"/>
-        <position name="servo_14" ctrllimited="true" ctrlrange="-1.5708 1.5708" forcelimited="true" forcerange="-3.0 3.0" gear="1" joint="joint14" kp="70"/>
+        <motor name="servo_1"  ctrllimited="true" ctrlrange="-3.0 3.0" gear="1" joint="joint1"/>
+        <motor name="servo_2"  ctrllimited="true" ctrlrange="-3.0 3.0" gear="1" joint="joint2"/>
+        <motor name="servo_3"  ctrllimited="true" ctrlrange="-3.0 3.0" gear="1" joint="joint3"/>
+        <motor name="servo_4"  ctrllimited="true" ctrlrange="-3.0 3.0" gear="1" joint="joint4"/>
+        <motor name="servo_5"  ctrllimited="true" ctrlrange="-3.0 3.0" gear="1" joint="joint5"/>
+        <motor name="servo_6"  ctrllimited="true" ctrlrange="-3.0 3.0" gear="1" joint="joint6"/>
+        <motor name="servo_7"  ctrllimited="true" ctrlrange="-3.0 3.0" gear="1" joint="joint7"/>
+        <motor name="servo_8"  ctrllimited="true" ctrlrange="-3.0 3.0" gear="1" joint="joint8"/>
+        <motor name="servo_9"  ctrllimited="true" ctrlrange="-3.0 3.0" gear="1" joint="joint9"/>
+        <motor name="servo_10" ctrllimited="true" ctrlrange="-3.0 3.0" gear="1" joint="joint10"/>
+        <motor name="servo_11" ctrllimited="true" ctrlrange="-3.0 3.0" gear="1" joint="joint11"/>
+        <motor name="servo_12" ctrllimited="true" ctrlrange="-3.0 3.0" gear="1" joint="joint12"/>
+        <motor name="servo_13" ctrllimited="true" ctrlrange="-3.0 3.0" gear="1" joint="joint13"/>
+        <motor name="servo_14" ctrllimited="true" ctrlrange="-3.0 3.0" gear="1" joint="joint14"/>
     </actuator>
 
     <sensor>

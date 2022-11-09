@@ -190,7 +190,7 @@ class bongEnv_v3(MujocoEnv, utils.EzPickle):
 
         if self._input_command_verbose:
             print('Reset input cmd to : '+str(rand_input))
-        observation = self._get_obs(controller_input=self._controller_input)
+        observation = self._get_obs()
 
         return observation
 

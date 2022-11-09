@@ -79,7 +79,7 @@ class bongEnv_v3(MujocoEnv, utils.EzPickle):
         self.is_healthy = True
 
         observation_space = Box(
-            low=-np.inf, high=np.inf, shape=(66,)
+            low=-np.inf, high=np.inf, shape=(49,)
         )
 
         self._input_command_verbose = False

@@ -29,7 +29,8 @@ config["evaluation_duration"] = 30
 ############# Create PPO Instance & Initiating
 ray.init()
 
-algo = ppo.PPO(config, 'bongEnv')
-algo.load_checkpoint("/home/bong/ray_results/PPO_bongEnv_2022-11-01_02-58-35vczmb1gh/checkpoint_000501/checkpoint-501")
+algo = ppo.PPO(config, 'bongEnv-v3')
+# algo.load_checkpoint("/home/bong/ray_results/PPO_bongEnv-v3_2022-11-09_18-25-10h_idntni/checkpoint_005501/checkpoint-5501")
+algo.restore("/home/bong/ray_results/PPO_bongEnv-v3_2022-11-09_18-25-10h_idntni/checkpoint_005501/checkpoint-5501")
 
 algo.evaluate()

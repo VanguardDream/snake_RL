@@ -93,7 +93,7 @@ class bongEnv_v3(MujocoEnv, utils.EzPickle):
             self, "snake_circle_alligned.xml", 2
         )
 
-        self.action_space = Discrete(5, start= -2)
+        self.action_space = Discrete(5)
 
     @property
     def terminated(self):
@@ -148,10 +148,10 @@ class bongEnv_v3(MujocoEnv, utils.EzPickle):
         rewards = forward_reward + healty_reward
 
         ### Costs
-        ctrl_cost = self._ctrl_cost_weight * np.linalg.norm(self.prior_action,1) 
-        costs = ctrl_cost
+        # ctrl_cost = self._ctrl_cost_weight * np.linalg.norm(self.prior_action,1) 
+        # costs = ctrl_cost
 
-        step_return = rewards - costs
+        step_return = rewards
 
         if self._input_command_verbose:
             # print(f'Reward info : _norm_input : {_norm_input}, _norm_obsvel : {_norm_obsvel}, _proj_vetor {_proj_vector}')
@@ -203,7 +203,7 @@ class bongEnv_v3(MujocoEnv, utils.EzPickle):
     #             setattr(self.viewer.cam, key, value)
 
     def do_simulation(self, action, n_frames):
-        ctrl = action * 0.75 * self.gait_gen.get_next_joints()
+        ctrl = (action - 2) * 0.75 * self.gait_gen.get_next_joints()
         idx = ctrl.nonzero()[0]
 
         for i in idx:

@@ -149,7 +149,7 @@ class bongEnv_v3(MujocoEnv, utils.EzPickle):
 
         ### Costs
         # ctrl_cost = self._ctrl_cost_weight * np.linalg.norm(self.prior_action,1) 
-        # costs = ctrl_cost
+        costs = 0
 
         step_return = rewards
 

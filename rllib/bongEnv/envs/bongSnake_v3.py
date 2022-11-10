@@ -139,7 +139,7 @@ class bongEnv_v3(MujocoEnv, utils.EzPickle):
         self.is_healthy = self._healthy_roll_range[0] < head_orientation_after.as_euler('ZYX')[2] < self._healthy_roll_range[1]
 
         ### Rewards
-        forward_reward = self._forward_reward_weight * np.linalg.norm(_vel_vector,1)
+        forward_reward = self._forward_reward_weight * (_vel_vector[0] - np.abs(_vel_vector[1]) - np.abs(_vel_vector[2]))
         healty_reward = 0
 
         if self.is_healthy:
@@ -163,6 +163,7 @@ class bongEnv_v3(MujocoEnv, utils.EzPickle):
             "xy_vel" : xy_velocity,
             "yaw_vel" : yaw_velocity,
             "control_input" : self._controller_input,
+            "health" : self.is_healthy,
             "rewards" : rewards,
             "costs" : costs,
         }

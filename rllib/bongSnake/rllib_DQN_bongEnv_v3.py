@@ -6,10 +6,10 @@ import datetime
 
 from ray.tune.logger import pretty_print
 
-_short_comment = 'DQN : ver3 used tf, not torch'
+_short_comment = 'V3: Restore data at 17002'
 
 config = dqn.DEFAULT_CONFIG.copy()
-# _cp_path = "/home/bong/ray_results/PPO_bongEnv_2022-10-28_23-31-31gbhv2yef/checkpoint_003001/checkpoint-3001"
+_cp_path = "/home/bong/ray_results/DQN_bongEnv-v3_2022-11-24_21-28-20pazj6_lr/checkpoint_017002"
 
 ############# Customize Hyper-Parameters
 config["num_gpus"] = 1
@@ -28,10 +28,8 @@ config["train_batch_size"] = 1024
 # print(pretty_print(config))
 
 ############# Create PPO Instance & Initiating
-ray.init()
-
 algo = dqn.DQN(config, 'bongEnv-v3')
-# algo.load_checkpoint(_cp_path)
+algo.restore(_cp_path)
 
 f_log = open('./training_log.txt','a')
 _date = datetime.datetime.now().strftime('%Y_%m_%d %A %H:%M:%S')

@@ -27,3 +27,235 @@ healthy reward removed, chgd deep layer number 2 to 3, chgd step number 500 to 1
 	Saved check point at : "/home/bong/ray_results/PPO_bongEnv_2022-10-24_18-14-07u23s5wtk/checkpoint_001001" (>> i: 1000) 
 	Saved check point at : "/home/bong/ray_results/PPO_bongEnv_2022-10-24_18-14-07u23s5wtk/checkpoint_001501" (>> i: 1500) 
 	Saved check point at : "/home/bong/ray_results/PPO_bongEnv_2022-10-24_18-14-07u23s5wtk/checkpoint_002001" (>> i: 2000) 
+
+Train start at 2022_10_28 Friday 22:56:47
+Scipy Rotation over 3.14 & health roll range chgd
+	Saved check point at : "/home/bong/ray_results/PPO_bongEnv_2022-10-28_22-56-38qfgadc6g/checkpoint_000001" (>> i: 0) 
+	
+Train start at 2022_10_28 Friday 23:31:41
+Scipy Rotation over 3.14 & health roll range chgd
+	Saved check point at : "/home/bong/ray_results/PPO_bongEnv_2022-10-28_23-31-31gbhv2yef/checkpoint_000001" (>> i: 0) 
+	Saved check point at : "/home/bong/ray_results/PPO_bongEnv_2022-10-28_23-31-31gbhv2yef/checkpoint_000501" (>> i: 500) 
+	Saved check point at : "/home/bong/ray_results/PPO_bongEnv_2022-10-28_23-31-31gbhv2yef/checkpoint_001001" (>> i: 1000) 
+	Saved check point at : "/home/bong/ray_results/PPO_bongEnv_2022-10-28_23-31-31gbhv2yef/checkpoint_001501" (>> i: 1500) 
+	Saved check point at : "/home/bong/ray_results/PPO_bongEnv_2022-10-28_23-31-31gbhv2yef/checkpoint_002001" (>> i: 2000) 
+	Saved check point at : "/home/bong/ray_results/PPO_bongEnv_2022-10-28_23-31-31gbhv2yef/checkpoint_002501" (>> i: 2500) 
+	Saved check point at : "/home/bong/ray_results/PPO_bongEnv_2022-10-28_23-31-31gbhv2yef/checkpoint_003001" (>> i: 3000) 
+
+
+Train start at 2022_11_01 Tuesday 02:58:47
+Continue On 2022-10-28_23-31-31gbhv2yef
+	Saved check point at : "/home/bong/ray_results/PPO_bongEnv_2022-11-01_02-58-35vczmb1gh/checkpoint_000001" (>> i: 0) 
+	Saved check point at : "/home/bong/ray_results/PPO_bongEnv_2022-11-01_02-58-35vczmb1gh/checkpoint_000501" (>> i: 500) 
+
+
+Train start at 2022_11_02 Wednesday 19:47:54
+only head orientation used
+	Saved check point at : "/home/bong/ray_results/PPO_bongEnv_2022-11-02_19-47-44m40rff21/checkpoint_000001" (>> i: 0) 
+	Saved check point at : "/home/bong/ray_results/PPO_bongEnv_2022-11-02_19-47-44m40rff21/checkpoint_000501" (>> i: 500) 
+	Saved check point at : "/home/bong/ray_results/PPO_bongEnv_2022-11-02_19-47-44m40rff21/checkpoint_001001" (>> i: 1000) 
+	Saved check point at : "/home/bong/ray_results/PPO_bongEnv_2022-11-02_19-47-44m40rff21/checkpoint_001501" (>> i: 1500) 
+	Saved check point at : "/home/bong/ray_results/PPO_bongEnv_2022-11-02_19-47-44m40rff21/checkpoint_002001" (>> i: 2000) 
+	Saved check point at : "/home/bong/ray_results/PPO_bongEnv_2022-11-02_19-47-44m40rff21/checkpoint_002501" (>> i: 2500) 
+	Saved check point at : "/home/bong/ray_results/PPO_bongEnv_2022-11-02_19-47-44m40rff21/checkpoint_003001" (>> i: 3000) 
+
+
+Train start at 2022_11_07 Monday 10:41:32
+A2C : First time
+	Saved check point at : "/home/bong/ray_results/A2C_bongEnv_2022-11-07_10-41-21jocess0_/checkpoint_000001" (>> i: 0) 
+	Saved check point at : "/home/bong/ray_results/A2C_bongEnv_2022-11-07_10-41-21jocess0_/checkpoint_000501" (>> i: 500) 
+	Saved check point at : "/home/bong/ray_results/A2C_bongEnv_2022-11-07_10-41-21jocess0_/checkpoint_001001" (>> i: 1000) 
+	Saved check point at : "/home/bong/ray_results/A2C_bongEnv_2022-11-07_10-41-21jocess0_/checkpoint_001501" (>> i: 1500) 
+	Saved check point at : "/home/bong/ray_results/A2C_bongEnv_2022-11-07_10-41-21jocess0_/checkpoint_002001" (>> i: 2000) 
+	Saved check point at : "/home/bong/ray_results/A2C_bongEnv_2022-11-07_10-41-21jocess0_/checkpoint_002501" (>> i: 2500) 
+	Saved check point at : "/home/bong/ray_results/A2C_bongEnv_2022-11-07_10-41-21jocess0_/checkpoint_003001" (>> i: 3000) 
+	
+Train start at 2022_11_08 Tuesday 17:08:23
+DQN : First time
+	Saved check point at : "/home/bong/ray_results/DQN_bongEnv-v2_2022-11-08_17-08-148d93o0_s/checkpoint_000001" (>> i: 0) 
+
+
+Train start at 2022_11_08 Tuesday 19:56:43
+V2 PPO First
+	Saved check point at : "/home/bong/ray_results/PPO_bongEnv-v2_2022-11-08_19-56-344h43i1i0/checkpoint_000001" (>> i: 0) 
+	Saved check point at : "/home/bong/ray_results/PPO_bongEnv-v2_2022-11-08_19-56-344h43i1i0/checkpoint_000501" (>> i: 500) 
+	Saved check point at : "/home/bong/ray_results/PPO_bongEnv-v2_2022-11-08_19-56-344h43i1i0/checkpoint_001001" (>> i: 1000) 
+	Saved check point at : "/home/bong/ray_results/PPO_bongEnv-v2_2022-11-08_19-56-344h43i1i0/checkpoint_001501" (>> i: 1500) 
+	Saved check point at : "/home/bong/ray_results/PPO_bongEnv-v2_2022-11-08_19-56-344h43i1i0/checkpoint_002001" (>> i: 2000) 
+	Saved check point at : "/home/bong/ray_results/PPO_bongEnv-v2_2022-11-08_19-56-344h43i1i0/checkpoint_002501" (>> i: 2500) 
+	Saved check point at : "/home/bong/ray_results/PPO_bongEnv-v2_2022-11-08_19-56-344h43i1i0/checkpoint_003001" (>> i: 3000) -> 이어서 학습 계속해도 될 듯?
+
+
+Train start at 2022_11_08 Tuesday 23:28:25
+DQN : ver2 reward func
+	Saved check point at : "/home/bong/ray_results/DQN_bongEnv-v2_2022-11-08_23-28-15bfrkx48b/checkpoint_000001" (>> i: 0) 
+	Saved check point at : "/home/bong/ray_results/DQN_bongEnv-v2_2022-11-08_23-28-15bfrkx48b/checkpoint_000501" (>> i: 500) 
+	Saved check point at : "/home/bong/ray_results/DQN_bongEnv-v2_2022-11-08_23-28-15bfrkx48b/checkpoint_001001" (>> i: 1000) 
+	Saved check point at : "/home/bong/ray_results/DQN_bongEnv-v2_2022-11-08_23-28-15bfrkx48b/checkpoint_001501" (>> i: 1500) 
+	Saved check point at : "/home/bong/ray_results/DQN_bongEnv-v2_2022-11-08_23-28-15bfrkx48b/checkpoint_002001" (>> i: 2000) 
+	Saved check point at : "/home/bong/ray_results/DQN_bongEnv-v2_2022-11-08_23-28-15bfrkx48b/checkpoint_002501" (>> i: 2500) 
+	Saved check point at : "/home/bong/ray_results/DQN_bongEnv-v2_2022-11-08_23-28-15bfrkx48b/checkpoint_003001" (>> i: 3000) 
+	Saved check point at : "/home/bong/ray_results/DQN_bongEnv-v2_2022-11-08_23-28-15bfrkx48b/checkpoint_003501" (>> i: 3500) 
+	Saved check point at : "/home/bong/ray_results/DQN_bongEnv-v2_2022-11-08_23-28-15bfrkx48b/checkpoint_004001" (>> i: 4000) 
+
+Train start at 2022_11_09 Wednesday 18:25:20
+V3 PPO First
+	Saved check point at : "/home/bong/ray_results/PPO_bongEnv-v3_2022-11-09_18-25-10h_idntni/checkpoint_000001" (>> i: 0) 
+	Saved check point at : "/home/bong/ray_results/PPO_bongEnv-v3_2022-11-09_18-25-10h_idntni/checkpoint_000501" (>> i: 500) 
+	Saved check point at : "/home/bong/ray_results/PPO_bongEnv-v3_2022-11-09_18-25-10h_idntni/checkpoint_001001" (>> i: 1000) 
+	Saved check point at : "/home/bong/ray_results/PPO_bongEnv-v3_2022-11-09_18-25-10h_idntni/checkpoint_001501" (>> i: 1500) 
+	Saved check point at : "/home/bong/ray_results/PPO_bongEnv-v3_2022-11-09_18-25-10h_idntni/checkpoint_002001" (>> i: 2000) 
+	Saved check point at : "/home/bong/ray_results/PPO_bongEnv-v3_2022-11-09_18-25-10h_idntni/checkpoint_002501" (>> i: 2500) 
+	Saved check point at : "/home/bong/ray_results/PPO_bongEnv-v3_2022-11-09_18-25-10h_idntni/checkpoint_003001" (>> i: 3000) 
+	Saved check point at : "/home/bong/ray_results/PPO_bongEnv-v3_2022-11-09_18-25-10h_idntni/checkpoint_003501" (>> i: 3500) 
+	Saved check point at : "/home/bong/ray_results/PPO_bongEnv-v3_2022-11-09_18-25-10h_idntni/checkpoint_004001" (>> i: 4000) 
+	Saved check point at : "/home/bong/ray_results/PPO_bongEnv-v3_2022-11-09_18-25-10h_idntni/checkpoint_004501" (>> i: 4500) 
+	Saved check point at : "/home/bong/ray_results/PPO_bongEnv-v3_2022-11-09_18-25-10h_idntni/checkpoint_005001" (>> i: 5000) 
+	Saved check point at : "/home/bong/ray_results/PPO_bongEnv-v3_2022-11-09_18-25-10h_idntni/checkpoint_005501" (>> i: 5500) 
+
+Train start at 2022_11_10 Thursday 19:34:51
+V3 reward func chgd norm to np.abs()
+	Saved check point at : "/home/bong/ray_results/PPO_bongEnv-v3_2022-11-10_19-34-41klb9ik01/checkpoint_000001" (>> i: 0) 
+	Saved check point at : "/home/bong/ray_results/PPO_bongEnv-v3_2022-11-10_19-34-41klb9ik01/checkpoint_000501" (>> i: 500) 
+	Saved check point at : "/home/bong/ray_results/PPO_bongEnv-v3_2022-11-10_19-34-41klb9ik01/checkpoint_001001" (>> i: 1000) 
+	Saved check point at : "/home/bong/ray_results/PPO_bongEnv-v3_2022-11-10_19-34-41klb9ik01/checkpoint_001501" (>> i: 1500) 
+	Saved check point at : "/home/bong/ray_results/PPO_bongEnv-v3_2022-11-10_19-34-41klb9ik01/checkpoint_002001" (>> i: 2000) 
+	Saved check point at : "/home/bong/ray_results/PPO_bongEnv-v3_2022-11-10_19-34-41klb9ik01/checkpoint_002501" (>> i: 2500) 
+	Saved check point at : "/home/bong/ray_results/PPO_bongEnv-v3_2022-11-10_19-34-41klb9ik01/checkpoint_003001" (>> i: 3000) 
+	Saved check point at : "/home/bong/ray_results/PPO_bongEnv-v3_2022-11-10_19-34-41klb9ik01/checkpoint_003501" (>> i: 3500) 
+	Saved check point at : "/home/bong/ray_results/PPO_bongEnv-v3_2022-11-10_19-34-41klb9ik01/checkpoint_004001" (>> i: 4000) 
+	Saved check point at : "/home/bong/ray_results/PPO_bongEnv-v3_2022-11-10_19-34-41klb9ik01/checkpoint_004501" (>> i: 4500) 
+	Saved check point at : "/home/bong/ray_results/PPO_bongEnv-v3_2022-11-10_19-34-41klb9ik01/checkpoint_005001" (>> i: 5000) 
+	Saved check point at : "/home/bong/ray_results/PPO_bongEnv-v3_2022-11-10_19-34-41klb9ik01/checkpoint_005501" (>> i: 5500) 
+	Saved check point at : "/home/bong/ray_results/PPO_bongEnv-v3_2022-11-10_19-34-41klb9ik01/checkpoint_006001" (>> i: 6000) 
+	Saved check point at : "/home/bong/ray_results/PPO_bongEnv-v3_2022-11-10_19-34-41klb9ik01/checkpoint_006501" (>> i: 6500) 
+	Saved check point at : "/home/bong/ray_results/PPO_bongEnv-v3_2022-11-10_19-34-41klb9ik01/checkpoint_007001" (>> i: 7000) 
+	Saved check point at : "/home/bong/ray_results/PPO_bongEnv-v3_2022-11-10_19-34-41klb9ik01/checkpoint_007501" (>> i: 7500) 
+	Saved check point at : "/home/bong/ray_results/PPO_bongEnv-v3_2022-11-10_19-34-41klb9ik01/checkpoint_008001" (>> i: 8000) 
+	Saved check point at : "/home/bong/ray_results/PPO_bongEnv-v3_2022-11-10_19-34-41klb9ik01/checkpoint_008501" (>> i: 8500) 
+	Saved check point at : "/home/bong/ray_results/PPO_bongEnv-v3_2022-11-10_19-34-41klb9ik01/checkpoint_009001" (>> i: 9000) 
+	Saved check point at : "/home/bong/ray_results/PPO_bongEnv-v3_2022-11-10_19-34-41klb9ik01/checkpoint_009501" (>> i: 9500) 
+	Saved check point at : "/home/bong/ray_results/PPO_bongEnv-v3_2022-11-10_19-34-41klb9ik01/checkpoint_010001" (>> i: 10000) 
+	Saved check point at : "/home/bong/ray_results/PPO_bongEnv-v3_2022-11-10_19-34-41klb9ik01/checkpoint_010501" (>> i: 10500) 
+	Saved check point at : "/home/bong/ray_results/PPO_bongEnv-v3_2022-11-10_19-34-41klb9ik01/checkpoint_011001" (>> i: 11000) 
+	Saved check point at : "/home/bong/ray_results/PPO_bongEnv-v3_2022-11-10_19-34-41klb9ik01/checkpoint_011501" (>> i: 11500) 
+	Saved check point at : "/home/bong/ray_results/PPO_bongEnv-v3_2022-11-10_19-34-41klb9ik01/checkpoint_012001" (>> i: 12000) 
+	Saved check point at : "/home/bong/ray_results/PPO_bongEnv-v3_2022-11-10_19-34-41klb9ik01/checkpoint_012501" (>> i: 12500) 
+	Saved check point at : "/home/bong/ray_results/PPO_bongEnv-v3_2022-11-10_19-34-41klb9ik01/checkpoint_013001" (>> i: 13000) 
+	Saved check point at : "/home/bong/ray_results/PPO_bongEnv-v3_2022-11-10_19-34-41klb9ik01/checkpoint_013501" (>> i: 13500) 
+	Saved check point at : "/home/bong/ray_results/PPO_bongEnv-v3_2022-11-10_19-34-41klb9ik01/checkpoint_014001" (>> i: 14000) 
+	Saved check point at : "/home/bong/ray_results/PPO_bongEnv-v3_2022-11-10_19-34-41klb9ik01/checkpoint_014501" (>> i: 14500) 
+	Saved check point at : "/home/bong/ray_results/PPO_bongEnv-v3_2022-11-10_19-34-41klb9ik01/checkpoint_015001" (>> i: 15000) 
+	Saved check point at : "/home/bong/ray_results/PPO_bongEnv-v3_2022-11-10_19-34-41klb9ik01/checkpoint_015501" (>> i: 15500) 
+	Saved check point at : "/home/bong/ray_results/PPO_bongEnv-v3_2022-11-10_19-34-41klb9ik01/checkpoint_016001" (>> i: 16000) 
+	Saved check point at : "/home/bong/ray_results/PPO_bongEnv-v3_2022-11-10_19-34-41klb9ik01/checkpoint_016501" (>> i: 16500) 
+	Saved check point at : "/home/bong/ray_results/PPO_bongEnv-v3_2022-11-10_19-34-41klb9ik01/checkpoint_017001" (>> i: 17000) 
+	Saved check point at : "/home/bong/ray_results/PPO_bongEnv-v3_2022-11-10_19-34-41klb9ik01/checkpoint_017501" (>> i: 17500) 
+	Saved check point at : "/home/bong/ray_results/PPO_bongEnv-v3_2022-11-10_19-34-41klb9ik01/checkpoint_018001" (>> i: 18000) 
+	Saved check point at : "/home/bong/ray_results/PPO_bongEnv-v3_2022-11-10_19-34-41klb9ik01/checkpoint_018501" (>> i: 18500) 
+	Saved check point at : "/home/bong/ray_results/PPO_bongEnv-v3_2022-11-10_19-34-41klb9ik01/checkpoint_019001" (>> i: 19000) 
+	Saved check point at : "/home/bong/ray_results/PPO_bongEnv-v3_2022-11-10_19-34-41klb9ik01/checkpoint_019501" (>> i: 19500) 
+	Saved check point at : "/home/bong/ray_results/PPO_bongEnv-v3_2022-11-10_19-34-41klb9ik01/checkpoint_020001" (>> i: 20000) 
+
+
+Train start at 2022_11_12 Saturday 11:41:24
+V3 : after 20000 iter
+	Saved check point at : "/home/bong/ray_results/PPO_bongEnv-v3_2022-11-12_11-41-07gt8o20bn/checkpoint_020002" (>> i: 0) 
+	Saved check point at : "/home/bong/ray_results/PPO_bongEnv-v3_2022-11-12_11-41-07gt8o20bn/checkpoint_020502" (>> i: 500) 
+	Saved check point at : "/home/bong/ray_results/PPO_bongEnv-v3_2022-11-12_11-41-07gt8o20bn/checkpoint_021002" (>> i: 1000) 
+	Saved check point at : "/home/bong/ray_results/PPO_bongEnv-v3_2022-11-12_11-41-07gt8o20bn/checkpoint_021502" (>> i: 1500) 
+	Saved check point at : "/home/bong/ray_results/PPO_bongEnv-v3_2022-11-12_11-41-07gt8o20bn/checkpoint_022002" (>> i: 2000) 
+	Saved check point at : "/home/bong/ray_results/PPO_bongEnv-v3_2022-11-12_11-41-07gt8o20bn/checkpoint_022502" (>> i: 2500) 
+	Saved check point at : "/home/bong/ray_results/PPO_bongEnv-v3_2022-11-12_11-41-07gt8o20bn/checkpoint_023002" (>> i: 3000) 
+	Saved check point at : "/home/bong/ray_results/PPO_bongEnv-v3_2022-11-12_11-41-07gt8o20bn/checkpoint_023502" (>> i: 3500) 
+	Saved check point at : "/home/bong/ray_results/PPO_bongEnv-v3_2022-11-12_11-41-07gt8o20bn/checkpoint_024002" (>> i: 4000) 
+	Saved check point at : "/home/bong/ray_results/PPO_bongEnv-v3_2022-11-12_11-41-07gt8o20bn/checkpoint_024502" (>> i: 4500) 
+	Saved check point at : "/home/bong/ray_results/PPO_bongEnv-v3_2022-11-12_11-41-07gt8o20bn/checkpoint_025002" (>> i: 5000) 
+	Saved check point at : "/home/bong/ray_results/PPO_bongEnv-v3_2022-11-12_11-41-07gt8o20bn/checkpoint_025502" (>> i: 5500) 
+	Saved check point at : "/home/bong/ray_results/PPO_bongEnv-v3_2022-11-12_11-41-07gt8o20bn/checkpoint_026002" (>> i: 6000) 
+	Saved check point at : "/home/bong/ray_results/PPO_bongEnv-v3_2022-11-12_11-41-07gt8o20bn/checkpoint_026502" (>> i: 6500) 
+	Saved check point at : "/home/bong/ray_results/PPO_bongEnv-v3_2022-11-12_11-41-07gt8o20bn/checkpoint_027002" (>> i: 7000) 
+	Saved check point at : "/home/bong/ray_results/PPO_bongEnv-v3_2022-11-12_11-41-07gt8o20bn/checkpoint_027502" (>> i: 7500) 
+	Saved check point at : "/home/bong/ray_results/PPO_bongEnv-v3_2022-11-12_11-41-07gt8o20bn/checkpoint_028002" (>> i: 8000) 
+	Saved check point at : "/home/bong/ray_results/PPO_bongEnv-v3_2022-11-12_11-41-07gt8o20bn/checkpoint_028502" (>> i: 8500) 
+	Saved check point at : "/home/bong/ray_results/PPO_bongEnv-v3_2022-11-12_11-41-07gt8o20bn/checkpoint_029002" (>> i: 9000) 
+	Saved check point at : "/home/bong/ray_results/PPO_bongEnv-v3_2022-11-12_11-41-07gt8o20bn/checkpoint_029502" (>> i: 9500) 
+	Saved check point at : "/home/bong/ray_results/PPO_bongEnv-v3_2022-11-12_11-41-07gt8o20bn/checkpoint_030002" (>> i: 10000) 
+	Saved check point at : "/home/bong/ray_results/PPO_bongEnv-v3_2022-11-12_11-41-07gt8o20bn/checkpoint_030502" (>> i: 10500) 
+	Saved check point at : "/home/bong/ray_results/PPO_bongEnv-v3_2022-11-12_11-41-07gt8o20bn/checkpoint_031002" (>> i: 11000) 
+	Saved check point at : "/home/bong/ray_results/PPO_bongEnv-v3_2022-11-12_11-41-07gt8o20bn/checkpoint_031502" (>> i: 11500) 
+
+Train start at 2022_11_17 Thursday 00:39:19
+V3 : after 31500 iter
+	Saved check point at : "/home/bong/ray_results/PPO_bongEnv-v3_2022-11-17_00-39-098fzxs3cn/checkpoint_031503" (>> i: 0) 
+	Saved check point at : "/home/bong/ray_results/PPO_bongEnv-v3_2022-11-17_00-39-098fzxs3cn/checkpoint_032003" (>> i: 500) 
+	Saved check point at : "/home/bong/ray_results/PPO_bongEnv-v3_2022-11-17_00-39-098fzxs3cn/checkpoint_032503" (>> i: 1000) 
+	Saved check point at : "/home/bong/ray_results/PPO_bongEnv-v3_2022-11-17_00-39-098fzxs3cn/checkpoint_033003" (>> i: 1500) 
+	Saved check point at : "/home/bong/ray_results/PPO_bongEnv-v3_2022-11-17_00-39-098fzxs3cn/checkpoint_033503" (>> i: 2000) 
+	Saved check point at : "/home/bong/ray_results/PPO_bongEnv-v3_2022-11-17_00-39-098fzxs3cn/checkpoint_034003" (>> i: 2500) 
+	
+Train start at 2022_11_24 Thursday 01:14:34
+DQN : ver3 used tf, not torch
+	Saved check point at : "/home/bong/ray_results/DQN_bongEnv-v3_2022-11-24_01-14-17et05lox2/checkpoint_000001" (>> i: 0) 
+	Saved check point at : "/home/bong/ray_results/DQN_bongEnv-v3_2022-11-24_01-14-17et05lox2/checkpoint_000501" (>> i: 500) 
+	Saved check point at : "/home/bong/ray_results/DQN_bongEnv-v3_2022-11-24_01-14-17et05lox2/checkpoint_001001" (>> i: 1000) 
+	Saved check point at : "/home/bong/ray_results/DQN_bongEnv-v3_2022-11-24_01-14-17et05lox2/checkpoint_001501" (>> i: 1500) 
+	Saved check point at : "/home/bong/ray_results/DQN_bongEnv-v3_2022-11-24_01-14-17et05lox2/checkpoint_002001" (>> i: 2000) 
+
+Train start at 2022_11_24 Thursday 11:18:01
+DQN : ver3 used tf, not torch (From Dorm)
+	Saved check point at : "/home/bong/ray_results/DQN_bongEnv-v3_2022-11-24_11-17-509rcu94g4/checkpoint_000001" (>> i: 0) 
+	Saved check point at : "/home/bong/ray_results/DQN_bongEnv-v3_2022-11-24_11-17-509rcu94g4/checkpoint_000501" (>> i: 500) 
+	Saved check point at : "/home/bong/ray_results/DQN_bongEnv-v3_2022-11-24_11-17-509rcu94g4/checkpoint_001001" (>> i: 1000) 
+	Saved check point at : "/home/bong/ray_results/DQN_bongEnv-v3_2022-11-24_11-17-509rcu94g4/checkpoint_001501" (>> i: 1500) 
+	Saved check point at : "/home/bong/ray_results/DQN_bongEnv-v3_2022-11-24_11-17-509rcu94g4/checkpoint_002001" (>> i: 2000) 
+	Saved check point at : "/home/bong/ray_results/DQN_bongEnv-v3_2022-11-24_11-17-509rcu94g4/checkpoint_002501" (>> i: 2500) 
+	Saved check point at : "/home/bong/ray_results/DQN_bongEnv-v3_2022-11-24_11-17-509rcu94g4/checkpoint_003001" (>> i: 3000) 
+	Saved check point at : "/home/bong/ray_results/DQN_bongEnv-v3_2022-11-24_11-17-509rcu94g4/checkpoint_003501" (>> i: 3500) 
+	Saved check point at : "/home/bong/ray_results/DQN_bongEnv-v3_2022-11-24_11-17-509rcu94g4/checkpoint_004001" (>> i: 4000) 
+	Saved check point at : "/home/bong/ray_results/DQN_bongEnv-v3_2022-11-24_11-17-509rcu94g4/checkpoint_004501" (>> i: 4500) 
+	Saved check point at : "/home/bong/ray_results/DQN_bongEnv-v3_2022-11-24_11-17-509rcu94g4/checkpoint_005001" (>> i: 5000) 
+	Saved check point at : "/home/bong/ray_results/DQN_bongEnv-v3_2022-11-24_11-17-509rcu94g4/checkpoint_005501" (>> i: 5500) 
+	Saved check point at : "/home/bong/ray_results/DQN_bongEnv-v3_2022-11-24_11-17-509rcu94g4/checkpoint_006001" (>> i: 6000) 
+	Saved check point at : "/home/bong/ray_results/DQN_bongEnv-v3_2022-11-24_11-17-509rcu94g4/checkpoint_006501" (>> i: 6500) 
+	Saved check point at : "/home/bong/ray_results/DQN_bongEnv-v3_2022-11-24_11-17-509rcu94g4/checkpoint_007001" (>> i: 7000) 
+
+Train start at 2022_11_24 Thursday 21:28:38
+V3: Restore dorm data
+	Saved check point at : "/home/bong/ray_results/DQN_bongEnv-v3_2022-11-24_21-28-20pazj6_lr/checkpoint_007002" (>> i: 0) 
+	Saved check point at : "/home/bong/ray_results/DQN_bongEnv-v3_2022-11-24_21-28-20pazj6_lr/checkpoint_007502" (>> i: 500) 
+	Saved check point at : "/home/bong/ray_results/DQN_bongEnv-v3_2022-11-24_21-28-20pazj6_lr/checkpoint_008002" (>> i: 1000) 
+	Saved check point at : "/home/bong/ray_results/DQN_bongEnv-v3_2022-11-24_21-28-20pazj6_lr/checkpoint_008502" (>> i: 1500) 
+	Saved check point at : "/home/bong/ray_results/DQN_bongEnv-v3_2022-11-24_21-28-20pazj6_lr/checkpoint_009002" (>> i: 2000) 
+	Saved check point at : "/home/bong/ray_results/DQN_bongEnv-v3_2022-11-24_21-28-20pazj6_lr/checkpoint_009502" (>> i: 2500) 
+	Saved check point at : "/home/bong/ray_results/DQN_bongEnv-v3_2022-11-24_21-28-20pazj6_lr/checkpoint_010002" (>> i: 3000) 
+	Saved check point at : "/home/bong/ray_results/DQN_bongEnv-v3_2022-11-24_21-28-20pazj6_lr/checkpoint_010502" (>> i: 3500) 
+	Saved check point at : "/home/bong/ray_results/DQN_bongEnv-v3_2022-11-24_21-28-20pazj6_lr/checkpoint_011002" (>> i: 4000) 
+	Saved check point at : "/home/bong/ray_results/DQN_bongEnv-v3_2022-11-24_21-28-20pazj6_lr/checkpoint_011502" (>> i: 4500) 
+	Saved check point at : "/home/bong/ray_results/DQN_bongEnv-v3_2022-11-24_21-28-20pazj6_lr/checkpoint_012002" (>> i: 5000) 
+	Saved check point at : "/home/bong/ray_results/DQN_bongEnv-v3_2022-11-24_21-28-20pazj6_lr/checkpoint_012502" (>> i: 5500) 
+	Saved check point at : "/home/bong/ray_results/DQN_bongEnv-v3_2022-11-24_21-28-20pazj6_lr/checkpoint_013002" (>> i: 6000) 
+	Saved check point at : "/home/bong/ray_results/DQN_bongEnv-v3_2022-11-24_21-28-20pazj6_lr/checkpoint_013502" (>> i: 6500) 
+	Saved check point at : "/home/bong/ray_results/DQN_bongEnv-v3_2022-11-24_21-28-20pazj6_lr/checkpoint_014002" (>> i: 7000) 
+	Saved check point at : "/home/bong/ray_results/DQN_bongEnv-v3_2022-11-24_21-28-20pazj6_lr/checkpoint_014502" (>> i: 7500) 
+	Saved check point at : "/home/bong/ray_results/DQN_bongEnv-v3_2022-11-24_21-28-20pazj6_lr/checkpoint_015002" (>> i: 8000) 
+	Saved check point at : "/home/bong/ray_results/DQN_bongEnv-v3_2022-11-24_21-28-20pazj6_lr/checkpoint_015502" (>> i: 8500) 
+	Saved check point at : "/home/bong/ray_results/DQN_bongEnv-v3_2022-11-24_21-28-20pazj6_lr/checkpoint_016002" (>> i: 9000) 
+	Saved check point at : "/home/bong/ray_results/DQN_bongEnv-v3_2022-11-24_21-28-20pazj6_lr/checkpoint_016502" (>> i: 9500) 
+	Saved check point at : "/home/bong/ray_results/DQN_bongEnv-v3_2022-11-24_21-28-20pazj6_lr/checkpoint_017002" (>> i: 10000) 
+
+
+Train start at 2022_11_27 Sunday 06:42:08
+V3: Restore data at 17002
+	Saved check point at : "/home/bong/ray_results/DQN_bongEnv-v3_2022-11-27_06-41-40l4bvjj8n/checkpoint_017003" (>> i: 0) 
+	Saved check point at : "/home/bong/ray_results/DQN_bongEnv-v3_2022-11-27_06-41-40l4bvjj8n/checkpoint_017503" (>> i: 500) 
+	Saved check point at : "/home/bong/ray_results/DQN_bongEnv-v3_2022-11-27_06-41-40l4bvjj8n/checkpoint_018003" (>> i: 1000) 
+	Saved check point at : "/home/bong/ray_results/DQN_bongEnv-v3_2022-11-27_06-41-40l4bvjj8n/checkpoint_018503" (>> i: 1500) 
+	Saved check point at : "/home/bong/ray_results/DQN_bongEnv-v3_2022-11-27_06-41-40l4bvjj8n/checkpoint_019003" (>> i: 2000) 
+	Saved check point at : "/home/bong/ray_results/DQN_bongEnv-v3_2022-11-27_06-41-40l4bvjj8n/checkpoint_019503" (>> i: 2500) 
+	Saved check point at : "/home/bong/ray_results/DQN_bongEnv-v3_2022-11-27_06-41-40l4bvjj8n/checkpoint_020003" (>> i: 3000) 
+	Saved check point at : "/home/bong/ray_results/DQN_bongEnv-v3_2022-11-27_06-41-40l4bvjj8n/checkpoint_020503" (>> i: 3500) 
+	Saved check point at : "/home/bong/ray_results/DQN_bongEnv-v3_2022-11-27_06-41-40l4bvjj8n/checkpoint_021003" (>> i: 4000) 
+	Saved check point at : "/home/bong/ray_results/DQN_bongEnv-v3_2022-11-27_06-41-40l4bvjj8n/checkpoint_021503" (>> i: 4500) 
+	Saved check point at : "/home/bong/ray_results/DQN_bongEnv-v3_2022-11-27_06-41-40l4bvjj8n/checkpoint_022003" (>> i: 5000) 
+	Saved check point at : "/home/bong/ray_results/DQN_bongEnv-v3_2022-11-27_06-41-40l4bvjj8n/checkpoint_022503" (>> i: 5500) 

@@ -24,6 +24,6 @@ config["train_batch_size"] = 1024
 ray.init()
 
 algo = dqn.DQN(config, 'bongEnv-v3')
-algo.restore("/home/bong/ray_results/DQN_bongEnv-v3_2022-11-24_01-14-17et05lox2/checkpoint_002001/")
+algo.restore("/home/bong/ray_results/DQN_bongEnv-v3_2022-11-27_06-41-40l4bvjj8n/checkpoint_022503")
 
 algo.evaluate()

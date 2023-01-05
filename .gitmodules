@@ -1,6 +1,3 @@
-[submodule "gym"]
-	path = gym
-	url = https://github.com/openai/gym.git
 [submodule "scripts/icra/DynamixelSDK"]
 	path = scripts/icra/DynamixelSDK
 	url = https://github.com/ROBOTIS-GIT/DynamixelSDK.git

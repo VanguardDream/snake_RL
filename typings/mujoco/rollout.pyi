@@ -1,0 +1,3 @@
+from _typeshed import Incomplete
+
+def rollout(model, data, initial_state: Incomplete | None = ..., ctrl: Incomplete | None = ..., *, skip_checks: bool = ..., nstate: Incomplete | None = ..., nstep: Incomplete | None = ..., initial_time: Incomplete | None = ..., initial_warmstart: Incomplete | None = ..., qfrc_applied: Incomplete | None = ..., xfrc_applied: Incomplete | None = ..., mocap: Incomplete | None = ..., state: Incomplete | None = ..., sensordata: Incomplete | None = ...): ...

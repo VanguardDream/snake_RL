@@ -36,7 +36,7 @@ class bongEnv(MujocoEnv, utils.EzPickle):
         forward_reward_weight=1.25,
         ctrl_direction_weight=0.8,
         ctrl_cost_weight=0.5,
-        healthy_reward=1.0,
+        healthy_reward=0,
         terminate_when_unhealthy=True,
         healthy_roll_range=(-2.1, 2.1),
         reset_noise_scale=1e-2,

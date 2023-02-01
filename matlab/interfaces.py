@@ -1,5 +1,5 @@
 import sys, os
-import matlab.engine
+# import matlab.engine
 import numpy as np
 import mujoco
 from mujoco import viewer
@@ -61,53 +61,29 @@ class snake_gait:
 def getpath(file:str, path:str):
     return path + file
 
-def simstart():
-    filename = ".\\description\\snake_circle_alligned.xml"
-    # dirpath = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__))) + "\\description\\"
+gait = snake_gait(gait_type=2)
 
+def gait_control(model : mujoco.MjModel, data : mujoco.MjData):
+    u = gait.get_selected_joints() * (np.random.random((1,1)) - 0.5) * 6
+    u = u.squeeze()
+    idx = int(np.nonzero(u)[0])
+    gait.gait_step()
+
+    data.ctrl[idx] = u[idx]
+
+
+def load_cb(model : mujoco.MjModel = None , data : mujoco.MjData = None ):
+    mujoco.set_mjcb_control(None)
+
+    filename = ".\\description\\snake_circle.xml"
     path = filename
 
     model = mujoco.MjModel.from_xml_path(path)
     data = mujoco.MjData(model)
 
-    mujoco.mj_forward(model, data)
+    if model is not None:
+        mujoco.set_mjcb_control(lambda model, data: gait_control(model, data))
 
-    SIM_DURATION = 10 # (seconds)
-    TIMESTEPS = np.power(10, np.linspace(-2, -4, 5))
+    return model, data
 
-    # prepare plotting axes
-    _, ax = plt.subplots(1, 1)
-
-    for dt in TIMESTEPS:
-        # set timestep, print
-        model.opt.timestep = dt
-
-        # allocate
-        n_steps = int(SIM_DURATION / model.opt.timestep)
-        sim_time = np.zeros(n_steps)
-        energy = np.zeros(n_steps)
-
-        # initialize
-        mujoco.mj_resetData(model, data)
-        data.qvel[0] = 9 # root joint velocity
-
-        # simulate
-        print('{} steps at dt = {:2.2g}ms'.format(n_steps, 1000*dt))
-        for i in range(n_steps):
-            mujoco.mj_step(model, data)
-            sim_time[i] = data.time
-            energy[i] = data.energy[0] + data.energy[1]
-
-        # plot
-        ax.plot(sim_time, energy, label='timestep = {:2.2g}ms'.format(1000*dt))
-
-    # finalize plot
-    ax.set_title('energy')
-    ax.set_ylabel('Joule')
-    ax.set_xlabel('second')
-    ax.legend(frameon=True)
-    plt.tight_layout()
-
-    # viewer.launch(model)
-
-simstart()
+viewer.launch(loader=load_cb)

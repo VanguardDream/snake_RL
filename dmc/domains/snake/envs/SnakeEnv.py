@@ -14,7 +14,16 @@ __model_location__ = __location__.parent.parent.parent.joinpath('models')
 
 class SnakeEnv(MujocoEnv, utils.EzPickle):
 
-    def __init__(self, frame_skip = 10) -> None:
+    metadata = {
+        "render_modes": [
+            "human",
+            "rgb_array",
+            "depth_array",
+        ],
+    "render_fps": 25,
+    }
+
+    def __init__(self, frame_skip = 4) -> None:
 
         # Action Space
         self.action_space = spaces.Box(low= -3.0, high= 3.0, shape=(14,))

@@ -3,14 +3,18 @@ import numpy as np
 import gymnasium as gym
 from dm_control import viewer
 
-env = gym.make('snake/SnakeEnv-v1',render_mode="human")
+# env = gym.make('snake/SnakeEnv-v1', render_mode="human")
+env = gym.make('snake/SnakeEnv-v1')
 action = gym.spaces.Box(low= -3.0, high= 3.0, shape=(14,))
 
 t = 0
 env.reset()
-while t < 1000:
-    env.step(action.sample())
-    env.render()
-    t = t + 1
+for testing in range(20):
+    for time in range(100):
+        # env.step(action.sample())
+        env.step(np.zeros((14,)))
+        # env.render()
+    env.reset()
+    print('resetting!')
 
-# env.close()
+env.close()

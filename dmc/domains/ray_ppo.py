@@ -10,12 +10,11 @@ from ray.tune.registry import register_env
 from ray.tune.logger import pretty_print
 
 
-ray.init()
 register_env("snake", lambda config: SnakeEnv())
 
 algo = (
     PPOConfig()
-    .rollouts(num_rollout_workers=4)
+    .rollouts(num_rollout_workers=4,)
     .resources(num_gpus=1)
     .environment(env="snake")
     .framework('torch')
@@ -23,10 +22,10 @@ algo = (
     .build()
 )
 
-for i in range(100):
-    result = algo.train()
+for i in range(10000):
+    result = algo.train(experiment_id = 'snake-230308')
     # print(pretty_print(result))
 
     if i % 5 == 0:
-        checkpoint_dir = algo.save("./cps/snake-v1")
+        checkpoint_dir = algo.save()
         print(f"Checkpoint saved in directory {checkpoint_dir}")

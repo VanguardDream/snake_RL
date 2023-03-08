@@ -55,7 +55,7 @@ class SnakeEnv(MujocoEnv, utils.EzPickle):
         self.action_space = spaces.Box(low= -3.0, high= 3.0, shape=(14,))
 
         # Observation Space
-        self.observation_space = spaces.Box(low=-np.inf, high=np.inf, shape=(62,), dtype=np.float64) # M_col and 48 sensordatas -> 14 + 48 => 62
+        self.observation_space = spaces.Box(low=-np.inf, high=np.inf, shape=(32,), dtype=np.float64) # M_col and 48 sensordatas -> 14 + 48 => 62
 
         # Create mujoco env instance
         MujocoEnv.__init__(self, os.path.join(__model_location__,'snake_circle_alligned.xml'), frame_skip, observation_space= self.observation_space, **kwargs)
@@ -100,10 +100,13 @@ class SnakeEnv(MujocoEnv, utils.EzPickle):
                     self.M_matrix[i][j] = 0
 
     def _get_obs(self):
-        slot = self.M_matrix[:,self.k]
-        sensors = self.data.sensordata[0:48]
-        observation = np.hstack((slot, sensors))
-
+        # slot = self.M_matrix[:,self.k]
+        # sensors = self.data.sensordata[0:48]
+        # observation = np.hstack((slot, sensors))
+        _pos = self.data.sensordata[6:20].copy()
+        _tor = self.data.sensordata[34:48].copy()
+        _quat = self.data.sensordata[48:52].copy()
+        observation = np.hstack((_pos, _tor, _quat))
         return observation
 
     def step(self, action):

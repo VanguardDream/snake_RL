@@ -9,8 +9,8 @@ action = gym.spaces.Box(low= -3.0, high= 3.0, shape=(14,))
 
 t = 0
 env.reset()
-for testing in range(20):
-    for time in range(100):
+for testing in range(5):
+    for time in range(10):
         # env.step(action.sample())
         env.step(np.zeros((14,)))
         # env.render()

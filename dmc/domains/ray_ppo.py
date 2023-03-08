@@ -23,7 +23,7 @@ algo = (
 )
 
 for i in range(10000):
-    result = algo.train(experiment_id = 'snake-230308')
+    result = algo.train()
     # print(pretty_print(result))
 
     if i % 5 == 0:

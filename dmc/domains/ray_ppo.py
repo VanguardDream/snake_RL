@@ -22,6 +22,8 @@ algo = (
     .build()
 )
 
+algo.restore("C:/Users/doore/ray_results/PPO_snake_2023-03-09_10-05-429z_a_3rm/checkpoint_001731/")
+
 for i in range(10000):
     result = algo.train()
     # print(pretty_print(result))

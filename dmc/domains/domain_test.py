@@ -10,10 +10,10 @@ action = gym.spaces.Box(low= -3.0, high= 3.0, shape=(14,))
 
 t = 0
 env.reset()
-for testing in range(3):
-    for time in range(400):
+for testing in range(12):
+    for time in range(100):
         env.step(action.sample())
     env.reset()
-    print('resetting!')
+    print('reseting!')
 
 env.close()

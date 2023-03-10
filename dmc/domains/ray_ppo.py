@@ -22,12 +22,13 @@ algo = (
     .build()
 )
 
-algo.restore("C:/Users/doore/ray_results/PPO_snake_2023-03-09_10-05-429z_a_3rm/checkpoint_001731/")
+algo.from_checkpoint("C:/Users/doore/ray_results/PPO_snake_18obs/checkpoint_001731/")
 
 for i in range(10000):
     result = algo.train()
     # print(pretty_print(result))
 
     if i % 5 == 0:
-        checkpoint_dir = algo.save()
-        print(f"Checkpoint saved in directory {checkpoint_dir}")
+        # checkpoint_dir = algo.save()
+        algo.export_policy_checkpoint()
+        # print(f"Checkpoint saved in directory {checkpoint_dir}")

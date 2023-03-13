@@ -1,7 +1,7 @@
 import gymnasium as gym
 
 # Gym env
-from snake_v2.envs.SnakeEnv import SnakeEnv
+from snake_v3.envs.SnakeEnv import SnakeEnv
 
 # import rl 알고리즘
 from ray.rllib.algorithms.ppo import PPOConfig 
@@ -79,25 +79,23 @@ class RNNModel(TorchRNN, nn.Module):
         action_out = self.action_branch(self._features)
         return action_out, [torch.squeeze(h, 0), torch.squeeze(c, 0)]
 
-register_env("snake", lambda config: SnakeEnv())
+register_env("snake-v3", lambda config: SnakeEnv())
 ModelCatalog.register_custom_model("MyRNN", RNNModel)
 
 algo = (
     PPOConfig()
-    .rollouts(num_rollout_workers=4,)
-    .resources(num_gpus=1)
-    .environment(env="snake")
+    .rollouts(num_rollout_workers=8,)
+    .resources(num_gpus=0.8)
+    .environment(env="snake-v3")
     .framework('torch')
-    .training(gamma=0.9, lr=0.001, model= {"custom_model" : "MyRNN", "custom_model_config" : {},})
+    .training(gamma=0.9, lr=0.001, model= {"use_lstm" : True, })
     .build()
 )
 
-algo.from_checkpoint("C:/Users/doore/ray_results/PPO_snake_v2_RNN_2/checkpoint_000301")
-
-for i in range(10000):
+for i in range(2000):
     result = algo.train()
     # print(pretty_print(result))
 
     if i % 5 == 0:
         checkpoint_dir = algo.save()
-        print(f"Checkpoint saved in directory {checkpoint_dir}   \r",end='')
+        print(f"Checkpoint saved in directory {checkpoint_dir}    \r")

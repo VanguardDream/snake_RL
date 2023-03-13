@@ -1,4 +1,4 @@
-from snake.envs.SnakeEnv import SnakeEnv
+from snake_v3.envs.SnakeEnv import SnakeEnv
 import gymnasium as gym
 import ray
 
@@ -10,25 +10,23 @@ from ray.tune.registry import register_env
 from ray.tune.logger import pretty_print
 
 
-register_env("snake", lambda config: SnakeEnv())
+register_env("snake_v3", lambda config: SnakeEnv())
 
 algo = (
     PPOConfig()
-    .rollouts(num_rollout_workers=4,)
-    .resources(num_gpus=1)
-    .environment(env="snake")
+    .rollouts(num_rollout_workers=8,)
+    .resources(num_gpus=0.85)
+    .environment(env="snake_v3")
     .framework('torch')
     .training(gamma=0.9, lr=0.001)
     .build()
 )
 
-algo.from_checkpoint("C:/Users/doore/ray_results/PPO_snake_18obs/checkpoint_001731/")
 
 for i in range(10000):
     result = algo.train()
     # print(pretty_print(result))
 
     if i % 5 == 0:
-        # checkpoint_dir = algo.save()
-        algo.export_policy_checkpoint()
-        # print(f"Checkpoint saved in directory {checkpoint_dir}")
+        checkpoint_dir = algo.save()
+        print(f"Checkpoint saved in directory {checkpoint_dir} \r   ")

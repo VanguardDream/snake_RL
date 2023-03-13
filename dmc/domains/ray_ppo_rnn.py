@@ -5,13 +5,13 @@ from snake_v2.envs.SnakeEnv import SnakeEnv
 
 # import rl 알고리즘
 from ray.rllib.algorithms.ppo import PPOConfig 
-from ray.rllib.algorithms.algorithm_config import AlgorithmConfig
+# from ray.rllib.algorithms.algorithm_config import AlgorithmConfig
 from ray.rllib.models import ModelCatalog
 from ray.rllib.models.modelv2 import ModelV2
 from ray.rllib.models.preprocessors import get_preprocessor
-from ray.rllib.models.torch.torch_modelv2 import TorchModelV2
+# from ray.rllib.models.torch.torch_modelv2 import TorchModelV2
 from ray.rllib.models.torch.recurrent_net import RecurrentNetwork as TorchRNN
-from ray.rllib.models.tf.recurrent_net import RecurrentNetwork
+# from ray.rllib.models.tf.recurrent_net import RecurrentNetwork
 from ray.rllib.utils.annotations import override
 from ray.rllib.utils.framework import try_import_tf, try_import_torch
 
@@ -92,10 +92,12 @@ algo = (
     .build()
 )
 
+algo.from_checkpoint("C:/Users/doore/ray_results/PPO_snake_v2_RNN_2/checkpoint_000301")
+
 for i in range(10000):
     result = algo.train()
-    print(pretty_print(result))
+    # print(pretty_print(result))
 
     if i % 5 == 0:
         checkpoint_dir = algo.save()
-        print(f"Checkpoint saved in directory {checkpoint_dir}")
+        print(f"Checkpoint saved in directory {checkpoint_dir}   \r",end='')

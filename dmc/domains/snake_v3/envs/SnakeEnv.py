@@ -139,7 +139,7 @@ class SnakeEnv(MujocoEnv, utils.EzPickle):
             self.render()
 
         terminated = False
-        if round(self.data.time / self.timestep) > 10 * np.shape(self.M_matrix)[1]:
+        if round(self.data.time / self.timestep) > 300 * np.shape(self.M_matrix)[1]: #Check! MuJoCo 10 Sim-step -> RL 1 action step!
             terminated = True
 
         return observation, reward, terminated, False, info

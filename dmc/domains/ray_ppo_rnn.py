@@ -88,11 +88,11 @@ algo = (
     .resources(num_gpus=0.8)
     .environment(env="snake-v3")
     .framework('torch')
-    .training(gamma=0.9, lr=0.001, model= {"use_lstm" : True, })
+    .training(gamma=0.95, lr=0.001, model= {"use_lstm" : True, "fcnet_activation": "swish", "max_seq_len": 64})
     .build()
 )
 
-for i in range(2000):
+for i in range(1000):
     result = algo.train()
     # print(pretty_print(result))
 

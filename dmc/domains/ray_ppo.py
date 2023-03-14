@@ -23,7 +23,7 @@ algo = (
 )
 
 
-for i in range(10000):
+for i in range(3000):
     result = algo.train()
     # print(pretty_print(result))
 

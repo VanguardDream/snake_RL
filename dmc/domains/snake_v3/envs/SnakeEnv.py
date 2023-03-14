@@ -121,7 +121,7 @@ class SnakeEnv(MujocoEnv, utils.EzPickle):
         xy_velocity = (xy_position_after - xy_position_before) / self.dt
         x_velocity, y_velocity = xy_velocity
 
-        forward_reward = x_velocity - np.abs(xy_position_after[1])
+        forward_reward = x_velocity - np.abs((xy_position_after[1]+0.05)/(xy_position_after[0]+0.05))
 
         observation = self._get_obs()
         reward = forward_reward
@@ -147,8 +147,8 @@ class SnakeEnv(MujocoEnv, utils.EzPickle):
     def reset_model(self):
         self.k = 0
         
-        noise_low = -0.1
-        noise_high = 0.1
+        noise_low = -0.03
+        noise_high = 0.03
 
         qpos = self.init_qpos + self.np_random.uniform(
         low=noise_low, high=noise_high, size=self.model.nq

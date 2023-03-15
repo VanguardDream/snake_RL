@@ -121,7 +121,8 @@ class SnakeEnv(MujocoEnv, utils.EzPickle):
         xy_velocity = (xy_position_after - xy_position_before) / self.dt
         x_velocity, y_velocity = xy_velocity
 
-        forward_reward = x_velocity - (np.abs(xy_position_after[1])+0.05) / (np.abs(xy_position_after[0]) + 0.05)
+        # forward_reward = x_velocity - (np.abs(xy_position_after[1])+0.05) / (np.abs(xy_position_after[0]) + 0.05)
+        forward_reward = 0.1 * xy_position_after[0] - (np.abs(xy_position_after[1])+0.15) / (np.abs(xy_position_after[0]) + 0.15)
 
         observation = self._get_obs()
         reward = forward_reward
@@ -139,7 +140,7 @@ class SnakeEnv(MujocoEnv, utils.EzPickle):
             self.render()
 
         terminated = False
-        if round(self.data.time / self.timestep) > 150 * np.shape(self.M_matrix)[1]: #Check! MuJoCo 10 Sim-step -> RL 1 action step!
+        if round(self.data.time / self.timestep) > 300 * np.shape(self.M_matrix)[1]: #Check! MuJoCo 10 Sim-step -> RL 1 action step!
             terminated = True
 
         return observation, reward, terminated, False, info

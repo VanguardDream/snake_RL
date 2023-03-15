@@ -131,7 +131,6 @@ class SnakeEnv(MujocoEnv, utils.EzPickle):
         forward_reward = 0.5 * xy_position_after[0] - (np.abs(xy_position_after[1])+0.15) / (np.abs(xy_position_after[0]) + 0.15)
         
         reward = forward_reward
-        print(xy_velocity)
 
         info = {
             "reward_fwd": forward_reward,

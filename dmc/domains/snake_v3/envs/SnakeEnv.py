@@ -71,16 +71,17 @@ class SnakeEnv(MujocoEnv, utils.EzPickle):
         b = 0
         b2 = 0
 
-        a = np.radians(30)
-        a2 = np.radians(15)
+        a = np.radians(15)
+        a2 = np.radians(45)
 
-        e_d1 = np.radians(15)
-        e_l1 = np.radians(15)
+        e_d1 = np.radians(45)
+        e_l1 = np.radians(45)
 
         e_d2 = 1
         e_l2 = 1
 
-        delta = np.radians(45)
+        # delta = np.radians(45) # for sidewinding
+        delta = np.radians(0) # for serpenoid
 
         t_range = np.arange(0, np.lcm(np.lcm(e_d2,e_l2), 2) * np.pi, self.action_frequency).transpose()
 
@@ -113,7 +114,9 @@ class SnakeEnv(MujocoEnv, utils.EzPickle):
         action = action * self.M_matrix[:,self.k]
 
         xy_position_before = self.data.qpos[0:2].copy()
+
         self.do_simulation(action, self.frame_skip)
+
         self.k = np.mod(self.k + 1, np.shape(self.M_matrix)[1])
 
         xy_position_after = self.data.qpos[0:2].copy()
@@ -121,10 +124,10 @@ class SnakeEnv(MujocoEnv, utils.EzPickle):
         xy_velocity = (xy_position_after - xy_position_before) / self.dt
         x_velocity, y_velocity = xy_velocity
 
+        observation = self._get_obs()
         # forward_reward = x_velocity - (np.abs(xy_position_after[1])+0.05) / (np.abs(xy_position_after[0]) + 0.05)
         forward_reward = 0.1 * xy_position_after[0] - (np.abs(xy_position_after[1])+0.15) / (np.abs(xy_position_after[0]) + 0.15)
-
-        observation = self._get_obs()
+        
         reward = forward_reward
         info = {
             "reward_fwd": forward_reward,

@@ -113,22 +113,26 @@ class SnakeEnv(MujocoEnv, utils.EzPickle):
     def step(self, action):
         action = action * self.M_matrix[:,self.k]
 
-        xy_position_before = self.data.qpos[0:2].copy()
+        # xy_position_before = self.data.qpos[0:2].copy()
+        xy_position_before = self.data.xpos[1][0:2].copy()
 
         self.do_simulation(action, self.frame_skip)
 
         self.k = np.mod(self.k + 1, np.shape(self.M_matrix)[1])
 
-        xy_position_after = self.data.qpos[0:2].copy()
+        # xy_position_after = self.data.qpos[0:2].copy()
+        xy_position_after = self.data.xpos[1][0:2].copy()
 
         xy_velocity = (xy_position_after - xy_position_before) / self.dt
         x_velocity, y_velocity = xy_velocity
 
         observation = self._get_obs()
         # forward_reward = x_velocity - (np.abs(xy_position_after[1])+0.05) / (np.abs(xy_position_after[0]) + 0.05)
-        forward_reward = 0.1 * xy_position_after[0] - (np.abs(xy_position_after[1])+0.15) / (np.abs(xy_position_after[0]) + 0.15)
+        forward_reward = 0.5 * xy_position_after[0] - (np.abs(xy_position_after[1])+0.15) / (np.abs(xy_position_after[0]) + 0.15)
         
         reward = forward_reward
+        print(xy_velocity)
+
         info = {
             "reward_fwd": forward_reward,
             "x_position": xy_position_after[0],

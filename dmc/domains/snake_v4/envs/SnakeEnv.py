@@ -55,7 +55,18 @@ class SnakeEnv(MujocoEnv, utils.EzPickle):
         self.action_space = spaces.Box(low= 0.0, high= 3.0, shape=(14,), dtype=np.float32)
 
         # Observation Space
-        self.observation_space = spaces.Box(low=-np.inf, high=np.inf, shape=(66,), dtype=np.float32) # M_col and 48 sensordatas -> 14 + 48 => 62
+        _slot_space = [1] * 14
+        _accelerometer_space = [100] * 3
+        _gyro_space = [20] * 3
+        _joint_pos_space = [1.58] * 14
+        _joint_vel_space = [8.4] * 14
+        _joint_torque_space = [3.0] * 14
+        _head_quat_space = [1.0] * 4
+
+        __max_spaces = np.array(_slot_space + _accelerometer_space + _gyro_space + _joint_pos_space + _head_quat_space)
+        __min_spaces = -1 * __max_spaces.copy()
+
+        self.observation_space = spaces.Box(low=__min_spaces, high=__max_spaces, shape=(38,), dtype=np.float32) # M_col and 48 sensordatas -> 14 + 48 => 62
 
         # Create mujoco env instance
         MujocoEnv.__init__(self, os.path.join(__model_location__,'snake_circle_contact.xml'), frame_skip, observation_space= self.observation_space, **kwargs)
@@ -102,9 +113,11 @@ class SnakeEnv(MujocoEnv, utils.EzPickle):
 
     def _get_obs(self):
         _slot = self.M_matrix[:,self.k].copy()
-        _sensors = self.data.sensordata[0:48].copy()
-        # observation = np.hstack((slot, sensors))
+        _sensors = self.data.sensordata[0:20].copy()
+        # _sensors = self.data.sensordata[0:48].copy()
+
         # _pos = self.data.sensordata[6:20].copy()
+        _vel = self.data.sensordata[20:34].copy()
         # _tor = self.data.sensordata[34:48].copy()
         _quat = self.data.sensordata[48:52].copy()
         observation = np.hstack((_slot, _sensors, _quat)).astype(np.float32).copy()
@@ -146,6 +159,11 @@ class SnakeEnv(MujocoEnv, utils.EzPickle):
             "x_velocity": x_velocity,
             "y_velocity": y_velocity,
             "forward_reward": forward_reward,
+            "next_gait_slot" : observation[0:14].copy(),
+            "accelerometer" : observation[14:17].copy(),
+            "gyro" : observation[17:20].copy(),
+            "joint_position" : observation[20:34].copy(),
+            "head_orientation" : observation[-4:]
         }
 
         reward = forward_reward + terminated_reward

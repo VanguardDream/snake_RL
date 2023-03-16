@@ -85,8 +85,8 @@ class SnakeEnv(MujocoEnv, utils.EzPickle):
         a = np.radians(15)
         a2 = np.radians(45)
 
-        e_d1 = np.radians(45)
-        e_l1 = np.radians(45)
+        e_d1 = np.radians(30)
+        e_l1 = np.radians(30)
 
         e_d2 = 1
         e_l2 = 1

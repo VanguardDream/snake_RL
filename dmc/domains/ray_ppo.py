@@ -1,33 +1,30 @@
-from snake_v3.envs.SnakeEnv import SnakeEnv
+from snake_v4.envs.SnakeEnv import SnakeEnv
 import gymnasium as gym
-import ray
 
 # import rl 알고리즘
-from ray.rllib.algorithms.ppo import PPOConfig, PPO 
+from ray.rllib.algorithms.ppo import PPOConfig
 from ray.rllib.algorithms.algorithm_config import AlgorithmConfig
 
 from ray.tune.registry import register_env
 from ray.tune.logger import pretty_print
 
 
-register_env("snake_v3", lambda config: SnakeEnv())
+register_env("snake_v4", lambda config: SnakeEnv())
 
 algo = (
     PPOConfig()
-    .rollouts(num_rollout_workers=8,)
+    .rollouts(num_rollout_workers=16,)
     .resources(num_gpus=0.95)
-    .environment(env="snake_v3")
+    .environment(env="snake_v4")
     .framework('torch')
-    .training(gamma=0.95, lr=0.0001, model= {"fcnet_hiddens": [16, 16, 16, 8, 4]})
+    .training(gamma=0.995, lr=0.0001, clip_param=0.2, kl_coeff=1.0, num_sgd_iter=20, sgd_minibatch_size=32768, train_batch_size=320000, model= {"fcnet_hiddens": [128, 128, 64, 64, 32], "free_log_std" : True }, )
     .build()
 )
 
-algo.restore("C:/Users/doore/ray_results/PPO_snake_v3_MLP/checkpoint_001456")
-
-for i in range(4000):
+for i in range(6000):
     result = algo.train()
     # print(pretty_print(result))
 
-    if i % 5 == 0:
+    if (i % 25 == 0) and (i != 0):
         checkpoint_dir = algo.save()
         print(f"Checkpoint saved in directory {checkpoint_dir}    \r")

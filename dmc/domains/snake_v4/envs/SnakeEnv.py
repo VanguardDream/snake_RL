@@ -151,6 +151,9 @@ class SnakeEnv(MujocoEnv, utils.EzPickle):
             terminated_reward = 15 * xy_position_after[0] - 5 * np.abs(xy_position_after[1])
             terminated = True
 
+        reward = forward_reward + terminated_reward
+        __model_sensordata = self.data.sensordata
+
         info = {
             "reward_fwd": forward_reward,
             "x_position": xy_position_after[0],
@@ -160,13 +163,15 @@ class SnakeEnv(MujocoEnv, utils.EzPickle):
             "y_velocity": y_velocity,
             "forward_reward": forward_reward,
             "next_gait_slot" : observation[0:14].copy(),
-            "accelerometer" : observation[14:17].copy(),
-            "gyro" : observation[17:20].copy(),
-            "joint_position" : observation[20:34].copy(),
-            "head_orientation" : observation[-4:]
+            "accelerometer" : __model_sensordata[0:3].copy(),
+            "gyro" : __model_sensordata[3:6].copy(),
+            "joint_position" : __model_sensordata[6:20].copy(),
+            "joint_velocity" : __model_sensordata[20:34].copy(),
+            "joint_torque" : __model_sensordata[34:48].copy(),
+            "head_orientation" : __model_sensordata[48:52].copy(),
+            "head_torque" : __model_sensordata[-3:].copy(),
         }
 
-        reward = forward_reward + terminated_reward
 
         if self.render_mode == "human":
             self.render()

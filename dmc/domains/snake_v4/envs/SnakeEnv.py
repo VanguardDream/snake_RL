@@ -56,17 +56,17 @@ class SnakeEnv(MujocoEnv, utils.EzPickle):
 
         # Observation Space
         _slot_space = [1] * 14
-        _accelerometer_space = [200] * 3
-        _gyro_space = [20] * 3
+        _accelerometer_space = [15] * 3
+        _gyro_space = [6] * 3
         _joint_pos_space = [2.1] * 14
         _joint_vel_space = [8.4] * 14
         _joint_torque_space = [3.0] * 14
         _head_quat_space = [1.0] * 4
 
-        __max_spaces = np.array(_slot_space + _accelerometer_space + _gyro_space + _joint_pos_space + _head_quat_space,dtype=np.float64)
-        __min_spaces = -1 * __max_spaces.copy()
+        self.__max_spaces = np.array(_slot_space + _accelerometer_space + _gyro_space + _joint_pos_space + _head_quat_space,dtype=np.float64)
+        self.__min_spaces = -1 * self.__max_spaces.copy()
 
-        self.observation_space = spaces.Box(low=__min_spaces, high=__max_spaces, shape=(38,),dtype=np.float64) # M_col and 48 sensordatas -> 14 + 48 => 62
+        self.observation_space = spaces.Box(low=self.__min_spaces, high=self.__max_spaces, shape=(38,),dtype=np.float64) # M_col and 48 sensordatas -> 14 + 48 => 62
 
         # Create mujoco env instance
         MujocoEnv.__init__(self, os.path.join(__model_location__,'snake_circle_contact.xml'), frame_skip, observation_space= self.observation_space, **kwargs)
@@ -120,7 +120,7 @@ class SnakeEnv(MujocoEnv, utils.EzPickle):
         _vel = self.data.sensordata[20:34].copy()
         # _tor = self.data.sensordata[34:48].copy()
         _quat = self.data.sensordata[48:52].copy()
-        observation = np.hstack((_slot, _sensors, _quat)).copy()
+        observation = np.clip(np.hstack((_slot, _sensors, _quat)).copy(),a_min=self.__min_spaces, a_max=self.__max_spaces)
         return observation
 
     def step(self, action):

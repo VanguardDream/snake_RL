@@ -126,21 +126,22 @@
     </worldbody>
 
     <contact>
-        <pair name="con_head" geom1="floor" geom2="head" condim="3" friction="0.8 0.65"/>
-        <pair name="con_link1" geom1="floor" geom2="link1" condim="3" friction="0.8 0.65"/>
-        <pair name="con_link2" geom1="floor" geom2="link2" condim="3" friction="0.8 0.65"/>
-        <pair name="con_link3" geom1="floor" geom2="link3" condim="3" friction="0.8 0.65"/>
-        <pair name="con_link4" geom1="floor" geom2="link4" condim="3" friction="0.8 0.65"/>
-        <pair name="con_link5" geom1="floor" geom2="link5" condim="3" friction="0.8 0.65"/>
-        <pair name="con_link6" geom1="floor" geom2="link6" condim="3" friction="0.8 0.65"/>
-        <pair name="con_link7" geom1="floor" geom2="link7" condim="3" friction="0.8 0.65"/>
-        <pair name="con_link8" geom1="floor" geom2="link8" condim="3" friction="0.8 0.65"/>
-        <pair name="con_link9" geom1="floor" geom2="link9" condim="3" friction="0.8 0.65"/>
-        <pair name="con_link10" geom1="floor" geom2="link10" condim="3" friction="0.8 0.65"/>
-        <pair name="con_link11" geom1="floor" geom2="link11" condim="3" friction="0.8 0.65"/>
-        <pair name="con_link12" geom1="floor" geom2="link12" condim="3" friction="0.8 0.65"/>
-        <pair name="con_link13" geom1="floor" geom2="link13" condim="3" friction="0.8 0.65"/>
-        <pair name="con_tail" geom1="floor" geom2="tail" condim="3" friction="0.8 0.65"/>
+        <!-- friction="normal tangential" -->
+        <pair name="con_head" geom1="floor" geom2="head" condim="3" friction="0.5 0.65"/>
+        <pair name="con_link1" geom1="floor" geom2="link1" condim="3" friction="0.5 0.65"/>
+        <pair name="con_link2" geom1="floor" geom2="link2" condim="3" friction="0.5 0.65"/>
+        <pair name="con_link3" geom1="floor" geom2="link3" condim="3" friction="0.5 0.65"/>
+        <pair name="con_link4" geom1="floor" geom2="link4" condim="3" friction="0.5 0.65"/>
+        <pair name="con_link5" geom1="floor" geom2="link5" condim="3" friction="0.5 0.65"/>
+        <pair name="con_link6" geom1="floor" geom2="link6" condim="3" friction="0.5 0.65"/>
+        <pair name="con_link7" geom1="floor" geom2="link7" condim="3" friction="0.5 0.65"/>
+        <pair name="con_link8" geom1="floor" geom2="link8" condim="3" friction="0.5 0.65"/>
+        <pair name="con_link9" geom1="floor" geom2="link9" condim="3" friction="0.5 0.65"/>
+        <pair name="con_link10" geom1="floor" geom2="link10" condim="3" friction="0.5 0.65"/>
+        <pair name="con_link11" geom1="floor" geom2="link11" condim="3" friction="0.5 0.65"/>
+        <pair name="con_link12" geom1="floor" geom2="link12" condim="3" friction="0.5 0.65"/>
+        <pair name="con_link13" geom1="floor" geom2="link13" condim="3" friction="0.5 0.65"/>
+        <pair name="con_tail" geom1="floor" geom2="tail" condim="3" friction="0.5 0.65"/>
     </contact>  
 
     <actuator>

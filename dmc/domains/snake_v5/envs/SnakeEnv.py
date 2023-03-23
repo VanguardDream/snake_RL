@@ -51,9 +51,6 @@ class SnakeEnv(MujocoEnv, utils.EzPickle):
     }
 
     def __init__(self, frame_skip = 10, **kwargs) -> None:
-        # Action Space
-        self.action_space = spaces.Box(low= 0.0, high= 3.0, shape=(14,))
-
         # Observation Space
         _slot_space = [1] * 14
         _accelerometer_space = [15] * 3
@@ -70,6 +67,9 @@ class SnakeEnv(MujocoEnv, utils.EzPickle):
 
         # Create mujoco env instance
         MujocoEnv.__init__(self, os.path.join(__model_location__,'snake_circle_contact_fixed.xml'), frame_skip, observation_space= self.observation_space, **kwargs)
+
+        # Action Space
+        self.action_space = spaces.Box(low= 0.0, high= 3.0, shape=(14,))
 
         # Physics variables
         self.k = 0

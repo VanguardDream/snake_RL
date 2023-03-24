@@ -50,7 +50,8 @@ class SnakeEnv(MujocoEnv, utils.EzPickle):
     "render_fps": 10,
     }
 
-    def __init__(self, frame_skip = 10, **kwargs) -> None:
+    def __init__(self, frame_skip = 10, **kwargs,) -> None:
+        utils.EzPickle.__init__(self, frame_skip, **kwargs,)
         # Observation Space
         _slot_space = [1] * 14
         _accelerometer_space = [15] * 3
@@ -143,12 +144,13 @@ class SnakeEnv(MujocoEnv, utils.EzPickle):
         __model_sensordata = self.data.sensordata
 
         forward_reward = 10 * x_velocity - 3 * np.abs(y_velocity)
-        torque_cost = 0.3 * np.linalg.norm(__model_sensordata[-3:],1)
+        # torque_cost = 0.3 * np.linalg.norm(__model_sensordata[-3:],1).copy()
+        torque_cost = 0
               
         terminated = False
         terminated_reward = 0
         if (round(self.data.time / self.timestep) /10) > 10 * np.shape(self.M_matrix)[1]: #Check! MuJoCo 10 Sim-step -> RL 1 action step!
-            terminated_reward = 50 * xy_position_after[0] - 30 * np.abs(xy_position_after[1])
+            # terminated_reward = 50 * xy_position_after[0] - 30 * np.abs(xy_position_after[1])
             terminated = True
 
         reward = forward_reward + terminated_reward - torque_cost

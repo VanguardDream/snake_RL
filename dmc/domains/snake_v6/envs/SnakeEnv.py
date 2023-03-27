@@ -57,14 +57,14 @@ class SnakeEnv(MujocoEnv, utils.EzPickle):
         _accelerometer_space = [15] * 3
         _gyro_space = [6] * 3
         _joint_pos_space = [2.1] * 14
-        _joint_vel_space = [8.4] * 14
-        _joint_torque_space = [3.0] * 14
+        _joint_vel_space = [10.4] * 14
+        _joint_torque_space = [5.0] * 14
         _head_quat_space = [1.0] * 4
 
-        self.__max_spaces = np.array(_slot_space + _accelerometer_space + _gyro_space + _joint_pos_space + _head_quat_space,dtype=np.float64)
+        self.__max_spaces = np.array(_slot_space + _accelerometer_space + _gyro_space + _joint_pos_space + _joint_vel_space + _joint_torque_space + _head_quat_space,dtype=np.float64)
         self.__min_spaces = -1 * self.__max_spaces.copy()
 
-        self.observation_space = spaces.Box(low=self.__min_spaces, high=self.__max_spaces, shape=(38,),dtype=np.float64) # M_col and 48 sensordatas -> 14 + 48 => 62
+        self.observation_space = spaces.Box(low=self.__min_spaces, high=self.__max_spaces, shape=(66,),dtype=np.float64) # M_col and 48 sensordatas -> 14 + 48 => 62
 
         # Create mujoco env instance
         MujocoEnv.__init__(self, os.path.join(__model_location__,'snake_circle_contact_fixed.xml'), frame_skip, observation_space= self.observation_space, **kwargs)
@@ -115,11 +115,11 @@ class SnakeEnv(MujocoEnv, utils.EzPickle):
 
     def _get_obs(self):
         _slot = self.M_matrix[:,self.k].copy()
-        _sensors = self.data.sensordata[0:20].copy()
-        # _sensors = self.data.sensordata[0:48].copy()
+        # _sensors = self.data.sensordata[0:20].copy()
+        _sensors = self.data.sensordata[0:48].copy()
 
         # _pos = self.data.sensordata[6:20].copy()
-        _vel = self.data.sensordata[20:34].copy()
+        # _vel = self.data.sensordata[20:34].copy()
         # _tor = self.data.sensordata[34:48].copy()
         _quat = self.data.sensordata[48:52].copy()
         observation = np.clip(np.hstack((_slot, _sensors, _quat)).copy(),a_min=self.__min_spaces, a_max=self.__max_spaces)

@@ -92,8 +92,8 @@ class SnakeEnv(MujocoEnv, utils.EzPickle):
         e_d1 = np.radians(30)
         e_l1 = np.radians(30)
 
-        e_d2 = 2
-        e_l2 = 2
+        e_d2 = 3
+        e_l2 = 3
 
         # delta = np.radians(45) # for sidewinding
         delta = np.radians(0) # for serpenoid
@@ -173,7 +173,7 @@ class SnakeEnv(MujocoEnv, utils.EzPickle):
         head_rotvec = head_R.as_rotvec(degrees=True)            
 
         # print(np.shape(self.M_matrix)[1])
-        if (np.round(self.data.time * 10)) >= np.shape(self.M_matrix)[1]: #Check! MuJoCo 10 Sim-step -> RL 1 action step!
+        if (np.round(self.data.time * 10)) >= 10 * np.shape(self.M_matrix)[1]: #Check! MuJoCo 10 Sim-step -> RL 1 action step!
             # terminated_reward = 50 * xy_position_after[0] - 30 * np.abs(xy_position_after[1])
             # print(self.data.time)
             terminated = True

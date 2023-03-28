@@ -35,13 +35,13 @@
         <light directional="false" diffuse="1 1 1" specular="0 0 0" pos="0 0 15" dir="0 0 -1" castshadow="false"/>
 
         <body name="head" pos="0 0 0.033" euler="0 0 0"> 
-            <!-- <freejoint name="root"/> for float joint  -->
-            <joint type="slide" axis="1 0 0"/>
-            <joint type="slide" axis="0 1 0"/>
-            <joint type="slide" axis="0 0 1"/>
-            <joint name="r_hinge" type="hinge" axis="1 0 0" frictionloss="0"/>
-            <joint name="p_hinge" type="hinge" axis="0 1 0" frictionloss="0"/>
-            <joint name="y_hinge" type="hinge" axis="0 0 1" frictionloss="1000"/>
+            <freejoint name="root"/> 
+            <!-- <joint type="slide" axis="1 0 0"/> -->
+            <!-- <joint type="slide" axis="0 1 0"/> -->
+            <!-- <joint type="slide" axis="0 0 1"/> -->
+            <!-- <joint name="r_hinge" type="hinge" axis="1 0 0" frictionloss="0"/> -->
+            <!-- <joint name="p_hinge" type="hinge" axis="0 1 0" frictionloss="0"/> -->
+            <!-- <joint name="y_hinge" type="hinge" axis="0 0 1" frictionloss="1000"/> -->
             <site name="s_head" pos="0 0 0" euler="0 0 0"/>
             <geom name="head" type="mesh" mesh="head_link" mass="0.2"/>
 

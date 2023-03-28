@@ -6,7 +6,9 @@
 
 <mujoco model="snake-dgist">
 
-    <option timestep="0.01"/>
+    <option timestep="0.01">
+        <flag sensornoise="enable"/>
+    </option>
 
     <asset>
         <texture name="texplane" type="2d" builtin="checker" rgb1=".8 .8 .8" rgb2=".1 0.15 0.2" width="512" height="512" mark="cross" markrgb=".8 .8 .8"/>  
@@ -169,76 +171,76 @@
 
     <sensor>
         <!-- index 0 - 5 -->
-        <accelerometer name="imu_accel" site="s_head"/>
-        <gyro name="imu_gyro" site="s_head"/>
+        <accelerometer name="imu_accel" site="s_head" noise="0.005"/>
+        <gyro name="imu_gyro" site="s_head" noise="0.005"/>
 
         <!-- index 6 - 19 -->
-        <jointpos name="pos_joint1" joint="joint1"/>
-        <jointpos name="pos_joint2" joint="joint2"/>
-        <jointpos name="pos_joint3" joint="joint3"/>
-        <jointpos name="pos_joint4" joint="joint4"/>
-        <jointpos name="pos_joint5" joint="joint5"/>
-        <jointpos name="pos_joint6" joint="joint6"/>
-        <jointpos name="pos_joint7" joint="joint7"/>
-        <jointpos name="pos_joint8" joint="joint8"/>
-        <jointpos name="pos_joint9" joint="joint9"/>
-        <jointpos name="pos_joint10" joint="joint10"/>
-        <jointpos name="pos_joint11" joint="joint11"/>
-        <jointpos name="pos_joint12" joint="joint12"/>
-        <jointpos name="pos_joint13" joint="joint13"/>
-        <jointpos name="pos_joint14" joint="joint14"/>
+        <jointpos name="pos_joint1" joint="joint1" noise="0.1"/>
+        <jointpos name="pos_joint2" joint="joint2" noise="0.1"/>
+        <jointpos name="pos_joint3" joint="joint3" noise="0.1"/>
+        <jointpos name="pos_joint4" joint="joint4" noise="0.1"/>
+        <jointpos name="pos_joint5" joint="joint5" noise="0.1"/>
+        <jointpos name="pos_joint6" joint="joint6" noise="0.1"/>
+        <jointpos name="pos_joint7" joint="joint7" noise="0.1"/>
+        <jointpos name="pos_joint8" joint="joint8" noise="0.1"/>
+        <jointpos name="pos_joint9" joint="joint9" noise="0.1"/>
+        <jointpos name="pos_joint10" joint="joint10" noise="0.1"/>
+        <jointpos name="pos_joint11" joint="joint11" noise="0.1"/>
+        <jointpos name="pos_joint12" joint="joint12" noise="0.1"/>
+        <jointpos name="pos_joint13" joint="joint13" noise="0.1"/>
+        <jointpos name="pos_joint14" joint="joint14" noise="0.1"/>
 
         <!-- index 20 - 33 -->
-        <actuatorvel name="vel_joint1" actuator="servo_1"/>
-        <actuatorvel name="vel_joint2" actuator="servo_2"/>
-        <actuatorvel name="vel_joint3" actuator="servo_3"/>
-        <actuatorvel name="vel_joint4" actuator="servo_4"/>
-        <actuatorvel name="vel_joint5" actuator="servo_5"/>
-        <actuatorvel name="vel_joint6" actuator="servo_6"/>
-        <actuatorvel name="vel_joint7" actuator="servo_7"/>
-        <actuatorvel name="vel_joint8" actuator="servo_8"/>
-        <actuatorvel name="vel_joint9" actuator="servo_9"/>
-        <actuatorvel name="vel_joint10" actuator="servo_10"/>
-        <actuatorvel name="vel_joint11" actuator="servo_11"/>
-        <actuatorvel name="vel_joint12" actuator="servo_12"/>
-        <actuatorvel name="vel_joint13" actuator="servo_13"/>
-        <actuatorvel name="vel_joint14" actuator="servo_14"/>
+        <actuatorvel name="vel_joint1" actuator="servo_1" noise="0.05"/>
+        <actuatorvel name="vel_joint2" actuator="servo_2" noise="0.05"/>
+        <actuatorvel name="vel_joint3" actuator="servo_3" noise="0.05"/>
+        <actuatorvel name="vel_joint4" actuator="servo_4" noise="0.05"/>
+        <actuatorvel name="vel_joint5" actuator="servo_5" noise="0.05"/>
+        <actuatorvel name="vel_joint6" actuator="servo_6" noise="0.05"/>
+        <actuatorvel name="vel_joint7" actuator="servo_7" noise="0.05"/>
+        <actuatorvel name="vel_joint8" actuator="servo_8" noise="0.05"/>
+        <actuatorvel name="vel_joint9" actuator="servo_9" noise="0.05"/>
+        <actuatorvel name="vel_joint10" actuator="servo_10" noise="0.05"/>
+        <actuatorvel name="vel_joint11" actuator="servo_11" noise="0.05"/>
+        <actuatorvel name="vel_joint12" actuator="servo_12" noise="0.05"/>
+        <actuatorvel name="vel_joint13" actuator="servo_13" noise="0.05"/>
+        <actuatorvel name="vel_joint14" actuator="servo_14" noise="0.05"/>
 
         <!-- index 34 - 47 -->
-        <actuatorfrc name="torque_joint1" actuator="servo_1"/>
-        <actuatorfrc name="torque_joint2" actuator="servo_2"/>
-        <actuatorfrc name="torque_joint3" actuator="servo_3"/>
-        <actuatorfrc name="torque_joint4" actuator="servo_4"/>
-        <actuatorfrc name="torque_joint5" actuator="servo_5"/>
-        <actuatorfrc name="torque_joint6" actuator="servo_6"/>
-        <actuatorfrc name="torque_joint7" actuator="servo_7"/>
-        <actuatorfrc name="torque_joint8" actuator="servo_8"/>
-        <actuatorfrc name="torque_joint9" actuator="servo_9"/>
-        <actuatorfrc name="torque_joint10" actuator="servo_10"/>
-        <actuatorfrc name="torque_joint11" actuator="servo_11"/>
-        <actuatorfrc name="torque_joint12" actuator="servo_12"/>
-        <actuatorfrc name="torque_joint13" actuator="servo_13"/>
-        <actuatorfrc name="torque_joint14" actuator="servo_14"/>
+        <actuatorfrc name="torque_joint1" actuator="servo_1" noise="0.1"/>
+        <actuatorfrc name="torque_joint2" actuator="servo_2" noise="0.1"/>
+        <actuatorfrc name="torque_joint3" actuator="servo_3" noise="0.1"/>
+        <actuatorfrc name="torque_joint4" actuator="servo_4" noise="0.1"/>
+        <actuatorfrc name="torque_joint5" actuator="servo_5" noise="0.1"/>
+        <actuatorfrc name="torque_joint6" actuator="servo_6" noise="0.1"/>
+        <actuatorfrc name="torque_joint7" actuator="servo_7" noise="0.1"/>
+        <actuatorfrc name="torque_joint8" actuator="servo_8" noise="0.1"/>
+        <actuatorfrc name="torque_joint9" actuator="servo_9" noise="0.1"/>
+        <actuatorfrc name="torque_joint10" actuator="servo_10" noise="0.1"/>
+        <actuatorfrc name="torque_joint11" actuator="servo_11" noise="0.1"/>
+        <actuatorfrc name="torque_joint12" actuator="servo_12" noise="0.1"/>
+        <actuatorfrc name="torque_joint13" actuator="servo_13" noise="0.1"/>
+        <actuatorfrc name="torque_joint14" actuator="servo_14" noise="0.1"/>
 
         <!-- index 48 - 51 -->
-        <framequat name="head_quat" objtype="site" objname="s_head"/>
+        <framequat name="head_quat" objtype="site" objname="s_head" noise="0.05"/>
 
         <!-- index 52 - 107 -->
-        <framequat name="link1_quat" objtype="site" objname="s_link1"/>
-        <framequat name="link2_quat" objtype="site" objname="s_link2"/>
-        <framequat name="link3_quat" objtype="site" objname="s_link3"/>
-        <framequat name="link4_quat" objtype="site" objname="s_link4"/>
-        <framequat name="link5_quat" objtype="site" objname="s_link5"/>
-        <framequat name="link6_quat" objtype="site" objname="s_link6"/>
-        <framequat name="link7_quat" objtype="site" objname="s_link7"/>
-        <framequat name="link8_quat" objtype="site" objname="s_link8"/>
-        <framequat name="link9_quat" objtype="site" objname="s_link9"/>
-        <framequat name="link10_quat" objtype="site" objname="s_link10"/>
-        <framequat name="link11_quat" objtype="site" objname="s_link11"/>
-        <framequat name="link12_quat" objtype="site" objname="s_link12"/>
-        <framequat name="link13_quat" objtype="site" objname="s_link13"/>
-        <framequat name="tail_quat" objtype="site" objname="s_tail"/>
-        <torque name="head_torque" site="s_head" />
+        <framequat name="link1_quat" objtype="site" objname="s_link1" noise="0.05"/>
+        <framequat name="link2_quat" objtype="site" objname="s_link2" noise="0.05"/>
+        <framequat name="link3_quat" objtype="site" objname="s_link3" noise="0.05"/>
+        <framequat name="link4_quat" objtype="site" objname="s_link4" noise="0.05"/>
+        <framequat name="link5_quat" objtype="site" objname="s_link5" noise="0.05"/>
+        <framequat name="link6_quat" objtype="site" objname="s_link6" noise="0.05"/>
+        <framequat name="link7_quat" objtype="site" objname="s_link7" noise="0.05"/>
+        <framequat name="link8_quat" objtype="site" objname="s_link8" noise="0.05"/>
+        <framequat name="link9_quat" objtype="site" objname="s_link9" noise="0.05"/>
+        <framequat name="link10_quat" objtype="site" objname="s_link10" noise="0.05"/>
+        <framequat name="link11_quat" objtype="site" objname="s_link11" noise="0.05"/>
+        <framequat name="link12_quat" objtype="site" objname="s_link12" noise="0.05"/>
+        <framequat name="link13_quat" objtype="site" objname="s_link13" noise="0.05"/>
+        <framequat name="tail_quat" objtype="site" objname="s_tail" noise="0.05"/>
+        <torque name="head_torque" site="s_head" noise="0.05"/>
 
     </sensor>
 </mujoco>

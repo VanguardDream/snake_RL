@@ -146,8 +146,7 @@ class SnakeEnv(MujocoEnv, utils.EzPickle):
 
     def step(self, action):
         action = 0.5 * (action) * self.M_matrix[:,self.k].copy()
-        print(action)
-
+        
         # xy_position_before = self.data.qpos[0:2].copy()
         xy_position_before = self.data.xpos[1][0:2].copy()
 

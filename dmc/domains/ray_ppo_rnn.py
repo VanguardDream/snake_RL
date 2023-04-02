@@ -1,10 +1,11 @@
 import gymnasium as gym
 
 # Gym env
-from snake_v6.envs.SnakeEnv import SnakeEnv
+from snake_v8.envs.SnakeEnv import SnakeEnv
 
 # import rl 알고리즘
 from ray.rllib.algorithms.ppo import PPOConfig 
+from ray import tune
 # from ray.rllib.algorithms.algorithm_config import AlgorithmConfig
 from ray.rllib.models import ModelCatalog
 from ray.rllib.models.modelv2 import ModelV2
@@ -17,27 +18,26 @@ from ray.tune.registry import register_env
 from ray.tune.logger import pretty_print
 
 
-register_env("snake-v6", lambda config: SnakeEnv())
+register_env("snake-v8", lambda config: SnakeEnv())
 
 algo = (
     PPOConfig()
     .rollouts(num_rollout_workers=16,)
     .resources(num_gpus=1)
-    .environment(env="snake-v6")
+    .environment(env="snake-v8")
     .framework('torch')
     .training(gamma=0.9, 
-              lr=0.0001,
+              lr=0.001,
               sgd_minibatch_size=8192,
-              train_batch_size=160000,
+              train_batch_size=320000,
               model= {
-        "fcnet_hiddens": [256, 512, 256, 128, 64], 
+        "fcnet_hiddens": [512, 512, 512, 512, 512, 512], 
         "use_lstm" : True,  
-        "max_seq_len": 310,
+        "max_seq_len": 150,
         "lstm_use_prev_action": True,
         "lstm_cell_size": 256, 
-        "_time_major": True,
     })
-    .evaluation(evaluation_interval=25)
+    .evaluation(evaluation_interval=10)
     .build()
 )
 

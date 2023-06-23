@@ -170,25 +170,45 @@ def op_param_simulation_phase(v:np.array):
     print(val)
 
 # Simulation example code
-# t_range = np.arange(0, 2 * np.pi, gait_sampling_interval).transpose()
 gait_param = selected_gait_parameters[0][:]
-
 M = genMotionMat(serpenoid(t_range, gait_param[0], gait_param[1], gait_param[2], gait_param[3], gait_param[4]))
-P = fourierApprox(t_range[:-2], curve_function_parameters)
-u = np.multiply(M, P)
-k = 0
 
 # loadmat = scipy.io.loadmat("powell_phase_1_result_20230623-002016.mat")
 # load_value = loadmat['result_value']
 # load_vector = loadmat['result_vector']
 
-# op_param_simulation_phase(load_vector[0,:])
+# load_vector = np.array([[2.71,	0.25,	-0.10,	-0.12,	-0.71]])
+
+# # op_param_simulation_phase(load_vector[0,:])
+# op_param_simulation_phase(np.array([2.71,	0.25,	-0.10,	-0.12,	-0.71]))
 
 # exit()
 
-# fig = plt.pcolor(u)
-# plt.show()
-# exit()
+load_vector = np.array([[2.71,	0.25,	-0.10,	-0.12,	-0.71]])
+t = np.arange(0,1.99 * np.pi, 2*np.pi/61).transpose()
+P = fourierApprox_phase(t, load_vector[0,:])
+u = np.multiply(M, P)
+
+fig = plt.pcolor(u)
+
+fig2, axs = plt.subplots(14)
+axs[0].plot(t, P[0, :])
+axs[1].plot(t, P[1, :])
+axs[2].plot(t, P[2, :])
+axs[3].plot(t, P[3, :])
+axs[4].plot(t, P[4, :])
+axs[5].plot(t, P[5, :])
+axs[6].plot(t, P[6, :])
+axs[7].plot(t, P[7, :])
+axs[8].plot(t, P[8, :])
+axs[9].plot(t, P[9, :])
+axs[10].plot(t, P[10, :])
+axs[11].plot(t, P[11, :])
+axs[12].plot(t, P[12, :])
+axs[13].plot(t, P[13, :])
+
+plt.show()
+exit()
 
 # Optimize
 def J(v0:np.array):
@@ -242,23 +262,27 @@ def J_phase(v:np.array):
     return -1 * val
 
 from scipy.optimize import minimize
+from scipy.optimize import Bounds
 from scipy.io import savemat
 import datetime
 
 t_start = datetime.datetime.now()
-v0 = -1 + (1+1)*np.random.rand(5)
+
+op_method = 'powell'
+op_iter = 2
+op_variables = 5
+op_bound = Bounds(lb=[-2.7] * op_variables, ub=[2.7] * op_variables)
+
+v0 = -1 + (1+1)*np.random.rand(op_variables)
 res_val = np.empty((0,1))
 res_vec = np.empty((0,np.size(v0)))
 res_done = np.empty((0,1))
 
-op_method = 'powell'
-op_iter = 100
-
 for _ in range(op_iter):
 
-    v0 = -1 + (1+1)*np.random.rand(5)
+    v0 = -1 + (1+1)*np.random.rand(op_variables)
 
-    res = minimize(J_phase, v0, method=op_method)
+    res = minimize(J_phase, v0, method=op_method, bounds=op_bound)
 
     res_val = np.vstack((res_val, res['fun']))
     res_vec = np.vstack((res_vec, res['x']))
@@ -269,6 +293,6 @@ for _ in range(op_iter):
     t_start = t_done
 
 matdata = {"result_value" : res_val, "result_vector" : res_vec, "result_done" : res_done}
-f_name = t_done.strftime(op_method + "_phase_" + str(op_iter) +"_result_%Y%m%d-%H%M%S.mat")
+f_name = t_done.strftime(op_method + "_v" +str(op_variables) +"_phase_" + str(op_iter) +"_result_%Y%m%d-%H%M%S.mat")
 
 savemat(f_name,matdata)

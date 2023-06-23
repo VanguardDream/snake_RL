@@ -130,49 +130,50 @@ P = fourierApprox(t_range[:-2], curve_function_parameters)
 u = np.multiply(M, P)
 k = 0
 
-loadmat = scipy.io.loadmat("powell_10_result_20230622-194817.mat")
-load_value = loadmat['result_value']
-load_vector = loadmat['result_vector']
+# loadmat = scipy.io.loadmat("powell_10_result_20230622-194817.mat")
+# load_value = loadmat['result_value']
+# load_vector = loadmat['result_vector']
 
-op_param_simulation(load_vector[1,:])
+# op_param_simulation(load_vector[1,:])
 
-op_v = load_vector[14,:]
-op_v = op_v.reshape(14,-1)
+# op_v = load_vector[14,:]
+# op_v = op_v.reshape(14,-1)
 
-viewer = mujoco_viewer.MujocoViewer(snake,simdata)
-mujoco.mj_forward(snake,simdata)
+# viewer = mujoco_viewer.MujocoViewer(snake,simdata)
+# mujoco.mj_forward(snake,simdata)
 
-for cases in range (3):
-    # v = -1 + (1+1)*np.random.rand(14,9)
-    P = fourierApprox(t_range[:-2], op_v)
-    u = np.multiply(M, P)
-    k = 0
+# for cases in range (3):
+#     # v = -1 + (1+1)*np.random.rand(14,9)
+#     P = fourierApprox(t_range[:-2], op_v)
+#     u = np.multiply(M, P)
+#     k = 0
 
-    for _ in range(1830):
-        k = k % np.shape(u)[1]
+#     for _ in range(1830):
+#         k = k % np.shape(u)[1]
 
-        simdata.ctrl = u[:,k]
+#         simdata.ctrl = u[:,k]
 
-        if _ % 10 == 0:
-            k = k + 1
+#         if _ % 10 == 0:
+#             k = k + 1
         
-        simdata.qpos[-2:] = get_robot_com(simdata)
-        mujoco.mj_step(snake,simdata)
-        viewer.render()
+#         simdata.qpos[-2:] = get_robot_com(simdata)
+#         mujoco.mj_step(snake,simdata)
+#         viewer.render()
 
-    val = simdata.qpos[-2] - np.abs(simdata.qpos[-1])
-    print(val)
-    mujoco.mj_resetData(snake,simdata)
+#     val = simdata.qpos[-2] - np.abs(simdata.qpos[-1])
+#     print(val)
+#     mujoco.mj_resetData(snake,simdata)
 
-fig = plt.pcolor(u)
-plt.show()
-exit()
+# fig = plt.pcolor(u)
+# plt.show()
+# exit()
 
 # Optimize
 def J(v0:np.array):
     # print("Initiated with "+str(v0),end='\r')
+    t = np.arange(0,1.99 * np.pi, 2*np.pi/61).transpose()
     v = v0.reshape(14,-1)
-    P = fourierApprox(t_range[:-2], v)
+    P = fourierApprox(t, v)
     # M = genMotionMat(serpenoid(t_range, gait_param[0], gait_param[1], gait_param[2], gait_param[3], gait_param[4]))
     u = np.multiply(M, P)
     k = 0
@@ -195,21 +196,25 @@ def J(v0:np.array):
     return -1 * val
 
 from scipy.optimize import minimize
+from scipy.optimize import Bounds
 from scipy.io import savemat
 import datetime
 
 t_start = datetime.datetime.now()
-v0 = -1 + (1+1)*np.random.rand(14*9)
+
+op_method = 'powell'
+op_iter = 2
+op_variables = 5
+op_bound = Bounds(lb=[-2.7] * (14 * op_variables), ub=[2.7] * (14 * op_variables), keep_feasible=True)
+
+v0 = -1 + (1+1)*np.random.rand(14 * op_variables)
 res_val = np.empty((0,1))
 res_vec = np.empty((0,np.size(v0)))
 res_done = np.empty((0,1))
 
-op_method = 'powell'
-op_iter = 10
-
 for _ in range(op_iter):
 
-    v0 = -1 + (1+1)*np.random.rand(14*9)
+    v0 = -1 + (1+1)*np.random.rand(14 * op_variables)
 
     res = minimize(J, v0, method=op_method)
 
@@ -222,6 +227,6 @@ for _ in range(op_iter):
     t_start = t_done
 
 matdata = {"result_value" : res_val, "result_vector" : res_vec, "result_done" : res_done}
-f_name = t_done.strftime(op_method + "_" + str(op_iter) +"_result_%Y%m%d-%H%M%S.mat")
+f_name = t_done.strftime(op_method + "_v" +str(op_variables) +"_" + str(op_iter) +"_result_%Y%m%d-%H%M%S.mat")
 
 savemat(f_name,matdata)

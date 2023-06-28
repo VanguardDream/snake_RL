@@ -23,6 +23,6 @@ end
 total_data = table(merge_done, merge_value, merge_vector);
 total_data = sortrows(total_data,2);
 
-% result.done = total_data.merge_done;
-% result.value = total_data.merge_value;
-% result.vector = total_data.merge_vector;
+result_done = total_data.merge_done;
+result_value = total_data.merge_value;
+result_vector = total_data.merge_vector;

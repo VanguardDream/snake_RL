@@ -17,7 +17,17 @@ algo = (
     .resources(num_gpus=0.95)
     .environment(env="snake_v5")
     .framework('torch')
-    .training(gamma=0.995, lr=0.0001, clip_param=0.2, kl_coeff=1.0, num_sgd_iter=20, sgd_minibatch_size=16384, train_batch_size=160000, model= {"fcnet_hiddens": [128, 128, 64, 64, 32], "free_log_std" : True }, )
+    .training(gamma=0.995, 
+              lr=0.0001, 
+              clip_param=0.2, 
+              kl_coeff=1.0, 
+              num_sgd_iter=20, 
+              sgd_minibatch_size=16384, 
+              train_batch_size=320000, 
+              model= {"fcnet_hiddens": [256, 256, 128, 128, 64], 
+                      "free_log_std" : True, 
+                      }, 
+                      )
     .build()
 )
 
@@ -25,6 +35,6 @@ for i in range(500):
     result = algo.train()
     # print(pretty_print(result))
 
-    if (i % 25 == 0) and (i != 0):
+    if (i + 1) % 25 == 0:
         checkpoint_dir = algo.save()
         print(f"Checkpoint saved in directory {checkpoint_dir}    \r")

@@ -7,7 +7,7 @@
 <mujoco model="snake-dgist">
 
     <option timestep="0.01">
-        <flag sensornoise="enable"/>
+        <!-- <flag sensornoise="enable"/> -->
     </option>
 
     <asset>
@@ -246,6 +246,8 @@
         <framequat name="link12_quat" objtype="site" objname="s_link12" noise="0.05"/>
         <framequat name="link13_quat" objtype="site" objname="s_link13" noise="0.05"/>
         <framequat name="tail_quat" objtype="site" objname="s_tail" noise="0.05"/>
+
+        <!-- index 108 - 111 -->
         <torque name="head_torque" site="s_head" noise="0.05"/>
 
     </sensor>

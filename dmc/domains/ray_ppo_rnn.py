@@ -1,4 +1,5 @@
 import gymnasium as gym
+import time
 
 # Gym env
 from snake_v8.envs.SnakeEnv import SnakeEnv
@@ -41,10 +42,13 @@ algo = (
     .build()
 )
 
+algo.restore('C:\\Users\\doore\\ray_results\\PPO_snake-v8_Base_925-1050\\checkpoint_001050')
+
 for i in range(1000):
     result = algo.train()
-    # print(pretty_print(result))
+    print(pretty_print(result))
 
     if ((i + 1) % 25 == 0):
         checkpoint_dir = algo.save()
+        
         print(f"Checkpoint saved in directory {checkpoint_dir}  \r")

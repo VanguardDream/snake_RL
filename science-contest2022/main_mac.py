@@ -29,6 +29,7 @@ else:
 BLACK = pygame.Color('black')
 WHITE = pygame.Color('white')
 
+ADDR_SHUTDOWN_FLAG          = 63
 ADDR_TORQUE_ENABLE          = 64
 ADDR_GOAL_POSITION          = 116
 ADDR_PRESENT_POSITION       = 132
@@ -66,6 +67,9 @@ else:
     print("Press any key to terminate...")
     getch()
     quit()
+
+for i in range(14):
+    packetHandler.write4ByteTxOnly(portHandler, (i), ADDR_SHUTDOWN_FLAG, 0x14)
 
 # This is a simple class that will help us print to the screen.
 # It has nothing to do with the joysticks, just outputting the
@@ -122,9 +126,18 @@ done = False
 controller = np.array([0, 0, 0, 0, 0, 0, 0],dtype=np.float16) # axis 0 ~ 2 and bt5
 bt_flip = False
 
-side_gait = g.gait(2, 37.2, 37.4, -8, 51.9, 61.7, 1, 1)
+side_gait = g.gait(2, 37.2, 37.4, -8, 51.9, 61.7, 1, 2) #과학축제 시연할 때,
+# side_gait = g.gait(2, 52.76,	319.65,	1.99,	72.07,	262.95,	7.91,	1) #EAAI Optimal (윗방향잘됨)
+# side_gait = g.gait(2, 37.2,     37.4,   -8,     61.9,   61.7,   1 ,  2) #paper? Optimal (아랫방향잘됨)
+
+
+# side_u_gait = g.gait(2, 52.76,	319.65,	1.99,	72.07,	262.95,	7.91,	1) #EAAI Optimal (윗방향잘됨)
+# side_d_gait = g.gait(2, 37.2,     37.4,   -8,     61.9,   61.7,   1 ,  2) #paper? Optimal (아랫방향잘됨)
+
 # serp_gait = g.gait(1, 55.7, 57.2, -9.5, 70.5, 76.5, 10, 1) #원래
-serp_gait = g.gait(1, 33.8, 189.9, -9.1, 36.5, 160.9, 7.0, 1) #모터가 죽어서 새로운 것
+# serp_gait = g.gait(1, 33.8, 189.9, -9.1, 36.5, 160.9, 7.0, 1) #모터가 죽어서 새로운 것
+
+serp_gait = g.gait(1, 39.8, 189.9, -9.1, 48.5, 160.9, 7.0, 1) #EAAI
 rot_gait = g.gait(2, 15,   116,     1,    52,    98,     1,     1)
 rot2_gait = g.gait(2, 15,   107,     5,    52,    91,    -7,     1)
 
@@ -167,6 +180,13 @@ def pthread():
                 elif ax_idx == 1:
                     motor_comand = serp_gait.generate(k) * abs(gait_comm[ax_idx])
                     motor_idx = serp_gait.commandIdx(k)
+                # elif ax_idx == 2:
+                #     if gait_comm[ax_idx] > 0:
+                #         motor_comand = side_d_gait.generate(k) * abs(gait_comm[ax_idx])
+                #         motor_idx = side_d_gait.commandIdx(k)
+                #     else:
+                #         motor_comand = side_gait.generate(k) * abs(gait_comm[ax_idx])
+                #         motor_idx = side_gait.commandIdx(k)
                 elif ax_idx == 2:
                     motor_comand = side_gait.generate(k) * abs(gait_comm[ax_idx])
                     motor_idx = side_gait.commandIdx(k)

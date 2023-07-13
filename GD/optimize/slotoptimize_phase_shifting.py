@@ -221,16 +221,17 @@ def op_param_simulation_phase(v:np.array):
 gait_param = selected_gait_parameters[0][:]
 M = genMotionMat(serpenoid(t_range, gait_param[0], gait_param[1], gait_param[2], gait_param[3], gait_param[4])).copy()
 
-# loadmat = scipy.io.loadmat("powell_v9_phase_1_result_20230628-204515.mat")
-# load_value = loadmat['result_value']
-# load_vector = loadmat['result_vector']
+loadmat = scipy.io.loadmat("powell_v3_phase_50_result_20230703-105112.mat")
+load_value = loadmat['result_value']
+load_vector = loadmat['result_vector']
 
-# op_param_simulation_phase(load_vector[0,:])
-
-# exit()
+# op_param_simulation_phase(load_vector[2,:])
+op_param_simulation_phase(np.array([2.0]))
+exit()
 
 # t = np.arange(0,1.9999 * np.pi, 2*np.pi/61).transpose()
-# P = fourierApprox_phase(t, load_vector[0,:])
+# # P = fourierApprox_phase(t, load_vector[2,:])
+# P = fourierApprox_phase(t, np.array([0.7]))
 # u = np.multiply(M, P)
 
 # fig = plt.pcolor(u)
@@ -284,22 +285,22 @@ def J(v0:np.array):
 def J_phase(v:np.array):
     # print("Initiated with "+str(v0),end='\r')
     t = np.arange(0,1.99 * np.pi, 2*np.pi/61).transpose()
-    P = fourierApprox_phase(t, v)
+    P = fourierApprox_phase(t, v).copy()
     # M = genMotionMat(serpenoid(t_range, gait_param[0], gait_param[1], gait_param[2], gait_param[3], gait_param[4]))
-    u = np.multiply(M, P)
+    u = np.multiply(M, P).copy()
     k = 0
 
     mujoco.mj_resetData(snake,simdata)
+    mujoco.mj_forward(snake,simdata)
 
     for _ in range(1830):
-        k = k % np.shape(u)[1]
-
-        simdata.ctrl = u[:,k]
+        simdata.ctrl = u[:,k].copy()
 
         if _ % 10 == 0:
             k = k + 1
+            k = k % np.shape(u)[1]
         
-        simdata.qpos[-2:] = get_robot_com(simdata)
+        simdata.qpos[-2:] = get_robot_com(simdata).copy()
         mujoco.mj_step(snake,simdata)
 
     val = simdata.qpos[-2] - np.abs(simdata.qpos[-1])
@@ -366,27 +367,31 @@ import datetime
 
 t_start = datetime.datetime.now()
 
-op_method = 'Nelder-Mead'
-# op_method = 'powell'
-op_iter = 100
-op_variables = 19
-op_bound = Bounds(lb= [0.0] + ([-0.2] * (op_variables - 1)), ub= [1.0] + ([0.2] * (op_variables - 1)))
-op_option = {'adaptive':True}
+# op_method = 'Nelder-Mead'
+# op_option = {'adaptive':True}
+op_method = 'powell'
+op_option = {}
 
-v0 = -2.7 + (2.7+2.7)*np.random.rand(op_variables)
-v0[0] = 2.7 * np.random.random(1)
+op_iter = 50
+op_variables = 1
+op_bound = Bounds(lb= [0.0] + ([-0.75] * (op_variables - 1)), ub= [3.0] + ([0.75] * (op_variables - 1)))
+
+v0 = np.random.rand(op_variables)
+v0[0] = np.random.random(1)
 
 res_val = np.empty((0,1))
 res_vec = np.empty((0,np.size(v0)))
+res_initvec = np.empty((0,np.size(v0)))
 res_done = np.empty((0,1))
 
 for _ in range(op_iter):
 
-    v0 = -0.2 + (0.2+0.2)*np.random.rand(op_variables)
-    v0[0] = 1.0 * np.random.random(1)
+    v0 = -0.75 + (0.75+0.75)*np.random.rand(op_variables)
+    v0[0] = 3.0 * np.random.random(1)
 
-    res = minimize(J_phase_orientation, v0, method=op_method, bounds=op_bound, options=op_option)
+    res = minimize(J_phase, v0, method=op_method, bounds=op_bound, options=op_option)
 
+    res_initvec = np.vstack((res_initvec, v0))
     res_val = np.vstack((res_val, res['fun']))
     res_vec = np.vstack((res_vec, res['x']))
     res_done = np.vstack((res_done, res['success']))
@@ -395,7 +400,7 @@ for _ in range(op_iter):
     print(f"Time elapsed : {(t_done - t_start).seconds}")
     t_start = t_done
 
-matdata = {"result_value" : res_val, "result_vector" : res_vec, "result_done" : res_done}
+matdata = {"result_value" : res_val, "result_vector" : res_vec, "result_done" : res_done, "result_init_vector" : res_initvec}
 f_name = t_done.strftime(op_method + "_v" +str(op_variables) +"_phase_" + str(op_iter) +"_result_%Y%m%d-%H%M%S.mat")
 
 savemat(f_name,matdata)

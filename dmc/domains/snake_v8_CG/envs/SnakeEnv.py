@@ -92,7 +92,7 @@ class SnakeEnv(MujocoEnv, utils.EzPickle):
         head_R = Rotation.from_quat([__model_sensordata[49], __model_sensordata[50], __model_sensordata[51], __model_sensordata[48]])
         head_rotvec = head_R.as_rotvec(degrees=True).copy()    
 
-        forward_reward = x_velocity
+        forward_reward = com_x_velocity
         # torque_cost = 0.3 * np.linalg.norm(__model_sensordata[-3:],1).copy()
 
         orientation_reward = 0
@@ -110,7 +110,7 @@ class SnakeEnv(MujocoEnv, utils.EzPickle):
         #     terminated_reward = -10
         #     terminated = True
 
-        if (np.round(self.data.time * (1/100))) >= 20 * 61: #Check! MuJoCo 10 Sim-step -> RL 1 action step!
+        if (np.round(self.data.time)) >= 3 * 61: #Check! MuJoCo 10 Sim-step -> RL 1 action step!
             # terminated_reward = 50 * xy_position_after[0] - 30 * np.abs(xy_position_after[1])
             # print(self.data.time)
             terminated = True

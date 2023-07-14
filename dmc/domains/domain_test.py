@@ -1,5 +1,5 @@
-import snake_v8_CG
-import snake_v8_mk1
+# import snake_v8_CG
+# import snake_v8_mk1
 import snake_v8_mk3
 import time as te
 import numpy as np
@@ -17,10 +17,10 @@ action = gym.spaces.Box(low= -3.0, high= 3.0, shape=(14,))
 
 r = 0
 env.reset()
-for testing in range(1):
-    for time in range(1000):
+for testing in range(10):
+    for time in range(90):
         # _act = env.action_space.sample()
-        _obs, _reward, done, _, _dict = env.step(0.4 * np.ones((14,)))
+        _obs, _reward, done, _, _dict = env.step(0.5 * np.ones((14,)))
         # _obs, _reward, done, _, _dict = env.step(_act)
         r = r + _reward
         if done:
@@ -29,7 +29,8 @@ for testing in range(1):
 
         
         # _obs, _reward, done, _, _dict = env.step(np.array([1]+[0]*13))
-        print(f"{_dict['com_angular_velocity']}")
+        # print(f"{_dict['com_angular_velocity']}",end="   ")
+        print(f"{_dict['com_rotation']}")
         # print(np.argmax(_dict['head_torque']))
         # print(f"forward : {_dict['forward_reward']} head torque : {_dict['head_torque_cost']} terminated : {_dict['terminated_reward']}")
     print(f"Done {r}")

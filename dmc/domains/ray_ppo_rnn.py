@@ -42,7 +42,7 @@ algo = (
     .build()
 )
 
-algo.restore('C:\\Users\\doore\\ray_results\\PPO_snake-v8_Base_925-1050\\checkpoint_001050')
+# algo.restore('C:\\Users\\Bong\\ray_results\\PPO_snake-v8_Base_925-1050\\checkpoint_001050')
 
 for i in range(1000):
     result = algo.train()

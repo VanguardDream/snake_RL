@@ -171,7 +171,7 @@ class SnakeEnv(MujocoEnv, utils.EzPickle):
         com_x_velocity, com_y_velocity = com_xy_velocity
         
         after_R = Rotation.from_quat(com_quat_after)
-        diff_quat = self.__quaternion_multiply(before_R.as_quat(canonical=True), np.array([-1 * com_quat_after[0], -1 * com_quat_after[1], -1 * com_quat_after[2], com_quat_after[3]]))
+        diff_quat = self.__quaternion_multiply(np.array([-1 * com_quat_before[0], -1 * com_quat_before[1], -1 * com_quat_before[2], com_quat_before[3]]), after_R.as_quat(canonical=True))
         # diff_quat = before_R.as_quat() * [-1 * com_quat_after[0], -1 * com_quat_after[1], -1 * com_quat_after[2], com_quat_after[3]]
         com_diff_rotvec = Rotation.from_quat(diff_quat).as_rotvec()
         com_angular_vel = com_diff_rotvec / self.dt
@@ -181,6 +181,12 @@ class SnakeEnv(MujocoEnv, utils.EzPickle):
 
         observation = self._get_obs()
         __model_sensordata = self.data.sensordata.copy()
+
+        if __model_sensordata[48] < 0:
+            __model_sensordata[48] = -1 * __model_sensordata[48]
+            __model_sensordata[49] = -1 * __model_sensordata[49]
+            __model_sensordata[50] = -1 * __model_sensordata[50]
+            __model_sensordata[51] = -1 * __model_sensordata[51]
 
         head_R = Rotation.from_quat([__model_sensordata[49], __model_sensordata[50], __model_sensordata[51], __model_sensordata[48]])
         head_rotvec = head_R.as_rotvec(degrees=True).copy()    
@@ -238,7 +244,7 @@ class SnakeEnv(MujocoEnv, utils.EzPickle):
             "head_orientation" : __model_sensordata[48:52].copy(),
             "head_rotation" : head_rotvec,
             "head_torque" : __model_sensordata[-3:].copy(),
-            "com_rotation" : after_R.as_rotvec().copy(),
+            "com_rotation" : after_R.as_rotvec(degrees=True).copy(),
             "com_angular_velocity" : com_angular_vel.copy(),
         }
 
@@ -280,7 +286,7 @@ class SnakeEnv(MujocoEnv, utils.EzPickle):
         return np.array([accum_x / len_names, accum_y / len_names])
     
     def get_body_rot(self):
-        _sensor_data = self.data.sensordata[48:108].copy()
+        _sensor_data = self.data.sensordata[48:104].copy()
         orientaions_com = np.reshape(_sensor_data,(-1,4)).copy()  
         new_order_orientaions_com = orientaions_com[:, [1, 2, 3, 0]].copy()
 
@@ -292,8 +298,8 @@ class SnakeEnv(MujocoEnv, utils.EzPickle):
     
 
     def __quaternion_multiply(self, q1, q2):
-        w1, x1, y1, z1 = q1
-        w2, x2, y2, z2 = q2
+        x1, y1, z1, w1 = q1
+        x2, y2, z2, w2 = q2
         
         w = w1*w2 - x1*x2 - y1*y2 - z1*z2
         x = w1*x2 + x1*w2 + y1*z2 - z1*y2

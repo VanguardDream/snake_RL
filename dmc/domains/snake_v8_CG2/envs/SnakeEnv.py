@@ -1,5 +1,5 @@
 __author__ = ["Bongsub Song"]
-# Mark 2 Env
+# Control group2 Env
 
 import numpy as np
 import pandas as pd
@@ -14,34 +14,6 @@ from scipy.spatial.transform import Rotation
 __location__ = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
 __location__ = pathlib.Path(__location__)
 __model_location__ = __location__.parent.parent.parent.joinpath('models')
-
-def serpenoid(t, b, b2, a, a2, e_d1, e_d2, e_l1, e_l2, delta):
-    #Hirose (1993) serpenoid curve implementations
-    f1 = e_d2 * t
-    f2 = e_l2 * t
-
-    j_1 = b + a * np.sin(e_d1 + f1)
-    j_2 = b2 + a2 * np.sin(e_l1 * 2 + f2 + delta)
-
-    j_3 = b + a * np.sin(e_d1 * 3 + f1)
-    j_4 = b2 + a2 * np.sin(e_l1 * 4 + f2 + delta)
-
-    j_5 = b + a * np.sin(e_d1 * 5 + f1)
-    j_6 = b2 + a2 * np.sin(e_l1 * 6 + f2 + delta)
-
-    j_7 = b + a * np.sin(e_d1 * 7 + f1)
-    j_8 = b2 + a2 * np.sin(e_l1 * 8 + f2 + delta)
-
-    j_9 = b + a * np.sin(e_d1 * 9 + f1)
-    j_10 = b2 + a2 * np.sin(e_l1 * 10 + f2 + delta)
-
-    j_11 = b + a * np.sin(e_d1 * 11 + f1)
-    j_12 = b2 + a2 * np.sin(e_l1 * 12 + f2 + delta)
-
-    j_13 = b + a * np.sin(e_d1 * 13 + f1)
-    j_14 = b2 + a2 * np.sin(e_l1 * 14 + f2 + delta)
-
-    return np.array([j_1, j_2, j_3, j_4, j_5, j_6, j_7, j_8, j_9, j_10, j_11, j_12, j_13, j_14])
 
 class SnakeEnv(MujocoEnv, utils.EzPickle):
     metadata = {
@@ -69,78 +41,26 @@ class SnakeEnv(MujocoEnv, utils.EzPickle):
         self._goal_orientation = __Rot_goal_orientation.as_rotvec(degrees=True)
         self._robot_body_names = ["head","link1","link2","link3","link4","link5","link6","link7","link8","link9","link10","link11","link12","link13","tail"]
 
-        self.__max_spaces = np.array(_slot_space + _joint_pos_space + _joint_vel_space,dtype=np.float64)
+        self.__max_spaces = np.array(_joint_pos_space + _joint_vel_space,dtype=np.float64)
         self.__min_spaces = -1 * self.__max_spaces.copy()
 
-        self.observation_space = spaces.Box(low=self.__min_spaces, high=self.__max_spaces, shape=(42,),dtype=np.float64) # M_col and 48 sensordatas -> 14 + 48 => 62
+        self.observation_space = spaces.Box(low=self.__min_spaces, high=self.__max_spaces, shape=(28,),dtype=np.float64) # M_col and 48 sensordatas -> 14 + 48 => 62
 
         # Create mujoco env instance
         MujocoEnv.__init__(self, os.path.join(__model_location__,'ramp_w_snake.xml'), frame_skip, observation_space= self.observation_space, **kwargs)
 
         # Action Space
-        self.action_space = spaces.Box(low= 0.0, high= 3.0, shape=(14,))
+        self.action_space = spaces.Box(low= -3.0, high= 3.0, shape=(14,))
         # self.action_space = spaces.MultiDiscrete(np.array([7]*14))
 
         # Physics variables
-        self.k = 0
         self.action_frequency = 0.1
         self.timestep = self.model.opt.timestep
         self.time = self.data.time
         self.frame_skip = frame_skip
 
-        # Make gait motion matrix
-        ### Gait parameters
-        b = 0
-        b2 = 0
-
-        a = 1
-        a2 = 1
-
-        e_d1 = np.radians(45)
-        e_l1 = np.radians(45)
-
-        e_d2 = 1
-        e_l2 = 1
-
-        delta = np.radians(45) # for sidewinding
-        # delta = np.radians(0) # for serpenoid
-        # delta = np.radians(90) # for roll
-
-        t_range = np.arange(0, np.lcm(np.lcm(e_d2,e_l2), 2) * np.pi, self.action_frequency).transpose()
-
-        joint_pos = serpenoid(t_range, b, b2, a, a2, e_d1, e_d2, e_l1, e_l2, delta)
-        joint_vel = np.diff(joint_pos.copy()) * (1 / self.action_frequency)
-        joint_tor = np.diff(joint_vel.copy()) * (1 / self.action_frequency)
-
-        self.M_matrix = joint_tor.copy()
-
-        # print(np.shape(joint_pos))
-        # print(np.shape(joint_vel))
-        # print(np.shape(joint_tor))
-
-        # for i in range(np.shape(self.M_matrix)[0]):
-        #     for  j in range(np.shape(self.M_matrix)[1]):
-        #         if self.M_matrix[i][j] > np.amax(joint_pos[i,:]) * 0.75:
-        #             self.M_matrix[i][j] = 1
-        #         elif self.M_matrix[i][j] < np.amin(joint_pos[i,:]) * 0.75:
-        #             self.M_matrix[i][j] = -1
-        #         else:
-        #             self.M_matrix[i][j] = 0
-
-        for i in range(np.shape(self.M_matrix)[0]):
-            for  j in range(np.shape(self.M_matrix)[1]):
-                if self.M_matrix[i][j] > 0:
-                    self.M_matrix[i][j] = 1
-                elif self.M_matrix[i][j] < 0:
-                    self.M_matrix[i][j] = -1
-                else:
-                    self.M_matrix[i][j] = 1
-
-        # dataframe_mat = pd.DataFrame(self.M_matrix)
-        # dataframe_mat.to_csv('gait_mat.csv',index=False)
 
     def _get_obs(self):
-        _slot = self.M_matrix[:,self.k].copy()
         # _sensors = self.data.sensordata[0:20].copy()
         # _sensors = self.data.sensordata[0:48].copy()
 
@@ -148,18 +68,15 @@ class SnakeEnv(MujocoEnv, utils.EzPickle):
         _vel = self.data.sensordata[20:34].copy()
         # _tor = self.data.sensordata[34:48].copy()
         # _quat = self.data.sensordata[48:52].copy()
-        observation = np.clip(np.hstack((_slot, _pos, _vel)).copy(),a_min=self.__min_spaces, a_max=self.__max_spaces)
+        observation = np.clip(np.hstack((_pos, _vel)).copy(),a_min=self.__min_spaces, a_max=self.__max_spaces)
         return observation
 
     def step(self, action):
-        action = (action) * self.M_matrix[:,self.k].copy()
         
         com_xy_position_before = self.get_robot_com()
         xy_position_before = self.data.xpos[1][0:2].copy()
 
-        self.do_simulation(action, self.frame_skip)
-
-        self.k = np.mod(self.k + 1, np.shape(self.M_matrix)[1])
+        self.do_simulation(action.copy(), self.frame_skip)
 
         com_xy_position_after = self.get_robot_com()
         xy_position_after = self.data.xpos[1][0:2].copy()
@@ -187,13 +104,7 @@ class SnakeEnv(MujocoEnv, utils.EzPickle):
 
         self.data.qpos[-2:] = [com_xy_position_after[0], com_xy_position_after[1]]
 
-
-        # print(np.shape(self.M_matrix)[1])
-        # if np.abs(head_rotvec[0]) > 80:
-        #     terminated_reward = -10
-        #     terminated = True
-
-        if (np.round(self.data.time)) >= 2 * np.shape(self.M_matrix)[1]: #Check! MuJoCo 10 Sim-step -> RL 1 action step!
+        if (np.round(self.data.time)) >= 2 * 61: #Check! MuJoCo 10 Sim-step -> RL 1 action step!
             # terminated_reward = 50 * xy_position_after[0] - 30 * np.abs(xy_position_after[1])
             # print(self.data.time)
             terminated = True

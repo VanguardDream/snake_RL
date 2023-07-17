@@ -47,7 +47,7 @@ class SnakeEnv(MujocoEnv, utils.EzPickle):
         self.observation_space = spaces.Box(low=self.__min_spaces, high=self.__max_spaces, shape=(28,),dtype=np.float64) # M_col and 48 sensordatas -> 14 + 48 => 62
 
         # Create mujoco env instance
-        MujocoEnv.__init__(self, os.path.join(__model_location__,'ramp_w_snake.xml'), frame_skip, observation_space= self.observation_space, **kwargs)
+        MujocoEnv.__init__(self, os.path.join(__model_location__,'ramp_w_snake_arrows.xml'), frame_skip, observation_space= self.observation_space, **kwargs)
 
         # Action Space
         self.action_space = spaces.Box(low= -3.0, high= 3.0, shape=(14,))
@@ -73,16 +73,26 @@ class SnakeEnv(MujocoEnv, utils.EzPickle):
 
     def step(self, action):
         
-        com_xy_position_before = self.get_robot_com()
+        com_xyz_position_before = self.get_robot_com()
         xy_position_before = self.data.xpos[1][0:2].copy()
+        com_quat_before = self.get_body_rot().copy()
+        before_R = Rotation.from_quat(com_quat_before)
 
         self.do_simulation(action.copy(), self.frame_skip)
 
-        com_xy_position_after = self.get_robot_com()
+        com_xyz_position_after = self.get_robot_com()
         xy_position_after = self.data.xpos[1][0:2].copy()
+        com_quat_after = self.get_body_rot().copy()
 
-        com_xy_velocity = (com_xy_position_after - com_xy_position_before) / self.dt
-        com_x_velocity, com_y_velocity = com_xy_velocity
+        com_xyz_velocity = (com_xyz_position_after - com_xyz_position_before) / self.dt
+        com_x_velocity, com_y_velocity, com_z_velocity = com_xyz_velocity
+
+        after_R = Rotation.from_quat(com_quat_after)
+        diff_quat = self.__quaternion_multiply(np.array([-1 * com_quat_before[0], -1 * com_quat_before[1], -1 * com_quat_before[2], com_quat_before[3]]), after_R.as_quat(canonical=True))
+
+        com_diff_rotvec = Rotation.from_quat(diff_quat).as_rotvec()
+        com_angular_vel = com_diff_rotvec / self.dt
+
         xy_velocity = (xy_position_after - xy_position_before) / self.dt
         x_velocity, y_velocity = xy_velocity
 
@@ -102,30 +112,33 @@ class SnakeEnv(MujocoEnv, utils.EzPickle):
         terminated = False
         terminated_reward = 0        
 
-        self.data.qpos[-2:] = [com_xy_position_after[0], com_xy_position_after[1]]
+        self.data.qpos[-7:-4] = [com_xyz_position_after[0], com_xyz_position_after[1], com_xyz_position_after[2]].copy()
+        self.data.qpos[-4::] = [after_R.as_quat(canonical=True)[3], after_R.as_quat(canonical=True)[0], after_R.as_quat(canonical=True)[1], after_R.as_quat(canonical=True)[2]]
 
         if (np.round(self.data.time)) >= 2 * 61: #Check! MuJoCo 10 Sim-step -> RL 1 action step!
             # terminated_reward = 50 * xy_position_after[0] - 30 * np.abs(xy_position_after[1])
             # print(self.data.time)
             terminated = True
 
-        if com_xy_position_after[1] < -1.8:
+        if com_xyz_position_after[1] < -1.8:
             terminated = True
 
-        if com_xy_position_after[1] > 0.3:
+        if com_xyz_position_after[1] > 0.3:
             terminated = True
 
-        if np.abs(com_xy_position_after[0]) > 0.6:
+        if np.abs(com_xyz_position_after[0]) > 0.6:
             terminated = True
 
         reward = forward_reward + orientation_reward + terminated_reward - torque_cost
 
         info = {
             "distance_from_origin": np.linalg.norm(xy_position_after, ord=2),
-            "com_x_position": com_xy_position_after[0],
-            "com_y_position": com_xy_position_after[1],
+            "com_x_position": com_xyz_position_after[0],
+            "com_y_position": com_xyz_position_after[1],
+            "com_z_position": com_xyz_position_after[2],
             "com_x_velocity": com_x_velocity,
             "com_y_velocity": com_y_velocity,
+            "com_z_velocity": com_z_velocity,
             "head_x_position": xy_position_after[0],
             "head_y_position": xy_position_after[1],
             "head_x_velocity": x_velocity,
@@ -172,11 +185,35 @@ class SnakeEnv(MujocoEnv, utils.EzPickle):
     def get_robot_com(self):
         accum_x = 0
         accum_y = 0
+        accum_z = 0
         len_names = len(self._robot_body_names)
 
         for name in self._robot_body_names:
-            x, y, _ = self.data.body(name).xpos
+            x, y, z = self.data.body(name).xpos
             accum_x = accum_x + x
             accum_y = accum_y + y
+            accum_z = accum_z + z
 
-        return np.array([accum_x / len_names, accum_y / len_names])
+        return np.array([accum_x / len_names, accum_y / len_names, accum_z / len_names])
+
+    def get_body_rot(self):
+        _sensor_data = self.data.sensordata[48:104].copy()
+        orientaions_com = np.reshape(_sensor_data,(-1,4)).copy()  
+        new_order_orientaions_com = orientaions_com[:, [1, 2, 3, 0]].copy()
+
+        com_R = Rotation.from_quat(new_order_orientaions_com)
+        # rpy_com = com_R.mean().as_rotvec()
+        quat_com = com_R.mean().as_quat(canonical=True)
+
+        return quat_com
+
+    def __quaternion_multiply(self, q1, q2):
+        x1, y1, z1, w1 = q1
+        x2, y2, z2, w2 = q2
+        
+        w = w1*w2 - x1*x2 - y1*y2 - z1*z2
+        x = w1*x2 + x1*w2 + y1*z2 - z1*y2
+        y = w1*y2 - x1*z2 + y1*w2 + z1*x2
+        z = w1*z2 + x1*y2 - y1*x2 + z1*w2
+    
+        return np.array([x, y, z, w],dtype=np.float64)

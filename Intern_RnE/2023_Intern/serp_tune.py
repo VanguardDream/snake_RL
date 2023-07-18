@@ -56,47 +56,85 @@ def main(ia, ia2):
     a = np.radians(ia)
     a2 = np.radians(ia2)
 
-    b = 0
-    b2 = 0
+    b = np.radians(0)
+    b2 = np.radians(0)
 
-    e_d1 = np.radians(45)
-    e_l1 = np.radians(45)
+    e_d1 = np.radians(0)
+    e_l1 = np.radians(0)
 
     e_d2 = 1
     e_l2 = 1
 
-    delta = np.radians(0) # for serpenoid
+    # delta = np.radians(0) # for serpenoid
     # delta = np.radians(45) # for sidewinding
-    # delta = np.radians(90) # for roll
+    delta = np.radians(90) # for roll
 
-    for i in range(0,915):
+    print("Setting group communication objects...")
+    # Add parameter storage for Dynamixel#1 present position value
+    for idx in range(14):
+        dxl_addparam_result = gsread_PP.addParam(idx)
+        if dxl_addparam_result != True:
+            print("[ID:%03d] groupSyncRead addparam failed" % idx)
+            quit()
 
-        goal = serpenoid(i/50, b, b2,a, a2, e_d1, e_l1, e_d2, e_l2, delta)
+    for idx in range(14):
+        dxl_addparam_result = gsread_PV.addParam(idx)
+        if dxl_addparam_result != True:
+            print("[ID:%03d] groupSyncRead addparam failed" % idx)
+            quit()
+
+
+
+    for i in range(0,1830):
+        presentP = np.empty(14)
+        presentV = np.empty(14)
+        goal = serpenoid(i/10, b, b2,a, a2, e_d1, e_d2, e_l1, e_l2, delta)
 
         commandQ = time.time()
 
         goal = np.degrees(goal.copy())
-        goalP = np.uint32(2048 + goal.squeeze() * 0.088)
-
-        presentP = np.empty(14)
-        presentV = np.empty(14)
+        goalP = np.uint32(2048 + goal.squeeze() * (1 / 0.088))
 
         for idx in range(14):
             gswrite.addParam(idx, [DXL_LOBYTE(DXL_LOWORD(goalP[idx])), DXL_HIBYTE(DXL_LOWORD(goalP[idx])), DXL_LOBYTE(DXL_HIWORD(goalP[idx])), DXL_HIBYTE(DXL_HIWORD(goalP[idx]))])
-        
+                    
         while(True):
             t_period = time.time() - commandQ
 
-            if t_period > 0.02:
-                gswrite.txPacket()
+            if t_period > 0.01:
+                 # Syncwrite goal position
+                dxl_comm_result = gswrite.txPacket()
+                if dxl_comm_result != COMM_SUCCESS:
+                    print("%s" % packetHandler.getTxRxResult(dxl_comm_result))
+
+                # Get present position & velocity value
+                # dxl_comm_result = gsread_PP.txRxPacket()
+                # if dxl_comm_result != COMM_SUCCESS:
+                #     print("%s" % packetHandler.getTxRxResult(dxl_comm_result))
+
+                # for idx in range(14):
+                #     dxl_getPdata_result = gsread_PP.isAvailable(idx, ADDR_PRESENT_POSITION, LEN_PRESENT_POSITION)
+                #     if dxl_getPdata_result != True:
+                #         print("[ID:%03d] groupSyncRead getdata failed" % idx)
+                #         quit()
+
+                # dxl_comm_result = gsread_PV.txRxPacket()
+                # if dxl_comm_result != COMM_SUCCESS:
+                #     print("%s" % packetHandler.getTxRxResult(dxl_comm_result))
+
+                # for idx in range(14):
+                #     dxl_getVdata_result = gsread_PV.isAvailable(idx, ADDR_PRESENT_VELOCITY, LEN_PRESENT_POSITION)
+                #     if dxl_getVdata_result != True:
+                #         print("[ID:%03d] groupSyncRead getdata failed" % idx)
+                #         quit()
+
+
+                # presentP[idx] = gsread_PP.getData(idx, ADDR_PRESENT_POSITION, LEN_PRESENT_POSITION)
+                # presentV[idx] = gsread_PV.getData(idx, ADDR_PRESENT_VELOCITY, LEN_PRESENT_VELOCITY)
+                
                 break
 
-            # Get present position & velocity value
-            for idx in range(14):
-                presentP[idx] = gsread_PP.getData(idx, ADDR_PRESENT_POSITION, LEN_PRESENT_POSITION)
-                presentV[idx] = gsread_PV.getData(idx, ADDR_PRESENT_VELOCITY, LEN_PRESENT_VELOCITY)
-
-            print(f"Running... {i / 50} sec.",end="\r")
+            print(f"Running... {i / 100} sec.",end="\r")
             
         gswrite.clearParam()
         gsread_PP.clearParam()
@@ -112,12 +150,13 @@ def main(ia, ia2):
     
 if __name__ == "__main__":
     # 실험용 인풋 파라미터
-    ia = 40
-    ia2 = 40
+    ia = -5
+    ia2 = -5
 
     # 모터 세팅 프로세스 시작!
 
     ADDR_TORQUE_ENABLE          = 64
+    ADDR_STATUS_RETURN_LEVEL    = 68
     ADDR_GOAL_POSITION          = 116
     ADDR_PRESENT_VELOCITY       = 128
     ADDR_PRESENT_POSITION       = 132
@@ -133,11 +172,11 @@ if __name__ == "__main__":
     PROTOCOL_VERSION            = 2.0
 
     # ex) Windows: "COM*", Linux: "/dev/ttyUSB*", Mac: "/dev/tty.usbserial-*"
-    DEVICENAME                  = 'COM3'
+    DEVICENAME                  = 'COM8'
     # DEVICENAME                    = '/dev/tty.usbserial-FT3M9YHP'
 
 
-    # Initialize PortHandler instance
+    # Initialize PortHandler instance 
     # Set the port path
     # Get methods and members of PortHandlerLinux or PortHandlerWindows
     portHandler = PortHandler(DEVICENAME)
@@ -151,7 +190,7 @@ if __name__ == "__main__":
     # Initialize groupBulkWrite Struct
     gswrite = GroupSyncWrite(portHandler, packetHandler, ADDR_GOAL_POSITION, LEN_GOAL_POSITION)
 
-# Initialize Groupsyncwrite instance
+    # Initialize Groupsyncwrite instance
     gsread_PP = GroupSyncRead(portHandler, packetHandler, ADDR_PRESENT_POSITION, LEN_PRESENT_POSITION)
     gsread_PV = GroupSyncRead(portHandler, packetHandler, ADDR_PRESENT_VELOCITY, LEN_PRESENT_VELOCITY)
 
@@ -176,24 +215,10 @@ if __name__ == "__main__":
 
     for i in range(14):
         packetHandler.write1ByteTxRx(portHandler, (i), ADDR_TORQUE_ENABLE, 1)
+        packetHandler.write1ByteTxRx(portHandler,(i), ADDR_STATUS_RETURN_LEVEL, 1)
 
 
-    print("Setting group communication objects...")
-    # Add parameter storage for Dynamixel#1 present position value
-    for idx in range(14):
-        dxl_addparam_result = gsread_PP.addParam(idx)
-        if dxl_addparam_result != True:
-            print("[ID:%03d] groupSyncRead addparam failed" % idx)
-            quit()
-
-    for idx in range(14):
-        dxl_addparam_result = gsread_PV.addParam(idx)
-        if dxl_addparam_result != True:
-            print("[ID:%03d] groupSyncRead addparam failed" % idx)
-            quit()
-
-
-#모터 세팅 프로세스 끝!
+    #모터 세팅 프로세스 끝!
 
     print('Ready for moving! press any key to move')
     getch()

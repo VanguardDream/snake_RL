@@ -165,7 +165,7 @@
     </body>
 
     <body name="ramp" pos="-0.5 -0.2 -0.02" euler="-3 0 0">
-      <geom name="ramp" type="box" size="2 2 0.015" pos="0 0 0" euler="0 0 0"  material="matramp"/>
+      <geom name="ramp" type="box" size="2 4 0.015" pos="0 0 0" euler="0 0 0"  material="matramp"/>
     </body>
 
   </worldbody>

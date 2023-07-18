@@ -78,8 +78,8 @@ class SnakeEnv(MujocoEnv, utils.EzPickle):
         MujocoEnv.__init__(self, os.path.join(__model_location__,'ramp_w_snake_arrows.xml'), frame_skip, observation_space= self.observation_space, **kwargs)
 
         # Action Space
-        self.action_space = spaces.Box(low= 0.0, high= 3.0, shape=(14,))
-        # self.action_space = spaces.MultiDiscrete(np.array([7]*14))
+        # self.action_space = spaces.Box(low= 0.0, high= 3.0, shape=(14,))
+        self.action_space = spaces.MultiDiscrete(np.array([7]*14))
 
         # Physics variables
         self.k = 0
@@ -99,14 +99,15 @@ class SnakeEnv(MujocoEnv, utils.EzPickle):
         e_d1 = np.radians(45)
         e_l1 = np.radians(45)
 
-        e_d2 = 1
-        e_l2 = 1
+        e_d2 = 4
+        e_l2 = 4
 
         delta = np.radians(45) # for sidewinding
         # delta = np.radians(0) # for serpenoid
         # delta = np.radians(90) # for roll
 
-        t_range = np.arange(0, np.lcm(np.lcm(e_d2,e_l2), 2) * np.pi, self.action_frequency).transpose()
+        # t_range = np.arange(0, np.lcm(np.lcm(e_d2,e_l2), 2) * np.pi, self.action_frequency).transpose()
+        t_range = np.arange(0, 2 * np.pi + 0.2, self.action_frequency).transpose()
 
         joint_pos = serpenoid(t_range, b, b2, a, a2, e_d1, e_d2, e_l1, e_l2, delta)
         joint_vel = np.diff(joint_pos.copy()) * (1 / self.action_frequency)
@@ -152,7 +153,7 @@ class SnakeEnv(MujocoEnv, utils.EzPickle):
         return observation
 
     def step(self, action):
-        action = (action) * self.M_matrix[:,self.k].copy()
+        action = 0.5 * (action) * self.M_matrix[:,self.k].copy()
         
         com_xyz_position_before = self.get_robot_com()
         xy_position_before = self.data.xpos[1][0:2].copy()
@@ -188,7 +189,7 @@ class SnakeEnv(MujocoEnv, utils.EzPickle):
         forward_reward = -1 * com_y_velocity - 0.1 * np.abs(com_x_velocity)
         # torque_cost = 0.3 * np.linalg.norm(__model_sensordata[-3:],1).copy()
 
-        orientation_reward = np.linalg.norm((1 / (np.abs(after_R.as_rotvec().copy() - self._goal_orientation) + 4)),1)
+        orientation_reward = 0.5 * np.linalg.norm(( 1 / ( np.abs(after_R.as_rotvec().copy()) - self._goal_orientation + 4 ) ), 1)
 
         torque_cost = 0
               
@@ -198,19 +199,22 @@ class SnakeEnv(MujocoEnv, utils.EzPickle):
         self.data.qpos[-7:-4] = [com_xyz_position_after[0], com_xyz_position_after[1], com_xyz_position_after[2]].copy()
         self.data.qpos[-4::] = [after_R.as_quat(canonical=True)[3], after_R.as_quat(canonical=True)[0], after_R.as_quat(canonical=True)[1], after_R.as_quat(canonical=True)[2]] 
 
-        if (np.round(self.data.time)) >= 2 * np.shape(self.M_matrix)[1]: #Check! MuJoCo 10 Sim-step -> RL 1 action step!
+        if (np.round(self.data.time)) >= 0.5 * np.shape(self.M_matrix)[1]: #Check! MuJoCo 10 Sim-step -> RL 1 action step!
             # terminated_reward = 50 * xy_position_after[0] - 30 * np.abs(xy_position_after[1])
             # print(self.data.time)
             terminated = True
 
-        if com_xyz_position_after[1] < -1.8:
+        if com_xyz_position_after[1] < -3.5:
             terminated = True
+            forward_reward = forward_reward + 2
 
         if com_xyz_position_after[1] > 0.3:
             terminated = True
+            forward_reward = forward_reward - 2
 
         if np.abs(com_xyz_position_after[0]) > 0.6:
             terminated = True
+            forward_reward = forward_reward - 2
 
         reward = forward_reward + orientation_reward + terminated_reward - torque_cost
 

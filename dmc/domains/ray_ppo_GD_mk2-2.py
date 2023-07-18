@@ -16,7 +16,7 @@ algo = (
     PPOConfig()
     .rollouts(num_rollout_workers=10,)
     .resources(num_gpus=0.95)
-    .environment(env="snake_mk2_2_v8")
+    .environment(env="snake_mk2_2_v8",)
     .framework('torch')
     .training(gamma=0.9, 
               lr=0.0001, 

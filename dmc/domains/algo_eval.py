@@ -1,7 +1,9 @@
 # from snake_v5.envs.SnakeEnv import SnakeEnv
 # from snake_v8.envs.SnakeEnv import SnakeEnv
 # from snake_v8_mk1.envs.SnakeEnv import SnakeEnv
-from snake_v8_CG.envs.SnakeEnv import SnakeEnv
+from snake_v8_mk2.envs.SnakeEnv import SnakeEnv
+# from snake_v8_CG.envs.SnakeEnv import SnakeEnv
+# from snake_v8_CG2.envs.SnakeEnv import SnakeEnv
 import gymnasium as gym
 import numpy as np
 
@@ -22,11 +24,10 @@ from ray.tune.logger import pretty_print
 
 
 # register_env("snake_v5", lambda config: SnakeEnv())
-# register_env("snake_v8", lambda config: SnakeEnv())
-# register_env("snake_mk1_v8", lambda config: SnakeEnv())
-register_env("snake_CG_v8", lambda config: SnakeEnv())
-# env = gym.make('snake/SnakeEnv-mk1-v8', render_mode="human")
-env = gym.make('snake/SnakeEnv-cg-v8', render_mode="human")
+env = gym.make('snake/SnakeEnv-mk2-v8', render_mode="human")
+# env = gym.make('snake/SnakeEnv-cg2-v8', render_mode="human")
+# register_env("snake_CG_v8", lambda config: SnakeEnv())
+# register_env("snake_CG_v8", lambda config: SnakeEnv())
 
 # algo = (
 #     PPOConfig()
@@ -41,7 +42,7 @@ env = gym.make('snake/SnakeEnv-cg-v8', render_mode="human")
 
 # algo.restore('C:\Users\Bong\ray_results\PPO_snake_mk1_v8_2023-07-13_19-45-351ev0yhrq\checkpoint_000500')
 
-pol = Policy.from_checkpoint("C:\\Users\\Bong-Office\\ray_results\\PPO_snake_CG_v8_2023-07-14_13-37-46mkbk4o_n\\checkpoint_000500")
+pol = Policy.from_checkpoint("C:\\Users\\Bong\\ray_results\\PPO_snake_mk2_v8_2023-07-18_00-10-28y_anlgvo\\checkpoint_000500")
 
 _state = pol['default_policy'].get_initial_state()
 _prev_action = np.zeros(14,)
@@ -49,12 +50,14 @@ _reward = 0
 _obs, _ = env.reset()
 _accum_reward = 0
 
-for epi in range(1):
-    for i in range(61*30):
+for epi in range(100):
+    for i in range(61*10):
         # _act, _state, _ = pol['default_policy'].compute_single_action(obs=_obs.copy(), state=_state.copy(), prev_action=_prev_action.copy(), prev_reward=_reward)
-        _act, _state, _ = pol['default_policy'].compute_single_action(obs=_obs.copy())
+        _act, _state, _ = pol['default_policy'].compute_single_action(obs=_obs.copy(),explore=True)
+        # _act = np.clip(_act, a_min=-3.0, a_max=3.0)
+        _act = np.clip(_act, a_min=0.0, a_max=3.0)
         _prev_action = _act.copy()
-        print(_act)
+        # print(_act)
         _obs, _reward, _done, _, _dict = env.step(_act)
         _accum_reward = _accum_reward + _reward
 
@@ -65,6 +68,7 @@ for epi in range(1):
         # print(f"{_dict['head_rotation']}")
         # print(_dict['forward_reward'])
     _obs, _ = env.reset()
+    print(_accum_reward)
     _accum_reward = 0
     print("episode done...")
 env.close()

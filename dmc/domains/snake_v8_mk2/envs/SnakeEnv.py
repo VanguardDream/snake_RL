@@ -188,7 +188,7 @@ class SnakeEnv(MujocoEnv, utils.EzPickle):
         forward_reward = -1 * com_y_velocity - np.abs(com_x_velocity)
         # torque_cost = 0.3 * np.linalg.norm(__model_sensordata[-3:],1).copy()
 
-        orientation_reward = -1 * np.linalg.norm(after_R.as_rotvec().copy(),1)
+        orientation_reward = -0.1 * np.linalg.norm(after_R.as_rotvec().copy(),1)
 
         torque_cost = 0
               

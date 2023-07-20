@@ -75,7 +75,7 @@ class SnakeEnv(MujocoEnv, utils.EzPickle):
         self.observation_space = spaces.Box(low=self.__min_spaces, high=self.__max_spaces, shape=(42,),dtype=np.float64) # M_col and 48 sensordatas -> 14 + 48 => 62
 
         # Create mujoco env instance
-        MujocoEnv.__init__(self, os.path.join(__model_location__,'ramp_w_snake_arrows.xml'), frame_skip, observation_space= self.observation_space, **kwargs)
+        MujocoEnv.__init__(self, os.path.join(__model_location__,'ramp_wo_snake_arrows.xml'), frame_skip, observation_space= self.observation_space, **kwargs)
 
         # Action Space
         # self.action_space = spaces.Box(low= 0.0, high= 3.0, shape=(14,))
@@ -93,8 +93,8 @@ class SnakeEnv(MujocoEnv, utils.EzPickle):
         b = 0
         b2 = 0
 
-        a = 1
-        a2 = 1
+        a = np.radians(40)
+        a2 = np.radians(40)
 
         e_d1 = np.radians(45)
         e_l1 = np.radians(45)
@@ -114,6 +114,7 @@ class SnakeEnv(MujocoEnv, utils.EzPickle):
         joint_tor = np.diff(joint_vel.copy()) * (1 / self.action_frequency)
 
         self.M_matrix = joint_tor.copy()
+        self.target_joint_pos = joint_pos.copy()
 
         # print(np.shape(joint_pos))
         # print(np.shape(joint_vel))
@@ -204,15 +205,15 @@ class SnakeEnv(MujocoEnv, utils.EzPickle):
             # print(self.data.time)
             terminated = True
 
-        if com_xyz_position_after[1] < -3.5:
-            terminated = True
-            forward_reward = forward_reward + 2
+        # if com_xyz_position_after[1] < -3.5:
+        #     terminated = True
+        #     forward_reward = forward_reward + 2
 
-        if com_xyz_position_after[1] > 0.3:
-            terminated = True
-            forward_reward = forward_reward - 2
+        # if com_xyz_position_after[1] > 0.3:
+        #     terminated = True
+        #     forward_reward = forward_reward - 2
 
-        if np.abs(com_xyz_position_after[0]) > 0.6:
+        if np.abs(com_xyz_position_after[0] + 0.477) > 0.6:
             terminated = True
             forward_reward = forward_reward - 2
 

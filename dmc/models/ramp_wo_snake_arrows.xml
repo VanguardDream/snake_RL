@@ -1,0 +1,286 @@
+<mujoco model="pipe-snake">
+
+  <option timestep="0.001">
+      <!-- <flag sensornoise="enable"/> -->
+  </option>
+
+
+  <visual>
+    <headlight ambient="0 0 0" diffuse="0 0 0" specular="1 1 1"/>
+    <quality shadowsize="8192"/>
+  </visual>
+
+  <asset>
+    <material name="floor" reflectance=".1"/>
+    <texture name="texplane" type="2d" builtin="checker" rgb1=".8 .8 .8" rgb2=".1 0.15 0.2" width="512" height="512" mark="cross" markrgb=".8 .8 .8"/>  
+
+    <texture name="wood" type="2d" file="./asset/wood_v1.png"/>
+
+    <texture name="texgeom" type="cube" builtin="flat" mark="cross" width="127" height="1278" 
+        rgb1="0.8 0.6 0.4" rgb2="0.8 0.6 0.4" markrgb="1 1 1" random="0.01"/>  
+
+    <material name="matplane" reflectance="0.3" texture="texplane" texrepeat="2 2" texuniform="true"/>
+    <material name="matramp" reflectance="0.3" texture="wood" texrepeat="2 2" texuniform="true"/>
+
+    <material name="matgeom" texture="texgeom" texuniform="true" rgba="0.8 0.6 .4 1"/>
+
+    <!-- link meshes -->
+    <mesh name="head_link" file="./asset/Head.stl"/>
+    <mesh name="h_link" file="./asset/Link2.stl"/>
+    <mesh name="v_link" file="./asset/Link3.stl"/>
+    <mesh name="tail_link" file="./asset/Tail.stl"/> 
+
+    <!-- arrows meshes -->
+    <material name="0,0,255" specular="0.333333" shininess="1.0" rgba="0.000000 0.000000 1.000000 1.000000"/>
+    <material name="0,255,0" specular="0.333333" shininess="1.0" rgba="0.000000 1.000000 0.000000 1.000000"/>
+    <material name="255,0,0" specular="0.333333" shininess="1.0" rgba="1.000000 0.000000 0.000000 1.000000"/>
+    <material name="255,255,0" specular="0.666667" shininess="1.0" rgba="1.000000 1.000000 0.000000 1.000000"/>
+    <mesh file="./asset/axis_arrows_0.obj"/>
+    <mesh file="./asset/axis_arrows_1.obj"/>
+    <mesh file="./asset/axis_arrows_2.obj"/>
+    <mesh file="./asset/axis_arrows_3.obj"/>
+  </asset>
+
+  <default>
+    <default class="collision">
+      <geom type="box" group="3"/>
+      <default class="pipe">
+        <geom size="0.0015 0.01425 3.5"/>
+      </default>
+    </default>
+
+    <default class="visual">
+      <geom group="2" type="mesh" contype="0" conaffinity="0"/>
+    </default>
+  </default>
+
+  <worldbody>
+    <geom name="floor" pos="0 0 0" size="0 0 .25" type="plane" material="matplane"/>
+    <light directional="false" diffuse="1 1 1" specular="0 0 0" pos="0 0 15" dir="0 0 -1" castshadow="false"/>
+
+    <body name="head" pos="0 0 0.038" euler="0 0 0"> 
+            <freejoint name="root"/> 
+            <!-- <joint type="slide" axis="1 0 0"/> -->
+            <!-- <joint type="slide" axis="0 1 0"/> -->
+            <!-- <joint type="slide" axis="0 0 1"/> -->
+            <!-- <joint name="r_hinge" type="hinge" axis="1 0 0" frictionloss="0"/> -->
+            <!-- <joint name="p_hinge" type="hinge" axis="0 1 0" frictionloss="0"/> -->
+            <!-- <joint name="y_hinge" type="hinge" axis="0 0 1" frictionloss="1000"/> -->
+            <site name="s_head" pos="0 0 0" euler="0 0 0"/>
+            <geom name="head" type="mesh" mesh="head_link" mass="0.2"/>
+
+        <body name="link1" pos="-0.0685 0 0" euler="0 0 0">
+            <site name="s_link1" pos="0 0 0" euler="0 0 0"/>
+            <joint name="joint1" type="hinge" pos="0.0685 0 0" axis="0 1 0" limited="true" range="-90 90" damping="0.42" armature="0.1"/>
+            <!-- <joint name="joint1" type="hinge" pos="0.0685 0 0" axis="0 1 0" limited="true" range="-90 90" damping="0.42" armature="0.1"/> -->
+            <geom name="link1" type="mesh" mesh="h_link" mass="0.2"/>
+
+        <body name="link2" pos="-0.0685 0 0" euler="0 0 0">
+            <site name="s_link2" pos="0 0 0" euler="0 0 0"/>
+            <joint name="joint2" type="hinge" pos="0.0685 0 0" axis="0 0 1" limited="true" range="-90 90" damping="0.42" armature="0.1"/>
+            <geom name="link2" type="mesh" mesh="v_link" mass="0.2"/>
+
+        <body name="link3" pos="-0.0685 0 0" euler="0 0 0">
+            <site name="s_link3" pos="0 0 0" euler="0 0 0"/>
+            <joint name="joint3" type="hinge" pos="0.0685 0 0" axis="0 1 0" limited="true" range="-90 90" damping="0.42" armature="0.1"/>
+            <geom name="link3" type="mesh" mesh="h_link" mass="0.2"/>
+        
+        <body name="link4" pos="-0.0685 0 0" euler="0 0 0">
+            <site name="s_link4" pos="0 0 0" euler="0 0 0"/>
+            <joint name="joint4" type="hinge" pos="0.0685 0 0" axis="0 0 1" limited="true" range="-90 90" damping="0.42" armature="0.1"/>
+            <geom name="link4" type="mesh" mesh="v_link" mass="0.2"/>
+
+        <body name="link5" pos="-0.0685 0 0" euler="0 0 0">
+            <site name="s_link5" pos="0 0 0" euler="0 0 0"/>
+            <joint name="joint5" type="hinge" pos="0.0685 0 0" axis="0 1 0" limited="true" range="-90 90" damping="0.42" armature="0.1"/>
+            <geom name="link5" type="mesh" mesh="h_link" mass="0.2"/>
+
+        <body name="link6" pos="-0.0685 0 0" euler="0 0 0">
+            <site name="s_link6" pos="0 0 0" euler="0 0 0"/>
+            <joint name="joint6" type="hinge" pos="0.0685 0 0" axis="0 0 1" limited="true" range="-90 90" damping="0.42" armature="0.1"/>
+            <geom name="link6" type="mesh" mesh="v_link" mass="0.2"/>
+
+        <body name="link7" pos="-0.0685 0 0" euler="0 0 0">
+            <site name="s_link7" pos="0 0 0" euler="0 0 0"/>
+            <joint name="joint7" type="hinge" pos="0.0685 0 0" axis="0 1 0" limited="true" range="-90 90" damping="0.42" armature="0.1"/>
+            <geom name="link7" type="mesh" mesh="h_link" mass="0.2"/>
+
+        <body name="link8" pos="-0.0685 0 0" euler="0 0 0">
+            <site name="s_link8" pos="0 0 0" euler="0 0 0"/>
+            <joint name="joint8" type="hinge" pos="0.0685 0 0" axis="0 0 1" limited="true" range="-90 90" damping="0.42" armature="0.1"/>
+            <geom name="link8" type="mesh" mesh="v_link" mass="0.2"/>
+
+        <body name="link9" pos="-0.0685 0 0" euler="0 0 0">
+            <site name="s_link9" pos="0 0 0" euler="0 0 0"/>
+            <joint name="joint9" type="hinge" pos="0.0685 0 0" axis="0 1 0" limited="true" range="-90 90" damping="0.42" armature="0.1"/>
+            <geom name="link9" type="mesh" mesh="h_link" mass="0.2"/>
+
+        <body name="link10" pos="-0.0685 0 0" euler="0 0 0">
+            <site name="s_link10" pos="0 0 0" euler="0 0 0"/>
+            <joint name="joint10" type="hinge" pos="0.0685 0 0" axis="0 0 1" limited="true" range="-90 90" damping="0.42" armature="0.1"/>
+            <geom name="link10" type="mesh" mesh="v_link" mass="0.2"/>
+
+        <body name="link11" pos="-0.0685 0 0" euler="0 0 0">
+            <site name="s_link11" pos="0 0 0" euler="0 0 0"/>
+            <joint name="joint11" type="hinge" pos="0.0685 0 0" axis="0 1 0" limited="true" range="-90 90" damping="0.42" armature="0.1"/>
+            <geom name="link11" type="mesh" mesh="h_link" mass="0.2"/>
+
+        <body name="link12" pos="-0.0685 0 0" euler="0 0 0">
+            <site name="s_link12" pos="0 0 0" euler="0 0 0"/>
+            <joint name="joint12" type="hinge" pos="0.0685 0 0" axis="0 0 1" limited="true" range="-90 90" damping="0.42" armature="0.1"/>
+            <geom name="link12" type="mesh" mesh="v_link" mass="0.2"/>
+
+        <body name="link13" pos="-0.0685 0 0" euler="0 0 0">
+            <site name="s_link13" pos="0 0 0" euler="0 0 0"/>
+            <joint name="joint13" type="hinge" pos="0.0685 0 0" axis="0 1 0" limited="true" range="-90 90" damping="0.42" armature="0.1"/>
+            <geom name="link13" type="mesh" mesh="h_link" mass="0.2"/>
+
+        <body name="tail" pos="-0.0413 0 0" euler="0 0 0">
+            <site name="s_tail" pos="0 0 0" euler="0 0 0"/>
+            <joint name="joint14" type="hinge" pos="0.0413 0 0" axis="0 0 1" limited="true" range="-90 90" damping="0.42" armature="0.1"/>
+            <geom name="tail" type="mesh" mesh="tail_link" mass="0.2"/>
+
+        </body>
+        </body>
+        </body>
+        </body>
+        </body>
+        </body>    
+        </body>    
+        </body>
+        </body>
+        </body>
+        </body>
+        </body>
+        </body>  
+        </body>    
+        </body>
+        
+    <body name="com_marker" pos="0 0 0" euler="0 0 0" gravcomp="1">
+        <freejoint name="com_axis"/> 
+        <geom mesh="axis_arrows_0" material="255,255,0" class="visual"/>
+        <geom mesh="axis_arrows_1" material="0,255,0" class="visual"/>
+        <geom mesh="axis_arrows_2" material="0,0,255" class="visual"/>
+        <geom mesh="axis_arrows_3" material="255,0,0" class="visual"/>
+    </body>
+
+    <!-- <body name="ramp" pos="-0.5 -0.2 -0.02" euler="-3 0 0">
+      <geom name="ramp" type="box" size="2 4 0.015" pos="0 0 0" euler="0 0 0"  material="matramp"/>
+    </body> -->
+
+  </worldbody>
+
+      <contact>
+        <!-- friction="normal tangential" -->
+        <pair name="con_head" geom1="floor" geom2="head" condim="4" friction="1 1 0.5 0.2 0.2"/>
+        <pair name="con_link1" geom1="floor" geom2="link1" condim="4" friction="1 1 0.5 0.2 0.2"/>
+        <pair name="con_link2" geom1="floor" geom2="link2" condim="4" friction="1 1 0.5 0.2 0.2"/>
+        <pair name="con_link3" geom1="floor" geom2="link3" condim="4" friction="1 1 0.5 0.2 0.2"/>
+        <pair name="con_link4" geom1="floor" geom2="link4" condim="4" friction="1 1 0.5 0.2 0.2"/>
+        <pair name="con_link5" geom1="floor" geom2="link5" condim="4" friction="1 1 0.5 0.2 0.2"/>
+        <pair name="con_link6" geom1="floor" geom2="link6" condim="4" friction="1 1 0.5 0.2 0.2"/>
+        <pair name="con_link7" geom1="floor" geom2="link7" condim="4" friction="1 1 0.5 0.2 0.2"/>
+        <pair name="con_link8" geom1="floor" geom2="link8" condim="4" friction="1 1 0.5 0.2 0.2"/>
+        <pair name="con_link9" geom1="floor" geom2="link9" condim="4" friction="1 1 0.5 0.2 0.2"/>
+        <pair name="con_link10" geom1="floor" geom2="link10" condim="4" friction="1 1 0.5 0.2 0.2"/>
+        <pair name="con_link11" geom1="floor" geom2="link11" condim="4" friction="1 1 0.5 0.2 0.2"/>
+        <pair name="con_link12" geom1="floor" geom2="link12" condim="4" friction="1 1 0.5 0.2 0.2"/>
+        <pair name="con_link13" geom1="floor" geom2="link13" condim="4" friction="1 1 0.5 0.2 0.2"/>
+        <pair name="con_tail" geom1="floor" geom2="tail" condim="4" friction="1 1 0.5 0.2 0.2"/>
+    </contact>  
+
+    <actuator>
+        <motor name="servo_1"  ctrllimited="true" ctrlrange="-3.0 3.0" gear="1" joint="joint1"/>
+        <motor name="servo_2"  ctrllimited="true" ctrlrange="-3.0 3.0" gear="1" joint="joint2"/>
+        <motor name="servo_3"  ctrllimited="true" ctrlrange="-3.0 3.0" gear="1" joint="joint3"/>
+        <motor name="servo_4"  ctrllimited="true" ctrlrange="-3.0 3.0" gear="1" joint="joint4"/>
+        <motor name="servo_5"  ctrllimited="true" ctrlrange="-3.0 3.0" gear="1" joint="joint5"/>
+        <motor name="servo_6"  ctrllimited="true" ctrlrange="-3.0 3.0" gear="1" joint="joint6"/>
+        <motor name="servo_7"  ctrllimited="true" ctrlrange="-3.0 3.0" gear="1" joint="joint7"/>
+        <motor name="servo_8"  ctrllimited="true" ctrlrange="-3.0 3.0" gear="1" joint="joint8"/>
+        <motor name="servo_9"  ctrllimited="true" ctrlrange="-3.0 3.0" gear="1" joint="joint9"/>
+        <motor name="servo_10" ctrllimited="true" ctrlrange="-3.0 3.0" gear="1" joint="joint10"/>
+        <motor name="servo_11" ctrllimited="true" ctrlrange="-3.0 3.0" gear="1" joint="joint11"/>
+        <motor name="servo_12" ctrllimited="true" ctrlrange="-3.0 3.0" gear="1" joint="joint12"/>
+        <motor name="servo_13" ctrllimited="true" ctrlrange="-3.0 3.0" gear="1" joint="joint13"/>
+        <motor name="servo_14" ctrllimited="true" ctrlrange="-3.0 3.0" gear="1" joint="joint14"/>
+    </actuator>
+
+    <sensor>
+        <!-- index 0 - 5 -->
+        <accelerometer name="imu_accel" site="s_head" noise="0.005"/>
+        <gyro name="imu_gyro" site="s_head" noise="0.005"/>
+
+        <!-- index 6 - 19 -->
+        <jointpos name="pos_joint1" joint="joint1" noise="0.1"/>
+        <jointpos name="pos_joint2" joint="joint2" noise="0.1"/>
+        <jointpos name="pos_joint3" joint="joint3" noise="0.1"/>
+        <jointpos name="pos_joint4" joint="joint4" noise="0.1"/>
+        <jointpos name="pos_joint5" joint="joint5" noise="0.1"/>
+        <jointpos name="pos_joint6" joint="joint6" noise="0.1"/>
+        <jointpos name="pos_joint7" joint="joint7" noise="0.1"/>
+        <jointpos name="pos_joint8" joint="joint8" noise="0.1"/>
+        <jointpos name="pos_joint9" joint="joint9" noise="0.1"/>
+        <jointpos name="pos_joint10" joint="joint10" noise="0.1"/>
+        <jointpos name="pos_joint11" joint="joint11" noise="0.1"/>
+        <jointpos name="pos_joint12" joint="joint12" noise="0.1"/>
+        <jointpos name="pos_joint13" joint="joint13" noise="0.1"/>
+        <jointpos name="pos_joint14" joint="joint14" noise="0.1"/>
+
+        <!-- index 20 - 33 -->
+        <actuatorvel name="vel_joint1" actuator="servo_1" noise="0.05"/>
+        <actuatorvel name="vel_joint2" actuator="servo_2" noise="0.05"/>
+        <actuatorvel name="vel_joint3" actuator="servo_3" noise="0.05"/>
+        <actuatorvel name="vel_joint4" actuator="servo_4" noise="0.05"/>
+        <actuatorvel name="vel_joint5" actuator="servo_5" noise="0.05"/>
+        <actuatorvel name="vel_joint6" actuator="servo_6" noise="0.05"/>
+        <actuatorvel name="vel_joint7" actuator="servo_7" noise="0.05"/>
+        <actuatorvel name="vel_joint8" actuator="servo_8" noise="0.05"/>
+        <actuatorvel name="vel_joint9" actuator="servo_9" noise="0.05"/>
+        <actuatorvel name="vel_joint10" actuator="servo_10" noise="0.05"/>
+        <actuatorvel name="vel_joint11" actuator="servo_11" noise="0.05"/>
+        <actuatorvel name="vel_joint12" actuator="servo_12" noise="0.05"/>
+        <actuatorvel name="vel_joint13" actuator="servo_13" noise="0.05"/>
+        <actuatorvel name="vel_joint14" actuator="servo_14" noise="0.05"/>
+
+        <!-- index 34 - 47 -->
+        <actuatorfrc name="torque_joint1" actuator="servo_1" noise="0.1"/>
+        <actuatorfrc name="torque_joint2" actuator="servo_2" noise="0.1"/>
+        <actuatorfrc name="torque_joint3" actuator="servo_3" noise="0.1"/>
+        <actuatorfrc name="torque_joint4" actuator="servo_4" noise="0.1"/>
+        <actuatorfrc name="torque_joint5" actuator="servo_5" noise="0.1"/>
+        <actuatorfrc name="torque_joint6" actuator="servo_6" noise="0.1"/>
+        <actuatorfrc name="torque_joint7" actuator="servo_7" noise="0.1"/>
+        <actuatorfrc name="torque_joint8" actuator="servo_8" noise="0.1"/>
+        <actuatorfrc name="torque_joint9" actuator="servo_9" noise="0.1"/>
+        <actuatorfrc name="torque_joint10" actuator="servo_10" noise="0.1"/>
+        <actuatorfrc name="torque_joint11" actuator="servo_11" noise="0.1"/>
+        <actuatorfrc name="torque_joint12" actuator="servo_12" noise="0.1"/>
+        <actuatorfrc name="torque_joint13" actuator="servo_13" noise="0.1"/>
+        <actuatorfrc name="torque_joint14" actuator="servo_14" noise="0.1"/>
+
+        <!-- index 48 - 51 -->
+        <framequat name="head_quat" objtype="site" objname="s_head" noise="0.05"/>
+
+        <!-- index 52 - 107 -->
+        <framequat name="link1_quat" objtype="site" objname="s_link1" noise="0.05"/>
+        <framequat name="link2_quat" objtype="site" objname="s_link2" noise="0.05"/>
+        <framequat name="link3_quat" objtype="site" objname="s_link3" noise="0.05"/>
+        <framequat name="link4_quat" objtype="site" objname="s_link4" noise="0.05"/>
+        <framequat name="link5_quat" objtype="site" objname="s_link5" noise="0.05"/>
+        <framequat name="link6_quat" objtype="site" objname="s_link6" noise="0.05"/>
+        <framequat name="link7_quat" objtype="site" objname="s_link7" noise="0.05"/>
+        <framequat name="link8_quat" objtype="site" objname="s_link8" noise="0.05"/>
+        <framequat name="link9_quat" objtype="site" objname="s_link9" noise="0.05"/>
+        <framequat name="link10_quat" objtype="site" objname="s_link10" noise="0.05"/>
+        <framequat name="link11_quat" objtype="site" objname="s_link11" noise="0.05"/>
+        <framequat name="link12_quat" objtype="site" objname="s_link12" noise="0.05"/>
+        <framequat name="link13_quat" objtype="site" objname="s_link13" noise="0.05"/>
+        <framequat name="tail_quat" objtype="site" objname="s_tail" noise="0.05"/>
+
+        <!-- index 108 - 111 -->
+        <torque name="head_torque" site="s_head" noise="0.05"/>
+
+    </sensor>
+
+</mujoco>

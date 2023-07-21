@@ -3,6 +3,10 @@ import mujoco_py
 import os
 import random
 import sys
+import datetime
+
+from threading import Thread
+from scipy.io import savemat
 
 sys.path.append('../') # 상위 폴더의 Gait 객체를 불러오기 위해서...
 # import gait_lambda # 이전 Gait 객체
@@ -227,5 +231,141 @@ def main4():
             print('Iteration : (%d) reward : %f'  %(count,reward))
             count = count + 1
 
+def main5():
+    #20230720 논문 재작성 실험을 위해서
+    # gait_type = 1
+    # gait_params = [39.8, 189.9, -9.1, 66.5, 160.9, 7.0, 1]  #EAAI
+    # gait_params = [40.7, 191.1, -9.1, 66.5, 160.9, 7.0, 1]  #CG1
+    # gait_params = [39.8, 189.9, -9.1, 67.1, 160.3, 7.0, 1]  #CG1
+
+    
+    # gait_type = 2
+    # gait_params = [52.76,	319.65,	1.99, 72.07, 262.95, 7.91, 1] # EAAI 263.95? 둘중하나
+    # gait_params = [52.16,	318.15,	1.99,	72.07,	262.95,	7.91,	1] #EAAI c1
+    # gait_params = [52.76,	319.65,	1.99,	72.67,	261.75,	7.91,	1] #EAAI c2
+
+    num_sims = 10
+    obj_sims = []
+    # gait_params = np.array([1, 39.8, 189.9, -9.1, 66.5, 160.9, 7.0, 1])
+
+    result_data_mat = np.empty((41,73,41,73))
+
+    for idx in range(num_sims):
+        obj_sims.append(mujoco_py.MjSim(snake))
+
+    def do_sim(sim :mujoco_py.MjSim, start:np.ndarray, end:np.ndarray):
+
+        internal_result = np.empty((41,73,41,73))
+
+        for p1 in range(start[0], end[0]):
+            for p2 in range(start[1], end[1]):
+                for p3 in range(start[2], end[2]):
+                    p4_start = datetime.datetime.now()
+                    for p4 in range(start[3], end[3]):
+                        params = np.array([])
+
+                        params = np.array([1, 20 + p1, p2 * 5, -9.1, 20 + p3, p4 * 5, 7.0, 1])
+                        gen = gait_lambda.gait(params[0], params[1], params[2], params[3], params[4], params[5], params[6], int(params[7]))
+                        g = params[0]
+
+                        # Variable for cost(loss) function
+                        delta_x = 0
+                        delta_y = 0
+                        penalty = 0
+
+                        for i in range(0,1000):
+                            goal = gen.generate(i)
+
+                            spec_motor = np.nonzero(goal)[0]
+
+                            for idx in spec_motor:
+                                # Commnad motor here
+                                sim.data.ctrl[idx] = gen.degtorad(goal[idx])
+                            
+                            try:
+                                sim.step()
+                            except:
+                                print("Doing step occur exception!! add penalty")
+                                penalty = -10000
+                                break
+
+
+                        delta_x = sim.data.get_body_xpos('head')[0]
+                        delta_y = sim.data.get_body_xpos('head')[1]
+
+                        sim.reset()
+                        #Calculate Cost here
+                        if (g == 2):
+                            J_value = 1500 * delta_y - 800 * abs(delta_x) - 900 * abs(delta_x / delta_y) + penalty
+                        else:
+                            J_value = 1500 * delta_x - 800 * abs(delta_y) - 900 * abs(delta_y / delta_x) + penalty
+
+                        # result_data_mat[p1,p2,p3,p4] = J_value
+                        internal_result[p1,p2,p3,p4] = J_value
+
+                    print(str(sim)+" last loop done : " + str(datetime.datetime.now()-p4_start))
+
+        print(str(sim) + " done!")
+        finished_time = datetime.datetime.now()
+        fname = finished_time.strftime(str(sim)+"grid_result_%Y%m%d-%H%M%S.mat")
+        m_dict = {'U' : internal_result}
+        savemat(fname, m_dict)
+
+
+    # do_sim(obj_sims[0],[0,0,0,0], [2,2,2,2], num_done, result_data_mat)
+    # ((41,73,41,73))
+
+    th0 = Thread(target=do_sim, args=(obj_sims[0], [0, 0, 0, 0], [4, 73, 41, 73]))
+    th1 = Thread(target=do_sim, args=(obj_sims[1], [4, 0, 0, 0], [8, 73, 41, 73]))
+    th2 = Thread(target=do_sim, args=(obj_sims[2], [8, 0, 0, 0], [12, 73, 41, 73]))
+    th3 = Thread(target=do_sim, args=(obj_sims[3], [12, 0, 0, 0], [16, 73, 41, 73]))
+    th4 = Thread(target=do_sim, args=(obj_sims[4], [16, 0, 0, 0], [20, 73, 41, 73]))
+    th5 = Thread(target=do_sim, args=(obj_sims[5], [20, 0, 0, 0], [24, 73, 41, 73]))
+    th6 = Thread(target=do_sim, args=(obj_sims[6], [24, 0, 0, 0], [28, 73, 41, 73]))
+    th7 = Thread(target=do_sim, args=(obj_sims[7], [28, 0, 0, 0], [32, 73, 41, 73]))
+    th8 = Thread(target=do_sim, args=(obj_sims[8], [32, 0, 0, 0], [36, 73, 41, 73]))
+    th9 = Thread(target=do_sim, args=(obj_sims[9], [36, 0, 0, 0], [41, 73, 41, 73]))
+
+    # th0 = Thread(target=do_sim, args=(obj_sims[0], [0,0,0,0], [4,7,4,7]))
+    # th1 = Thread(target=do_sim, args=(obj_sims[1], [4,7,4,7], [8,14,8,14]))
+    # th2 = Thread(target=do_sim, args=(obj_sims[2], [8,14,8,14], [12,21,12,21]))
+    # th3 = Thread(target=do_sim, args=(obj_sims[3], [12,21,12,21], [16,28,16,28]))
+    # th4 = Thread(target=do_sim, args=(obj_sims[4], [16,28,16,28], [20,35,20,35]))
+    # th5 = Thread(target=do_sim, args=(obj_sims[5], [20,35,20,35], [24,42,24,42]))
+    # th6 = Thread(target=do_sim, args=(obj_sims[6], [24,42,24,42], [28,49,28,49]))
+    # th7 = Thread(target=do_sim, args=(obj_sims[7], [28,49,28,49], [32,56,32,56]))
+    # th8 = Thread(target=do_sim, args=(obj_sims[8], [32,56,32,56], [36,63,36,63]))
+    # th9 = Thread(target=do_sim, args=(obj_sims[9], [36,63,36,63], [41,73,41,73]))
+
+    th0.start()
+    th1.start()
+    th2.start()
+    th3.start()
+    th4.start()
+    th5.start()
+    th6.start()
+    th7.start()
+    th8.start()
+    th9.start()
+
+    th0.join()
+    th1.join()
+    th2.join()
+    th3.join()
+    th4.join()
+    th5.join()
+    th6.join()
+    th7.join()
+    th8.join()
+    th9.join()
+
+    # finished_time = datetime.datetime.now()
+    # fname = finished_time.strftime("grid_result_%Y%m%d-%H%M%S.mat")
+    # m_dict = {'U' : result_data_mat}
+    # savemat(fname, m_dict)
+
+
+
+
 if __name__ == "__main__":
-        main3()
+        main5()

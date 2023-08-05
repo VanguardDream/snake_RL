@@ -98,11 +98,11 @@ class SnakeEnv(MujocoEnv, utils.EzPickle):
         e_d1 = np.radians(30)
         e_l1 = np.radians(30)
 
-        e_d2 = 1
-        e_l2 = 1
+        e_d2 = 3
+        e_l2 = 3
 
         # delta = np.radians(45) # for sidewinding
-        delta = np.radians(90) # for serpenoid
+        delta = np.radians(0) # for serpenoid
 
         t_range = np.arange(0, np.lcm(np.lcm(e_d2,e_l2), 2) * np.pi, self.action_frequency).transpose()
 

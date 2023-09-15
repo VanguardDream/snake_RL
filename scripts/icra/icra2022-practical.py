@@ -31,7 +31,8 @@ def J(g, d_a, d_p, d_l, l_a, l_p, l_l, tau):
     delta_x = 0
     delta_y = 0
 
-    for i in range(0,6000):
+    _gait_time = time.time()
+    for i in range(0,1000):
 
         goal = gen.generate(i)
 
@@ -49,9 +50,11 @@ def J(g, d_a, d_p, d_l, l_a, l_p, l_l, tau):
             while(True):
                 t_period = time.time() - commandQ
 
-                if t_period > 0.015:
+                if t_period > 0.01:
                     packetHandler.write4ByteTxOnly(portHandler, (idx), ADDR_GOAL_POSITION, goalP)
                     break
+
+    print(time.time() - _gait_time)
 
 
 
@@ -79,7 +82,7 @@ def main():
     # gait_params = [52.76,	319.65,	1.99,	72.67,	261.75,	7.91,	1] #EAAI c2
 
 
-    # [37.2, 37.4, -8, 61.9, 61.7, 1 ,  3] # op
+    # gait_params = [37.2, 37.4, -8, 61.9, 61.7, 1 ,  3] # op
 
     # gait_params = [38.2, 43.4, -8, 66.0, 51.6, 1 ,  3] 
     # gait_params = [38.2, 43.4, -8, 66.0, 51.6, 1 ,  3] # Poor original op
@@ -98,8 +101,8 @@ def main():
 
 
     #20230720 논문 재작성 실험을 위해서
-    # gait_type = 1
-    # gait_params = [39.8, 189.9, -9.1, 66.5, 160.9, 7.0, 1]  #EAAI
+    gait_type = 1
+    gait_params = [39.8, 189.9, -9.1, 66.5, 160.9, 7.0, 1]  #EAAI
     # gait_params = [40.7, 191.1, -9.1, 66.5, 160.9, 7.0, 1]  #CG1
     # gait_params = [39.8, 189.9, -9.1, 67.1, 160.3, 7.0, 1]  #CG1
 
@@ -171,6 +174,26 @@ if __name__ == "__main__":
 
     for i in range(14):
         packetHandler.write1ByteTxRx(portHandler, (i), ADDR_TORQUE_ENABLE, 1)
+
+    time.sleep(0.1)
+
+    for i in range(14):
+        packetHandler.write1ByteTxRx(portHandler, (i), ADDR_TORQUE_ENABLE, 1)
+
+    time.sleep(0.1)
+
+    for i in range(14):
+        packetHandler.write4ByteTxOnly(portHandler, i, ADDR_GOAL_POSITION, 2048)
+
+    time.sleep(0.1)
+    
+    for i in range(14):
+        packetHandler.write4ByteTxOnly(portHandler, i, ADDR_GOAL_POSITION, 2048)
+
+    time.sleep(0.1)
+    
+    for i in range(14):
+        packetHandler.write4ByteTxOnly(portHandler, i, ADDR_GOAL_POSITION, 2048)
 
     # GroupBW = GroupBulkWrite(portHandler,packetHandler)
 

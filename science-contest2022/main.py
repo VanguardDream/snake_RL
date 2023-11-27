@@ -42,8 +42,8 @@ BAUDRATE                    = 3000000 # -> 통신 속도 조절
 PROTOCOL_VERSION            = 2.0
 
 # ex) Windows: "COM*", Linux: "/dev/ttyUSB*", Mac: "/dev/tty.usbserial-*"
-# DEVICENAME                  = 'COM1'
-DEVICENAME                    = '/dev/tty.usbserial-FT3M9YHP'
+DEVICENAME                  = 'COM1'
+# DEVICENAME                    = '/dev/tty.usbserial-FT3M9YHP'
 
 portHandler = PortHandler(DEVICENAME)
 packetHandler = PacketHandler(PROTOCOL_VERSION)

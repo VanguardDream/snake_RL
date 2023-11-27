@@ -102,9 +102,9 @@ def main():
 
     #20230720 논문 재작성 실험을 위해서
     gait_type = 1
-    gait_params = [39.8, 189.9, -9.1, 66.5, 160.9, 7.0, 1]  #EAAI
+    # gait_params = [39.8, 189.9, -9.1, 66.5, 160.9, 7.0, 1]  #EAAI
     # gait_params = [40.7, 191.1, -9.1, 66.5, 160.9, 7.0, 1]  #CG1
-    # gait_params = [39.8, 189.9, -9.1, 67.1, 160.3, 7.0, 1]  #CG1
+    gait_params = [39.8, 189.9, -9.1, 67.1, 160.3, 7.0, 1]  #CG1
 
     
     # gait_type = 2
@@ -204,6 +204,11 @@ if __name__ == "__main__":
     main()
 
     # print('done!')
+
+    for i in range(14):
+        packetHandler.write1ByteTxRx(portHandler, (i), ADDR_TORQUE_ENABLE, 0)
+
+    time.sleep(0.1)
 
     for i in range(14):
         packetHandler.write1ByteTxRx(portHandler, (i), ADDR_TORQUE_ENABLE, 0)

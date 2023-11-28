@@ -1,0 +1,55 @@
+<Resources>
+  <string id="%1%" value="온도에 따라 선택한 윤활제의 다이나믹 점도"/>
+  <string id="%2%" value="윤활제"/>
+  <string id="%3%" value="윤활제 지정"/>
+  <string id="%4%" value="||h|"/>
+  <string id="%5%" value="0 |^o|C에서의 윤활제 다이나믹 점도"/>
+  <string id="%6%" value="Pa s"/>
+  <string id="%7%" value="||r|"/>
+  <string id="%8%" value="오일 밀도"/>
+  <string id="%9%" value="kg m|^3|"/>
+  <string id="%10%" value="10 |^o|C에서의 윤활제 다이나믹 점도"/>
+  <string id="%11%" value="20 |^o|C에서의 윤활제 다이나믹 점도"/>
+  <string id="%12%" value="30 |^o|C에서의 윤활제 다이나믹 점도"/>
+  <string id="%13%" value="40 |^o|C에서의 윤활제 다이나믹 점도"/>
+  <string id="%14%" value="50 |^o|C에서의 윤활제 다이나믹 점도"/>
+  <string id="%15%" value="60 |^o|C에서의 윤활제 다이나믹 점도"/>
+  <string id="%16%" value="70 |^o|C에서의 윤활제 다이나믹 점도"/>
+  <string id="%17%" value="80 |^o|C에서의 윤활제 다이나믹 점도"/>
+  <string id="%18%" value="90 |^o|C에서의 윤활제 다이나믹 점도"/>
+  <string id="%19%" value="100 |^o|C에서의 윤활제 다이나믹 점도"/>
+  <string id="%20%" value="베어링 오일 SAE 10; 10-W"/>
+  <string id="%21%" value="베어링 오일 SAE 20; 20-W"/>
+  <string id="%22%" value="베어링 오일 SAE 30"/>
+  <string id="%23%" value="베어링 오일 SAE 40"/>
+  <string id="%24%" value="베어링 오일 SAE 50"/>
+  <string id="%25%" value="베어링 오일 SAE 60"/>
+  <string id="%26%" value="베어링 오일 SAE 70"/>
+  <string id="%27%" value="베어링 오일 P0"/>
+  <string id="%28%" value="베어링 오일 J1"/>
+  <string id="%29%" value="베어링 오일 J2"/>
+  <string id="%30%" value="터빈 오일 TB32"/>
+  <string id="%31%" value="베어링 오일 J3"/>
+  <string id="%32%" value="터빈 오일 T4C"/>
+  <string id="%33%" value="베어링 오일 J4"/>
+  <string id="%34%" value="베어링 오일 J5"/>
+  <string id="%35%" value="엔진 오일 M3AD"/>
+  <string id="%36%" value="엔진 오일 M4A"/>
+  <string id="%37%" value="베어링 오일 J6"/>
+  <string id="%38%" value="엔진 오일 M6A"/>
+  <string id="%39%" value="오일 OD8"/>
+  <string id="%40%" value="오일 M9A"/>
+  <string id="%41%" value="오일 K12"/>
+  <string id="%42%" value="오일 K18"/>
+  <string id="%43%" value="||h||.0|"/>
+  <string id="%44%" value="||h||.10|"/>
+  <string id="%45%" value="||h||.20|"/>
+  <string id="%46%" value="||h||.30|"/>
+  <string id="%47%" value="||h||.40|"/>
+  <string id="%48%" value="||h||.50|"/>
+  <string id="%49%" value="||h||.60|"/>
+  <string id="%50%" value="||h||.70|"/>
+  <string id="%51%" value="||h||.80|"/>
+  <string id="%52%" value="||h||.90|"/>
+  <string id="%53%" value="||h||.100|"/>
+</Resources>

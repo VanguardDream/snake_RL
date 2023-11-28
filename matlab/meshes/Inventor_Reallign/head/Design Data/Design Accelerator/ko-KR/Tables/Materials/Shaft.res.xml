@@ -1,0 +1,15 @@
+<Resources>
+  <string id="%1%" value="샤프트 재질(ANSI)"/>
+  <string id="%2%" value="재질 지정"/>
+  <string id="%3%" value="허용 압력"/>
+  <string id="%4%" value="psi"/>
+  <string id="%5%" value="허용 비틀림 응력"/>
+  <string id="%6%" value="스테인리스강"/>
+  <string id="%7%" value="고등급/합금강"/>
+  <string id="%8%" value="주강"/>
+  <string id="%9%" value="회주철"/>
+  <string id="%10%" value="청동"/>
+  <string id="%11%" value="재질"/>
+  <string id="%12%" value="||s||.Al|"/>
+  <string id="%13%" value="||t||.AlT|"/>
+</Resources>

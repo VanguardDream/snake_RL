@@ -1,0 +1,11 @@
+<Resources>
+  <string id="%1%" value="브레이크 압력"/>
+  <string id="%2%" value="재질"/>
+  <string id="%3%" value="p[MPa]"/>
+  <string id="%4%" value="몰딩"/>
+  <string id="%5%" value="위빙"/>
+  <string id="%6%" value="소결 합금"/>
+  <string id="%7%" value="코르크"/>
+  <string id="%8%" value="목재"/>
+  <string id="%9%" value="주철, 경강"/>
+</Resources>

@@ -1,0 +1,16 @@
+<Resources>
+  <string id="%1%" value="적용 계수"/>
+  <string id="%2%" value="균일"/>
+  <string id="%3%" value="약한 충격"/>
+  <string id="%4%" value="비연속 충격"/>
+  <string id="%5%" value="강한 충격"/>
+  <string id="%6%" value="균일(터빈, 모터)"/>
+  <string id="%7%" value="약함	(수력 모터)"/>
+  <string id="%8%" value="중간(내부 연소, 엔진)"/>
+  <string id="%9%" value="하중 유형"/>
+  <string id="%10%" value="동력원"/>
+  <string id="%11%" value="(발전기-팬)"/>
+  <string id="%12%" value="(진동, 펌프 등)"/>
+  <string id="%13%" value="(구동 펌프)"/>
+  <string id="%14%" value="(펀치, 전단기 등)"/>  
+</Resources>

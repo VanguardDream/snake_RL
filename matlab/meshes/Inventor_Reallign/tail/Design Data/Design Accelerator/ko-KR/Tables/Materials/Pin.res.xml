@@ -1,0 +1,13 @@
+<Resources>
+  <string id="%1%" value="핀 재질(ANSI)"/>
+  <string id="%2%" value="재질 지정"/>
+  <string id="%3%" value="허용 전단 응력"/>
+  <string id="%4%" value="psi"/>
+  <string id="%5%" value="탄소강 1211; 1212; 1213"/>
+  <string id="%6%" value="고탄소강 1070 - 1095"/>
+  <string id="%7%" value="스테인리스강 302"/>
+  <string id="%8%" value="스테인리스강 410 - 420"/>
+  <string id="%9%" value="합금강 6150H"/>
+  <string id="%10%" value="재질"/>
+  <string id="%11%" value="||t||.Al|"/>
+</Resources>

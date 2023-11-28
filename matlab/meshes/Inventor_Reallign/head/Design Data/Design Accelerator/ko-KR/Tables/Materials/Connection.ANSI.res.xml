@@ -1,0 +1,20 @@
+<Resources>
+  <string id="%1%" value="스플라인 재질"/>
+  <string id="%2%" value="재질 지정"/>
+  <string id="%3%" value="브리넬 경도 번호"/>
+  <string id="%4%" value="ul"/>
+  <string id="%5%" value="비커 경도 번호(피라미드)"/>
+  <string id="%6%" value="허용 압축 응력"/>
+  <string id="%7%" value="psi"/>
+  <string id="%8%" value="허용 전단 응력"/>
+  <string id="%9%" value="강"/>
+  <string id="%10%" value="표면 경화강"/>
+  <string id="%11%" value="표피 경화강"/>
+  <string id="%12%" value="재질"/>
+  <string id="%13%" value="B|.hn|"/>
+  <string id="%14%" value="HV"/>
+  <string id="%15%" value="S|.c|"/>
+  <string id="%16%" value="S|.s|"/>
+  <string id="%17%" value="허용 인장 응력"/>
+  <string id="%18%" value="S|.t|"/>
+</Resources>

@@ -1,0 +1,6 @@
+<Resources>
+  <string id="%1%" value="대체 계수"/>
+  <string id="%2%" value="반복 하중"/>
+  <string id="%3%" value="대체 하중(예: 아이들러)"/>
+  <string id="%4%" value="취소 가능 작업"/>
+</Resources>

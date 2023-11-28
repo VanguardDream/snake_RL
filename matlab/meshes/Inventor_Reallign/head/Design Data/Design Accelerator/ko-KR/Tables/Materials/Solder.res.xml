@@ -1,0 +1,13 @@
+<Resources>
+  <string id="%1%" value="접합 재질"/>
+  <string id="%2%" value="재질 지정"/>
+  <string id="%3%" value="접합 인장 강도"/>
+  <string id="%4%" value="psi"/>
+  <string id="%5%" value="접합 전단 강도"/>
+  <string id="%6%" value="주석 땜납"/>
+  <string id="%7%" value="구리 땜납"/>
+  <string id="%8%" value="은 땜납"/>
+  <string id="%9%" value="재질"/>
+  <string id="%10%" value="S||.s|"/>
+  <string id="%11%" value="S||.t|"/>
+</Resources>

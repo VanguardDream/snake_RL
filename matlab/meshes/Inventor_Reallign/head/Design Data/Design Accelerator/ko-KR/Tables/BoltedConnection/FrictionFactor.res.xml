@@ -1,0 +1,17 @@
+<Resources>
+  <string id="%1%" value="마찰계수"/>
+  <string id="%2%" value="재질"/>
+  <string id="%3%" value="윤활되지 않음"/>
+  <string id="%4%" value="윤활됨"/>
+  <string id="%5%" value="강 - 강"/>
+  <string id="%6%" value="강 - 주철"/>
+  <string id="%7%" value="강 - 황동"/>
+  <string id="%8%" value="강 - 황동"/>
+  <string id="%9%" value="주철 - 주철"/>
+  <string id="%10%" value="주철 - 청동"/>
+  <string id="%11%" value="청동 - 청동"/>
+  <string id="%12%" value="알루미늄 - 알루미늄"/>
+  <string id="%13%" value="구리 - 구리"/>
+  <string id="%14%" value="강 - 플렉시글라스"/>
+  <string id="%15%" value="플렉시글라스 - 플렉시글라스"/>
+</Resources>

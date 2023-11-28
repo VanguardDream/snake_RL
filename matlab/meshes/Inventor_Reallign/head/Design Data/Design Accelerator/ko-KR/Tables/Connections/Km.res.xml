@@ -1,0 +1,9 @@
+<Resources>
+  <string id="%1%" value="플랙시블 스플라인의 정렬 불량에 대한 하중 분포 계수"/>
+  <string id="%2%" value="정렬 불량, 인치당 인치"/>
+  <string id="%3%" value="하중 분포 계수, Km"/>
+  <string id="%4%" value="1/2인치 이나비"/>
+  <string id="%5%" value="1인치 이나비"/>
+  <string id="%6%" value="2인치 이나비"/>
+  <string id="%7%" value="4인치 이나비"/>
+</Resources>

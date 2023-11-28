@@ -1,0 +1,9 @@
+<Resources>
+  <string id="%1%" value="스레드 마찰계수"/>
+  <string id="%2%" value="스레드 표면"/>
+  <string id="%3%" value="윤활되지 않음"/>
+  <string id="%4%" value="윤활됨"/>
+  <string id="%5%" value="검정 코팅 또는 인산염 코팅"/>
+  <string id="%6%" value="갈바닉 아연 코팅"/>
+  <string id="%7%" value="카드뮴 도금"/>
+</Resources>

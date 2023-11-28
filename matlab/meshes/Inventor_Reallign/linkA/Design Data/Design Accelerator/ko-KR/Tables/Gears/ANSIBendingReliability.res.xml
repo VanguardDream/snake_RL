@@ -1,0 +1,8 @@
+<Resources>
+  <string id="%1%" value="신뢰도 계수 테이블"/>
+  <string id="%2%" value="99.99% 신뢰도"/>
+  <string id="%3%" value="99.9% 신뢰도"/>
+  <string id="%4%" value="99% 신뢰도"/>
+  <string id="%5%" value="90% 신뢰도"/>
+  <string id="%6%" value="50% 신뢰도"/>
+</Resources>

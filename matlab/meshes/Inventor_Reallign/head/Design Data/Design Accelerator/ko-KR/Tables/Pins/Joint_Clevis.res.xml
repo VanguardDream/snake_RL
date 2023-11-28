@@ -1,0 +1,8 @@
+<Resources>
+  <string id="%1%" value="서비스 계수"/>
+  <string id="%2%" value="정하중"/>
+  <string id="%3%" value="반복 하중"/>
+  <string id="%4%" value="대체 하중"/>
+  <string id="%5%" value="영구 맞춤"/>
+  <string id="%6%" value="실행 중 맞춤"/>
+</Resources>

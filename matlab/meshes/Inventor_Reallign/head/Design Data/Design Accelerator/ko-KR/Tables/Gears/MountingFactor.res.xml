@@ -1,0 +1,11 @@
+<Resources>
+  <string id="%1%" value="마운팅 계수"/>
+  <string id="%2%" value="지원 특성"/>
+  <string id="%3%" value="이나비 [인치]"/>
+  <string id="%4%" value="0-2"/>
+  <string id="%5%" value="최대 16"/>
+  <string id="%6%" value="정확한 마운팅, 작은 베어링 틈새, 최소 처짐, 정밀 기어"/>
+  <string id="%7%" value="강체가 낮은 마운팅, 정확도가 낮은 기어, 전체 면에 걸친 접촉"/>
+  <string id="%8%" value="전체 면 접촉보다 낮은 정확도 및 마운팅이 있습니다."/>
+  <string id="%9%" value="2.2 이상"/>
+</Resources>

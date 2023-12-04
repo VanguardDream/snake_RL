@@ -1,0 +1,5 @@
+<Resources>
+  <string id="%1%" value="작동 온도에 따른 베어링의 정격 하중 감소 계수(SKF)"/>
+  <string id="%2%" value="온도"/>
+  <string id="%3%" value="정격 하중 감소 계수"/>
+</Resources>

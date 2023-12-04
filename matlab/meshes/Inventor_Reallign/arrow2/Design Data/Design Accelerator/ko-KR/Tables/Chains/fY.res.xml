@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?><Resources>
+  <string id="%1%" value="충격 계수"/>
+  <string id="%2%" value="연계 기계"/>
+  <string id="%3%" value="전동 모터"/>
+  <string id="%4%" value="저속 연소 엔진(1개 실린더)"/>
+  <string id="%5%" value="저속 연소 엔진(2개 실린더)"/>
+  <string id="%6%" value="고속 연소 엔진(1개 또는 2개 실린더)"/>
+  <string id="%7%" value="고속 연소 엔진(4개 실린더)"/>
+  <string id="%8%" value="고속 연소 엔진(6개 실린더 이상)"/>
+  <string id="%9%" value="고속 수력 터빈"/>
+  <string id="%10%" value="저속 수력 터빈"/>
+  <string id="%11%" value="증기 터빈"/>
+  <string id="%12%" value="증기 기관"/>
+  <string id="%13%" value="변속기 출력"/>
+  <string id="%14%" value="선반, 드릴"/>
+  <string id="%15%" value="밀링 머신"/>
+  <string id="%16%" value="평삭기"/>
+  <string id="%17%" value="셰이퍼, 슬로터"/>
+  <string id="%18%" value="스트레처 레벌러"/>
+  <string id="%19%" value="유압 프레스"/>
+  <string id="%20%" value="이심 프레스"/>
+  <string id="%21%" value="레버 프레스"/>
+  <string id="%22%" value="목공 기계"/>
+  <string id="%23%" value="룸(Loom)"/>
+  <string id="%24%" value="원형 프레임"/>
+  <string id="%25%" value="플랫 호지어리 프레임"/>
+  <string id="%26%" value="방적기"/>
+  <string id="%27%" value="왕복 단일 단계 압축기"/>
+  <string id="%28%" value="왕복 이중 단계 압축기"/>
+  <string id="%29%" value="원심 단일 단계 압축기"/>
+  <string id="%30%" value="원심 이중 단계 압축기"/>
+  <string id="%31%" value="송풍기"/>
+  <string id="%32%" value="환풍기"/>
+  <string id="%33%" value="피스톤 단일 실린더 펌프"/>
+  <string id="%34%" value="피스톤 이중 실린더 펌프"/>
+  <string id="%35%" value="원심 펌프"/>
+  <string id="%36%" value="멀티 스탠드 밀"/>
+  <string id="%37%" value="연속 밀"/>
+  <string id="%38%" value="파쇄기"/>
+  <string id="%39%" value="팬 밀"/>
+  <string id="%40%" value="튜브 밀"/>
+  <string id="%41%" value="해머 밀"/>
+  <string id="%42%" value="변속기 캘린더"/>
+  <string id="%43%" value="다이렉트 캘린더"/>
+  <string id="%44%" value="셀룰로스 그라인더"/>
+  <string id="%45%" value="쉐이킹 스크린"/>
+  <string id="%46%" value="래밍 머신"/>
+  <string id="%47%" value="회전 믹서"/>
+  <string id="%48%" value="굴삭기"/>
+  <string id="%49%" value="로터리 엔진 경운기"/>
+  <string id="%50%" value="믹서"/>
+  <string id="%51%" value="느슨한 재질용 컨베이어"/>
+  <string id="%52%" value="구조물 재질용 컨베이어"/>
+  <string id="%53%" value="리프팅 장치"/>
+  <string id="%54%" value="포크 리프트 트럭"/>
+  <string id="%55%" value="광산 권양기"/>
+  <string id="%56%" value="발전기 - 대형"/>
+  <string id="%57%" value="발전기 - 소형"/>
+  <string id="%58%" value="변속기 출력"/>
+</Resources>

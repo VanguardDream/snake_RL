@@ -1,0 +1,16 @@
+<Resources>
+  <string id="%1%" value="웜 재질(SI)"/>
+  <string id="%2%" value="재질"/>
+  <string id="%3%" value="재질 지정"/>
+  <string id="%4%" value="웜 재질 계수"/>
+  <string id="%5%" value="ul"/>
+  <string id="%6%" value="E"/>
+  <string id="%7%" value="탄성 계수"/>
+  <string id="%8%" value="||m|"/>
+  <string id="%9%" value="프와송의 비"/>
+  <string id="%10%" value="MPa"/>
+  <string id="%11%" value="경화 강"/>
+  <string id="%12%" value="강"/>
+  <string id="%13%" value="주철"/>
+  <string id="%14%" value="k|.mat|"/>
+</Resources>

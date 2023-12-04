@@ -1,0 +1,12 @@
+<Resources>
+  <string id="%1%" value="저널 베어링 재질"/>
+  <string id="%2%" value="재질 지정"/>
+  <string id="%3%" value="허용 압력"/>
+  <string id="%4%" value="MPa"/>
+  <string id="%5%" value="구조용 강"/>
+  <string id="%6%" value="고등급/합금강"/>
+  <string id="%7%" value="주강"/>
+  <string id="%8%" value="회주철"/>
+  <string id="%9%" value="재질"/>
+  <string id="%10%" value="||s||.al|"/>
+</Resources>

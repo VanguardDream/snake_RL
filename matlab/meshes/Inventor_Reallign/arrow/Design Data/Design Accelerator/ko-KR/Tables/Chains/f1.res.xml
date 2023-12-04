@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?><Resources>
+  <string id="%1%" value="서비스 계수"/>
+  <string id="%2%" value="연계 기계 특징"/>
+  <string id="%3%" value="연동 기계 특징"/>
+  <string id="%4%" value="부드럽게 실행"/>
+  <string id="%5%" value="약한 충격"/>
+  <string id="%6%" value="보통 충격"/>
+  <string id="%7%" value="강한 충격"/>
+  <string id="%8%" value="충격 계수"/>
+</Resources>

@@ -1,0 +1,41 @@
+<Resources>
+<string id="%1%" value="스프링 재질"/>
+<string id="%2%" value="재질 지정"/>
+<string id="%3%" value="밀도"/>
+<string id="%4%" value="kg/m^3"/>
+<string id="%5%" value="인장 계수"/>
+<string id="%6%" value="MPa"/>
+<string id="%7%" value="극한 인장 강도에 대한 허용 굽힘 응력 비율"/>
+<string id="%8%" value="극한 인장 응력"/>
+<string id="%9%" value="특허받은 인발 - 탄소강 - 1등급"/>
+<string id="%10%" value="특허받은 인발 - 탄소강 - 2등급"/>
+<string id="%11%" value="특허받은 인발 - 탄소강 - 3등급"/>
+<string id="%12%" value="특허받은 인발 - 탄소강 - 4등급"/>
+<string id="%13%" value="특허받은 인발 - 탄소강 - 5등급"/>
+<string id="%14%" value="열처리 와이어 탄소강"/>
+<string id="%15%" value="열처리 와이어 - 강 Si-Cr(14 260)"/>
+<string id="%16%" value="가열 냉각 와이어 - 강 Si-Cr(14 260)"/>
+<string id="%17%" value="열처리 와이어 - 강 Mn-Cr-V(15 260)"/>
+<string id="%18%" value="가열 냉각 와이어 - 강 Mn-Cr-V(15 260)"/>
+<string id="%19%" value="인발 와이어 - 스테인리스강 Cr-Ni(17 242)"/>
+<string id="%20%" value="인발 주석 청동(42 3016 및 42 3018)"/>
+<string id="%21%" value="인발 황동(42 3210 및 42 3213)"/>
+<string id="%22%" value="재질"/>
+<string id="%23%" value="표준"/>
+<string id="%24%" value="표준"/>
+<string id="%25%" value="R|.o|"/>
+<string id="%26%" value="E"/>
+<string id="%27%" value="계수"/>
+<string id="%28%" value="WD"/>
+<string id="%29%" value="와이어 지름"/>
+<string id="%30%" value="mm"/>
+<string id="%31%" value="||s||.ult|"/>
+<string id="%32%" value="ISO"/>
+<string id="%33%" value="DIN"/>
+<string id="%34%" value="와이어 지름 및 극한 인장 강도"/>
+<string id="%35%" value="ul"/>
+<string id="%36%" value="강선, 클래스 1"/>
+<string id="%37%" value="강선, 클래스 2 및 2A"/>
+<string id="%38%" value="강선, 클래스 3"/>
+<string id="%39%" value="GOST"/>
+</Resources>

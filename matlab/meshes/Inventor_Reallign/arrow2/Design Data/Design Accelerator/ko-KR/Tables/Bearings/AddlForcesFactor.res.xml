@@ -1,0 +1,20 @@
+<Resources>
+  <string id="%1%" value="추가 힘 계수"/>
+  <string id="%2%" value="계수"/>
+  <string id="%3%" value="기계 유형"/>
+  <string id="%4%" value="전기식 회전 기계, 터빈, 터보 압축기"/>
+  <string id="%5%" value="철도 및 피스톤 엔진"/>
+  <string id="%6%" value="벨트 컨베이어, 삭도, 펌프, 팬"/>
+  <string id="%7%" value="크레인, 엘리베이터, 광산 팬"/>
+  <string id="%8%" value="광산 엘리베이터 및 펌프"/>
+  <string id="%9%" value="피스톤 펌프 및 압축기"/>
+  <string id="%10%" value="팬, 튜브 및 해머 밀, 파쇄기"/>
+  <string id="%11%" value="굴착기"/>
+  <string id="%12%" value="건조 드럼"/>
+  <string id="%13%" value="종이 및 직물 기계"/>
+  <string id="%14%" value="음식 조리용 기계"/>
+  <string id="%15%" value="연삭기; 천공기, 분쇄기, 톱 기계 및 목재 절단기"/>
+  <string id="%16%" value="선반, 왕복 절단기"/>
+  <string id="%17%" value="롤링 밀, 단조 해머, 동력 시트 전단기, 쇄광기"/>
+  <string id="%18%" value="조압연기"/>
+</Resources>

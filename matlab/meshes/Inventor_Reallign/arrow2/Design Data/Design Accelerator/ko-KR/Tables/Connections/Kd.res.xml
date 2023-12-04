@@ -1,0 +1,6 @@
+<Resources>
+  <string id="%1%" value="커플링 설계 계수"/>
+  <string id="%2%" value="고정 연결"/>
+  <string id="%3%" value="하중이 없을 때의 슬라이딩 커플링"/>
+  <string id="%4%" value="하중이 있을 때의 슬라이딩 커플링"/>
+</Resources>

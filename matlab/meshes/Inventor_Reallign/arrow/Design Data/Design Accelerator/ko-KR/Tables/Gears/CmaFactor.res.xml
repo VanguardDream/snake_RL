@@ -1,0 +1,6 @@
+<Resources>
+  <string id="%1%" value="기어링 열기"/>
+  <string id="%2%" value="상용 닫힌 기어 장치"/>
+  <string id="%3%" value="정밀한 닫힌 기어 장치"/>
+  <string id="%4%" value="매우 정밀한 닫힌 기어 장치"/>
+</Resources>

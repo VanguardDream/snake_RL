@@ -1,0 +1,12 @@
+<Resources>
+  <string id="%1%" value="원하는 서비스 수명(백만회 회전)"/>
+  <string id="%2%" value="낮은 RPM(거의 사용되지 않음)"/>
+  <string id="%3%" value="낮은 RPM(항상 최대한 사용되지는 않음)"/>
+  <string id="%4%" value="낮은 RPM(최대한 사용됨)"/>
+  <string id="%5%" value="중간 RPM(거의 사용되지 않음)"/>
+  <string id="%6%" value="중간 RPM(항상 최대한 사용되지는 않음)"/>
+  <string id="%7%" value="중간 RPM(최대한 사용됨)"/>
+  <string id="%8%" value="높은 RPM(거의 사용되지 않음)"/>
+  <string id="%9%" value="높은 RPM(항상 최대한 사용되지는 않음)"/>
+  <string id="%10%" value="높은 RPM(최대한 사용됨)"/>
+</Resources>

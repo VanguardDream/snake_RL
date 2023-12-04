@@ -1,0 +1,14 @@
+<Resources>
+  <string id="%1%" value="DIN 5480 - 커터 유형"/>
+  <string id="%2%" value="유형"/>
+  <string id="%3%" value="플랭크 완료"/>
+  <string id="%4%" value="h|.aP0|"/>
+  <string id="%5%" value="이끝 높이 계수"/>  
+  <string id="%6%" value="ul"/>
+  <string id="%7%" value="밀링"/>
+  <string id="%8%" value="포크"/>  
+  <string id="%9%" value="브로치"/> 
+  <string id="%10%" value="기준"/>   
+  <string id="%11%" value="c|.FP0|"/>  
+  <string id="%12%" value="계수"/>      
+</Resources>

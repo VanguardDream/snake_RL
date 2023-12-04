@@ -1,0 +1,6 @@
+<Resources>
+  <string id="%1%" value="접시형 스프링 - CSN"/>
+  <string id="%2%" value="접시형 스프링 - ANSI"/>
+  <string id="%3%" value="접시형 스프링 - DIN"/>
+  <string id="%4%" value="접시형 스프링 - GOST"/>
+</Resources>

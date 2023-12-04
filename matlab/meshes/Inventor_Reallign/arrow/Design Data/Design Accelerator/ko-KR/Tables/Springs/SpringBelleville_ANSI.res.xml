@@ -1,0 +1,14 @@
+<Resources>
+  <string id="%1%" value="접시형 스프링 - ANSI"/>
+  <string id="%2%" value="이름"/>
+  <string id="%3%" value="스프링 지정"/>
+  <string id="%4%" value="D"/>
+  <string id="%5%" value="외부 지름"/>
+  <string id="%6%" value="in"/>
+  <string id="%7%" value="내부 지름"/>
+  <string id="%8%" value="d"/>
+  <string id="%9%" value="재질 두께"/>
+  <string id="%10%" value="t"/>
+  <string id="%11%" value="하중 제거된 높이"/>
+  <string id="%12%" value="H"/>
+</Resources>

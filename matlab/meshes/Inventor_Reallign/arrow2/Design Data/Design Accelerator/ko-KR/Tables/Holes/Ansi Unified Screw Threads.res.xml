@@ -1,0 +1,17 @@
+<Resources>
+  <string id="%1%" value="공칭 지름"/>
+  <string id="%2%" value="밀접한 틈새"/>
+  <string id="%3%" value="보통 틈새"/>
+  <string id="%4%" value="여유있는 틈새"/>
+  <string id="%5%" value="머리 지름"/>
+  <string id="%6%" value="카운터보어 깊이"/>
+  <string id="%7%" value="카운터싱크 각도"/>
+  <string id="%8%" value="ANSI 통합 나사 스레드"/>
+  <string id="%9%" value="ANSI 접시 머리 작은 나사(82)"/>
+  <string id="%10%" value="ANSI 접시 머리 작은 나사(100)"/>
+  <string id="%11%" value="ANSI 6각 머리 볼트"/>
+  <string id="%12%" value="ANSI 6각 작은 나사"/>
+  <string id="%13%" value="ANSI 타원형 머리 작은 나사"/>
+  <string id="%14%" value="ANSI 소켓 머리 캡 나사"/>
+  <string id="%15%" value="ANSI 접시 머리 작은 나사(80)"/>
+</Resources>

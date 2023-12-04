@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?><Resources>
+  <string id="%1%" value="ANSI"/>
+  <string id="%2%" value="접시 머리 작은 나사(82)"/>
+  <string id="%3%" value="접시 머리 작은 나사(100)"/>
+  <string id="%4%" value="6각 머리 볼트"/>
+  <string id="%5%" value="6각 작은 나사"/>
+  <string id="%6%" value="타원형 머리 작은 나사"/>
+  <string id="%7%" value="소켓 머리 캡 나사"/>
+  <string id="%8%" value="ANSI(미터법)"/>
+  <string id="%9%" value="접시 머리 작은 나사"/>
+  <string id="%10%" value="6각 머리 캡 나사"/>
+  <string id="%11%" value="6각 머리 작은 나사"/>
+  <string id="%12%" value="DIN"/>
+  <string id="%13%" value="카운터싱크 접시 머리 나사"/>
+  <string id="%14%" value="카운터싱크 양각 머리 나사"/>
+  <string id="%15%" value="6각 머리 나사"/>
+  <string id="%16%" value="6각 소켓 카운터싱크 6각 나사"/>
+  <string id="%17%" value="6각 소켓 머리 캡 나사"/>
+  <string id="%18%" value="ISO"/>
+  <string id="%19%" value="6각 소켓 카운터싱크 캡 나사"/>
+  <string id="%20%" value="JIS"/>
+  <string id="%21%" value="드릴 구멍"/>
+  <string id="%22%" value="접시 머리 작은 나사(80)"/>
+  <string id="%23%" value="카운터싱크 접시 머리 나사 DIN EN ISO 2009"/>
+  <string id="%24%" value="카운터싱크 양각 머리 나사 ISO 2010"/>
+  <string id="%25%" value="6각 머리 캡 나사 DIN EN 24017"/>
+  <string id="%26%" value="6각 머리 캡 나사 DIN EN 24014(접촉 공간)"/>
+  <string id="%27%" value="카운터싱크 접시 머리 6각 소켓 나사 DIN EN ISO 10642"/>
+  <string id="%28%" value="소켓 머리 캡 나사 DIN EN ISO 4762"/>
+  <string id="%29%" value="홈붙이 치즈 머리 나사 DIN 84"/>
+  <string id="%30%" value="카운터싱크 접시 머리 나사 ISO 2009/7046"/>
+  <string id="%31%" value="카운터싱크 양각 머리 나사 ISO 2010/7047"/>
+  <string id="%32%" value="6각 머리 캡 나사 ISO 24017"/>
+  <string id="%33%" value="6각 머리 캡 나사 ISO 24014(접촉 공간)"/>
+  <string id="%34%" value="카운터싱크 접시 머리 6각 소켓 나사 ISO 10642"/>
+  <string id="%35%" value="소켓 머리 캡 나사 ISO 4762"/>
+  <string id="%36%" value="홈붙이 치즈 머리 나사 ISO 1207"/>
+  <string id="%37%" value="GOST"/>
+  <string id="%38%" value="GOST 12876-67"/>
+  <string id="%39%" value="접시머리 GOST 12876-67"/>
+  <string id="%40%" value="접시머리 + 워셔 GOST 12876-67"/>
+  <string id="%41%" value="6각 머리 볼트/너트 GOST 12876-67"/>  
+  <string id="%42%" value="6각 머리 볼트/너트(축소된 크기) GOST 12876-67"/>
+  <string id="%43%" value="6각 머리 볼트/너트(확대된 워셔) GOST 12876-67"/>
+  <string id="%44%" value="원통형 머리 6각 소켓 나사 GOST 12876-67"/>
+  <string id="%45%" value="원통형 머리 6각 소켓 나사 + 워셔 GOST 12876-67"/>
+  <string id="%46%" value="원통형 머리 홈붙이 나사 GOST 12876-67"/>
+  <string id="%47%" value="원통형 머리 홈붙이 나사 + 워셔 GOST 12876-67"/>
+</Resources>

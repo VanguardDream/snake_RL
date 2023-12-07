@@ -5,6 +5,7 @@ clc;
 robot = rigidBodyTree;
 robot.BaseName = 'base_link';
 robot.DataFormat = 'row';
+robot.Gravity = [0 0 0];
 
 %% Head 링크 구성 정보
 tf_zero = trvec2tform([0 0 0]); %tf1 translation (xyz)
@@ -118,16 +119,16 @@ addBody(robot,tail,'link13');
 
 clear i tmpBody linkNumber linkName refBody joint1 joint2 joint14 head link1 link2 tail;
 %%
-% rndconfig = randomConfiguration(robot);
-% [comLocation,comJac] = centerOfMass(robot, rndconfig);
-% 
-% show(robot, rndconfig);
-% 
-% hold all
-% plot3(comLocation(1),comLocation(2),comLocation(3),Marker="x",MarkerSize=30,LineWidth=5);
+rndconfig = randomConfiguration(robot);
+[comLocation,comJac] = centerOfMass(robot, rndconfig);
 
-%% 구성 확인
-[comLocation,comJac] = centerOfMass(robot);
-show(robot);
+show(robot, rndconfig);
+
 hold all
 plot3(comLocation(1),comLocation(2),comLocation(3),Marker="x",MarkerSize=30,LineWidth=5);
+
+%% 구성 확인
+% [comLocation,comJac] = centerOfMass(robot);
+% show(robot);
+% hold all
+% plot3(comLocation(1),comLocation(2),comLocation(3),Marker="x",MarkerSize=30,LineWidth=5);

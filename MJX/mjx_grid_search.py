@@ -10,7 +10,7 @@ import time
 import numpy as np
 import itertools
 
-from multiprocessing import Process, Queue
+from multiprocessing import Process, Queue, shared_memory
 
 m_serp = np.eye(14)
 
@@ -117,6 +117,7 @@ def sim_start() -> None:
 
 def param2filename(params:np.ndarray)->str:
     f_name = str(params)
+    f_name = f_name.replace(',','')
     f_name = f_name.replace(' ','x')
     f_name = f_name.replace('[','')
     f_name = f_name.replace(']','')
@@ -183,17 +184,48 @@ def J(t, parameters:np.ndarray, g:str = 'serp', visual:bool = False, savelog:boo
         if savelog:
             media.write_video(f_name+g+'.mp4',frames, fps=100)
     
-    print(time.time() - time_start_sim)
+    # print(time.time() - time_start_sim)
 
-    if savelog:
-        data = {g+"trajectory_"+f_name: p_head}
-        savemat(g+f_name+'.mat',data)
+    if savelog and not(visual):
+        sim_data = {g+"trajectory_"+f_name: p_head}
+        savemat(g+f_name+'.mat',sim_data)
 
-    return data.body('head').xpos.copy()
+    # return data.body('head').xpos.copy()
+    return np.hstack((data.body('head').xpos.copy(), data.sensordata[48:52].copy()))
+
+def iter_J(basis:np.ndarray, param, g:str, shd_name:str, shd_shape, visual:bool, savelog:bool) -> None:
+    param_coeff = [10, 10, 0.8 * np.pi, 0.8 * np.pi, 8 * np.pi, 8 * np.pi, 10]
+
+    for i in param:
+        exist_shm = shared_memory.SharedMemory(name=shd_name)
+        d_map = np.ndarray(shd_shape, dtype=np.float64, buffer=exist_shm.buf)
+
+        idx = i - (basis + np.array([1, 1, 1, 1, 1, 1, 0]))
+        combinations = np.round(np.divide(i, param_coeff), 2)
+
+        d_map[idx[0], idx[1], idx[2], idx[3], idx[4], idx[5], idx[6], :] = J(t, combinations, g, visual, savelog)
+
+        # print(d_map[idx[0], idx[1], idx[2], idx[3], idx[4], idx[5], idx[6], :])
+        # print(J(t, combinations, g, visual, savelog))
+
+        exist_shm.close()
+
+def base2Param(base:list, param:list) -> np.ndarray:
+    base = np.array(base)
+    param = np.array(param)
+    idx = np.array([1, 1, 1, 1, 1, 1, 0])
+
+    param_coeff = [10, 10, 0.8 * np.pi, 0.8 * np.pi, 8 * np.pi, 8 * np.pi, 10]
+
+    input_p = np.round(np.divide((base + param +  idx), param_coeff), 2)
+
+    return input_p
 
 def orderize_J(param_min:np.ndarray, param_max:np.ndarray, g:str = 'serp', visual:bool = False, savelog:bool = False)->np.ndarray:
     #min param -> [0, 0, 0, 0, 0, 0, 0]
     #max param -> [14, 14, 16, 16, 16, 16, 0]
+
+    basis = param_min
 
     a_d = np.arange(1,15)[param_min[0]:param_max[0]] # Radian
     a_l = np.arange(1,15)[param_min[1]:param_max[1]] # Radian
@@ -204,29 +236,41 @@ def orderize_J(param_min:np.ndarray, param_max:np.ndarray, g:str = 'serp', visua
     # p = np.random.randint(1,17) / 8 * np.pi
     p = [0] # Radian
 
-    combinations = list(itertools.product(a_d, a_l, o_d, o_l, n_d, n_l, p))
-    param_coeff = [10, 10, 8 * np.pi, 8 * np.pi, 8 * np.pi, 8 * np.pi, 10]
+    n1 = len(a_d)
+    n2 = len(a_l)
+    n3 = len(o_d)
+    n4 = len(o_l)
+    n5 = len(n_d)
+    n6 = len(n_l)
+    n7 = len(p)
 
-    combinations = np.round(np.divide(combinations, param_coeff), 1)
+    vel_map = np.empty((n1,n2,n3,n4,n5,n6,n7,7), dtype=np.float64)
+    shm = shared_memory.SharedMemory(name="shared_vel_map", create=True, size=vel_map.nbytes)
+    data_map = np.ndarray(vel_map.shape, dtype=vel_map.dtype, buffer=shm.buf)
+
+    combinations = list(itertools.product(a_d, a_l, o_d, o_l, n_d, n_l, p))
 
     print(f'Number of Combinations : {len(combinations)}')
 
-    ea = len(combinations) // 6
+    ea = len(combinations) // 12
 
-    start_idx = [0, 1 * ea, 2 * ea, 3 * ea, 4 * ea, 5 * ea] 
+    start_idx = [0, 1 * ea, 2 * ea, 3 * ea, 4 * ea, 5 * ea, 6 * ea, 7 * ea, 8 * ea , 9 * ea, 10 * ea, 11 * ea] 
 
-    print(f'For 6 processes start indices : {start_idx}')
+    print(f'For 12 processes start indices : {start_idx}')
 
-    def iter_J(param, g:str, visual:bool, savelog:bool):
-        for i in range(iter):
-            print(J(t, i, g, visual, savelog))
+    pc1 = Process(target=iter_J, args=(np.array(basis), list(combinations[start_idx[0]:start_idx[1]]), g, shm.name, vel_map.shape, visual, savelog))
+    pc2 = Process(target=iter_J, args=(np.array(basis), list(combinations[start_idx[1]:start_idx[2]]), g, shm.name, vel_map.shape, visual, savelog))
+    pc3 = Process(target=iter_J, args=(np.array(basis), list(combinations[start_idx[2]:start_idx[3]]), g, shm.name, vel_map.shape, visual, savelog))
+    pc4 = Process(target=iter_J, args=(np.array(basis), list(combinations[start_idx[3]:start_idx[4]]), g, shm.name, vel_map.shape, visual, savelog))
+    pc5 = Process(target=iter_J, args=(np.array(basis), list(combinations[start_idx[4]:start_idx[5]]), g, shm.name, vel_map.shape, visual, savelog))
+    pc6 = Process(target=iter_J, args=(np.array(basis), list(combinations[start_idx[5]:start_idx[6]]), g, shm.name, vel_map.shape, visual, savelog))
+    pc7 = Process(target=iter_J, args=(np.array(basis), list(combinations[start_idx[6]:start_idx[7]]), g, shm.name, vel_map.shape, visual, savelog))
+    pc8 = Process(target=iter_J, args=(np.array(basis), list(combinations[start_idx[7]:start_idx[8]]), g, shm.name, vel_map.shape, visual, savelog))
+    pc9 = Process(target=iter_J, args=(np.array(basis), list(combinations[start_idx[8]:start_idx[9]]), g, shm.name, vel_map.shape, visual, savelog))
+    pc10 = Process(target=iter_J, args=(np.array(basis), list(combinations[start_idx[9]:start_idx[10]]), g, shm.name, vel_map.shape, visual, savelog))
+    pc11 = Process(target=iter_J, args=(np.array(basis), list(combinations[start_idx[10]:start_idx[11]]), g, shm.name, vel_map.shape, visual, savelog))
+    pc12 = Process(target=iter_J, args=(np.array(basis), list(combinations[start_idx[11]::]), g, shm.name, vel_map.shape, visual, savelog))
 
-    pc1 = Process(target=iter_J, args=(combinations[start_idx[0]:start_idx[1]], g, visual, savelog))
-    pc2 = Process(target=iter_J, args=(combinations[start_idx[1]:start_idx[2]], g, visual, savelog))
-    pc3 = Process(target=iter_J, args=(combinations[start_idx[2]:start_idx[3]], g, visual, savelog))
-    pc4 = Process(target=iter_J, args=(combinations[start_idx[3]:start_idx[4]], g, visual, savelog))
-    pc5 = Process(target=iter_J, args=(combinations[start_idx[4]:start_idx[5]], g, visual, savelog))
-    pc6 = Process(target=iter_J, args=(combinations[start_idx[5]::], g, visual, savelog))
 
     pc1.start()
     pc2.start()
@@ -234,12 +278,37 @@ def orderize_J(param_min:np.ndarray, param_max:np.ndarray, g:str = 'serp', visua
     pc4.start()
     pc5.start()
     pc6.start()
+    pc7.start()
+    pc8.start()
+    pc9.start()
+    pc10.start()
+    pc11.start()
+    pc12.start()
+
     pc1.join()
     pc2.join()
     pc3.join()
     pc4.join()
     pc5.join()
     pc6.join()
+    pc7.join()
+    pc8.join()
+    pc9.join()
+    pc10.join()
+    pc11.join()
+    pc12.join()
+
+    # for i in combinations:
+    #     idx = i - (basis + np.array([1,1,1,1,1,1,0]))
+    #     print(data_map[idx[0], idx[1], idx[2], idx[3], idx[4], idx[5], idx[6], :])
+
+    data_dict = {g+'_map': data_map, g+'_basis' : basis}
+    savemat("vel_map_"+g+'_b_'+param2filename(basis)+f"_{len(combinations)}"+"_.mat", data_dict)
+    
+    shm.close()
+    shm.unlink()
+
+    print('done')
 
 
 ### Main script
@@ -247,10 +316,24 @@ if __name__ == "__main__":
     params = np.array([1.3, 0.6, 5.50, 0.79, 5.90, 6.30, 0])
     params = np.round(params, 1)
 
-    orderize_J([7, 7, 0, 0, 0, 0, 0], [8, 8, 2, 2, 2, 2, 0])
-    # pc1 = Process(target=J, args=())
-    # J(t, params, 'side', False, True)
+    grid_start_time = time.time()
 
-    pass
+    # Sim once
+    bais = [7, 7, 14, 7, 0, 0, 0]
+    param = [0, 0, 0, 0, 10, 5, 0]
+
+    J(t, base2Param(bais, param), 'side', True, True)
+
+    # Grid Search
+    # orderize_J([7, 7, 14, 7, 0, 0, 0], [8, 8, 15, 8, 16, 16, 1],g='serp')
+    # orderize_J([7, 7, 14, 7, 0, 0, 0], [8, 8, 15, 8, 16, 16, 1],g='side')
+    # orderize_J([7, 7, 14, 7, 0, 0, 0], [8, 8, 15, 8, 16, 16, 1],g='ones')
+
+    print(f'Simdone... {time.time() - grid_start_time}')
+
+    # vel_map = np.empty((15,15,17,17,17), dtype=object)
+    # vel_map[0,0,0,0,0] = np.array([0, 0, 0])
+    # data_dict = {'map': vel_map}
+    # savemat("testing.mat", data_dict, noneObject=[0])
 
 

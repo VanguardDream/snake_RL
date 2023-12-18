@@ -10,6 +10,7 @@ import time
 import numpy as np
 import itertools
 
+from scipy.spatial.transform import Rotation
 from multiprocessing import Process, Queue, shared_memory
 
 m_serp = np.eye(14)
@@ -186,7 +187,10 @@ def J(t, parameters:np.ndarray, g:str = 'serp', visual:bool = False, savelog:boo
         sim_data = {g+"_trajectory_"+f_name: p_head}
         savemat("trajectory_"+g+f_name+'.mat',sim_data)
 
-    return np.mean(p_head, axis=0)
+    ori_head = p_head[:,3::]
+    quat_p_head = Rotation.from_quat(ori_head[:, [1, 2, 3, 0]].copy())
+    
+    return np.hstack((np.mean(p_head[:,0:3], axis=0), Rotation.mean(quat_p_head).as_quat()[3], Rotation.mean(quat_p_head).as_quat()[0], Rotation.mean(quat_p_head).as_quat()[1], Rotation.mean(quat_p_head).as_quat()[2]))
     # return np.hstack((data.body('head').xpos.copy(), data.sensordata[48:52].copy()))
 
 def iter_J(basis:np.ndarray, param, g:str, shd_name:str, shd_shape, visual:bool, savelog:bool) -> None:
@@ -316,7 +320,8 @@ if __name__ == "__main__":
     # param = [0, 0, 0, 0, 3, 11, 0]
 
     # sim_data = J(t, base2Param(bais, param), 'serp', False, False)
-    # # print(np.linalg.norm(sim_data[0:3]))
+    # print(sim_data)
+    # print(np.linalg.norm(sim_data[0:3]))
 
     # Grid Search
     orderize_J([7, 7, 14, 7, 0, 0, 0], [8, 8, 15, 8, 16, 16, 1],g='serp')

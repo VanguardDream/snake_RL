@@ -141,10 +141,9 @@ def J(t, parameters:np.ndarray, g:str = 'serp', visual:bool = False, savelog:boo
 
     q = make_gait_input(make_ref_input(t, parameters[0], parameters[1], parameters[2], parameters[3], parameters[4], parameters[5], parameters[6]), m)
     
-    if savelog:
-        p_head = np.empty((0,7))
-        step_data = np.hstack((data.body('head').xpos.copy(), data.sensordata[48:52].copy()))
-        p_head = np.vstack((p_head, step_data))
+    p_head = np.empty((0,7))
+    step_data = np.hstack((data.body('head').xpos.copy(), data.sensordata[48:52].copy()))
+    p_head = np.vstack((p_head, step_data))
 
     if visual:
         with mujoco.viewer.launch_passive(snake, data) as viewer:
@@ -155,9 +154,8 @@ def J(t, parameters:np.ndarray, g:str = 'serp', visual:bool = False, savelog:boo
 
                 mujoco.mj_step(snake, data)
 
-                if savelog:
-                    step_data = np.hstack((data.body('head').xpos.copy(), data.sensordata[48:52].copy()))
-                    p_head = np.vstack((p_head, step_data))
+                step_data = np.hstack((data.body('head').xpos.copy(), data.sensordata[48:52].copy()))
+                p_head = np.vstack((p_head, step_data))
 
                 viewer.sync()
 
@@ -172,10 +170,10 @@ def J(t, parameters:np.ndarray, g:str = 'serp', visual:bool = False, savelog:boo
 
             mujoco.mj_step(snake, data)
 
-            if savelog:
-                step_data = np.hstack((data.body('head').xpos.copy(), data.sensordata[48:52].copy()))
-                p_head = np.vstack((p_head, step_data))
+            step_data = np.hstack((data.body('head').xpos.copy(), data.sensordata[48:52].copy()))
+            p_head = np.vstack((p_head, step_data))
 
+            if savelog:
                 renderer.update_scene(data)
                 pixel = renderer.render()
 
@@ -184,14 +182,12 @@ def J(t, parameters:np.ndarray, g:str = 'serp', visual:bool = False, savelog:boo
         if savelog:
             media.write_video(f_name+g+'.mp4',frames, fps=100)
     
-    # print(time.time() - time_start_sim)
-
     if savelog and not(visual):
-        sim_data = {g+"trajectory_"+f_name: p_head}
-        savemat(g+f_name+'.mat',sim_data)
+        sim_data = {g+"_trajectory_"+f_name: p_head}
+        savemat("trajectory_"+g+f_name+'.mat',sim_data)
 
-    # return data.body('head').xpos.copy()
-    return np.hstack((data.body('head').xpos.copy(), data.sensordata[48:52].copy()))
+    return np.mean(p_head, axis=0)
+    # return np.hstack((data.body('head').xpos.copy(), data.sensordata[48:52].copy()))
 
 def iter_J(basis:np.ndarray, param, g:str, shd_name:str, shd_shape, visual:bool, savelog:bool) -> None:
     param_coeff = [10, 10, 0.8 * np.pi, 0.8 * np.pi, 8 * np.pi, 8 * np.pi, 10]
@@ -209,17 +205,6 @@ def iter_J(basis:np.ndarray, param, g:str, shd_name:str, shd_shape, visual:bool,
         # print(J(t, combinations, g, visual, savelog))
 
         exist_shm.close()
-
-def base2Param(base:list, param:list) -> np.ndarray:
-    base = np.array(base)
-    param = np.array(param)
-    idx = np.array([1, 1, 1, 1, 1, 1, 0])
-
-    param_coeff = [10, 10, 0.8 * np.pi, 0.8 * np.pi, 8 * np.pi, 8 * np.pi, 10]
-
-    input_p = np.round(np.divide((base + param +  idx), param_coeff), 2)
-
-    return input_p
 
 def orderize_J(param_min:np.ndarray, param_max:np.ndarray, g:str = 'serp', visual:bool = False, savelog:bool = False)->np.ndarray:
     #min param -> [0, 0, 0, 0, 0, 0, 0]
@@ -310,24 +295,33 @@ def orderize_J(param_min:np.ndarray, param_max:np.ndarray, g:str = 'serp', visua
 
     print('done')
 
+def base2Param(base:list, param:list) -> np.ndarray:
+    base = np.array(base)
+    param = np.array(param)
+    idx = np.array([1, 1, 1, 1, 1, 1, 0])
+
+    param_coeff = [10, 10, 0.8 * np.pi, 0.8 * np.pi, 8 * np.pi, 8 * np.pi, 10]
+
+    input_p = np.round(np.divide((base + param +  idx), param_coeff), 2)
+
+    return input_p
+
 
 ### Main script
 if __name__ == "__main__":
-    params = np.array([1.3, 0.6, 5.50, 0.79, 5.90, 6.30, 0])
-    params = np.round(params, 1)
-
     grid_start_time = time.time()
 
-    # Sim once
-    bais = [7, 7, 14, 7, 0, 0, 0]
-    param = [0, 0, 0, 0, 10, 5, 0]
+    # # Sim once
+    # bais = [7, 7, 14, 7, 0, 0, 0]
+    # param = [0, 0, 0, 0, 3, 11, 0]
 
-    J(t, base2Param(bais, param), 'side', True, True)
+    # sim_data = J(t, base2Param(bais, param), 'serp', False, False)
+    # # print(np.linalg.norm(sim_data[0:3]))
 
     # Grid Search
-    # orderize_J([7, 7, 14, 7, 0, 0, 0], [8, 8, 15, 8, 16, 16, 1],g='serp')
-    # orderize_J([7, 7, 14, 7, 0, 0, 0], [8, 8, 15, 8, 16, 16, 1],g='side')
-    # orderize_J([7, 7, 14, 7, 0, 0, 0], [8, 8, 15, 8, 16, 16, 1],g='ones')
+    orderize_J([7, 7, 14, 7, 0, 0, 0], [8, 8, 15, 8, 16, 16, 1],g='serp')
+    orderize_J([7, 7, 14, 7, 0, 0, 0], [8, 8, 15, 8, 16, 16, 1],g='side')
+    orderize_J([7, 7, 14, 7, 0, 0, 0], [8, 8, 15, 8, 16, 16, 1],g='ones')
 
     print(f'Simdone... {time.time() - grid_start_time}')
 

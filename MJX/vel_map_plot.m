@@ -14,9 +14,9 @@ Y = 1:1:sz(2);
 
 for dX = 1:1:sz(1);
     for dY = 1:1:sz(2);
-        T_serp(dX,dY) = norm(squeeze(serp_map(dX,dY,4:6)));
-        T_side(dX,dY) = norm(squeeze(side_map(dX,dY,4:6)));
-        T_ones(dX,dY) = norm(squeeze(ones_map(dX,dY,4:6)));
+        T_serp(dX,dY) = transpose(norm(squeeze(serp_map(dX,dY,1:3))));
+        T_side(dX,dY) = transpose(norm(squeeze(side_map(dX,dY,1:3))));
+        T_ones(dX,dY) = transpose(norm(squeeze(ones_map(dX,dY,1:3))));
     end
 end
 

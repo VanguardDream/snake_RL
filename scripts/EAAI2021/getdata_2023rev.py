@@ -315,16 +315,16 @@ def main5():
     # do_sim(obj_sims[0],[0,0,0,0], [2,2,2,2], num_done, result_data_mat)
     # ((41,73,41,73))
 
-    th0 = Thread(target=do_sim, args=(obj_sims[0], [0, 0, 0, 0], [4, 73, 41, 73]))
-    th1 = Thread(target=do_sim, args=(obj_sims[1], [4, 0, 0, 0], [8, 73, 41, 73]))
-    th2 = Thread(target=do_sim, args=(obj_sims[2], [8, 0, 0, 0], [12, 73, 41, 73]))
-    th3 = Thread(target=do_sim, args=(obj_sims[3], [12, 0, 0, 0], [16, 73, 41, 73]))
-    th4 = Thread(target=do_sim, args=(obj_sims[4], [16, 0, 0, 0], [20, 73, 41, 73]))
-    th5 = Thread(target=do_sim, args=(obj_sims[5], [20, 0, 0, 0], [24, 73, 41, 73]))
-    th6 = Thread(target=do_sim, args=(obj_sims[6], [24, 0, 0, 0], [28, 73, 41, 73]))
-    th7 = Thread(target=do_sim, args=(obj_sims[7], [28, 0, 0, 0], [32, 73, 41, 73]))
-    th8 = Thread(target=do_sim, args=(obj_sims[8], [32, 0, 0, 0], [36, 73, 41, 73]))
-    th9 = Thread(target=do_sim, args=(obj_sims[9], [36, 0, 0, 0], [41, 73, 41, 73]))
+    th0 = Thread(target=do_sim, args=(obj_sims[0], [3, 72, 0, 0], [4, 73, 41, 73]))
+    th1 = Thread(target=do_sim, args=(obj_sims[1], [7, 72, 0, 0], [8, 73, 41, 73]))
+    th2 = Thread(target=do_sim, args=(obj_sims[2], [11, 72, 0, 0], [12, 73, 41, 73]))
+    th3 = Thread(target=do_sim, args=(obj_sims[3], [15, 72, 0, 0], [16, 73, 41, 73]))
+    th4 = Thread(target=do_sim, args=(obj_sims[4], [19, 72, 0, 0], [20, 73, 41, 73]))
+    th5 = Thread(target=do_sim, args=(obj_sims[5], [23, 72, 0, 0], [24, 73, 41, 73]))
+    th6 = Thread(target=do_sim, args=(obj_sims[6], [27, 72, 0, 0], [28, 73, 41, 73]))
+    th7 = Thread(target=do_sim, args=(obj_sims[7], [31, 72, 0, 0], [32, 73, 41, 73]))
+    th8 = Thread(target=do_sim, args=(obj_sims[8], [35, 72, 0, 0], [36, 73, 41, 73]))
+    th9 = Thread(target=do_sim, args=(obj_sims[9], [40, 72, 0, 0], [41, 73, 41, 73]))
 
     # th0 = Thread(target=do_sim, args=(obj_sims[0], [0,0,0,0], [4,7,4,7]))
     # th1 = Thread(target=do_sim, args=(obj_sims[1], [4,7,4,7], [8,14,8,14]))
@@ -368,4 +368,9 @@ def main5():
 
 
 if __name__ == "__main__":
+        import time
+
+        print('Sim start...')
+        t_start = time.time()
         main5()
+        print(time.time-t_start)

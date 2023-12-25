@@ -127,7 +127,86 @@ def param2filename(params:np.ndarray)->str:
     return f_name
 
 def J(t, parameters:np.ndarray, g:str = 'serp', visual:bool = False, savelog:bool = False) -> np.ndarray:
-    snake = mujoco.MjModel.from_xml_path("../dmc/models/snake_circle_contact.xml")
+    snake = mujoco.MjModel.from_xml_path("../dmc/models/snake_circle_contact_servo.xml")
+    data = mujoco.MjData(snake)
+    mujoco.mj_forward(snake, data)
+
+    f_name = param2filename(parameters)
+    m = []
+    if g == "serp":
+        m = m_serp
+    elif g == "side":
+        m = m_side
+    elif g == "ones":
+        m = m_ones
+
+    q = make_gait_input(make_ref_input(t, parameters[0], parameters[1], parameters[2], parameters[3], parameters[4], parameters[5], parameters[6]), m)
+    
+    p_head = np.empty((0,7))
+    step_data = np.hstack((data.body('head').xpos.copy(), data.sensordata[48:52].copy()))
+    p_head = np.vstack((p_head, step_data))
+
+    if visual:
+        with mujoco.viewer.launch_passive(snake, data) as viewer:
+            time_start_sim = time.time()
+            for i in q:
+                time_step = time.time()
+                data.ctrl= i
+
+                mujoco.mj_step(snake, data)
+
+                step_data = np.hstack((data.body('head').xpos.copy(), data.sensordata[48:52].copy()))
+                p_head = np.vstack((p_head, step_data))
+
+                viewer.sync()
+
+                while snake.opt.timestep - (time.time() - time_step) > 0:
+                    time.sleep(0)
+    else:
+        renderer = mujoco.Renderer(snake)
+        frames = []
+        time_start_sim = time.time()
+        for i in q:
+            data.ctrl= i
+
+            mujoco.mj_step(snake, data)
+
+            step_data = np.hstack((data.body('head').xpos.copy(), data.sensordata[48:52].copy()))
+            p_head = np.vstack((p_head, step_data))
+
+            if savelog:
+                renderer.update_scene(data)
+                pixel = renderer.render()
+
+                frames.append(pixel)
+
+        if savelog:
+            media.write_video(f_name+g+'.mp4',frames, fps=100)
+    
+    if savelog and not(visual):
+        sim_data = {g+"_trajectory_"+f_name: p_head}
+        savemat("trajectory_"+g+f_name+'.mat',sim_data)
+
+
+    # Scalar J
+    J_value = 0
+
+    if (g == 'side'):
+        J_value = 1500 * p_head[-1,1] - 800 * abs(p_head[-1,1]) - 900 * abs(p_head[-1,0] / p_head[-1,1])
+    else:
+        J_value = 1500 * p_head[-1,0] - 800 * abs(p_head[-1,0]) - 900 * abs(p_head[-1,1] / p_head[-1,0])
+
+    return J_value
+
+    # Position & Orientation
+    ori_head = p_head[:,3::]
+
+    quat_p_head = Rotation.from_quat(ori_head[:, [1, 2, 3, 0]].copy())
+    
+    # return np.hstack((np.mean(p_head[:,0:3], axis=0), Rotation.mean(quat_p_head).as_quat()[3], Rotation.mean(quat_p_head).as_quat()[0], Rotation.mean(quat_p_head).as_quat()[1], Rotation.mean(quat_p_head).as_quat()[2]))
+
+def J_force_mean(t, parameters:np.ndarray, g:str = 'serp', visual:bool = False, savelog:bool = False) -> np.ndarray:
+    snake = mujoco.MjModel.from_xml_path("../dmc/models/snake_circle_contact_servo.xml")
     data = mujoco.MjData(snake)
     mujoco.mj_forward(snake, data)
 
@@ -448,14 +527,13 @@ def base2Param_scalar(base:list, param:list) -> np.ndarray:
 if __name__ == "__main__":
     grid_start_time = time.time()
 
-    # # Sim once
-    bais = [7, 7, 14, 7, 0, 0, 0]
-    param = [0, 0, 0, 0, 44, 23, 0]
+    # # # Sim once
+    # bais = [7, 11, 14, 7, 0, 0, 0]
+    # param = [0, 0, 0, 0, 229, 201, 0]
 
-    # sim_data = J(t, base2Param(bais, param), 'serp', False, False)
-    sim_data = J(t, base2Param_scalar(bais, param), 'serp', True, False)
-    print(sim_data)
-    # print(np.linalg.norm(sim_data[0:3]))
+    # # sim_data = J(t, base2Param(bais, param), 'serp', False, False)
+    # sim_data = J(t, base2Param_scalar(bais, param), 'ones', True, False)
+    # print(sim_data)
 
     # # Grid Search
     # orderize_J([7, 7, 14, 7, 0, 0, 0], [8, 8, 15, 8, 16, 16, 1],g='serp')
@@ -468,7 +546,12 @@ if __name__ == "__main__":
     # orderize_J([7, 7, 7, 7, 0, 0, 0], [8, 8, 16, 16, 16, 16, 1],g='ones')
 
     # Paper Grid Search
-    # orderize_scalar_J([7, 7, 14, 7, 0, 0, 0], [8, 8, 15, 8, 360, 360, 1],g='serp')
+    orderize_scalar_J([7, 11, 14, 7, 0, 0, 0], [8, 12, 15, 8, 360, 360, 1],g='side')
+    orderize_scalar_J([7, 11, 14, 7, 0, 0, 0], [8, 12, 15, 8, 360, 360, 1],g='ones')
+
+    orderize_scalar_J([8, 12, 14, 7, 0, 0, 0], [9, 13, 15, 8, 360, 360, 1],g='side')
+    orderize_scalar_J([8, 12, 14, 7, 0, 0, 0], [9, 13, 15, 8, 360, 360, 1],g='serp')
+    orderize_scalar_J([8, 12, 14, 7, 0, 0, 0], [9, 13, 15, 8, 360, 360, 1],g='ones')
 
     print(f'Simdone... {time.time() - grid_start_time}')
 

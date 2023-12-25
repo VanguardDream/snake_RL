@@ -1,6 +1,7 @@
 clc; clear;
 %%
-load grid_map_serp_b_7x7x14x7x0x0x0_129600_.mat
+% load grid_map_serp_b_7x7x14x7x0x0x0_129600_.mat
+load grid_map_serp_b_7x11x14x7x0x0x0_129600_servo.mat
 
 %%
 serp_map = squeeze(serp_grid);
@@ -29,9 +30,16 @@ clear dX dY;
 U_serp = max(U_serp, -2000);
 
 %% U Grid
+U_serp = transpose(U_serp); %이유는 모르지만 계속 X,Y 값이 바뀌어 있음.
 figure(Name='Utility grid map');
-surf(n_d, n_l, U_serp);
+mesh(n_l, n_d, U_serp);
 xlabel("Dorsal Spatial");
 ylabel("Lateral Spatial");
 
+view([0 90])
 
+%% Argmax in matrix
+[C,I] = max(U_serp(:));
+
+[I1,I2] = ind2sub(size(U_serp),I);
+U_serp(I1,I2)

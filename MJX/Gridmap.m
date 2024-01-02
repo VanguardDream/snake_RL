@@ -1,10 +1,13 @@
 clc; clear;
 %%
 % load grid_map_serp_b_7x7x14x7x0x0x0_129600_.mat
-load grid_map_serp_b_7x11x14x7x0x0x0_129600_servo.mat
+% load grid_map_ones_b_7x11x14x7x0x0x0_129600_servo.mat
+load velocity_grid_map_side_b_8x12x14x7x0x0x0_129600_.mat
 
 %%
-serp_map = squeeze(serp_grid);
+% serp_map = squeeze(serp_grid);
+serp_map = squeeze(side_grid);
+% serp_map = squeeze(ones_grid);
 
 sz = size(serp_map);
 
@@ -27,16 +30,18 @@ U_serp = serp_map(:,:,1);
 
 clear dX dY;
 
-U_serp = max(U_serp, -2000);
+U_serp = max(U_serp, -3000);
 
 %% U Grid
-U_serp = transpose(U_serp); %이유는 모르지만 계속 X,Y 값이 바뀌어 있음.
+% U_serp = transpose(U_serp); %이유는 모르지만 계속 X,Y 값이 바뀌어 있음.
 figure(Name='Utility grid map');
-mesh(n_l, n_d, U_serp);
+mesh(U_serp);
 xlabel("Dorsal Spatial");
 ylabel("Lateral Spatial");
 
-view([0 90])
+colorbar;
+
+view([90 -90])
 
 %% Argmax in matrix
 [C,I] = max(U_serp(:));

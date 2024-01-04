@@ -714,11 +714,15 @@ if __name__ == "__main__":
     # # Sim once
     # bais = [7, 11, 14, 7, 0, 0, 0] # Serp
     # # bais = [8, 12, 14, 7, 0, 0, 0] # Side
-    # param = [0, 0, 0, 0, 233, 18, 180] # Serp OP
+    
+    # # param = [0, 0, 0, 0, 233, 18, 180] # Serp OP
     # # param = [0, 0, 0, 0, 220, 198, 0] # Side OP
+    # param = [0, 0, 0, 0, 233, 197, 90] # Side Phi90 OP
+
+
 
     # # sim_data = J(t, base2Param(bais, param), 'serp', False, False)
-    # sim_data = J_velocity(t, base2Param_scalar(bais, param), 'serp', True, False)
+    # sim_data = J_velocity(t, base2Param_scalar(bais, param), 'side', True, False)
     # print(sim_data)
 
     # # Grid Search
@@ -740,8 +744,8 @@ if __name__ == "__main__":
     # orderize_velocity_J([8, 12, 14, 7, 0, 0, 0], [9, 13, 15, 8, 360, 360, 1],g='serp')
     # orderize_velocity_J([8, 12, 14, 7, 0, 0, 0], [9, 13, 15, 8, 360, 360, 1],g='ones')
 
-    orderize_velocity_J([7, 11, 14, 7, 0, 0, 90], [8, 12, 15, 8, 360, 360, 91],g='side')
-    orderize_velocity_J([8, 12, 14, 7, 0, 0, 90], [9, 13, 15, 8, 360, 360, 91],g='side')
+    orderize_velocity_J([7, 11, 14, 7, 0, 0, 90], [8, 12, 15, 8, 360, 360, 91],g='ones')
+    orderize_velocity_J([8, 12, 14, 7, 0, 0, 90], [9, 13, 15, 8, 360, 360, 91],g='ones')
 
     # # Optimal param and Phi differ grid searching
     # orderize_velocity_J([7, 11, 14, 7, 233, 18, 0], [8, 12, 15, 8, 234, 19, 360],g='serp')

@@ -50,7 +50,7 @@ def make_ref_input(t, amp_dor, amp_lat, omega_dor, omega_lat, nu_dor, nu_lat, ph
 
     temporal = np.outer(t, omega_n)
 
-    u_input = np.sin(temporal + nu_n * link_n) * amp_n + phi_n
+    u_input = np.sin(temporal + nu_n * link_n + phi_n) * amp_n 
 
     return u_input.copy()
 
@@ -609,7 +609,7 @@ def orderize_velocity_J(param_min:np.ndarray, param_max:np.ndarray, g:str = 'ser
     n_d = np.arange(1,361)[param_min[4]:param_max[4]] # Degree
     n_l = np.arange(1,361)[param_min[5]:param_max[5]] # Degree
     # p = np.random.randint(1,17) / 8 * np.pi
-    p = np.arange(1,361)[param_min[6]:param_max[6]] # Radian
+    p = np.arange(0,360)[param_min[6]:param_max[6]] # Radian
 
     n1 = len(a_d)
     n2 = len(a_l)
@@ -700,7 +700,7 @@ def base2Param_scalar(base:list, param:list) -> np.ndarray:
     param = np.array(param)
     idx = np.array([1, 1, 1, 1, 1, 1, 0])
 
-    param_coeff = [10, 10, 0.8 * np.pi, 0.8 * np.pi, 180 / np.pi, 180 / np.pi, 10]
+    param_coeff = [10, 10, 0.8 * np.pi, 0.8 * np.pi, 180 / np.pi, 180 / np.pi, 180 / np.pi]
 
     input_p = np.round(np.divide((base + param +  idx), param_coeff), 2)
 
@@ -711,15 +711,15 @@ def base2Param_scalar(base:list, param:list) -> np.ndarray:
 if __name__ == "__main__":
     grid_start_time = time.time()
 
-    # Sim once
-    bais = [7, 11, 14, 7, 0, 0, 0] # Serp
-    # bais = [8, 12, 14, 7, 0, 0, 0] # Side
-    param = [0, 0, 0, 0, 233, 18, 45] # Serp OP
-    # param = [0, 0, 0, 0, 220, 198, 0] # Side OP
+    # # Sim once
+    # bais = [7, 11, 14, 7, 0, 0, 0] # Serp
+    # # bais = [8, 12, 14, 7, 0, 0, 0] # Side
+    # param = [0, 0, 0, 0, 233, 18, 180] # Serp OP
+    # # param = [0, 0, 0, 0, 220, 198, 0] # Side OP
 
-    # sim_data = J(t, base2Param(bais, param), 'serp', False, False)
-    sim_data = J_velocity(t, base2Param_scalar(bais, param), 'ones', False, True)
-    print(sim_data)
+    # # sim_data = J(t, base2Param(bais, param), 'serp', False, False)
+    # sim_data = J_velocity(t, base2Param_scalar(bais, param), 'serp', True, False)
+    # print(sim_data)
 
     # # Grid Search
     # orderize_J([7, 7, 14, 7, 0, 0, 0], [8, 8, 15, 8, 16, 16, 1],g='serp')
@@ -731,7 +731,7 @@ if __name__ == "__main__":
     # orderize_J([7, 7, 7, 7, 0, 0, 0], [8, 8, 16, 16, 16, 16, 1],g='side')
     # orderize_J([7, 7, 7, 7, 0, 0, 0], [8, 8, 16, 16, 16, 16, 1],g='ones')
 
-    # # Paper Grid Search
+    # Paper Grid Search
     # orderize_velocity_J([7, 11, 14, 7, 0, 0, 0], [8, 12, 15, 8, 360, 360, 1],g='serp')
     # orderize_velocity_J([7, 11, 14, 7, 0, 0, 0], [8, 12, 15, 8, 360, 360, 1],g='side')
     # orderize_velocity_J([7, 11, 14, 7, 0, 0, 0], [8, 12, 15, 8, 360, 360, 1],g='ones')
@@ -739,6 +739,9 @@ if __name__ == "__main__":
     # orderize_velocity_J([8, 12, 14, 7, 0, 0, 0], [9, 13, 15, 8, 360, 360, 1],g='side')
     # orderize_velocity_J([8, 12, 14, 7, 0, 0, 0], [9, 13, 15, 8, 360, 360, 1],g='serp')
     # orderize_velocity_J([8, 12, 14, 7, 0, 0, 0], [9, 13, 15, 8, 360, 360, 1],g='ones')
+
+    orderize_velocity_J([7, 11, 14, 7, 0, 0, 90], [8, 12, 15, 8, 360, 360, 91],g='side')
+    orderize_velocity_J([8, 12, 14, 7, 0, 0, 90], [9, 13, 15, 8, 360, 360, 91],g='side')
 
     # # Optimal param and Phi differ grid searching
     # orderize_velocity_J([7, 11, 14, 7, 233, 18, 0], [8, 12, 15, 8, 234, 19, 360],g='serp')

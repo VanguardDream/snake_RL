@@ -5,8 +5,8 @@ clc; clear;
 load velocity_grid_map_side_b_8x12x14x7x0x0x0_129600_.mat
 
 %%
-% serp_map = squeeze(serp_grid);
-serp_map = squeeze(side_grid);
+serp_map = squeeze(serp_grid);
+% serp_map = squeeze(side_grid);
 % serp_map = squeeze(ones_grid);
 
 sz = size(serp_map);

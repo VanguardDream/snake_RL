@@ -2,10 +2,11 @@ clc; clear;
 %%
 % load grid_map_serp_b_7x7x14x7x0x0x0_129600_.mat
 % load grid_map_ones_b_7x11x14x7x0x0x0_129600_servo.mat
-load velocity_grid_map_so
+load velocity_grid_map_side_b_8x12x14x7x0x0x0_129600_.mat
+
 %%
-% serp_map = squeeze(serp_grid);
-serp_map = squeeze(side_grid);
+serp_map = squeeze(serp_grid);
+% serp_map = squeeze(side_grid);
 % serp_map = squeeze(ones_grid);
 
 sz = size(serp_map);

@@ -1,0 +1,13 @@
+#ROM Area
+uint16 id
+uint32 baudrate
+#RAM Area
+bool torque
+int16 goal_current
+int16 goal_velocity
+uint16 goal_position
+int16 present_current
+int16 present_velocity
+uint16 present_position
+uint16 voltage
+uint16 temperature

@@ -3,9 +3,7 @@ from rclpy.node import Node
 
 from horcrux_interfaces.msg import MotorState
 
-
 class mini_sub(Node):
-
     def __init__(self):
         super().__init__('minimal_subscriber')
         self.subscription = self.create_subscription(
@@ -17,7 +15,6 @@ class mini_sub(Node):
 
     def listener_callback(self, msg):
             self.get_logger().info('I heard: "%d"' % msg.id)  # CHANGE
-
 
 def main(args=None):
     rclpy.init(args=args)

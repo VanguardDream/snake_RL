@@ -1,21 +1,28 @@
 from launch import LaunchDescription
-from launch_ros.actions import Node
+from launch_ros.actions import Node, RosTimer
 
 def generate_launch_description():
     return LaunchDescription([
         Node(
             package='joy',
-            namespace='horcrux',
             executable='joy_node',
+            namespace='horcrux',
             name='joy_op'
+        ),
+        Node(
+            package='handsfree_imu',
+            executable='hfi_a9_node',
+            namespace='horcrux',
+            name='head_imu'
         ),
         Node(
             package='horcrux_state',
             executable='state_node',
-            name='horcrux_state',
-            remappings=[
-                        ('/joy', '/horcrux/joy'),
-                        ('/robot_state', '/horcrux/robot_state'),
-                        ]
+            namespace='horcrux',
+            name='horcrux_state'
+            # remappings=[
+            #             ('/joy', '/horcrux/joy'),
+            #             ('/robot_state', '/horcrux/robot_state'),
+            #             ]
         )
     ])

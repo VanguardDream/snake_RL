@@ -24,6 +24,7 @@ setup(
     entry_points={
         'console_scripts': [
             'state_node = horcrux_state.horcrux_state:main',
+            'motors_node = horcrux_state.motor_state:main',
         ],
     },
 )

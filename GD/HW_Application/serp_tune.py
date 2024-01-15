@@ -100,7 +100,7 @@ def main(ia, ia2):
         while(True):
             t_period = time.time() - commandQ
 
-            if t_period > 0.1:
+            if t_period > 0.005:
                  # Syncwrite goal position
                 dxl_comm_result = gswrite.txPacket()
                 if dxl_comm_result != COMM_SUCCESS:
@@ -131,10 +131,10 @@ def main(ia, ia2):
                     presentP[idx] = gsread_PP.getData(idx, ADDR_PRESENT_POSITION, LEN_PRESENT_POSITION)
                     presentV[idx] = gsread_PV.getData(idx, ADDR_PRESENT_VELOCITY, LEN_PRESENT_VELOCITY)
                 
+                print(f"Running... {i / 10} sec. | [ID:01 POS] : {presentP[0]} | [ID:01 VEL] : {presentV[0]}",end="\n")
+                
                 break
-
-            print(f"Running... {i / 10} sec. | [ID:01 POS] : {presentP[0]} | [ID:01 VEL] : {presentV[0]}",end="\n")
-            
+   
         gswrite.clearParam()
         gsread_PP.clearParam()
         gsread_PV.clearParam()
@@ -172,7 +172,8 @@ if __name__ == "__main__":
 
     # ex) Windows: "COM*", Linux: "/dev/ttyUSB*", Mac: "/dev/tty.usbserial-*"
     # DEVICENAME                  = 'COM8'
-    DEVICENAME                    = '/dev/tty.usbserial-FT3M9YHP'
+    # DEVICENAME                    = '/dev/tty.usbserial-FT3M9YHP'
+    DEVICENAME                    = '/dev/ttyDXL'
 
 
     # Initialize PortHandler instance 

@@ -16,8 +16,6 @@ from sensor_msgs.msg import MagneticField
 from tf_transformations import quaternion_from_euler
 from tf_transformations import euler_from_quaternion
 
-
-# 查找 ttyUSB* 设备
 def find_ttyUSB():
     print('imu Default port is /dev/ttyUSB0, If use multiple serial devices, Please use launch after modify in the file imu corresponding serial port')
     posts = [port.device for port in serial.tools.list_ports.comports() if 'USB' in port.device]
@@ -50,9 +48,9 @@ data_right_count = 0
 
 class imu_hfi_a9_node(Node):
     def __init__(self):
-        super().__init__('imu_hfi_a9_node')
+        super().__init__('imu_hfi_a9_node', enable_rosout=True)
         self.timer_period = 1/300
-        self.create_timer(self.timer_period, self.timer_cb)
+        self.msg_timer = self.create_timer(self.timer_period, self.timer_cb)
 
         self.gra_normalization = True
 
@@ -60,7 +58,7 @@ class imu_hfi_a9_node(Node):
         self.mag_msg = MagneticField()
 
         try:
-            self.hf_imu = serial.Serial(port="/dev/ttyUSB0", baudrate=921600, timeout=0.5)
+            self.hf_imu = serial.Serial(port="/dev/ttyIMU_head", baudrate=921600, timeout=0.5)
 
             if self.hf_imu.is_open:
                 self.get_logger().info("\033[32m Serial port opened successfully...\033[0m")
@@ -155,14 +153,14 @@ class imu_hfi_a9_node(Node):
             angle_radian = [angle_degree[i] * math.pi / 180 for i in range(3)]
             qua = quaternion_from_euler(angle_radian[0], -angle_radian[1], -angle_radian[2])
 
-            self.imu_msg.orientation.x = qua[0]
-            self.imu_msg.orientation.y = qua[1]
-            self.imu_msg.orientation.z = qua[2]
-            self.imu_msg.orientation.w = qua[3]
+            self.imu_msg.orientation.x = float(qua[0])
+            self.imu_msg.orientation.y = float(qua[1])
+            self.imu_msg.orientation.z = float(qua[2])
+            self.imu_msg.orientation.w = float(qua[3])
 
-            self.imu_msg.angular_velocity.x = angularVelocity[0]
-            self.imu_msg.angular_velocity.y = angularVelocity[1]
-            self.imu_msg.angular_velocity.z = angularVelocity[2]
+            self.imu_msg.angular_velocity.x = float(angularVelocity[0])
+            self.imu_msg.angular_velocity.y = float(angularVelocity[1])
+            self.imu_msg.angular_velocity.z = float(angularVelocity[2])
             
             acc_k = math.sqrt(acceleration[0] ** 2 + acceleration[1] ** 2 + acceleration[2] ** 2)
             if acc_k == 0:
@@ -177,9 +175,9 @@ class imu_hfi_a9_node(Node):
                 self.imu_msg.linear_acceleration.y = acceleration[1] * -9.8
                 self.imu_msg.linear_acceleration.z = acceleration[2] * -9.8
 
-            self.mag_msg.magnetic_field.x = magnetometer[0]
-            self.mag_msg.magnetic_field.y = magnetometer[1]
-            self.mag_msg.magnetic_field.z = magnetometer[2]
+            self.mag_msg.magnetic_field.x = float(magnetometer[0])
+            self.mag_msg.magnetic_field.y = float(magnetometer[1])
+            self.mag_msg.magnetic_field.z = float(magnetometer[2])
 
             self.pub_imu_.publish(self.imu_msg)
             self.pub_mag_.publish(self.mag_msg)
@@ -194,6 +192,14 @@ class imu_hfi_a9_node(Node):
 
         ieee_data.reverse()
         return ieee_data
+
+    def __del__(self):
+        self.get_logger().info("Node destroyer called...")
+        self.destroy_timer(self.msg_timer)
+        self.destroy_publisher(self.pub_imu_)
+        self.destroy_publisher(self.pub_mag_)
+        self.hf_imu.close()
+        self.get_logger().info("Node has been terminated sucessfully...")
 
 def main(args = None):
     find_ttyUSB()

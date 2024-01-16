@@ -2,7 +2,7 @@
 std_msgs/Header header
 
 # Motor State
-horcrux_interfaces/MotorState[14] motors
+horcrux_interfaces/MotorStates motors
 
 # Sensor State
 sensor_msgs/Joy joy

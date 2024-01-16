@@ -17,6 +17,12 @@ def generate_launch_description():
         ),
         Node(
             package='horcrux_state',
+            executable='motors_node',
+            namespace='horcrux',
+            name='dxl_comm'
+        ),
+        Node(
+            package='horcrux_state',
             executable='state_node',
             namespace='horcrux',
             name='horcrux_state'

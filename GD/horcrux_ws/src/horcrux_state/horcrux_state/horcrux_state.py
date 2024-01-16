@@ -3,6 +3,7 @@ from rclpy.node import Node
 
 #msgs
 from horcrux_interfaces.msg import RobotState
+from horcrux_interfaces.msg import MotorStates
 from sensor_msgs.msg import Joy, Imu, MagneticField
 
 class joy_sub(Node):
@@ -26,6 +27,12 @@ class joy_sub(Node):
             self.mag_cb,
             1
         )
+        self.sub_motors = self.create_subscription(
+            MotorStates,
+            'motor_states',
+            self.motors_cb,
+            1
+        )
 
         self.publisher_ = self.create_publisher(RobotState, 'robot_state', 10)
         timer_period = 1/20
@@ -33,6 +40,7 @@ class joy_sub(Node):
         self.joy_data = Joy()
         self.imu_data = Imu()
         self.mag_data = MagneticField()
+        self.motors_data = MotorStates()
 
     def joy_cb(self, msg:Joy):
         self.joy_data = msg
@@ -43,10 +51,15 @@ class joy_sub(Node):
     def mag_cb(self, msg:MagneticField):
         self.mag_data = msg
 
+    def motors_cb(self, msg:MotorStates):
+        self.motors_data = msg
+
     def timer_cb(self):
         msg = RobotState()
         msg.joy = self.joy_data
         msg.imu = self.imu_data
+        msg.mag = self.mag_data
+        msg.motors = self.motors_data
 
         self.publisher_.publish(msg)
 

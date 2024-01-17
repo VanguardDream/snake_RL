@@ -1,0 +1,41 @@
+[0.032s] Invoking command in '/home/bong/project/snake_RL/GD/horcrux_ws/build/handsfree_ros_imu': /usr/bin/cmake /home/bong/project/snake_RL/GD/horcrux_ws/src/handsfree_ros_imu -DCATKIN_INSTALL_INTO_PREFIX_ROOT=0 -DCMAKE_INSTALL_PREFIX=/home/bong/project/snake_RL/GD/horcrux_ws/install/handsfree_ros_imu
+[0.039s] [0mCMake Deprecation Warning at CMakeLists.txt:1 (cmake_minimum_required):
+[0.039s]   Compatibility with CMake < 2.8.12 will be removed from a future version of
+[0.039s]   CMake.
+[0.039s] 
+[0.039s]   Update the VERSION argument <min> value or use a ...<max> suffix to tell
+[0.039s]   CMake that the project does not need compatibility with older versions.
+[0.039s] 
+[0.039s] [0m
+[0.108s] -- The C compiler identification is GNU 11.4.0
+[0.184s] -- The CXX compiler identification is GNU 11.4.0
+[0.194s] -- Detecting C compiler ABI info
+[0.264s] -- Detecting C compiler ABI info - done
+[0.270s] -- Check for working C compiler: /usr/bin/cc - skipped
+[0.271s] -- Detecting C compile features
+[0.272s] -- Detecting C compile features - done
+[0.282s] -- Detecting CXX compiler ABI info
+[0.343s] -- Detecting CXX compiler ABI info - done
+[0.346s] -- Check for working CXX compiler: /usr/bin/c++ - skipped
+[0.346s] -- Detecting CXX compile features
+[0.347s] -- Detecting CXX compile features - done
+[0.357s] [31mCMake Error at CMakeLists.txt:4 (find_package):
+[0.358s]   By not providing "Findcatkin.cmake" in CMAKE_MODULE_PATH this project has
+[0.358s]   asked CMake to find a package configuration file provided by "catkin", but
+[0.358s]   CMake did not find one.
+[0.358s] 
+[0.358s]   Could not find a package configuration file provided by "catkin" with any
+[0.358s]   of the following names:
+[0.358s] 
+[0.358s]     catkinConfig.cmake
+[0.358s]     catkin-config.cmake
+[0.358s] 
+[0.358s]   Add the installation prefix of "catkin" to CMAKE_PREFIX_PATH or set
+[0.358s]   "catkin_DIR" to a directory containing one of the above files.  If "catkin"
+[0.358s]   provides a separate development package or SDK, be sure it has been
+[0.358s]   installed.
+[0.358s] 
+[0.358s] [0m
+[0.358s] -- Configuring incomplete, errors occurred!
+[0.358s] See also "/home/bong/project/snake_RL/GD/horcrux_ws/build/handsfree_ros_imu/CMakeFiles/CMakeOutput.log".
+[0.361s] Invoked command in '/home/bong/project/snake_RL/GD/horcrux_ws/build/handsfree_ros_imu' returned '1': /usr/bin/cmake /home/bong/project/snake_RL/GD/horcrux_ws/src/handsfree_ros_imu -DCATKIN_INSTALL_INTO_PREFIX_ROOT=0 -DCMAKE_INSTALL_PREFIX=/home/bong/project/snake_RL/GD/horcrux_ws/install/handsfree_ros_imu

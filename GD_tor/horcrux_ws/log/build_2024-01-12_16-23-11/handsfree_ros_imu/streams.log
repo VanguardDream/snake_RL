@@ -1,0 +1,29 @@
+[0.032s] Invoking command in '/home/bong/project/snake_RL/GD/horcrux_ws/build/handsfree_ros_imu': /usr/bin/cmake /home/bong/project/snake_RL/GD/horcrux_ws/src/handsfree_ros_imu -DCATKIN_INSTALL_INTO_PREFIX_ROOT=0 -DCMAKE_INSTALL_PREFIX=/home/bong/project/snake_RL/GD/horcrux_ws/install/handsfree_ros_imu
+[0.038s] [0mCMake Deprecation Warning at CMakeLists.txt:1 (cmake_minimum_required):
+[0.038s]   Compatibility with CMake < 2.8.12 will be removed from a future version of
+[0.038s]   CMake.
+[0.039s] 
+[0.039s]   Update the VERSION argument <min> value or use a ...<max> suffix to tell
+[0.039s]   CMake that the project does not need compatibility with older versions.
+[0.040s] 
+[0.040s] [0m
+[0.052s] [31mCMake Error at CMakeLists.txt:4 (find_package):
+[0.052s]   By not providing "Findcatkin.cmake" in CMAKE_MODULE_PATH this project has
+[0.053s]   asked CMake to find a package configuration file provided by "catkin", but
+[0.053s]   CMake did not find one.
+[0.053s] 
+[0.054s]   Could not find a package configuration file provided by "catkin" with any
+[0.054s]   of the following names:
+[0.054s] 
+[0.054s]     catkinConfig.cmake
+[0.055s]     catkin-config.cmake
+[0.055s] 
+[0.055s]   Add the installation prefix of "catkin" to CMAKE_PREFIX_PATH or set
+[0.055s]   "catkin_DIR" to a directory containing one of the above files.  If "catkin"
+[0.056s]   provides a separate development package or SDK, be sure it has been
+[0.056s]   installed.
+[0.056s] 
+[0.057s] [0m
+[0.057s] -- Configuring incomplete, errors occurred!
+[0.057s] See also "/home/bong/project/snake_RL/GD/horcrux_ws/build/handsfree_ros_imu/CMakeFiles/CMakeOutput.log".
+[0.058s] Invoked command in '/home/bong/project/snake_RL/GD/horcrux_ws/build/handsfree_ros_imu' returned '1': /usr/bin/cmake /home/bong/project/snake_RL/GD/horcrux_ws/src/handsfree_ros_imu -DCATKIN_INSTALL_INTO_PREFIX_ROOT=0 -DCMAKE_INSTALL_PREFIX=/home/bong/project/snake_RL/GD/horcrux_ws/install/handsfree_ros_imu

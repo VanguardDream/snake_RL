@@ -1,0 +1,28 @@
+[0.379s] Invoking command in '/home/bong/project/snake_RL/GD/horcrux_ws/src/horcrux_state': PYTHONPATH=/home/bong/project/snake_RL/GD/horcrux_ws/build/horcrux_state/prefix_override:/home/bong/project/snake_RL/GD/horcrux_ws/install/horcrux_state/lib/python3.10/site-packages:/home/bong/project/snake_RL/GD/horcrux_ws/install/horcrux_interfaces/lib/python3.10/site-packages:/home/bong/project/snake_RL/GD/horcrux_ws/install/horcrux_state/lib/python3.10/site-packages:/home/bong/project/snake_RL/GD/horcrux_ws/install/horcrux_msg/lib/python3.10/site-packages:/home/bong/project/snake_RL/GD/horcrux_ws/install/handsfree_imu/lib/python3.10/site-packages:/opt/ros/iron/lib/python3.10/site-packages /usr/bin/python3 setup.py egg_info --egg-base ../../build/horcrux_state build --build-base /home/bong/project/snake_RL/GD/horcrux_ws/build/horcrux_state/build install --record /home/bong/project/snake_RL/GD/horcrux_ws/build/horcrux_state/install.log --single-version-externally-managed
+[0.490s] running egg_info
+[0.490s] writing ../../build/horcrux_state/horcrux_state.egg-info/PKG-INFO
+[0.490s] writing dependency_links to ../../build/horcrux_state/horcrux_state.egg-info/dependency_links.txt
+[0.491s] writing entry points to ../../build/horcrux_state/horcrux_state.egg-info/entry_points.txt
+[0.491s] writing requirements to ../../build/horcrux_state/horcrux_state.egg-info/requires.txt
+[0.491s] writing top-level names to ../../build/horcrux_state/horcrux_state.egg-info/top_level.txt
+[0.491s] reading manifest file '../../build/horcrux_state/horcrux_state.egg-info/SOURCES.txt'
+[0.492s] adding license file 'LICENSE'
+[0.492s] writing manifest file '../../build/horcrux_state/horcrux_state.egg-info/SOURCES.txt'
+[0.492s] running build
+[0.492s] running build_py
+[0.492s] copying horcrux_state/motor_state.py -> /home/bong/project/snake_RL/GD/horcrux_ws/build/horcrux_state/build/lib/horcrux_state
+[0.492s] running install
+[0.492s] /usr/lib/python3/dist-packages/setuptools/command/install.py:34: SetuptoolsDeprecationWarning: setup.py install is deprecated. Use build and pip and other standards-based tools.
+[0.492s]   warnings.warn(
+[0.493s] running install_lib
+[0.493s] copying /home/bong/project/snake_RL/GD/horcrux_ws/build/horcrux_state/build/lib/horcrux_state/motor_state.py -> /home/bong/project/snake_RL/GD/horcrux_ws/install/horcrux_state/lib/python3.10/site-packages/horcrux_state
+[0.493s] byte-compiling /home/bong/project/snake_RL/GD/horcrux_ws/install/horcrux_state/lib/python3.10/site-packages/horcrux_state/motor_state.py to motor_state.cpython-310.pyc
+[0.494s] running install_data
+[0.494s] running install_egg_info
+[0.495s] removing '/home/bong/project/snake_RL/GD/horcrux_ws/install/horcrux_state/lib/python3.10/site-packages/horcrux_state-0.0.0-py3.10.egg-info' (and everything under it)
+[0.496s] Copying ../../build/horcrux_state/horcrux_state.egg-info to /home/bong/project/snake_RL/GD/horcrux_ws/install/horcrux_state/lib/python3.10/site-packages/horcrux_state-0.0.0-py3.10.egg-info
+[0.496s] running install_scripts
+[0.506s] Installing motors_node script to /home/bong/project/snake_RL/GD/horcrux_ws/install/horcrux_state/lib/horcrux_state
+[0.506s] Installing state_node script to /home/bong/project/snake_RL/GD/horcrux_ws/install/horcrux_state/lib/horcrux_state
+[0.507s] writing list of installed files to '/home/bong/project/snake_RL/GD/horcrux_ws/build/horcrux_state/install.log'
+[0.519s] Invoked command in '/home/bong/project/snake_RL/GD/horcrux_ws/src/horcrux_state' returned '0': PYTHONPATH=/home/bong/project/snake_RL/GD/horcrux_ws/build/horcrux_state/prefix_override:/home/bong/project/snake_RL/GD/horcrux_ws/install/horcrux_state/lib/python3.10/site-packages:/home/bong/project/snake_RL/GD/horcrux_ws/install/horcrux_interfaces/lib/python3.10/site-packages:/home/bong/project/snake_RL/GD/horcrux_ws/install/horcrux_state/lib/python3.10/site-packages:/home/bong/project/snake_RL/GD/horcrux_ws/install/horcrux_msg/lib/python3.10/site-packages:/home/bong/project/snake_RL/GD/horcrux_ws/install/handsfree_imu/lib/python3.10/site-packages:/opt/ros/iron/lib/python3.10/site-packages /usr/bin/python3 setup.py egg_info --egg-base ../../build/horcrux_state build --build-base /home/bong/project/snake_RL/GD/horcrux_ws/build/horcrux_state/build install --record /home/bong/project/snake_RL/GD/horcrux_ws/build/horcrux_state/install.log --single-version-externally-managed

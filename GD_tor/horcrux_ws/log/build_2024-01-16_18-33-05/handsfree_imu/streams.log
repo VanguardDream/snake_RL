@@ -1,0 +1,24 @@
+[0.394s] Invoking command in '/home/bong/project/snake_RL/GD/horcrux_ws/src/handsfree_imu': PYTHONPATH=/home/bong/project/snake_RL/GD/horcrux_ws/build/handsfree_imu/prefix_override:/home/bong/project/snake_RL/GD/horcrux_ws/install/handsfree_imu/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 setup.py egg_info --egg-base ../../build/handsfree_imu build --build-base /home/bong/project/snake_RL/GD/horcrux_ws/build/handsfree_imu/build install --record /home/bong/project/snake_RL/GD/horcrux_ws/build/handsfree_imu/install.log --single-version-externally-managed
+[0.516s] running egg_info
+[0.516s] writing ../../build/handsfree_imu/handsfree_imu.egg-info/PKG-INFO
+[0.516s] writing dependency_links to ../../build/handsfree_imu/handsfree_imu.egg-info/dependency_links.txt
+[0.517s] writing entry points to ../../build/handsfree_imu/handsfree_imu.egg-info/entry_points.txt
+[0.517s] writing requirements to ../../build/handsfree_imu/handsfree_imu.egg-info/requires.txt
+[0.517s] writing top-level names to ../../build/handsfree_imu/handsfree_imu.egg-info/top_level.txt
+[0.517s] reading manifest file '../../build/handsfree_imu/handsfree_imu.egg-info/SOURCES.txt'
+[0.517s] adding license file 'LICENSE'
+[0.518s] writing manifest file '../../build/handsfree_imu/handsfree_imu.egg-info/SOURCES.txt'
+[0.518s] running build
+[0.518s] running build_py
+[0.518s] running install
+[0.518s] /usr/lib/python3/dist-packages/setuptools/command/install.py:34: SetuptoolsDeprecationWarning: setup.py install is deprecated. Use build and pip and other standards-based tools.
+[0.518s]   warnings.warn(
+[0.518s] running install_lib
+[0.519s] running install_data
+[0.519s] running install_egg_info
+[0.521s] removing '/home/bong/project/snake_RL/GD/horcrux_ws/install/handsfree_imu/lib/python3.10/site-packages/handsfree_imu-0.0.0-py3.10.egg-info' (and everything under it)
+[0.521s] Copying ../../build/handsfree_imu/handsfree_imu.egg-info to /home/bong/project/snake_RL/GD/horcrux_ws/install/handsfree_imu/lib/python3.10/site-packages/handsfree_imu-0.0.0-py3.10.egg-info
+[0.521s] running install_scripts
+[0.533s] Installing hfi_a9_node script to /home/bong/project/snake_RL/GD/horcrux_ws/install/handsfree_imu/lib/handsfree_imu
+[0.533s] writing list of installed files to '/home/bong/project/snake_RL/GD/horcrux_ws/build/handsfree_imu/install.log'
+[0.619s] Invoked command in '/home/bong/project/snake_RL/GD/horcrux_ws/src/handsfree_imu' returned '0': PYTHONPATH=/home/bong/project/snake_RL/GD/horcrux_ws/build/handsfree_imu/prefix_override:/home/bong/project/snake_RL/GD/horcrux_ws/install/handsfree_imu/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 setup.py egg_info --egg-base ../../build/handsfree_imu build --build-base /home/bong/project/snake_RL/GD/horcrux_ws/build/handsfree_imu/build install --record /home/bong/project/snake_RL/GD/horcrux_ws/build/handsfree_imu/install.log --single-version-externally-managed

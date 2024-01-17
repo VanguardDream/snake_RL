@@ -1,0 +1,36 @@
+// generated from rosidl_adapter/resource/msg.idl.em
+// with input from horcrux_interfaces/msg/MotorState.msg
+// generated code does not contain a copyright notice
+
+
+module horcrux_interfaces {
+  module msg {
+    @verbatim (language="comment", text=
+      "ROM Area")
+    struct MotorState {
+      uint16 id;
+
+      uint32 baudrate;
+
+      @verbatim (language="comment", text=
+        "RAM Area")
+      boolean torque;
+
+      float goal_current;
+
+      float goal_velocity;
+
+      float goal_position;
+
+      float present_current;
+
+      float present_velocity;
+
+      float present_position;
+
+      float voltage;
+
+      float temperature;
+    };
+  };
+};

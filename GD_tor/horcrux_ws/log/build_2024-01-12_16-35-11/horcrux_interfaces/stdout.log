@@ -1,0 +1,23 @@
+[  2%] Built target horcrux_interfaces__rosidl_generator_type_description
+[  2%] Built target ament_cmake_python_copy_horcrux_interfaces
+[  4%] Built target horcrux_interfaces__cpp
+[ 22%] Built target horcrux_interfaces__rosidl_generator_c
+[ 31%] Built target horcrux_interfaces__rosidl_typesupport_fastrtps_cpp
+[ 40%] Built target horcrux_interfaces__rosidl_typesupport_cpp
+[ 50%] Built target horcrux_interfaces__rosidl_typesupport_fastrtps_c
+[ 59%] Built target horcrux_interfaces__rosidl_typesupport_introspection_c
+[ 68%] Built target horcrux_interfaces__rosidl_typesupport_c
+[ 77%] Built target horcrux_interfaces__rosidl_typesupport_introspection_cpp
+[ 77%] Built target horcrux_interfaces
+[ 79%] Built target horcrux_interfaces__py
+[ 86%] Built target horcrux_interfaces__rosidl_generator_py
+running egg_info
+writing horcrux_interfaces.egg-info/PKG-INFO
+writing dependency_links to horcrux_interfaces.egg-info/dependency_links.txt
+writing top-level names to horcrux_interfaces.egg-info/top_level.txt
+reading manifest file 'horcrux_interfaces.egg-info/SOURCES.txt'
+writing manifest file 'horcrux_interfaces.egg-info/SOURCES.txt'
+[ 90%] Built target horcrux_interfaces__rosidl_typesupport_introspection_c__pyext
+[ 95%] Built target horcrux_interfaces__rosidl_typesupport_c__pyext
+[ 95%] Built target ament_cmake_python_build_horcrux_interfaces_egg
+[100%] Built target horcrux_interfaces__rosidl_typesupport_fastrtps_c__pyext

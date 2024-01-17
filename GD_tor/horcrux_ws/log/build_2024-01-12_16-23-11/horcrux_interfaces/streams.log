@@ -1,0 +1,24 @@
+[0.056s] Invoking command in '/home/bong/project/snake_RL/GD/horcrux_ws/build/horcrux_interfaces': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/home/bong/project/snake_RL/GD/horcrux_ws/install/horcrux_state:/home/bong/project/snake_RL/GD/horcrux_ws/install/horcrux_msg:/opt/ros/iron /usr/bin/cmake --build /home/bong/project/snake_RL/GD/horcrux_ws/build/horcrux_interfaces -- -j4 -l4
+[0.100s] [  2%] Built target horcrux_interfaces__rosidl_generator_type_description
+[0.117s] [  2%] Built target ament_cmake_python_copy_horcrux_interfaces
+[0.123s] [  4%] Built target horcrux_interfaces__cpp
+[0.128s] [ 22%] Built target horcrux_interfaces__rosidl_generator_c
+[0.149s] [ 34%] Built target horcrux_interfaces__rosidl_typesupport_cpp
+[0.150s] [ 43%] Built target horcrux_interfaces__rosidl_typesupport_fastrtps_cpp
+[0.151s] [ 50%] Built target horcrux_interfaces__rosidl_typesupport_fastrtps_c
+[0.167s] [ 59%] Built target horcrux_interfaces__rosidl_typesupport_introspection_c
+[0.171s] [ 70%] Built target horcrux_interfaces__rosidl_typesupport_introspection_cpp
+[0.172s] [ 77%] Built target horcrux_interfaces__rosidl_typesupport_c
+[0.187s] [ 77%] Built target horcrux_interfaces
+[0.203s] [ 79%] Built target horcrux_interfaces__py
+[0.221s] [ 86%] Built target horcrux_interfaces__rosidl_generator_py
+[0.239s] [ 93%] Built target horcrux_interfaces__rosidl_typesupport_fastrtps_c__pyext
+[0.240s] [ 95%] Built target horcrux_interfaces__rosidl_typesupport_introspection_c__pyext
+[0.240s] [100%] Built target horcrux_interfaces__rosidl_typesupport_c__pyext
+[0.253s] running egg_info
+[0.255s] writing horcrux_interfaces.egg-info/PKG-INFO
+[0.255s] writing dependency_links to horcrux_interfaces.egg-info/dependency_links.txt
+[0.255s] writing top-level names to horcrux_interfaces.egg-info/top_level.txt
+[0.256s] reading manifest file 'horcrux_interfaces.egg-info/SOURCES.txt'
+[0.256s] writing manifest file 'horcrux_interfaces.egg-info/SOURCES.txt'
+[0.271s] [100%] Built target ament_cmake_python_build_horcrux_interfaces_egg

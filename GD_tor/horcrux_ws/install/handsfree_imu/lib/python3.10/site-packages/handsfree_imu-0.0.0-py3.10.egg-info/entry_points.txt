@@ -1,0 +1,3 @@
+[console_scripts]
+hfi_a9_node = handsfree_imu.hfi_a9_node:main
+

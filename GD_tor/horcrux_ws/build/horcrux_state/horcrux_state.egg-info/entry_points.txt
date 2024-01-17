@@ -1,0 +1,4 @@
+[console_scripts]
+motors_node = horcrux_state.motor_state:main
+state_node = horcrux_state.horcrux_state:main
+

@@ -1,0 +1,46 @@
+[0.037s] Invoking command in '/home/bong/project/snake_RL/GD/horcrux_ws/build/handsfree_ros_imu': /usr/bin/cmake /home/bong/project/snake_RL/GD/horcrux_ws/src/handsfree_ros_imu -DCMAKE_INSTALL_PREFIX=/home/bong/project/snake_RL/GD/horcrux_ws/install/handsfree_ros_imu
+[0.042s] [0mCMake Deprecation Warning at CMakeLists.txt:3 (cmake_minimum_required):
+[0.042s]   Compatibility with CMake < 2.8.12 will be removed from a future version of
+[0.042s]   CMake.
+[0.043s] 
+[0.043s]   Update the VERSION argument <min> value or use a ...<max> suffix to tell
+[0.043s]   CMake that the project does not need compatibility with older versions.
+[0.043s] 
+[0.044s] [0m
+[0.047s] -- Found ament_cmake: 2.0.3 (/opt/ros/iron/share/ament_cmake/cmake)
+[0.165s] -- Found Python3: /usr/bin/python3.10 (found version "3.10.12") found components: Interpreter 
+[0.237s] -- Found rosidl_default_generators: 1.5.0 (/opt/ros/iron/share/rosidl_default_generators/cmake)
+[0.241s] [33mCMake Warning (dev) at /opt/ros/iron/share/ament_cmake_core/cmake/core/list_append_unique.cmake:30 (if):
+[0.242s]   Policy CMP0057 is not set: Support new IN_LIST if() operator.  Run "cmake
+[0.242s]   --help-policy CMP0057" for policy details.  Use the cmake_policy command to
+[0.243s]   set the policy and suppress this warning.
+[0.243s] 
+[0.243s]   IN_LIST will be interpreted as an operator when the policy is set to NEW.
+[0.244s]   Since the policy is not set the OLD behavior will be used.
+[0.244s] Call Stack (most recent call first):
+[0.244s]   /opt/ros/iron/share/ament_cmake_core/cmake/index/ament_index_get_resources.cmake:51 (list_append_unique)
+[0.245s]   /opt/ros/iron/share/rosidl_core_generators/cmake/rosidl_core_generators-extras.cmake:5 (ament_index_get_resources)
+[0.245s]   /opt/ros/iron/share/rosidl_core_generators/cmake/rosidl_core_generatorsConfig.cmake:41 (include)
+[0.245s]   /opt/ros/iron/share/rosidl_default_generators/cmake/ament_cmake_export_dependencies-extras.cmake:21 (find_package)
+[0.245s]   /opt/ros/iron/share/rosidl_default_generators/cmake/rosidl_default_generatorsConfig.cmake:41 (include)
+[0.246s]   CMakeLists.txt:7 (find_package)
+[0.246s] This warning is for project developers.  Use -Wno-dev to suppress it.
+[0.246s] [0m
+[0.246s] [31mCMake Error at /opt/ros/iron/share/ament_cmake_core/cmake/core/list_append_unique.cmake:30 (if):
+[0.247s]   if given arguments:
+[0.247s] 
+[0.247s]     "NOT" "element" "IN_LIST" "paths_to_search"
+[0.248s] 
+[0.248s]   Unknown arguments specified
+[0.248s] Call Stack (most recent call first):
+[0.248s]   /opt/ros/iron/share/ament_cmake_core/cmake/index/ament_index_get_resources.cmake:51 (list_append_unique)
+[0.249s]   /opt/ros/iron/share/rosidl_core_generators/cmake/rosidl_core_generators-extras.cmake:5 (ament_index_get_resources)
+[0.249s]   /opt/ros/iron/share/rosidl_core_generators/cmake/rosidl_core_generatorsConfig.cmake:41 (include)
+[0.249s]   /opt/ros/iron/share/rosidl_default_generators/cmake/ament_cmake_export_dependencies-extras.cmake:21 (find_package)
+[0.249s]   /opt/ros/iron/share/rosidl_default_generators/cmake/rosidl_default_generatorsConfig.cmake:41 (include)
+[0.250s]   CMakeLists.txt:7 (find_package)
+[0.250s] 
+[0.250s] [0m
+[0.250s] -- Configuring incomplete, errors occurred!
+[0.251s] See also "/home/bong/project/snake_RL/GD/horcrux_ws/build/handsfree_ros_imu/CMakeFiles/CMakeOutput.log".
+[0.253s] Invoked command in '/home/bong/project/snake_RL/GD/horcrux_ws/build/handsfree_ros_imu' returned '1': /usr/bin/cmake /home/bong/project/snake_RL/GD/horcrux_ws/src/handsfree_ros_imu -DCMAKE_INSTALL_PREFIX=/home/bong/project/snake_RL/GD/horcrux_ws/install/handsfree_ros_imu

@@ -1,0 +1,6 @@
+msg/MotorState.idl
+msg/MotorState.msg
+msg/MotorStates.idl
+msg/MotorStates.msg
+msg/RobotState.idl
+msg/RobotState.msg

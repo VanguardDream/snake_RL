@@ -29,6 +29,6 @@ rllib/bongEnv/bongSnake/*.txt
 science-contest2022/DynamixelSDK/*
 
 #ROS builds
-GD/horcrux_ws/build/*
-GD/horcrux_ws/install/*
-GD/horcrux_ws/log/*
+GD_tor/horcrux_ws/build/*
+GD_tor/horcrux_ws/install/*
+GD_tor/horcrux_ws/log/*

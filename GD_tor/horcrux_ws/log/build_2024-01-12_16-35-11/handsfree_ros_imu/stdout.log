@@ -1,5 +1,0 @@
--- Found ament_cmake: 2.0.3 (/opt/ros/iron/share/ament_cmake/cmake)
--- Found Python3: /usr/bin/python3.10 (found version "3.10.12") found components: Interpreter 
--- Found rosidl_default_generators: 1.5.0 (/opt/ros/iron/share/rosidl_default_generators/cmake)
--- Configuring incomplete, errors occurred!
-See also "/home/bong/project/snake_RL/GD/horcrux_ws/build/handsfree_ros_imu/CMakeFiles/CMakeOutput.log".

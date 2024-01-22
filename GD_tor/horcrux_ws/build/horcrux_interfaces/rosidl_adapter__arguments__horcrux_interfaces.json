@@ -1,8 +1,0 @@
-{
-  "package_name": "horcrux_interfaces",
-  "non_idl_tuples": [
-    "/home/bong/project/snake_RL/GD/horcrux_ws/src/horcrux_interfaces:msg/MotorState.msg",
-    "/home/bong/project/snake_RL/GD/horcrux_ws/src/horcrux_interfaces:msg/MotorStates.msg",
-    "/home/bong/project/snake_RL/GD/horcrux_ws/src/horcrux_interfaces:msg/RobotState.msg"
-  ]
-}

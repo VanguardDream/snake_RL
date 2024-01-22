@@ -1,6 +1,0 @@
-source;share/horcrux_state/hook/pythonpath.ps1
-source;share/horcrux_state/hook/pythonpath.dsv
-source;share/horcrux_state/hook/pythonpath.sh
-source;share/horcrux_state/hook/ament_prefix_path.ps1
-source;share/horcrux_state/hook/ament_prefix_path.dsv
-source;share/horcrux_state/hook/ament_prefix_path.sh

@@ -1,5 +1,0 @@
-[console_scripts]
-hello_node = horcrux_msg.hello_node:main
-pub = horcrux_msg.pub:main
-sub = horcrux_msg.sub:main
-

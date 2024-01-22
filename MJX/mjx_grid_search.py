@@ -275,11 +275,12 @@ def J_velocity(t, parameters:np.ndarray, g:str = 'serp', visual:bool = False, sa
 
     J_value = 0
 
-    # Return scalar data
+    # Return scalar data -> X-Y 위치 기반의 U 값
     if (g == 'side'):
         J_value = np.abs(J_result[1]) - np.abs(J_result[0])
     else:
-        J_value = J_result[0] - np.abs(J_result[1])
+        # J_value = J_result[0] - np.abs(J_result[1])
+        J_value = np.abs(J_result[1]) - np.abs(J_result[0]) #20240104 ones 게이트 비교를 위해서 기존 Side와 똑같이
 
     return J_value
 

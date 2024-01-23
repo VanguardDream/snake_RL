@@ -23,6 +23,12 @@ def generate_launch_description():
         ),
         Node(
             package='horcrux_state',
+            executable='command_node',
+            namespace='horcrux',
+            name='NN_command'
+        ),
+        Node(
+            package='horcrux_state',
             executable='state_node',
             namespace='horcrux',
             name='horcrux_state'

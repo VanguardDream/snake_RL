@@ -4,6 +4,8 @@ import numpy as np
 from .gait import serpenoid
 
 from rclpy.node import Node
+from rclpy.clock import Clock
+from rclpy.time import Time
 
 from horcrux_interfaces.msg import EnvAction
 from horcrux_interfaces.msg import EnvState
@@ -53,10 +55,10 @@ class horcrux_command(Node):
             10
         )
 
-        # self.gait = serpenoid.util(45,45,10,10,0) # serpentine
+        self.gait = serpenoid.util(30,30,40,40,0) # serpentine
         # self.gait = serpenoid.util(45,45,10,10,45) # sidewinding
-        # self.gait = serpenoid.util(0,0,10,10,90) # rolling
-        self.gait = serpenoid.util(30,30,10,10,90) # helix
+        # self.gait = serpenoid.util(0,0,30,30,90) # rolling
+        # self.gait = serpenoid.util(30,30,40,40,90) # helix
         self.motionMat = self.gait.getMotionMat()
         self.k_max = self.motionMat.shape[1] - 1
         self.k = 0
@@ -93,7 +95,7 @@ class horcrux_command(Node):
         msg.header.stamp = self.get_clock().now().to_msg()
         msg.c_action = self.motionMat[:,self.k]
         self.k += 1
-        self.k = np.clip(self.k, 0, self.k_max)
+        self.k = self.k % self.k_max
 
         self._pub_gait.publish(msg)
 
@@ -104,11 +106,11 @@ class horcrux_command(Node):
         else:
             self.__action = msg.c_action
 
-        # print(msg.header.stamp.nanosec)
-        if (msg.header.stamp - self.__action_uptime) > 115000000:
-            print(f'Inference is delayed...')
+        # print(self.__action_uptime.nanoseconds)
+        # if (msg.header.stamp.nanosec - self.__action_uptime.nanoseconds) > 115000000:
+        #     print(f'Inference is delayed...')
         
-        self.__action_uptime = msg.header.stamp
+        # self.__action_uptime = msg.header.stamp
     
     def _state_cb(self, msg:RobotState):
         for idx in range(14):
@@ -116,8 +118,11 @@ class horcrux_command(Node):
             self.__motor_velocities[idx] = msg.motors.motors[idx].present_velocity
             self.__motor_positions[idx] = msg.motors.motors[idx].present_position
 
-        self.__joy_axes[0] = msg.joy.axes[0] # Left X
-        self.__joy_axes[1] = msg.joy.axes[1] # Left Y
+        try:
+            self.__joy_axes[0] = msg.joy.axes[0] # Left X
+            self.__joy_axes[1] = msg.joy.axes[1] # Left Y
+        except Exception as e:
+            print(e)
 
         self.__head_oreientation[0] = msg.imu.orientation.w
         self.__head_oreientation[1] = msg.imu.orientation.x
@@ -131,7 +136,6 @@ class horcrux_command(Node):
         self.__head_linear_acc[0] = msg.imu.linear_acceleration.x
         self.__head_linear_acc[1] = msg.imu.linear_acceleration.y
         self.__head_linear_acc[2] = msg.imu.linear_acceleration.z
-
         
 
 def main(args = None):

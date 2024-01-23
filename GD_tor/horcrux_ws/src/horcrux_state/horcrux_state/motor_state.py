@@ -53,7 +53,7 @@ class motor_state_node(Node):
         self.dxl_poh = PortHandler(DEVICENAME)
         self.dxl_pah = PacketHandler(PROTOCOL_VERSION)
 
-        self.gswrite = GroupSyncWrite(self.dxl_poh, self.dxl_pah, ADDR_GOAL_POSITION, LEN_GOAL_POSITION)
+        self.gswrite = GroupSyncWrite(self.dxl_poh, self.dxl_pah, ADDR_GOAL_CURRENT, LEN_GOAL_CURRENT)
 
         # self.gbread_TE = GroupBulkRead(self.dxl_poh, self.dxl_pah)
         # self.gbread_GC = GroupBulkRead(self.dxl_poh, self.dxl_pah)
@@ -64,7 +64,7 @@ class motor_state_node(Node):
         self.gbread_PP = GroupBulkRead(self.dxl_poh, self.dxl_pah)
         # self.gbread_PVL = GroupBulkRead(self.dxl_poh, self.dxl_pah)
         self.gbread_PT = GroupBulkRead(self.dxl_poh, self.dxl_pah)
-        
+
         self.tiktok = 0
         self.pub_time = Clock().now()
         pub_timing = 1/10
@@ -91,15 +91,22 @@ class motor_state_node(Node):
         else:
             self.pub_timer = self.create_timer(pub_timing, self.pub_cb)
             self.motors_pub = self.create_publisher(MotorStates, 'motor_states', 10)
-
-        self.get_logger().info("\033[32m Node initation done...\033[0m")
-
+        
         self.action_sub = self.create_subscription(
             EnvAction,
             'NN_action',
             self.action_sub_cb,
             10
         )
+
+        self.get_logger().info("\033[32m Node initation done...\033[0m")
+
+        self.get_logger().info("\033[32m Send enable command to motors...\033[0m")
+
+        for i in range(14):
+            self.dxl_pah.write1ByteTxRx(self.dxl_poh, (i), ADDR_TORQUE_ENABLE, 1)
+        for i in range(14):
+            self.dxl_pah.write1ByteTxRx(self.dxl_poh, (i), ADDR_TORQUE_ENABLE, 1)
 
     def pub_cb(self):
         cb_up = Clock().now()
@@ -341,7 +348,8 @@ class motor_state_node(Node):
 
     def action_sub_cb(self, msg:EnvAction):
         for idx in range(14):
-            dxl_add_param_result = self.gswrite.addParam(idx, msg.c_action[idx])
+            # dxl_add_param_result = self.gswrite.addParam(idx, int(100 * msg.c_action[idx]))
+            dxl_add_param_result = self.gswrite.addParam(idx, [DXL_LOBYTE(int(50 * msg.c_action[idx])),DXL_HIBYTE(int(50 * msg.c_action[idx]))])
             if dxl_add_param_result != True:
                 self.get_logger().warn("\033[31m [ID:%03d] Addparam fail(action)...\033[0m" % idx)
 
@@ -350,12 +358,28 @@ class motor_state_node(Node):
             self.get_logger().warn("\033[31m GBPP_Tx fail with error %s \033[0m" % self.dxl_pah.getTxRxResult(dxl_comm_result))
 
         self.gswrite.clearParam()
+    
+    def motor_off(self):
+        for i in range(14):
+            self.dxl_pah.write1ByteTxRx(self.dxl_poh, (i), ADDR_TORQUE_ENABLE, 0)
+        for i in range(14):
+            self.dxl_pah.write1ByteTxRx(self.dxl_poh, (i), ADDR_TORQUE_ENABLE, 0)      
+
+    def __del__(self):
+        for i in range(14):
+            self.dxl_pah.write1ByteTxRx(self.dxl_poh, (i), ADDR_TORQUE_ENABLE, 0)
+        for i in range(14):
+            self.dxl_pah.write1ByteTxRx(self.dxl_poh, (i), ADDR_TORQUE_ENABLE, 0)
+             
 
 def main(args = None):
     rclpy.init(args=args)
     node = motor_state_node()
 
     rclpy.spin(node)
+
+    node.motor_off()
+    node.motor_off()
 
     node.destroy_node()
     rclpy.shutdown()

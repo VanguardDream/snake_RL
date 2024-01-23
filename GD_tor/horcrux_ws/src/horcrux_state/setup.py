@@ -3,6 +3,7 @@ from glob import glob
 from setuptools import find_packages, setup
 
 package_name = 'horcrux_state'
+submodules = "horcrux_state/gait"
 
 setup(
     name=package_name,
@@ -25,6 +26,7 @@ setup(
         'console_scripts': [
             'state_node = horcrux_state.horcrux_state:main',
             'motors_node = horcrux_state.motor_state:main',
+            'command_node = horcrux_state.command:main',
         ],
     },
 )

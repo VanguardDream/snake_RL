@@ -1,7 +1,12 @@
 from dynamixel_sdk import *
 import serial
+
+from .gait import serpenoid
+
+from horcrux_interfaces.msg import EnvAction
 from horcrux_interfaces.msg import MotorStates
 from horcrux_interfaces.msg import MotorState
+
 import rclpy
 from rclpy.node import Node
 from rclpy.clock import Clock
@@ -89,6 +94,12 @@ class motor_state_node(Node):
 
         self.get_logger().info("\033[32m Node initation done...\033[0m")
 
+        self.action_sub = self.create_subscription(
+            EnvAction,
+            'NN_action',
+            self.action_sub_cb,
+            10
+        )
 
     def pub_cb(self):
         cb_up = Clock().now()
@@ -248,6 +259,8 @@ class motor_state_node(Node):
             if dxl_data[5][idx] > 0x7fffffff:
                 dxl_data[5][idx] -= 4294967296 
             dxl_data[6][idx] = self.gbread_PP.getData(idx,ADDR_PRESENT_POSITION,LEN_PRESENT_POSITION)
+            if dxl_data[6][idx] > 0x7fffffff:
+                dxl_data[6][idx] -= 4294967296 
             # dxl_data[7][idx] = self.gbread_PVL.getData(idx,ADDR_PRESENT_VELOCITY,LEN_PRESENT_VOLTAGE)
             dxl_data[8][idx] = self.gbread_PT.getData(idx,ADDR_PRESENT_TEMPERATURE,LEN_PRESENT_TEMPERATURE)
 
@@ -326,6 +339,17 @@ class motor_state_node(Node):
         msg.header.stamp = dxl_lookup_done.to_msg()
         self.motors_pub.publish(msg)
 
+    def action_sub_cb(self, msg:EnvAction):
+        for idx in range(14):
+            dxl_add_param_result = self.gswrite.addParam(idx, msg.c_action[idx])
+            if dxl_add_param_result != True:
+                self.get_logger().warn("\033[31m [ID:%03d] Addparam fail(action)...\033[0m" % idx)
+
+        dxl_comm_result = self.gswrite.txPacket()
+        if dxl_comm_result != COMM_SUCCESS:
+            self.get_logger().warn("\033[31m GBPP_Tx fail with error %s \033[0m" % self.dxl_pah.getTxRxResult(dxl_comm_result))
+
+        self.gswrite.clearParam()
 
 def main(args = None):
     rclpy.init(args=args)

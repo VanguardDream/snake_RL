@@ -1,10 +1,10 @@
-import jax
-import mediapy as media
+# import jax
+# import mediapy as media
 import mujoco
 import mujoco.viewer
 from scipy.io import savemat
 
-from mujoco import mjx
+# from mujoco import mjx
 
 import time
 import numpy as np

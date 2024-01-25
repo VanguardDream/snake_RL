@@ -8,6 +8,7 @@ allnew/svm/data.csv
 *.pyc
 *.zip
 *.pkl
+*.egg-info
 
 allnew/svm/*.csv
 allnew/svm/*.mat

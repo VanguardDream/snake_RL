@@ -85,22 +85,24 @@ class PlaneWorld(MujocoEnv, utils.EzPickle):
             "render_fps": int(np.round(1.0 / self.dt)),
         }
 
-        obs_size = self.data.sensordata.size
+        obs_size = self.data.sensordata.size + 14
 
         self.observation_space = Box(
-                low=-40, high= 40, shape=(obs_size,), dtype=np.float64
+                low=-np.inf, high= np.inf, shape=(obs_size,), dtype=np.float64
         )
 
         self.action_space = Box(
                 low=0, high=1.5, shape=(14,), dtype=np.float64
         )
 
+        self.motion_vector = np.array([0] * 14)
         self.observation_structure = {
                 "jpos":self.data.sensordata[:14],
                 "jvel":self.data.sensordata[14:28],
                 "head_orientation":self.data.sensordata[28:32],
                 "head_angvel":self.data.sensordata[32:35],
                 "head_linacc":self.data.sensordata[35:38],
+                "motion_vector":self.motion_vector,
         }
 
     @property
@@ -111,7 +113,7 @@ class PlaneWorld(MujocoEnv, utils.EzPickle):
     def is_healthy(self):
             _q_head_orientation = Rotation([self.data.sensordata[29],self.data.sensordata[30],self.data.sensordata[31],self.data.sensordata[28]])
             r, p, y = _q_head_orientation.as_rotvec(True)
-            min_r, max_r = self.healthy_roll_range
+            min_r, max_r = self._healthy_roll_range
             is_healthy = min_r <= r <= max_r
             return is_healthy
     
@@ -119,18 +121,19 @@ class PlaneWorld(MujocoEnv, utils.EzPickle):
          control_cost = self._ctrl_cost_weight * np.sum(np.square(action))
          return control_cost
             
-    def action(self, action):
-        xy_head_pos_before = self.data.body(self.main_body).xpos[:2].copy()
-        head_quat_before = self.data.body(self.main_body).xquat.copy()
+    def step(self, action):
+        xy_head_pos_before = self.data.body(self._main_body).xpos[:2].copy()
+        head_quat_before = self.data.body(self._main_body).xquat.copy()
         rpy_before = Rotation([head_quat_before[1], head_quat_before[2], head_quat_before[3], head_quat_before[0]]).as_rotvec(False)
 
         motion_vector = np.random.choice([-1, 1], size=14)
+        self.motion_vector = motion_vector
         direction_action = action * motion_vector
 
         self.do_simulation(direction_action, self.frame_skip)
 
-        xy_head_pos_after = self.data.body(self.main_body).xpos[:2].copy()
-        head_quat_after = self.data.body(self.main_body).xquat.copy()
+        xy_head_pos_after = self.data.body(self._main_body).xpos[:2].copy()
+        head_quat_after = self.data.body(self._main_body).xquat.copy()
         rpy_after = Rotation([head_quat_after[1], head_quat_after[2], head_quat_after[3], head_quat_after[0]]).as_rotvec(False)
 
         forward_dist = np.linalg.norm(xy_head_pos_after - xy_head_pos_before)

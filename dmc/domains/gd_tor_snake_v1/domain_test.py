@@ -17,5 +17,6 @@ print(env.action_space)
 
 for i in range(3003):
     random = np.random.random(14) * 1.5
-    obs, rew, terminated, _, _ = env.step(random)
+    obs, rew, terminated, _, info = env.step(random)
     print(rew)
+    # print(info['reward_side'])

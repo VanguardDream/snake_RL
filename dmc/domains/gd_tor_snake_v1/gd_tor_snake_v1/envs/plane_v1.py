@@ -171,7 +171,7 @@ class PlaneWorld(MujocoEnv, utils.EzPickle):
         rewards = forward_reward + healthy_reward
 
         ctrl_cost = self.control_cost(action)
-        side_cost = y_vel * self._side_cost_weight
+        side_cost = np.abs(y_vel) * self._side_cost_weight
 
         costs = ctrl_cost + side_cost
 

@@ -126,8 +126,7 @@ class PlaneWorld(MujocoEnv, utils.EzPickle):
         head_quat_before = self.data.body(self._main_body).xquat.copy()
         rpy_before = Rotation([head_quat_before[1], head_quat_before[2], head_quat_before[3], head_quat_before[0]]).as_rotvec(False)
 
-        motion_vector = np.random.choice([-1, 1], size=14)
-        self.motion_vector = motion_vector
+        motion_vector = self.motion_vector
         direction_action = action * motion_vector
 
         self.do_simulation(direction_action, self.frame_skip)
@@ -144,6 +143,9 @@ class PlaneWorld(MujocoEnv, utils.EzPickle):
 
         x_vel = x_disp / self.dt
         y_vel = y_disp / self.dt
+
+        motion_vector = np.random.choice([-1, 1], size=14)
+        self.motion_vector = motion_vector
 
         observation = self._get_obs(motion_vector)
         reward, reward_info = self._get_rew(x_vel, y_vel, action)

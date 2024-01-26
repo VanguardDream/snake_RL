@@ -1,5 +1,6 @@
 from typing import Dict, Optional, Tuple, Union
 from gymnasium.envs.mujoco.mujoco_env import DEFAULT_SIZE
+from gd_tor_snake_v1.envs.gait import Gait
 
 import numpy as np
 
@@ -11,9 +12,7 @@ from numpy.typing import NDArray
 
 from scipy.spatial.transform import Rotation
 
-DEFAULT_CAMERA_CONFIG = {
-    "distance": 4.0,
-}
+DEFAULT_CAMERA_CONFIG = {}
 
 
 class PlaneWorld(MujocoEnv, utils.EzPickle):
@@ -34,10 +33,13 @@ class PlaneWorld(MujocoEnv, utils.EzPickle):
             ctrl_cost_weight: float = 0.5,
             healthy_reward: float = 1.0,
             main_body: Union[int, str] = 2,
+            render_camera_name = "ceiling",
             terminate_when_unhealthy: bool = False,
             healthy_roll_range: Tuple[float, float] = (-100, 100),
             contact_force_range: Tuple[float, float] = (-1.0, 1.0),
-            reset_noise_scale: float = 0.1,
+            reset_noise_scale: float = 0.03,
+            use_gait: bool = False,
+            gait_params: Tuple[float, float, float, float, float] = (30, 30, 40, 40, 0),
             **kwargs,
     ):
         utils.EzPickle.__init__(
@@ -50,10 +52,13 @@ class PlaneWorld(MujocoEnv, utils.EzPickle):
             ctrl_cost_weight,
             healthy_reward,
             main_body,
+            render_camera_name,
             terminate_when_unhealthy,
             healthy_roll_range,
             contact_force_range,
             reset_noise_scale,
+            use_gait,
+            gait_params,
             **kwargs,                
         )
 
@@ -66,13 +71,19 @@ class PlaneWorld(MujocoEnv, utils.EzPickle):
         self._reset_noise_scale = reset_noise_scale
         self._main_body = main_body
         self._terminate_when_unhealthy = terminate_when_unhealthy
+        self._use_gait = use_gait
+        self._gait = Gait(gait_params)
+        self._k = 0
 
         MujocoEnv.__init__(
                 self,
                 model_path,
                 frame_skip,
+                width=1280,
+                height=720,
                 observation_space = None, # define later
                 default_camera_config = default_camera_config,
+                camera_name = render_camera_name,
                 **kwargs,
         )
 
@@ -144,9 +155,13 @@ class PlaneWorld(MujocoEnv, utils.EzPickle):
         x_vel = x_disp / self.dt
         y_vel = y_disp / self.dt
 
-        motion_vector = np.random.choice([-1, 1], size=14)
-        self.motion_vector = motion_vector
-
+        
+        if self._use_gait:
+            self.motion_vector = self._gait.getMvec(self._k)
+            self._k += 1
+        else:
+            self.motion_vector = np.random.choice([-1, 1], size=14)
+        
         observation = self._get_obs(motion_vector)
         reward, reward_info = self._get_rew(x_vel, y_vel, action)
         terminated = (not self.is_healthy) and self._terminate_when_unhealthy
@@ -206,3 +221,4 @@ class PlaneWorld(MujocoEnv, utils.EzPickle):
         observation = self._get_obs(np.array([0] * 14))
 
         return observation
+    

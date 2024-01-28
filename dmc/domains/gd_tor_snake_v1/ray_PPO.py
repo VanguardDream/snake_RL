@@ -16,7 +16,7 @@ __location__ = pathlib.Path(__location__)
 __model_location__ = __location__.parent.parent.joinpath('models')
 __model_path__ = os.path.join(__model_location__,'env_snake_v1.xml')
 
-from ray.rllib.algorithms import ppo
+from ray.rllib.algorithms.ppo import PPOConfig
 from ray.tune.logger import pretty_print
 
 env_config = {
@@ -29,6 +29,21 @@ env_config = {
                 "gait_params": (30,30,40,40,0),
             }
 
+# algo_config = (
+#     PPOConfig()
+#     .environment("gd_tor_snake_v1/plane-v1")
+#     .rollouts(num_rollout_workers=4)
+#     .framework("torch")
+# )
+
+algo_config = PPOConfig()
+algo_config = algo_config.environment("gd_tor_snake_v1/plane-v1", env_config= env_config)
+algo_config = algo_config.rollouts(num_rollout_workers=4)
+algo_config = algo_config.framework('torch')
+algo_config = algo_config.training(gamma=0.9, lr=0.01)
+algo_config = algo_config.resources(num_gpus=0.8)
+
+algo = algo_config.build()
 # ray.init()
 
 

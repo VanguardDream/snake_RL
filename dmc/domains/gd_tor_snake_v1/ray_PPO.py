@@ -6,6 +6,7 @@ import os
 import pathlib
 import time
 import mediapy as media
+import ray
 
 from gymnasium.utils.save_video import save_video
 from gd_tor_snake_v1.envs.plane_v1 import PlaneWorld
@@ -15,28 +16,20 @@ __location__ = pathlib.Path(__location__)
 __model_location__ = __location__.parent.parent.joinpath('models')
 __model_path__ = os.path.join(__model_location__,'env_snake_v1.xml')
 
-from ray.rllib.algorithms.ppo import PPOConfig
+from ray.rllib.algorithms import ppo
 from ray.tune.logger import pretty_print
-from ray.tune.registry import register_env
 
-register_env("gd_tor_snake_v1/plane-v1", lambda config: PlaneWorld(model_path=__model_path__, 
-                                                                   terminate_when_unhealthy=True,
-                                                                   ctrl_cost_weight=0.2,
-                                                                   render_mode="rgb_array",
-                                                                   render_camera_name="com",
-                                                                   use_gait=False))
+env_config = {
+                "model_path":str(__model_path__),
+                "terminate_when_unhealthy":True,
+                "ctrl_cost_weight": 0.2,
+                "render_mode": 'rgb_array',
+                "render_camera_name": "com",
+                "use_gait": False,
+                "gait_params": (30,30,40,40,0),
+            }
 
-algo = (
-    PPOConfig()
-    .rollouts(num_rollout_workers=8)
-    .resources(num_gpus=0.8)
-    .environment(env="gd_tor_snake_v1/plane-v1")
-    .build()
-)
-
-for i in range(10):
-    result = algo.train()
-    print(pretty_print(result))
+# ray.init()
 
 
 

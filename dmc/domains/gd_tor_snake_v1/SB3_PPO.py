@@ -18,26 +18,29 @@ gait = Gait((30,30,40,40,0))
 env = gym.make("gd_tor_snake_v1/plane-v1", 
                model_path = __model_path__, 
                terminate_when_unhealthy = True,
-               forward_reward_weight = 7,
+               forward_reward_weight = 2,
                ctrl_cost_weight = 0.2, 
                render_mode = 'rgb_array', 
                render_camera_name = "com", 
                healthy_reward = 0.2,
-               use_gait = True,
+               use_gait = False,
                gait_params = (30,30,40,40,0)) 
 
+step_starting_index = 0
+episode_index = 8
+policy_dir = "../policies"
+video_prefix = "SB3_PPO_20240128"
+
+os.makedirs(policy_dir, exist_ok=True)
 model = PPO("MlpPolicy", env, verbose=1)
-model.learn(total_timesteps=30000)
+model.learn(total_timesteps=1)
+
+model.save(f"{policy_dir+'/PPO'}")
 
 vec_env = model.get_env()
 obs = vec_env.reset()
 
-
-step_starting_index = 0
-episode_index = 8
-video_prefix = "SB3_PPO_20240128"
 frames = []
-
 for i in range(1000):
     action, _states = model.predict(obs, deterministic=True)
     obs, reward, done, info = vec_env.step(action)

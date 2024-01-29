@@ -36,7 +36,7 @@ env = gym.make("gd_tor_snake_v1/plane-v1",
                side_cost_weight = 1.1,
                ctrl_cost_weight = 0.1, 
                render_mode = 'rgb_array', 
-               render_camera_name = "head_mount", 
+               render_camera_name = "com", 
                healthy_reward = 0.2,
                use_gait = False,
                gait_params = (30,30,40,40,0)) 
@@ -53,25 +53,25 @@ __now_str = datetime.datetime.now().strftime("%Y%m%d_%H-%M-%S")
 video_prefix = "SB3_PPO_" + __now_str
 log_prefix = "SB3_PPO_" + __now_str
 
-# Learning
-vec_env = make_vec_env("gd_tor_snake_v1/plane-v1", n_envs=20, env_kwargs=env_config)
-model = PPO("MlpPolicy", vec_env, gamma=0.9, tensorboard_log= tensorboard_logdir + "/" + log_prefix, verbose=1)
+# # Learning
+# vec_env = make_vec_env("gd_tor_snake_v1/plane-v1", n_envs=20, env_kwargs=env_config)
+# model = PPO("MlpPolicy", vec_env, gamma=0.9, tensorboard_log= tensorboard_logdir + "/" + log_prefix, verbose=1)
 
 # Loading
-model = PPO.load(policy_dir+'/PPO/'+'20240129_14-30-22',env=vec_env) # For learning 삭제하지 않고 계속 아래로 이어갈 것!!
-# model = PPO.load(policy_dir+'/PPO/'+'20240129_14-30-22',env=env) # For evaluating
+# model = PPO.load(policy_dir+'/PPO/'+'20240129_14-30-22',env=vec_env) # For learning 삭제하지 않고 계속 아래로 이어갈 것!!
+model = PPO.load(policy_dir+'/PPO/'+'20240129_15-55-34',env=env) # For evaluating
 
-model.learn(total_timesteps=2000000)
-model.save(f"{policy_dir+'/PPO/'+__now_str}")
+# model.learn(total_timesteps=2000000)
+# model.save(f"{policy_dir+'/PPO/'+__now_str}")
 
-# frames = []
-# obs, info = env.reset()
-# for i in range(1000):
-#     action, _states = model.predict(obs, deterministic=True)
-#     obs, reward, done, _, info = env.step(action)
-#     obs[-14:] = gait.getMvec(i)
+frames = []
+obs, info = env.reset()
+for i in range(1000):
+    action, _states = model.predict(obs, deterministic=True)
+    obs, reward, done, _, info = env.step(action)
+    obs[-14:] = gait.getMvec(i)
 
-#     pixels = env.render()
-#     frames.append(pixels)
+    pixels = env.render()
+    frames.append(pixels)
 
-# save_video(frames,"../videos", name_prefix=video_prefix, fps=env.metadata["render_fps"], step_starting_index = step_starting_index, episode_index = episode_index)
+save_video(frames,"../videos", name_prefix=video_prefix, fps=env.metadata["render_fps"], step_starting_index = step_starting_index, episode_index = episode_index)

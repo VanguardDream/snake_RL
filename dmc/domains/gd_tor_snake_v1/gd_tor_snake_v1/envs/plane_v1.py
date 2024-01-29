@@ -141,9 +141,11 @@ class PlaneWorld(MujocoEnv, utils.EzPickle):
             
     def step(self, action):
         xy_head_pos_before = self.data.body(self._main_body).xpos[:2].copy()
-        com_pos_before = self.get_body_com()
         head_quat_before = self.data.body(self._main_body).xquat.copy()
         rpy_before = Rotation([head_quat_before[1], head_quat_before[2], head_quat_before[3], head_quat_before[0]]).as_rotvec(False)
+        
+        com_pos_before = self.get_robot_com()
+        com_rpy_before = self.get_robot_rot()
 
         motion_vector = self.motion_vector
         direction_action = action * motion_vector
@@ -154,15 +156,28 @@ class PlaneWorld(MujocoEnv, utils.EzPickle):
         head_quat_after = self.data.body(self._main_body).xquat.copy()
         rpy_after = Rotation([head_quat_after[1], head_quat_after[2], head_quat_after[3], head_quat_after[0]]).as_rotvec(False)
 
-        forward_dist = np.linalg.norm(xy_head_pos_after - xy_head_pos_before)
+        com_pos_after = self.get_robot_com()
+        com_rpy_after = self.get_robot_rot()
 
-        d_yaw = rpy_after[2] - rpy_before[2]
+        # ## Head based
+        # forward_dist = np.linalg.norm(xy_head_pos_after - xy_head_pos_before)
+
+        # d_yaw = rpy_after[2] - rpy_before[2]
+        # x_disp = forward_dist * np.cos(d_yaw)
+        # y_disp = forward_dist * np.sin(d_yaw)
+
+        # x_vel = x_disp / self.dt
+        # y_vel = y_disp / self.dt
+
+        ## COM based
+        forward_dist = np.linalg.norm(com_pos_after - com_pos_before)
+
+        d_yaw = com_rpy_after[2] - com_rpy_before[2]
         x_disp = forward_dist * np.cos(d_yaw)
         y_disp = forward_dist * np.sin(d_yaw)
 
         x_vel = x_disp / self.dt
         y_vel = y_disp / self.dt
-
         
         if self._use_gait:
             self.motion_vector = self._gait.getMvec(self._k)
@@ -230,7 +245,7 @@ class PlaneWorld(MujocoEnv, utils.EzPickle):
 
         return observation
     
-    def get_robot_com(self):
+    def get_robot_com(self)->np.ndarray:
         accum_x = 0
         accum_y = 0
         len_names = len(self._robot_body_names)
@@ -242,13 +257,18 @@ class PlaneWorld(MujocoEnv, utils.EzPickle):
 
         return np.array([accum_x / len_names, accum_y / len_names])
 
-    def get_body_rot(self):
-        _sensor_data = self.data.sensordata[48:104].copy()
-        orientaions_com = np.reshape(_sensor_data,(-1,4)).copy()  
-        new_order_orientaions_com = orientaions_com[:, [1, 2, 3, 0]].copy()
+    def get_robot_rot(self)->np.ndarray:
+        com_roll = 0
+        com_pitch = 0
+        com_yaw = 0
 
-        com_R = Rotation.from_quat(new_order_orientaions_com)
-        # rpy_com = com_R.mean().as_rotvec()
-        quat_com = com_R.mean().as_quat(canonical=True)
+        robot_quats = np.empty((0,4))
+        for name in self._robot_body_names:
+            robot_quats = np.vstack((robot_quats, self.data.body(name).xquat))
 
-        return quat_com
+        robot_quats = robot_quats[:, [1, 2, 3, 0]]
+        robot_rot = Rotation(robot_quats)
+
+        com_roll, com_pitch, com_yaw = robot_rot.mean().as_rotvec(False)
+
+        return np.array([com_roll, com_pitch, com_yaw])

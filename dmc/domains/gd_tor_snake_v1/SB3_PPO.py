@@ -51,20 +51,21 @@ os.makedirs(tensorboard_logdir, exist_ok=True)
 import datetime
 __now_str = datetime.datetime.now().strftime("%Y%m%d_%H-%M-%S")
 video_prefix = "SB3_PPO_" + __now_str
-log_prefix = "/SB3_PPO_" + __now_str
+log_prefix = "SB3_PPO_" + __now_str
 
 # Learning
-# vec_env = make_vec_env("gd_tor_snake_v1/plane-v1", n_envs=10, env_kwargs=env_config)
-# model = PPO("MlpPolicy", vec_env, gamma=0.9, tensorboard_log= tensorboard_logdir + log_prefix, verbose=1)
-# model.learn(total_timesteps=2000000)
-
-# model.save(f"{policy_dir+'/PPO/'+__now_str}")
+vec_env = make_vec_env("gd_tor_snake_v1/plane-v1", n_envs=20, env_kwargs=env_config)
+model = PPO("MlpPolicy", vec_env, gamma=0.9, tensorboard_log= tensorboard_logdir + "/" + log_prefix, verbose=1)
 
 # Loading
-model = PPO.load(policy_dir+'/PPO/'+'20240129_14-30-22')
-obs, info = env.reset()
+model = PPO.load(policy_dir+'/PPO/'+'20240129_14-30-22',env=vec_env) # For learning 삭제하지 않고 계속 아래로 이어갈 것!!
+# model = PPO.load(policy_dir+'/PPO/'+'20240129_14-30-22',env=env) # For evaluating
+
+model.learn(total_timesteps=2000000)
+model.save(f"{policy_dir+'/PPO/'+__now_str}")
 
 # frames = []
+# obs, info = env.reset()
 # for i in range(1000):
 #     action, _states = model.predict(obs, deterministic=True)
 #     obs, reward, done, _, info = env.step(action)

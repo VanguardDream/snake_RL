@@ -80,6 +80,7 @@ class PlaneWorld(MujocoEnv, utils.EzPickle):
         self._use_gait = use_gait
         self._gait = Gait(gait_params)
         self._k = 0
+        self._robot_body_names = ["head","link1","link2","link3","link4","link5","link6","link7","link8","link9","link10","link11","link12","link13","tail"]
 
         MujocoEnv.__init__(
                 self,
@@ -140,6 +141,7 @@ class PlaneWorld(MujocoEnv, utils.EzPickle):
             
     def step(self, action):
         xy_head_pos_before = self.data.body(self._main_body).xpos[:2].copy()
+        com_pos_before = self.get_body_com()
         head_quat_before = self.data.body(self._main_body).xquat.copy()
         rpy_before = Rotation([head_quat_before[1], head_quat_before[2], head_quat_before[3], head_quat_before[0]]).as_rotvec(False)
 
@@ -228,3 +230,25 @@ class PlaneWorld(MujocoEnv, utils.EzPickle):
 
         return observation
     
+    def get_robot_com(self):
+        accum_x = 0
+        accum_y = 0
+        len_names = len(self._robot_body_names)
+
+        for name in self._robot_body_names:
+            x, y, _ = self.data.body(name).xpos
+            accum_x = accum_x + x
+            accum_y = accum_y + y
+
+        return np.array([accum_x / len_names, accum_y / len_names])
+
+    def get_body_rot(self):
+        _sensor_data = self.data.sensordata[48:104].copy()
+        orientaions_com = np.reshape(_sensor_data,(-1,4)).copy()  
+        new_order_orientaions_com = orientaions_com[:, [1, 2, 3, 0]].copy()
+
+        com_R = Rotation.from_quat(new_order_orientaions_com)
+        # rpy_com = com_R.mean().as_rotvec()
+        quat_com = com_R.mean().as_quat(canonical=True)
+
+        return quat_com

@@ -3,6 +3,8 @@ from gymnasium.envs.mujoco.mujoco_env import DEFAULT_SIZE
 from gd_tor_snake_v1.envs.gait import Gait
 
 import numpy as np
+import os
+import pathlib
 
 from gymnasium import utils
 from gymnasium.envs.mujoco import MujocoEnv
@@ -14,6 +16,9 @@ from scipy.spatial.transform import Rotation
 
 DEFAULT_CAMERA_CONFIG = {}
 
+__pkg_dir__ = pathlib.Path(os.path.dirname(__file__))
+__resource_dir__ = os.path.join(__pkg_dir__.parent,'resources')
+__mjcf_model_path__ = os.path.join(__resource_dir__, 'env_snake_v1.xml')
 
 class PlaneWorld(MujocoEnv, utils.EzPickle):
     metadata = {
@@ -22,16 +27,17 @@ class PlaneWorld(MujocoEnv, utils.EzPickle):
             "rgb_array",
             "depth_array",
         ],
+        "render_fps":10 # For gymnasium 0.28.1
     }
     def __init__(
             self, 
-            model_path, 
+            model_path = __mjcf_model_path__,
             frame_skip: int = 20, 
             default_camera_config: Dict[str, Union[float, int]] = DEFAULT_CAMERA_CONFIG,
-            forward_reward_weight: float = 1,
-            side_cost_weight:float = 0.5,
-            ctrl_cost_weight: float = 0.5,
-            healthy_reward: float = 1.0,
+            forward_reward_weight: float = 2,
+            side_cost_weight:float = 1.1,
+            ctrl_cost_weight: float = 0.1,
+            healthy_reward: float = 0.1,
             main_body: Union[int, str] = 2,
             render_camera_name = "ceiling",
             terminate_when_unhealthy: bool = False,
@@ -103,7 +109,7 @@ class PlaneWorld(MujocoEnv, utils.EzPickle):
         )
 
         self.action_space = Box(
-                low=0, high=1.5, shape=(14,), dtype=np.float64
+                low=0, high=1.5, shape=(14,), dtype=np.float32
         )
 
         self.motion_vector = np.array([0] * 14)

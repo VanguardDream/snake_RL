@@ -10,6 +10,7 @@ import ray
 
 from gymnasium.utils.save_video import save_video
 from gd_tor_snake_v1.envs.plane_v1 import PlaneWorld
+from ray import tune
 
 __location__ = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
 __location__ = pathlib.Path(__location__)
@@ -18,34 +19,33 @@ __model_path__ = os.path.join(__model_location__,'env_snake_v1.xml')
 
 from ray.rllib.algorithms.ppo import PPOConfig
 from ray.tune.logger import pretty_print
+from ray.tune.registry import register_env
 
 env_config = {
-                "model_path":str(__model_path__),
                 "terminate_when_unhealthy":True,
-                "ctrl_cost_weight": 0.2,
+                "forward_reward_weight": 2,
+                "side_cost_weight": 1.1,
+                "ctrl_cost_weight": 0.1,
                 "render_mode": 'rgb_array',
                 "render_camera_name": "com",
+                "healthy_reward": 0.2,
                 "use_gait": False,
                 "gait_params": (30,30,40,40,0),
             }
 
-# algo_config = (
-#     PPOConfig()
-#     .environment("gd_tor_snake_v1/plane-v1")
-#     .rollouts(num_rollout_workers=4)
-#     .framework("torch")
-# )
+ray.init()
+register_env("snake_env", lambda env_config: PlaneWorld(env_config))
 
-algo_config = PPOConfig()
-algo_config = algo_config.environment("gd_tor_snake_v1/plane-v1", env_config= env_config)
-algo_config = algo_config.rollouts(num_rollout_workers=4)
-algo_config = algo_config.framework('torch')
-algo_config = algo_config.training(gamma=0.9, lr=0.01)
-algo_config = algo_config.resources(num_gpus=0.8)
+config = (  # 1. Configure the algorithm,
+    PPOConfig()
+    .environment("snake_env")
+    .rollouts(num_rollout_workers=2)
+    .framework("torch")
+    .training(model={"fcnet_hiddens": [64, 64]})
+    .evaluation(evaluation_num_workers=1)
+)
 
-algo = algo_config.build()
-# ray.init()
-
+algo = config.build()  # 2. build the algorithm,
 
 
 # #camera names : com, ceiling, head_mount

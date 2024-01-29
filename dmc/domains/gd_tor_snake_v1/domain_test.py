@@ -20,7 +20,6 @@ __model_path__ = os.path.join(__model_location__,'env_snake_v1.xml')
 # (0,0,30,30,90) # rolling
 # (30,30,40,40,90) # helix
 env = gym.make("gd_tor_snake_v1/plane-v1", 
-               model_path = __model_path__, 
                terminate_when_unhealthy = True, 
                ctrl_cost_weight = 0.2, 
                render_mode = 'rgb_array', 
@@ -31,7 +30,7 @@ _ = env.reset()
 
 step_starting_index = 0
 episode_index = 8
-video_prefix = "PPO_20240126"
+video_prefix = "PPO_20240126-0.28.1"
 frames = []
 
 for i in range(1000):

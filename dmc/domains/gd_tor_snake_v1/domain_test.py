@@ -21,11 +21,10 @@ __model_path__ = os.path.join(__model_location__,'env_snake_v1.xml')
 # (30,30,40,40,90) # helix
 env = gym.make("gd_tor_snake_v1/plane-v1", 
                terminate_when_unhealthy = True, 
-               ctrl_cost_weight = 0.2, 
                render_mode = 'human', 
                render_camera_name = "head_mount", 
                use_gait = True,
-               gait_params = (0,0,10,10,90)) 
+               gait_params = (0,0,30,30,90),) 
 _ = env.reset()
 
 step_starting_index = 0
@@ -35,11 +34,21 @@ frames = []
 
 for i in range(3000):
     # random = np.random.random(14) * 1.5
-    random = np.ones(14) * 0.2
+    random = np.ones(14) * 0.3
 
     obs, rew, terminated, _, info = env.step(random)
     if terminated:
         env.reset()
+
+    if i % 300 == 0:
+        env.reset()
+
+    # print(info)
+    # print(np.round((info['reward_forward'] + info['reward_side']),6))
+    print(np.round(info['reward_forward'],6), end='    ')
+    print(np.round(info['reward_side'],6), end='    ')
+    print(np.round(info['reward_unhealthy'],6), end='    ')
+    print(np.round(info['reward_healthy'],6))
 
     pixels = env.render()
 

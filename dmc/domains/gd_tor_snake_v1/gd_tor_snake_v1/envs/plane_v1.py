@@ -34,17 +34,17 @@ class PlaneWorld(MujocoEnv, utils.EzPickle):
             model_path = __mjcf_model_path__,
             frame_skip: int = 20, 
             default_camera_config: Dict[str, Union[float, int]] = DEFAULT_CAMERA_CONFIG,
-            forward_reward_weight: float = 2,
-            side_cost_weight:float = 1.1,
-            ctrl_cost_weight: float = 0.1,
-            unhealthy_cost_weight: float = 0.5,
+            forward_reward_weight: float = 60,
+            side_cost_weight:float = 60,
+            ctrl_cost_weight: float = 0,
+            unhealthy_cost_weight: float = 1.0,
             healthy_reward: float = 0.1,
             main_body: Union[int, str] = 2,
             render_camera_name = "ceiling",
             terminate_when_unhealthy: bool = False,
             unhealthy_max_steps: int = 15,
             healthy_roll_range: Tuple[float, float] = (-45, 45),
-            terminating_roll_range: Tuple[float, float] = (-100, 100),
+            terminating_roll_range: Tuple[float, float] = (-120, 120),
             contact_force_range: Tuple[float, float] = (-1.0, 1.0),
             reset_noise_scale: float = 0.03,
             use_gait: bool = False,
@@ -148,8 +148,8 @@ class PlaneWorld(MujocoEnv, utils.EzPickle):
     @property
     def is_terminated(self):
             _q_head_orientation = Rotation([self.data.sensordata[29],self.data.sensordata[30],self.data.sensordata[31],self.data.sensordata[28]])
-            r, p, y = _q_head_orientation.as_rotvec(True)
-            # r, p, y = self.get_robot_rot() * (180 / np.pi)
+            # r, p, y = _q_head_orientation.as_rotvec(True)
+            r, p, y = self.get_robot_rot() * (180 / np.pi)
             min_r, max_r = self._terminating_roll_range
             is_not_over = min_r <= r <= max_r
 
@@ -165,7 +165,7 @@ class PlaneWorld(MujocoEnv, utils.EzPickle):
             return is_done
     
     def control_cost(self, action):
-         control_cost = self._ctrl_cost_weight * np.sum(np.square(action))
+         control_cost = self._ctrl_cost_weight * np.sum(action)
          return control_cost
             
     def step(self, action):
@@ -198,16 +198,24 @@ class PlaneWorld(MujocoEnv, utils.EzPickle):
         # x_vel = x_disp / self.dt
         # y_vel = y_disp / self.dt
 
-        ## COM based
-        forward_dist = np.linalg.norm(com_pos_after - com_pos_before)
+        # ## COM based
+        # forward_dist = np.linalg.norm(com_pos_after - com_pos_before)
 
-        d_yaw = com_rpy_after[2] - com_rpy_before[2]
-        x_disp = forward_dist * np.cos(d_yaw)
-        y_disp = forward_dist * np.sin(d_yaw)
+        # d_yaw = com_rpy_after[2] - com_rpy_before[2]
+        # x_disp = forward_dist * np.cos(d_yaw)
+        # y_disp = forward_dist * np.sin(d_yaw)
+
+        # x_vel = x_disp / self.dt
+        # y_vel = y_disp / self.dt
+
+        ## Global CoM Disp
+        x_disp = com_pos_after[0] - com_pos_before[0]
+        y_disp = com_pos_after[1] - com_pos_before[1]
 
         x_vel = x_disp / self.dt
         y_vel = y_disp / self.dt
         
+        # ## Gait changing...
         self.motion_vector = self._gait.getMvec(self._k)
         self._k += 1
 
@@ -263,11 +271,11 @@ class PlaneWorld(MujocoEnv, utils.EzPickle):
 
         # Gait reset
         if not(self._use_gait):
-            a = np.random.randint(1, 180)
-            b = np.random.randint(1, 180)
+            a = np.random.randint(0, 180)
+            b = np.random.randint(0, 180)
             c = np.random.randint(10, 90)
             d = np.random.randint(10, 90)
-            e = np.random.randint( 0, 90)
+            e = np.random.randint( 0, 360)
 
             self._gait = Gait((a, b, c, d, e))
 

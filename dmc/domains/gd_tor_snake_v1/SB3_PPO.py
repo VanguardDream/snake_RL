@@ -16,13 +16,9 @@ __model_location__ = __location__.parent.parent.joinpath('models')
 __model_path__ = os.path.join(__model_location__,'env_snake_v1.xml')
 
 env_config = {
-                "terminate_when_unhealthy":True,
-                "forward_reward_weight": 2,
-                "side_cost_weight": 1.1,
-                "ctrl_cost_weight": 0.1,
+                "terminate_when_unhealthy":False,
                 "render_mode": 'rgb_array',
                 "render_camera_name": "com",
-                "healthy_reward": 0.2,
                 "use_gait": False,
                 "gait_params": (30,30,40,40,0),
             }
@@ -56,7 +52,7 @@ video_prefix = "SB3_PPO_" + __now_str
 log_prefix = "SB3_PPO_" + __now_str
 
 # # Learning
-vec_env = make_vec_env("gd_tor_snake_v1/plane-v1", n_envs=20, env_kwargs=env_config)
+vec_env = make_vec_env("gd_tor_snake_v1/plane-v1", n_envs=60, env_kwargs=env_config)
 model = PPO("MlpPolicy", vec_env, gamma=0.9, learning_rate=0.0003, batch_size=4096, tensorboard_log = tensorboard_logdir + "/" + log_prefix, verbose=1, policy_kwargs= policy_kwargs)
 
 # Loading
@@ -72,7 +68,7 @@ cp_callback = CheckpointCallback(
     save_vecnormalize= True,
 )
 
-model.learn(total_timesteps=10000000,callback=cp_callback, progress_bar=True)
+model.learn(total_timesteps=20000000,callback=cp_callback, progress_bar=True)
 model.save(f"{policy_dir+'/PPO/'+__now_str}")
 
 

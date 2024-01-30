@@ -27,7 +27,7 @@ env_config = {
             }
 
 
-gait = Gait((30,30,40,40,0))
+gait = Gait((15,15,40,40,0))
 
 env = gym.make("gd_tor_snake_v1/plane-v1", 
                model_path = __model_path__, 
@@ -39,7 +39,7 @@ env = gym.make("gd_tor_snake_v1/plane-v1",
                render_camera_name = "com", 
                healthy_reward = 0.2,
                use_gait = False,
-               gait_params = (30,30,40,40,0)) 
+               gait_params = (15,15,40,40,0)) 
 
 step_starting_index = 0
 episode_index = 8
@@ -55,32 +55,36 @@ log_prefix = "SB3_SAC_" + __now_str
 
 # Learning
 vec_env = make_vec_env("gd_tor_snake_v1/plane-v1", n_envs=20, env_kwargs=env_config)
-model = SAC("MlpPolicy", vec_env, gamma=0.9, learning_rate=0.0003, batch_size=4096,tensorboard_log= tensorboard_logdir + "/" + log_prefix, verbose=1)
+# model = SAC("MlpPolicy", vec_env, gamma=0.9, learning_rate=0.0003, batch_size=4096,tensorboard_log= tensorboard_logdir + "/" + log_prefix, verbose=1)
 
 # Loading
 # model = SAC.load(policy_dir+'/SAC/'+'20240129_14-30-22',env=vec_env) # For learning 삭제하지 않고 계속 아래로 이어갈 것!!
-# model = SAC.load(policy_dir+'/SAC/'+'20240129_15-55-34',env=env) # For evaluating
+# model = SAC.load(policy_dir+'/SAC/'+'20240129_19-50-32.zip',env=vec_env) # For evaluating
+
+model = SAC.load(policy_dir+'/SAC/'+'20240130_12-09-40.zip',env=env) # For evaluating
 
 # Check point CB
 from stable_baselines3.common.callbacks import CheckpointCallback
 cp_callback = CheckpointCallback(
-    save_freq=500000,
-    save_path= policy_dir+'/SAC/'+__now_str+'/CPs',
+    save_freq=10000,
+    save_path= policy_dir+'/SAC/'+__now_str+'/',
     save_replay_buffer= True,
     save_vecnormalize= True,
 )
 
-model.learn(total_timesteps=20000000,callback=cp_callback, progress_bar=True)
-model.save(f"{policy_dir+'/SAC/'+__now_str}")
+# model.learn(total_timesteps=2000000,callback=cp_callback, progress_bar=True)
+# model.save(f"{policy_dir+'/SAC/'+__now_str}")
 
-# frames = []
-# obs, info = env.reset()
-# for i in range(1000):
-#     action, _states = model.predict(obs, deterministic=True)
-#     obs, reward, done, _, info = env.step(action)
-#     obs[-14:] = gait.getMvec(i)
+frames = []
+obs, info = env.reset()
+for i in range(1000):
+    action, _states = model.predict(obs, deterministic=True)
+    obs, reward, done, _, info = env.step(action)
+    obs[-14:] = gait.getMvec(i)
 
-#     pixels = env.render()
-#     frames.append(pixels)
+    pixels = env.render()
+    frames.append(pixels)
 
-# save_video(frames,"../videos", name_prefix=video_prefix, fps=env.metadata["render_fps"], step_starting_index = step_starting_index, episode_index = episode_index)
+env.close()
+
+save_video(frames,"../videos", name_prefix=video_prefix, fps=env.metadata["render_fps"], step_starting_index = step_starting_index, episode_index = episode_index)

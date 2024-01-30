@@ -37,11 +37,14 @@ class PlaneWorld(MujocoEnv, utils.EzPickle):
             forward_reward_weight: float = 2,
             side_cost_weight:float = 1.1,
             ctrl_cost_weight: float = 0.1,
+            unhealthy_cost_weight: float = 0.5,
             healthy_reward: float = 0.1,
             main_body: Union[int, str] = 2,
             render_camera_name = "ceiling",
             terminate_when_unhealthy: bool = False,
-            healthy_roll_range: Tuple[float, float] = (-100, 100),
+            unhealthy_max_steps: int = 15,
+            healthy_roll_range: Tuple[float, float] = (-45, 45),
+            terminating_roll_range: Tuple[float, float] = (-100, 100),
             contact_force_range: Tuple[float, float] = (-1.0, 1.0),
             reset_noise_scale: float = 0.03,
             use_gait: bool = False,
@@ -56,11 +59,14 @@ class PlaneWorld(MujocoEnv, utils.EzPickle):
             forward_reward_weight,
             side_cost_weight,
             ctrl_cost_weight,
+            unhealthy_cost_weight,
             healthy_reward,
             main_body,
             render_camera_name,
             terminate_when_unhealthy,
+            unhealthy_max_steps,
             healthy_roll_range,
+            terminating_roll_range,
             contact_force_range,
             reset_noise_scale,
             use_gait,
@@ -71,8 +77,10 @@ class PlaneWorld(MujocoEnv, utils.EzPickle):
         self._forward_reward_weight = forward_reward_weight
         self._side_cost_weight = side_cost_weight
         self._ctrl_cost_weight = ctrl_cost_weight
+        self._unhealthy_cost_weight = unhealthy_cost_weight
         self._healthy_reward = healthy_reward
         self._healthy_roll_range = healthy_roll_range
+        self._terminating_roll_range = terminating_roll_range
         self._contact_force_range = contact_force_range
         self._reset_noise_scale = reset_noise_scale
         self._main_body = main_body
@@ -80,6 +88,8 @@ class PlaneWorld(MujocoEnv, utils.EzPickle):
         self._use_gait = use_gait
         self._gait = Gait(gait_params)
         self._k = 0
+        self._unhealthy_max_steps = unhealthy_max_steps
+        self._unhealth_steps = 0
         self._robot_body_names = ["head","link1","link2","link3","link4","link5","link6","link7","link8","link9","link10","link11","link12","link13","tail"]
 
         MujocoEnv.__init__(
@@ -124,7 +134,7 @@ class PlaneWorld(MujocoEnv, utils.EzPickle):
         }
 
     @property
-    def healthy_reward(self):
+    def healthy_reward(self):          
             return self.is_healthy * self._healthy_reward
     
     @property
@@ -134,6 +144,25 @@ class PlaneWorld(MujocoEnv, utils.EzPickle):
             min_r, max_r = self._healthy_roll_range
             is_healthy = min_r <= r <= max_r
             return is_healthy
+    
+    @property
+    def is_terminated(self):
+            _q_head_orientation = Rotation([self.data.sensordata[29],self.data.sensordata[30],self.data.sensordata[31],self.data.sensordata[28]])
+            r, p, y = _q_head_orientation.as_rotvec(True)
+            # r, p, y = self.get_robot_rot() * (180 / np.pi)
+            min_r, max_r = self._terminating_roll_range
+            is_not_over = min_r <= r <= max_r
+
+            is_done = False
+            if is_not_over:
+                self._unhealth_steps = 0
+            else:
+                self._unhealth_steps += 1
+
+            if self._unhealth_steps >= self._unhealthy_max_steps:
+                is_done = True
+
+            return is_done
     
     def control_cost(self, action):
          control_cost = self._ctrl_cost_weight * np.sum(np.square(action))
@@ -179,15 +208,13 @@ class PlaneWorld(MujocoEnv, utils.EzPickle):
         x_vel = x_disp / self.dt
         y_vel = y_disp / self.dt
         
-        if self._use_gait:
-            self.motion_vector = self._gait.getMvec(self._k)
-            self._k += 1
-        else:
-            self.motion_vector = np.random.choice([-1, 1], size=14)
+        self.motion_vector = self._gait.getMvec(self._k)
+        self._k += 1
+
         
         observation = self._get_obs(motion_vector)
         reward, reward_info = self._get_rew(x_vel, y_vel, action)
-        terminated = (not self.is_healthy) and self._terminate_when_unhealthy
+        terminated = self.is_terminated and self._terminate_when_unhealthy
         info = {
             "x_displacement": x_disp,
             "y_displacement": y_disp,
@@ -210,8 +237,9 @@ class PlaneWorld(MujocoEnv, utils.EzPickle):
 
         ctrl_cost = self.control_cost(action)
         side_cost = np.abs(y_vel) * self._side_cost_weight
+        unhealthy_cost = self.is_terminated * self._unhealthy_cost_weight
 
-        costs = ctrl_cost + side_cost
+        costs = ctrl_cost + side_cost + unhealthy_cost
 
         reward = rewards - costs
 
@@ -220,6 +248,7 @@ class PlaneWorld(MujocoEnv, utils.EzPickle):
              "reward_healthy":healthy_reward,
              "reward_ctrl":-ctrl_cost,
              "reward_side":-side_cost,
+             "reward_unhealthy":-unhealthy_cost,
         }
 
         return reward, reward_info
@@ -229,6 +258,20 @@ class PlaneWorld(MujocoEnv, utils.EzPickle):
           return np.concatenate((self.data.sensordata.flatten(), mVec))
     
     def reset_model(self):
+        # Unhealthy step reset
+        self._unhealth_steps = 0
+
+        # Gait reset
+        if not(self._use_gait):
+            a = np.random.randint(1, 180)
+            b = np.random.randint(1, 180)
+            c = np.random.randint(10, 90)
+            d = np.random.randint(10, 90)
+            e = np.random.randint( 0, 90)
+
+            self._gait = Gait((a, b, c, d, e))
+
+        # System reset
         noise_low = -self._reset_noise_scale
         noise_high = self._reset_noise_scale
 

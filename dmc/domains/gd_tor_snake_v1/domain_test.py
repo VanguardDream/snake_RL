@@ -22,10 +22,10 @@ __model_path__ = os.path.join(__model_location__,'env_snake_v1.xml')
 env = gym.make("gd_tor_snake_v1/plane-v1", 
                terminate_when_unhealthy = True, 
                ctrl_cost_weight = 0.2, 
-               render_mode = 'rgb_array', 
-               render_camera_name = "com", 
-               use_gait = False,
-               gait_params = (30,30,40,40,0)) 
+               render_mode = 'human', 
+               render_camera_name = "head_mount", 
+               use_gait = True,
+               gait_params = (0,0,10,10,90)) 
 _ = env.reset()
 
 step_starting_index = 0
@@ -33,11 +33,13 @@ episode_index = 8
 video_prefix = "PPO_20240126-0.28.1"
 frames = []
 
-for i in range(1000):
+for i in range(3000):
     # random = np.random.random(14) * 1.5
-    random = np.ones(14) * 0.3
+    random = np.ones(14) * 0.2
 
     obs, rew, terminated, _, info = env.step(random)
+    if terminated:
+        env.reset()
 
     pixels = env.render()
 
@@ -45,7 +47,7 @@ for i in range(1000):
 
 env.reset()
 
-save_video(frames,"../videos", name_prefix=video_prefix, fps=env.metadata["render_fps"], step_starting_index = step_starting_index, episode_index = episode_index)
+# save_video(frames,"../videos", name_prefix=video_prefix, fps=env.metadata["render_fps"], step_starting_index = step_starting_index, episode_index = episode_index)
 
 env.close()
         

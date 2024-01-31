@@ -1,6 +1,7 @@
 import gd_tor_snake_v1
 import gymnasium as gym
 import numpy as np
+import pandas as pd
 
 import os
 import pathlib
@@ -20,17 +21,26 @@ __model_path__ = os.path.join(__model_location__,'env_snake_v1.xml')
 # (0,0,30,30,90) # rolling
 # (30,30,40,40,90) # helix
 env = gym.make("gd_tor_snake_v1/plane-v1", 
-               terminate_when_unhealthy = True, 
+               terminate_when_unhealthy = False, 
                render_mode = 'human', 
                render_camera_name = "head_mount", 
                use_gait = True,
-               gait_params = (0,0,30,30,90),) 
+               gait_params = (45,45,10,10,45),) 
 _ = env.reset()
 
 step_starting_index = 0
 episode_index = 8
 video_prefix = "PPO_20240126-0.28.1"
 frames = []
+datas = {"joint_pos":np.empty((0,14)),
+         "joint_vel":np.empty((0,14)),
+         "head_quat":np.empty((0,4)),
+         "head_ang_vel":np.empty((0,3)),
+         "head_lin_acc":np.empty((0,3)),
+         "motion_vector":np.empty((0,14)),
+         "head_rpy":np.empty((0,3)),
+         "com_rpy":np.empty((0,3)),
+         }
 
 for i in range(3000):
     # random = np.random.random(14) * 1.5
@@ -40,16 +50,19 @@ for i in range(3000):
     if terminated:
         env.reset()
 
-    if i % 300 == 0:
-        env.reset()
+    # if i % 300 == 0:
+    #     env.reset()
+        
 
-    # print(info)
-    # print(np.round((info['reward_forward'] + info['reward_side']),6))
-    print(np.round(info['reward_forward'],6), end='    ')
-    print(np.round(info['reward_side'],6), end='    ')
-    print(np.round(info['reward_unhealthy'],6), end='    ')
-    print(np.round(info['reward_healthy'],6))
-
+    datas['joint_pos'] = np.vstack((datas['joint_pos'], info['joint_pos'])).tolist()
+    datas['joint_vel'] = np.vstack((datas['joint_vel'], info['joint_vel'])).tolist()
+    datas['head_quat'] = np.vstack((datas['head_quat'], info['head_quat'])).tolist()
+    datas['head_ang_vel'] = np.vstack((datas['head_ang_vel'], info['head_ang_vel'])).tolist()
+    datas['head_lin_acc'] = np.vstack((datas['head_lin_acc'], info['head_lin_acc'])).tolist()
+    datas['motion_vector'] = np.vstack((datas['motion_vector'], info['motion_vector'])).tolist()
+    datas['head_rpy'] = np.vstack((datas['head_rpy'], info['head_rpy'])).tolist()
+    datas['com_rpy'] = np.vstack((datas['com_rpy'], info['com_rpy'])).tolist()
+        
     pixels = env.render()
 
     frames.append(pixels)
@@ -59,4 +72,60 @@ env.reset()
 # save_video(frames,"../videos", name_prefix=video_prefix, fps=env.metadata["render_fps"], step_starting_index = step_starting_index, episode_index = episode_index)
 
 env.close()
-        
+
+import datetime
+__now_str = datetime.datetime.now().strftime("%Y%m%d_%H-%M-%S")
+savedata_pos = pd.DataFrame(datas['joint_pos'], columns=['POS_1',
+                                                         'POS_2',
+                                                         'POS_3',
+                                                         'POS_4',
+                                                         'POS_5',
+                                                         'POS_6',
+                                                         'POS_7',
+                                                         'POS_8',
+                                                         'POS_9',
+                                                         'POS_10',
+                                                         'POS_11',
+                                                         'POS_12',
+                                                         'POS_13',
+                                                         'POS_14'
+                                                         ])
+savedata_vel = pd.DataFrame(datas['joint_vel'], columns=['VEL_1',
+                                                         'VEL_2',
+                                                         'VEL_3',
+                                                         'VEL_4',
+                                                         'VEL_5',
+                                                         'VEL_6',
+                                                         'VEL_7',
+                                                         'VEL_8',
+                                                         'VEL_9',
+                                                         'VEL_10',
+                                                         'VEL_11',
+                                                         'VEL_12',
+                                                         'VEL_13',
+                                                         'VEL_14'
+                                                         ])
+savedata_h_quat = pd.DataFrame(datas['head_quat'], columns=['qw', 'qx', 'qy', 'qz'])
+savedata_h_a_vel = pd.DataFrame(datas['head_ang_vel'], columns=['angular_vel_r', 'angular_vel_p', 'angular_vel_y'])
+savedata_h_l_acc = pd.DataFrame(datas['head_lin_acc'], columns=['linear_acc_x', 'linear_acc_y', 'linear_acc_z'])
+savedata_m_Vec = pd.DataFrame(datas['motion_vector'], columns=['Motion_vec_1',
+                                                               'Motion_vec_2',
+                                                               'Motion_vec_3',
+                                                               'Motion_vec_4',
+                                                               'Motion_vec_5',
+                                                               'Motion_vec_6',
+                                                               'Motion_vec_7',
+                                                               'Motion_vec_8',
+                                                               'Motion_vec_9',
+                                                               'Motion_vec_10',
+                                                               'Motion_vec_11',
+                                                               'Motion_vec_12',
+                                                               'Motion_vec_13',
+                                                               'Motion_vec_14'
+                                                               ])
+savedata_h_rpy = pd.DataFrame(datas['head_rpy'], columns=['head_roll', 'head_pitch', 'head_yaw'])
+savedata_c_rpy = pd.DataFrame(datas['com_rpy'], columns=['com_roll', 'com_pitch', 'com_yaw'])
+
+integrated_data = pd.concat([savedata_pos, savedata_vel, savedata_h_quat, savedata_h_a_vel, savedata_h_l_acc, savedata_m_Vec, savedata_h_rpy, savedata_c_rpy], axis=1)
+
+integrated_data.to_csv('./'+__now_str+'integrated.csv')

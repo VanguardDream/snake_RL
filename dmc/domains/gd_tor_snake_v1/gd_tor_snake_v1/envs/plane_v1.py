@@ -38,11 +38,11 @@ class PlaneWorld(MujocoEnv, utils.EzPickle):
             side_cost_weight:float = 60,
             ctrl_cost_weight: float = 0,
             unhealthy_cost_weight: float = 1.0,
-            healthy_reward: float = 0.1,
+            healthy_reward: float = 0,
             main_body: Union[int, str] = 2,
             render_camera_name = "ceiling",
             terminate_when_unhealthy: bool = False,
-            unhealthy_max_steps: int = 15,
+            unhealthy_max_steps: int = 30,
             healthy_roll_range: Tuple[float, float] = (-45, 45),
             terminating_roll_range: Tuple[float, float] = (-120, 120),
             contact_force_range: Tuple[float, float] = (-1.0, 1.0),
@@ -147,11 +147,12 @@ class PlaneWorld(MujocoEnv, utils.EzPickle):
     
     @property
     def is_terminated(self):
-            _q_head_orientation = Rotation([self.data.sensordata[29],self.data.sensordata[30],self.data.sensordata[31],self.data.sensordata[28]])
+            # _q_head_orientation = Rotation([self.data.sensordata[29],self.data.sensordata[30],self.data.sensordata[31],self.data.sensordata[28]])
             # r, p, y = _q_head_orientation.as_rotvec(True)
-            r, p, y = self.get_robot_rot() * (180 / np.pi)
-            min_r, max_r = self._terminating_roll_range
-            is_not_over = min_r <= r <= max_r
+
+            r, p, y = self.get_robot_rot()
+            t_min_r, t_max_r = self._terminating_roll_range
+            is_not_over = t_min_r <= r <= t_max_r
 
             is_done = False
             if is_not_over:
@@ -218,7 +219,6 @@ class PlaneWorld(MujocoEnv, utils.EzPickle):
         # ## Gait changing...
         self.motion_vector = self._gait.getMvec(self._k)
         self._k += 1
-
         
         observation = self._get_obs(motion_vector)
         reward, reward_info = self._get_rew(x_vel, y_vel, action)
@@ -229,6 +229,14 @@ class PlaneWorld(MujocoEnv, utils.EzPickle):
             "distance_from_origin": np.linalg.norm(self.data.qpos[0:2], ord=2),
             "x_velocity": x_vel,
             "y_velocity": y_vel,
+            "joint_pos": observation[:14].copy(),
+            "joint_vel": observation[-38:-24].copy(),
+            "head_quat": observation[-24:-20].copy(),
+            "head_ang_vel": observation[-20:-17].copy(),
+            "head_lin_acc": observation[-17:-14].copy(),
+            "motion_vector": observation[-14:].copy(),
+            "head_rpy": rpy_after,
+            "com_rpy": com_rpy_after,
             **reward_info,
         }
 
@@ -315,11 +323,11 @@ class PlaneWorld(MujocoEnv, utils.EzPickle):
 
         robot_quats = np.empty((0,4))
         for name in self._robot_body_names:
-            robot_quats = np.vstack((robot_quats, self.data.body(name).xquat))
+            robot_quats = np.vstack((robot_quats, self.data.body(name).xquat.copy()))
 
         robot_quats = robot_quats[:, [1, 2, 3, 0]]
         robot_rot = Rotation(robot_quats)
 
-        com_roll, com_pitch, com_yaw = robot_rot.mean().as_rotvec(False)
+        com_roll, com_pitch, com_yaw = robot_rot.mean().as_rotvec(True)
 
         return np.array([com_roll, com_pitch, com_yaw])

@@ -279,11 +279,11 @@ class PlaneWorld(MujocoEnv, utils.EzPickle):
 
         # Gait reset
         if not(self._use_gait):
-            a = np.random.randint(0, 180)
-            b = np.random.randint(0, 180)
-            c = np.random.randint(10, 90)
-            d = np.random.randint(10, 90)
-            e = np.random.randint( 0, 360)
+            a = np.random.randint(30, 45)
+            b = np.random.randint(30, 45)
+            c = np.random.randint(10, 30)
+            d = np.random.randint(10, 30)
+            e = np.random.randint( 0, 1)
 
             self._gait = Gait((a, b, c, d, e))
 

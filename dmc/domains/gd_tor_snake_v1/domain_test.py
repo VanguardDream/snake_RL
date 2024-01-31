@@ -14,6 +14,7 @@ __location__ = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file
 __location__ = pathlib.Path(__location__)
 __model_location__ = __location__.parent.parent.joinpath('models')
 __model_path__ = os.path.join(__model_location__,'env_snake_v1.xml')
+__contact_model_path__ = os.path.join(__model_location__,'env_snake_v1_contact.xml')
 
 #camera names : com, ceiling, head_mount
 # (30,30,40,40,0) # serpentine
@@ -21,11 +22,12 @@ __model_path__ = os.path.join(__model_location__,'env_snake_v1.xml')
 # (0,0,30,30,90) # rolling
 # (30,30,40,40,90) # helix
 env = gym.make("gd_tor_snake_v1/plane-v1", 
+               model_path = __contact_model_path__,
                terminate_when_unhealthy = False, 
                render_mode = 'human', 
                render_camera_name = "head_mount", 
                use_gait = True,
-               gait_params = (45,45,10,10,45),) 
+               gait_params = (40,40,15,15,0),) 
 _ = env.reset()
 
 step_starting_index = 0
@@ -40,11 +42,22 @@ datas = {"joint_pos":np.empty((0,14)),
          "motion_vector":np.empty((0,14)),
          "head_rpy":np.empty((0,3)),
          "com_rpy":np.empty((0,3)),
+
+         "x_disp":np.empty((0,1)),
+         "y_disp":np.empty((0,1)),
+         "origin_disp":np.empty((0,1)),
+         "x_vel":np.empty((0,1)),
+         "y_vel":np.empty((0,1)),
+         "reward_forward":np.empty((0,1)),
+         "reward_healthy":np.empty((0,1)),
+         "reward_ctrl":np.empty((0,1)),
+         "reward_side":np.empty((0,1)),
+         "reward_unhealthy":np.empty((0,1)),
          }
 
 for i in range(3000):
     # random = np.random.random(14) * 1.5
-    random = np.ones(14) * 0.3
+    random = np.ones(14) * 0.4
 
     obs, rew, terminated, _, info = env.step(random)
     if terminated:
@@ -53,15 +66,25 @@ for i in range(3000):
     # if i % 300 == 0:
     #     env.reset()
         
+    # datas['joint_pos'] = np.vstack((datas['joint_pos'], info['joint_pos'])).tolist()
+    # datas['joint_vel'] = np.vstack((datas['joint_vel'], info['joint_vel'])).tolist()
+    # datas['head_quat'] = np.vstack((datas['head_quat'], info['head_quat'])).tolist()
+    # datas['head_ang_vel'] = np.vstack((datas['head_ang_vel'], info['head_ang_vel'])).tolist()
+    # datas['head_lin_acc'] = np.vstack((datas['head_lin_acc'], info['head_lin_acc'])).tolist()
+    # datas['motion_vector'] = np.vstack((datas['motion_vector'], info['motion_vector'])).tolist()
+    # datas['head_rpy'] = np.vstack((datas['head_rpy'], info['head_rpy'])).tolist()
+    # datas['com_rpy'] = np.vstack((datas['com_rpy'], info['com_rpy'])).tolist()
 
-    datas['joint_pos'] = np.vstack((datas['joint_pos'], info['joint_pos'])).tolist()
-    datas['joint_vel'] = np.vstack((datas['joint_vel'], info['joint_vel'])).tolist()
-    datas['head_quat'] = np.vstack((datas['head_quat'], info['head_quat'])).tolist()
-    datas['head_ang_vel'] = np.vstack((datas['head_ang_vel'], info['head_ang_vel'])).tolist()
-    datas['head_lin_acc'] = np.vstack((datas['head_lin_acc'], info['head_lin_acc'])).tolist()
-    datas['motion_vector'] = np.vstack((datas['motion_vector'], info['motion_vector'])).tolist()
-    datas['head_rpy'] = np.vstack((datas['head_rpy'], info['head_rpy'])).tolist()
-    datas['com_rpy'] = np.vstack((datas['com_rpy'], info['com_rpy'])).tolist()
+    # datas['x_disp'] = np.vstack((datas['x_disp'], info['x_displacement'])).tolist()
+    # datas['y_disp'] = np.vstack((datas['y_disp'], info['y_displacement'])).tolist()
+    # datas['origin_disp'] = np.vstack((datas['origin_disp'], info['distance_from_origin'])).tolist()
+    # datas['x_vel'] = np.vstack((datas['x_vel'], info['x_velocity'])).tolist()
+    # datas['y_vel'] = np.vstack((datas['y_vel'], info['y_velocity'])).tolist()
+    # datas['reward_forward'] = np.vstack((datas['reward_forward'], info['reward_forward'])).tolist()
+    # datas['reward_healthy'] = np.vstack((datas['reward_healthy'], info['reward_healthy'])).tolist()
+    # datas['reward_ctrl'] = np.vstack((datas['reward_ctrl'], info['reward_ctrl'])).tolist()
+    # datas['reward_side'] = np.vstack((datas['reward_side'], info['reward_side'])).tolist()
+    # datas['reward_unhealthy'] = np.vstack((datas['reward_unhealthy'], info['reward_unhealthy'])).tolist()
         
     pixels = env.render()
 
@@ -72,6 +95,8 @@ env.reset()
 # save_video(frames,"../videos", name_prefix=video_prefix, fps=env.metadata["render_fps"], step_starting_index = step_starting_index, episode_index = episode_index)
 
 env.close()
+
+exit()
 
 import datetime
 __now_str = datetime.datetime.now().strftime("%Y%m%d_%H-%M-%S")
@@ -126,6 +151,18 @@ savedata_m_Vec = pd.DataFrame(datas['motion_vector'], columns=['Motion_vec_1',
 savedata_h_rpy = pd.DataFrame(datas['head_rpy'], columns=['head_roll', 'head_pitch', 'head_yaw'])
 savedata_c_rpy = pd.DataFrame(datas['com_rpy'], columns=['com_roll', 'com_pitch', 'com_yaw'])
 
-integrated_data = pd.concat([savedata_pos, savedata_vel, savedata_h_quat, savedata_h_a_vel, savedata_h_l_acc, savedata_m_Vec, savedata_h_rpy, savedata_c_rpy], axis=1)
+savedata_x_disp = pd.DataFrame(datas['x_disp'], columns=['x_disp'])
+savedata_y_disp = pd.DataFrame(datas['y_disp'], columns=['y_disp'])
+savedata_o_disp = pd.DataFrame(datas['origin_disp'], columns=['origin_disp'])
+savedata_x_vel = pd.DataFrame(datas['x_vel'], columns=['x_vel'])
+savedata_y_vel = pd.DataFrame(datas['y_vel'], columns=['y_vel'])
+savedata_r_for = pd.DataFrame(datas['reward_forward'], columns=['reward_forward'])
+savedata_r_health = pd.DataFrame(datas['reward_healthy'], columns=['reward_healthy'])
+savedata_r_ctrl = pd.DataFrame(datas['reward_ctrl'], columns=['reward_ctrl'])
+savedata_r_side = pd.DataFrame(datas['reward_side'], columns=['reward_side'])
+savedata_r_uhealth = pd.DataFrame(datas['reward_unhealthy'], columns=['reward_unhealthy'])
+
+
+integrated_data = pd.concat([savedata_pos, savedata_vel, savedata_h_quat, savedata_h_a_vel, savedata_h_l_acc, savedata_m_Vec, savedata_h_rpy, savedata_c_rpy, savedata_x_disp, savedata_y_disp, savedata_o_disp, savedata_x_vel, savedata_y_vel, savedata_r_for, savedata_r_health, savedata_r_ctrl, savedata_r_side, savedata_r_uhealth], axis=1)
 
 integrated_data.to_csv('./'+__now_str+'integrated.csv')

@@ -24,7 +24,7 @@ __contact_model_path__ = os.path.join(__model_location__,'env_snake_v1_contact.x
 # (30,30,40,40,90) # helix
 __camera_type__ = 'com'
 env = gym.make("gd_tor_snake_v1/plane-v1", 
-               model_path = __model_path__,
+               model_path = __contact_model_path__,
                terminate_when_unhealthy = False, 
             #    render_mode = 'human', 
                render_mode = 'rgb_array', 

@@ -21,7 +21,7 @@ __contact_model_path__ = os.path.join(__model_location__,'env_snake_v1_contact.x
 # (45,45,10,10,45) # sidewinding
 # (0,0,30,30,90) # rolling
 # (30,30,40,40,90) # helix
-env = gym.make("gd_tor_snake_v1/plane-v1", 
+env = gym.make("gd_tor_snake_v1/plane-control", 
                model_path = __contact_model_path__,
                terminate_when_unhealthy = False, 
                render_mode = 'human', 

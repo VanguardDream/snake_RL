@@ -22,12 +22,14 @@ __contact_model_path__ = os.path.join(__model_location__,'env_snake_v1_contact.x
 # (45,45,10,10,45) # sidewinding
 # (0,0,30,30,90) # rolling
 # (30,30,40,40,90) # helix
+__camera_type__ = 'com'
 env = gym.make("gd_tor_snake_v1/plane-v1", 
-               model_path = __contact_model_path__,
+               model_path = __model_path__,
                terminate_when_unhealthy = False, 
             #    render_mode = 'human', 
                render_mode = 'rgb_array', 
-               render_camera_name = "com", 
+            #    render_camera_name = "head_mount", 
+               render_camera_name = __camera_type__, 
                use_gait = True,
                gait_params = (30,30,15,15,0),) 
 _ = env.reset()
@@ -62,15 +64,15 @@ os.makedirs(tensorboard_logdir, exist_ok=True)
 
 import datetime
 __now_str = datetime.datetime.now().strftime("%Y%m%d_%H-%M-%S")
-video_prefix = "SB3_PPO_" + __now_str
+video_prefix = "SB3_PPO_" + __now_str + __camera_type__
 log_prefix = "SB3_PPO_" + __now_str
 
 # load policy
-policy = PPO.load(policy_dir+'/PPO/'+'20240201_15-27-17.zip', env=env)
-# policy = PPO.load(policy_dir+'/PPO/20240201_01-22-36/'+'rl_model_9000000_steps.zip', env=env)
+# policy = PPO.load(policy_dir+'/PPO/'+'20240201_01-22-36.zip', env=env)
+policy = PPO.load(policy_dir+'/PPO/20240201_01-22-36/'+'rl_model_9000000_steps.zip', env=env)
 obs, _ = env.reset()
 
-for i in range(3000):
+for i in range(1000):
     action, _states = policy.predict(observation=obs, deterministic=True)
 
     obs, rew, terminated, _, info = env.step(action)
@@ -104,6 +106,8 @@ for i in range(3000):
     frames.append(pixels)
 
 env.reset()
+
+# save_video(frames,"../videos", name_prefix=video_prefix, fps=env.metadata["render_fps"], step_starting_index = step_starting_index, episode_index = episode_index)
 
 env.close()
 

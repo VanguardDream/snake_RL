@@ -328,7 +328,7 @@ class motor_state_node(Node):
             # tmp.goal_position = dxl_data[3][idx]
             tmp.present_current = dxl_data[4][idx] * 2.69 # mA
             tmp.present_velocity = dxl_data[5][idx] * 0.229 # RPM
-            tmp.present_position = dxl_data[6][idx] * 0.087891 # degree
+            tmp.present_position = (dxl_data[6][idx] * 0.087891) - 180 # degree
             # tmp.voltage = dxl_data[7][idx]
             tmp.temperature = dxl_data[8][idx] * 1.0 # Cecius
 

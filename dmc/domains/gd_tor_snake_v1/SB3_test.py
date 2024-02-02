@@ -23,16 +23,24 @@ __contact_model_path__ = os.path.join(__model_location__,'env_snake_v1_contact.x
 # (0,0,30,30,90) # rolling
 # (30,30,40,40,90) # helix
 __camera_type__ = 'com'
-env = gym.make("gd_tor_snake_v1/plane-v1", 
+# env = gym.make("gd_tor_snake_v1/plane-v1", 
+#                model_path = __contact_model_path__,
+#                terminate_when_unhealthy = False, 
+#             #    render_mode = 'human', 
+#                render_mode = 'rgb_array', 
+#             #    render_camera_name = "head_mount", 
+#                render_camera_name = __camera_type__, 
+#                use_gait = True,
+#                gait_params = (30,30,15,15,0),) 
+
+env = gym.make("gd_tor_snake_v1/plane-control", 
                model_path = __contact_model_path__,
                terminate_when_unhealthy = False, 
             #    render_mode = 'human', 
                render_mode = 'rgb_array', 
             #    render_camera_name = "head_mount", 
                render_camera_name = __camera_type__, 
-               use_gait = True,
-               gait_params = (30,30,15,15,0),) 
-_ = env.reset()
+               ) 
 
 step_starting_index = 0
 episode_index = 8
@@ -68,8 +76,8 @@ video_prefix = "SB3_PPO_" + __now_str + __camera_type__
 log_prefix = "SB3_PPO_" + __now_str
 
 # load policy
-# policy = PPO.load(policy_dir+'/PPO/'+'20240201_01-22-36.zip', env=env)
-policy = PPO.load(policy_dir+'/PPO/20240201_01-22-36/'+'rl_model_9000000_steps.zip', env=env)
+policy = PPO.load(policy_dir+'/PPO/'+'20240202_01-58-27_control.zip', env=env)
+# policy = PPO.load(policy_dir+'/PPO/20240201_01-22-36/'+'rl_model_9000000_steps.zip', env=env)
 obs, _ = env.reset()
 
 for i in range(1000):
@@ -179,5 +187,5 @@ savedata_r_uhealth = pd.DataFrame(datas['reward_unhealthy'], columns=['reward_un
 
 integrated_data = pd.concat([savedata_pos, savedata_vel, savedata_h_quat, savedata_h_a_vel, savedata_h_l_acc, savedata_m_Vec, savedata_h_rpy, savedata_c_rpy, savedata_x_disp, savedata_y_disp, savedata_o_disp, savedata_x_vel, savedata_y_vel, savedata_r_for, savedata_r_health, savedata_r_ctrl, savedata_r_side, savedata_r_uhealth], axis=1)
 
-# integrated_data.to_csv('./'+__now_str+'SB3_policy.csv')
+integrated_data.to_csv('./'+__now_str+'SB3_policy.csv')
 save_video(frames,"../videos", name_prefix=video_prefix, fps=env.metadata["render_fps"], step_starting_index = step_starting_index, episode_index = episode_index)

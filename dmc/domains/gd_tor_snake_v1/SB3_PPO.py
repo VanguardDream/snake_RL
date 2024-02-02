@@ -56,11 +56,12 @@ log_prefix = "SB3_PPO_" + __now_str
 
 # # # Learning
 vec_env = make_vec_env("gd_tor_snake_v1/plane-v1", n_envs=60, env_kwargs=env_config)
-# model = PPO("MlpPolicy", vec_env, gamma=0.9, learning_rate=0.0003, batch_size=4096, tensorboard_log = tensorboard_logdir + "/" + log_prefix, verbose=1, policy_kwargs= policy_kwargs)
+vec_env_control = make_vec_env("gd_tor_snake_v1/plane-control", n_envs=60, env_kwargs=env_config)
+model = PPO("MlpPolicy", vec_env_control, gamma=0.9, learning_rate=0.0003, batch_size=4096, tensorboard_log = tensorboard_logdir + "/" + log_prefix, verbose=1, policy_kwargs= policy_kwargs)
 
 # Loading
 # model = PPO.load(policy_dir+'/PPO/'+'20240130_21-12-04.zip',env=vec_env) # For learning 삭제하지 않고 계속 아래로 이어갈 것!!
-model = PPO.load(policy_dir+'/PPO/'+'20240201_01-22-36.zip',env=env) # For evaluating
+# model = PPO.load(policy_dir+'/PPO/'+'20240201_01-22-36.zip',env=env) # For evaluating
 
 # Check point CB
 from stable_baselines3.common.callbacks import CheckpointCallback
@@ -71,18 +72,18 @@ cp_callback = CheckpointCallback(
     save_vecnormalize= True,
 )
 
-# model.learn(total_timesteps=20000000,callback=cp_callback, progress_bar=True)
-# model.save(f"{policy_dir+'/PPO/'+__now_str}")
+model.learn(total_timesteps=20000000,callback=cp_callback, progress_bar=True)
+model.save(f"{policy_dir+'/PPO/'+__now_str}")
 
 
-frames = []
-obs, info = env.reset()
-for i in range(1000):
-    action, _states = model.predict(obs, deterministic=True)
-    obs, reward, done, _, info = env.step(action)
-    # obs[-14:] = gait.getMvec(i)
+# frames = []
+# obs, info = env.reset()
+# for i in range(1000):
+#     action, _states = model.predict(obs, deterministic=True)
+#     obs, reward, done, _, info = env.step(action)
+#     # obs[-14:] = gait.getMvec(i)
 
-    pixels = env.render()
-    frames.append(pixels)
+#     pixels = env.render()
+#     frames.append(pixels)
 
-save_video(frames,"../videos", name_prefix=video_prefix, fps=env.metadata["render_fps"], step_starting_index = step_starting_index, episode_index = episode_index)
+# save_video(frames,"../videos", name_prefix=video_prefix, fps=env.metadata["render_fps"], step_starting_index = step_starting_index, episode_index = episode_index)

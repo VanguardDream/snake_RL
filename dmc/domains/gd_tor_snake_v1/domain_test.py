@@ -21,13 +21,14 @@ __contact_model_path__ = os.path.join(__model_location__,'env_snake_v1_contact.x
 # (45,45,10,10,45) # sidewinding
 # (0,0,30,30,90) # rolling
 # (30,30,40,40,90) # helix
-env = gym.make("gd_tor_snake_v1/plane-control", 
+env = gym.make("gd_tor_snake_v1/plane-v1", 
                model_path = __contact_model_path__,
                terminate_when_unhealthy = False, 
                render_mode = 'human', 
                render_camera_name = "head_mount", 
                use_gait = True,
-               gait_params = (40,40,15,15,0),) 
+               gait_params = (30,30,15,15,0)
+               ,) 
 _ = env.reset()
 
 step_starting_index = 0
@@ -57,7 +58,7 @@ datas = {"joint_pos":np.empty((0,14)),
 
 for i in range(3000):
     # random = np.random.random(14) * 1.5
-    random = np.ones(14) * 0.4
+    random = np.ones(14) * 0.2
 
     obs, rew, terminated, _, info = env.step(random)
     if terminated:

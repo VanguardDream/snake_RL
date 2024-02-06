@@ -22,11 +22,11 @@ env_config = {
                 "side_cost_weight": 1,
                 "render_mode": 'rgb_array',
                 "render_camera_name": "com",
-                "use_gait": True,
+                "use_gait": False,
                 "gait_params": (30,30,15,15,0),
             }
 
-policy_kwargs = dict(net_arch=dict(pi=[128, 128, 64], vf=[256]))
+policy_kwargs = dict(net_arch=dict(pi=[256, 256, 64], vf=[256, 256]))
 
 gait = Gait((30,30,40,40,0))
 
@@ -56,8 +56,26 @@ log_prefix = "SB3_PPO_" + __now_str
 
 # # # Learning
 vec_env = make_vec_env("gd_tor_snake_v1/plane-v1", n_envs=60, env_kwargs=env_config)
-vec_env_control = make_vec_env("gd_tor_snake_v1/plane-control", n_envs=60, env_kwargs=env_config)
-model = PPO("MlpPolicy", vec_env_control, gamma=0.9, learning_rate=0.0003, batch_size=4096, tensorboard_log = tensorboard_logdir + "/" + log_prefix, verbose=1, policy_kwargs= policy_kwargs)
+# vec_env_control = make_vec_env("gd_tor_snake_v1/plane-control", n_envs=60, env_kwargs=env_config)
+
+# 20240204 Optuna hyper-params
+model = PPO(
+    "MlpPolicy", 
+    vec_env, 
+    batch_size=128, 
+    n_steps=32, 
+    gamma=0.995, 
+    learning_rate=8.838841e-05, 
+    clip_range=0.2, 
+    n_epochs=5, 
+    gae_lambda=0.9, 
+    max_grad_norm=0.9, 
+    vf_coef=0.667859, 
+    use_sde=True,
+    sde_sample_freq=16,
+    tensorboard_log = tensorboard_logdir + "/" + log_prefix, 
+    verbose=1, 
+    policy_kwargs= policy_kwargs)
 
 # Loading
 # model = PPO.load(policy_dir+'/PPO/'+'20240130_21-12-04.zip',env=vec_env) # For learning 삭제하지 않고 계속 아래로 이어갈 것!!

@@ -22,11 +22,11 @@ env_config = {
                 "side_cost_weight": 1,
                 "render_mode": 'rgb_array',
                 "render_camera_name": "com",
-                "use_gait": False,
+                "use_gait": True,
                 "gait_params": (30,30,15,15,0),
             }
 
-policy_kwargs = dict(net_arch=dict(pi=[256, 256, 64], vf=[256, 256]))
+policy_kwargs = dict(net_arch=dict(pi=[128, 128], vf=[128, 128]))
 
 step_starting_index = 0
 episode_index = 8
@@ -48,17 +48,18 @@ vec_env = make_vec_env("gd_tor_snake_v1/plane-v1", n_envs=60, env_kwargs=env_con
 model = RecurrentPPO(
     "MlpLstmPolicy", 
     vec_env, 
-    batch_size=128, 
-    n_steps=32, 
-    gamma=0.995, 
-    learning_rate=8.838841e-05, 
-    clip_range=0.2, 
+    batch_size=16, 
+    n_steps=256, 
+    gamma=0.9, 
+    learning_rate=0.0003226614, 
+    ent_coef=4.1605292e-05, 
+    clip_range=0.4, 
     n_epochs=5, 
     gae_lambda=0.9, 
-    max_grad_norm=0.9, 
-    vf_coef=0.667859, 
+    max_grad_norm=5, 
+    vf_coef=0.143442327, 
     use_sde=True,
-    sde_sample_freq=16,
+    sde_sample_freq=8,
     tensorboard_log = tensorboard_logdir + "/" + log_prefix, 
     verbose=1, 
     policy_kwargs= policy_kwargs)
@@ -76,7 +77,7 @@ cp_callback = CheckpointCallback(
     save_vecnormalize= True,
 )
 
-model.learn(total_timesteps=20000000,callback=cp_callback, progress_bar=True)
+model.learn(total_timesteps=100000000,callback=cp_callback, progress_bar=True)
 model.save(f"{policy_dir+'/RPPO/'+__now_str}")
 
 

@@ -9,6 +9,7 @@ import time
 import mediapy as media
 
 from stable_baselines3 import PPO
+from sb3_contrib import RecurrentPPO
 from gymnasium.utils.save_video import save_video
 
 __location__ = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
@@ -50,6 +51,8 @@ datas = {"joint_pos":np.empty((0,14)),
          "head_quat":np.empty((0,4)),
          "head_ang_vel":np.empty((0,3)),
          "head_lin_acc":np.empty((0,3)),
+         "head_lin_vel_esti":np.zeros((0,3)),
+         "head_lin_pos_esti":np.zeros((0,3)),
          "motion_vector":np.empty((0,14)),
          "head_rpy":np.empty((0,3)),
          "com_rpy":np.empty((0,3)),
@@ -64,6 +67,7 @@ datas = {"joint_pos":np.empty((0,14)),
          "reward_ctrl":np.empty((0,1)),
          "reward_side":np.empty((0,1)),
          "reward_unhealthy":np.empty((0,1)),
+         "reward_total":np.zeros((0,1)),
          }
 policy_dir = "../policies"
 os.makedirs(policy_dir, exist_ok=True)
@@ -77,11 +81,13 @@ log_prefix = "SB3_PPO_" + __now_str
 
 # load policy
 policy = PPO.load(policy_dir+'/PPO/'+'20240205_18-03-05_optuna_first.zip', env=env)
+# policy = RecurrentPPO.load(policy_dir+'/RPPO/'+'20240206_15-23-06.zip', env=env)
 # policy = PPO.load(policy_dir+'/PPO/20240201_01-22-36/'+'rl_model_9000000_steps.zip', env=env)
-obs, _ = env.reset()
 
+obs, _ = env.reset()
+_states = None
 for i in range(1000):
-    action, _states = policy.predict(observation=obs, deterministic=True)
+    action, _states = policy.predict(observation=obs, state=_states, deterministic=True)
 
     obs, rew, terminated, _, info = env.step(action)
 
@@ -121,6 +127,10 @@ env.close()
 
 
 import datetime
+datas['head_lin_vel_esti'] = (np.cumsum(datas['head_lin_acc'], axis=0)*0.005).tolist()
+datas['head_lin_pos_esti'] = (np.cumsum(datas['head_lin_vel_esti'], axis=0)*0.005).tolist()
+datas['reward_total'] = np.cumsum(datas['reward_forward'], axis=0).tolist()
+
 __now_str = datetime.datetime.now().strftime("%Y%m%d_%H-%M-%S")
 savedata_pos = pd.DataFrame(datas['joint_pos'], columns=['POS_1',
                                                          'POS_2',
@@ -155,6 +165,8 @@ savedata_vel = pd.DataFrame(datas['joint_vel'], columns=['VEL_1',
 savedata_h_quat = pd.DataFrame(datas['head_quat'], columns=['qw', 'qx', 'qy', 'qz'])
 savedata_h_a_vel = pd.DataFrame(datas['head_ang_vel'], columns=['angular_vel_r', 'angular_vel_p', 'angular_vel_y'])
 savedata_h_l_acc = pd.DataFrame(datas['head_lin_acc'], columns=['linear_acc_x', 'linear_acc_y', 'linear_acc_z'])
+savedata_h_l_vel_esti = pd.DataFrame(datas['head_lin_vel_esti'], columns=['linear_vel_x', 'linear_vel_y', 'linear_vel_z'])
+savedata_h_l_pos_esti = pd.DataFrame(datas['head_lin_pos_esti'], columns=['linear_pos_x', 'linear_pos_y', 'linear_pos_z'])
 savedata_m_Vec = pd.DataFrame(datas['motion_vector'], columns=['Motion_vec_1',
                                                                'Motion_vec_2',
                                                                'Motion_vec_3',
@@ -183,9 +195,12 @@ savedata_r_health = pd.DataFrame(datas['reward_healthy'], columns=['reward_healt
 savedata_r_ctrl = pd.DataFrame(datas['reward_ctrl'], columns=['reward_ctrl'])
 savedata_r_side = pd.DataFrame(datas['reward_side'], columns=['reward_side'])
 savedata_r_uhealth = pd.DataFrame(datas['reward_unhealthy'], columns=['reward_unhealthy'])
+savedata_r_total = pd.DataFrame(datas['reward_total'], columns=['reward_total'])
 
 
-integrated_data = pd.concat([savedata_pos, savedata_vel, savedata_h_quat, savedata_h_a_vel, savedata_h_l_acc, savedata_m_Vec, savedata_h_rpy, savedata_c_rpy, savedata_x_disp, savedata_y_disp, savedata_o_disp, savedata_x_vel, savedata_y_vel, savedata_r_for, savedata_r_health, savedata_r_ctrl, savedata_r_side, savedata_r_uhealth], axis=1)
+
+
+integrated_data = pd.concat([savedata_pos, savedata_vel, savedata_h_quat, savedata_h_a_vel, savedata_h_l_acc, savedata_h_l_vel_esti, savedata_h_l_pos_esti, savedata_m_Vec, savedata_h_rpy, savedata_c_rpy, savedata_x_disp, savedata_y_disp, savedata_o_disp, savedata_x_vel, savedata_y_vel, savedata_r_for, savedata_r_health, savedata_r_ctrl, savedata_r_side, savedata_r_uhealth, savedata_r_total], axis=1)
 
 integrated_data.to_csv('./logs/'+__now_str+'SB3_policy.csv')
 save_video(frames,"../videos", name_prefix=video_prefix, fps=env.metadata["render_fps"], step_starting_index = step_starting_index, episode_index = episode_index)

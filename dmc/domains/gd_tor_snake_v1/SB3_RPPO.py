@@ -66,13 +66,13 @@ model = RecurrentPPO(
     policy_kwargs= policy_kwargs)
 
 # Loading
-# model = PPO.load(policy_dir+'/PPO/'+'20240130_21-12-04.zip',env=vec_env) # For learning 삭제하지 않고 계속 아래로 이어갈 것!!
+model = RecurrentPPO.load(policy_dir+'/RPPO/'+'20240207_17-50-46.zip',env=vec_env) # For learning 삭제하지 않고 계속 아래로 이어갈 것!!
 # model = PPO.load(policy_dir+'/PPO/'+'20240201_01-22-36.zip',env=env) # For evaluating
 
 # Check point CB
 from stable_baselines3.common.callbacks import CheckpointCallback
 cp_callback = CheckpointCallback(
-    save_freq=10000,
+    save_freq=500000,
     save_path= policy_dir+'/RPPO/'+__now_str+'/',
     save_replay_buffer= True,
     save_vecnormalize= True,

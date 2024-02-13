@@ -30,6 +30,7 @@ env = gym.make("gd_tor_snake_v1/plane-v1",
             #    render_mode = 'human', 
                render_mode = 'rgb_array', 
             #    render_camera_name = "head_mount", 
+               unhealthy_max_steps = 10,  
                render_camera_name = __camera_type__, 
                use_gait = True,
                gait_params = (30,30,15,15,0),) 
@@ -129,7 +130,12 @@ env.close()
 import datetime
 datas['head_lin_vel_esti'] = (np.cumsum(datas['head_lin_acc'], axis=0)*0.005).tolist()
 datas['head_lin_pos_esti'] = (np.cumsum(datas['head_lin_vel_esti'], axis=0)*0.005).tolist()
-datas['reward_total'] = np.cumsum(datas['reward_forward'], axis=0).tolist()
+_accum_reward_forward = np.cumsum(datas['reward_forward'], axis=0)
+_accum_reward_healthy = np.cumsum(datas['reward_healthy'], axis=0)
+_accum_reward_ctrl = np.cumsum(datas['reward_ctrl'], axis=0)
+_accum_reward_side = np.cumsum(datas['reward_side'], axis=0)
+_accum_reward_unhealthy = np.cumsum(datas['reward_unhealthy'], axis=0)
+datas['reward_total'] = (_accum_reward_forward + _accum_reward_healthy + _accum_reward_ctrl + _accum_reward_side + _accum_reward_unhealthy).tolist()
 
 __now_str = datetime.datetime.now().strftime("%Y%m%d_%H-%M-%S")
 savedata_pos = pd.DataFrame(datas['joint_pos'], columns=['POS_1',

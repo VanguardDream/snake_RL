@@ -19,7 +19,8 @@ __contact_model_path__ = os.path.join(__model_location__,'env_snake_v1_contact.x
 env_config = {
                 "model_path": __contact_model_path__,
                 "terminate_when_unhealthy":True,
-                "side_cost_weight": 1,
+                "side_cost_weight": 10,
+                "healthy_reward" : 1.0,
                 "render_mode": 'rgb_array',
                 "render_camera_name": "com",
                 "use_gait": True,

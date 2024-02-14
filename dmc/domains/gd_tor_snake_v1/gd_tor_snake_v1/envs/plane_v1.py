@@ -27,7 +27,7 @@ class PlaneWorld(MujocoEnv, utils.EzPickle):
             "rgb_array",
             "depth_array",
         ],
-        "render_fps":10 # For gymnasium 0.28.1
+        "render_fps" : 10 # For gymnasium 0.28.1
     }
     def __init__(
             self, 

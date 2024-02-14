@@ -33,7 +33,8 @@ env = gym.make("gd_tor_snake_v1/plane-v1",
                unhealthy_max_steps = 10,  
                render_camera_name = __camera_type__, 
                use_gait = True,
-               gait_params = (30,30,15,15,0),) 
+               gait_params = (30,30,15,15,0),
+               ) 
 
 # env = gym.make("gd_tor_snake_v1/plane-control", 
 #                model_path = __contact_model_path__,
@@ -47,6 +48,7 @@ env = gym.make("gd_tor_snake_v1/plane-v1",
 step_starting_index = 0
 episode_index = 8
 frames = []
+
 datas = {"joint_pos":np.empty((0,14)),
          "joint_vel":np.empty((0,14)),
          "head_quat":np.empty((0,4)),
@@ -81,8 +83,9 @@ video_prefix = "SB3_PPO_" + __now_str + __camera_type__
 log_prefix = "SB3_PPO_" + __now_str
 
 # load policy
-# policy = PPO.load(policy_dir+'/PPO/'+'20240205_18-03-05_optuna_first.zip', env=env)
-policy = RecurrentPPO.load(policy_dir+'/RPPO/'+'20240207_17-50-46.zip', env=env)
+# policy = PPO.load(policy_dir+'/PPO/'+'20240213_18-37-25_subproc/rl_model_48000000_steps.zip', env=env)
+policy = PPO.load(policy_dir+'/PPO/'+'20240213_18-37-25_subproc.zip', env=env)
+# policy = RecurrentPPO.load(policy_dir+'/RPPO/'+'20240207_17-50-46.zip', env=env)
 # policy = PPO.load(policy_dir+'/PPO/20240201_01-22-36/'+'rl_model_9000000_steps.zip', env=env)
 
 obs, _ = env.reset()
@@ -210,3 +213,4 @@ integrated_data = pd.concat([savedata_pos, savedata_vel, savedata_h_quat, saveda
 
 integrated_data.to_csv('./logs/'+__now_str+'SB3_policy.csv')
 save_video(frames,"../videos", name_prefix=video_prefix, fps=env.metadata["render_fps"], step_starting_index = step_starting_index, episode_index = episode_index)
+

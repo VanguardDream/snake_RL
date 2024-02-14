@@ -47,7 +47,7 @@ log_prefix = "SB3_PPO_" + __now_str
 if __name__ == '__main__':
 
     # Env Creating
-    vec_env = make_vec_env("gd_tor_snake_v1/plane-v1", n_envs=16, vec_env_cls=SubprocVecEnv, vec_env_kwargs=dict(start_method='spawn'), env_kwargs=env_config)
+    vec_env = make_vec_env("gd_tor_snake_v1/plane-v1", n_envs=24, vec_env_cls=SubprocVecEnv, vec_env_kwargs=dict(start_method='spawn'), env_kwargs=env_config)
 
     # 20240204 Optuna hyper-params
     model = PPO(

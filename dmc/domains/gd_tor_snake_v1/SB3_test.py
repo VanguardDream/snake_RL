@@ -84,8 +84,9 @@ log_prefix = "SB3_PPO_" + __now_str
 
 # load policy
 # policy = PPO.load(policy_dir+'/PPO/'+'20240213_18-37-25_subproc/rl_model_48000000_steps.zip', env=env)
-policy = PPO.load(policy_dir+'/PPO/'+'20240213_18-37-25_subproc.zip', env=env)
-# policy = RecurrentPPO.load(policy_dir+'/RPPO/'+'20240207_17-50-46.zip', env=env)
+# policy = PPO.load(policy_dir+'/PPO/'+'20240213_18-37-25_subproc.zip', env=env)
+# policy = RecurrentPPO.load(policy_dir+'/RPPO/'+'20240213_19-31-29/rl_model_40000000_steps.zip', env=env)
+policy = RecurrentPPO.load(policy_dir+'/RPPO/'+'20240213_19-31-29_subproc_40M.zip', env=env)
 # policy = PPO.load(policy_dir+'/PPO/20240201_01-22-36/'+'rl_model_9000000_steps.zip', env=env)
 
 obs, _ = env.reset()

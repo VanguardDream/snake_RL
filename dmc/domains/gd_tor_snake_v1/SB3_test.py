@@ -27,8 +27,8 @@ __camera_type__ = 'com'
 env = gym.make("gd_tor_snake_v1/plane-v1", 
                model_path = __contact_model_path__,
                terminate_when_unhealthy = False, 
-            #    render_mode = 'human', 
-               render_mode = 'rgb_array', 
+               render_mode = 'human', 
+            #    render_mode = 'rgb_array', 
             #    render_camera_name = "head_mount", 
                unhealthy_max_steps = 10,  
                render_camera_name = __camera_type__, 
@@ -83,10 +83,10 @@ video_prefix = "SB3_PPO_" + __now_str + __camera_type__
 log_prefix = "SB3_PPO_" + __now_str
 
 # load policy
-# policy = PPO.load(policy_dir+'/PPO/'+'20240213_18-37-25_subproc/rl_model_48000000_steps.zip', env=env)
+policy = PPO.load(policy_dir+'/PPO/'+'20240214_17-49-53/rl_model_240000000_steps.zip', env=env)
 # policy = PPO.load(policy_dir+'/PPO/'+'20240213_18-37-25_subproc.zip', env=env)
 # policy = RecurrentPPO.load(policy_dir+'/RPPO/'+'20240213_19-31-29/rl_model_40000000_steps.zip', env=env)
-policy = RecurrentPPO.load(policy_dir+'/RPPO/'+'20240213_19-31-29_subproc_40M.zip', env=env)
+# policy = RecurrentPPO.load(policy_dir+'/RPPO/'+'20240213_19-31-29_subproc_40M.zip', env=env)
 # policy = PPO.load(policy_dir+'/PPO/20240201_01-22-36/'+'rl_model_9000000_steps.zip', env=env)
 
 obs, _ = env.reset()
@@ -212,6 +212,6 @@ savedata_r_total = pd.DataFrame(datas['reward_total'], columns=['reward_total'])
 
 integrated_data = pd.concat([savedata_pos, savedata_vel, savedata_h_quat, savedata_h_a_vel, savedata_h_l_acc, savedata_h_l_vel_esti, savedata_h_l_pos_esti, savedata_m_Vec, savedata_h_rpy, savedata_c_rpy, savedata_x_disp, savedata_y_disp, savedata_o_disp, savedata_x_vel, savedata_y_vel, savedata_r_for, savedata_r_health, savedata_r_ctrl, savedata_r_side, savedata_r_uhealth, savedata_r_total], axis=1)
 
-integrated_data.to_csv('./logs/'+__now_str+'SB3_policy.csv')
-save_video(frames,"../videos", name_prefix=video_prefix, fps=env.metadata["render_fps"], step_starting_index = step_starting_index, episode_index = episode_index)
+# integrated_data.to_csv('./logs/'+__now_str+'SB3_policy.csv')
+# save_video(frames,"../videos", name_prefix=video_prefix, fps=env.metadata["render_fps"], step_starting_index = step_starting_index, episode_index = episode_index)
 

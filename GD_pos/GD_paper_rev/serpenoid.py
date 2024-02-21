@@ -30,7 +30,7 @@ class Gait():
 
         self._time_step_bar = param_bar[7]
 
-        self._t = np.arange(0, 300, self._time_step).transpose()
+        self._t = np.arange(0, 10, self._time_step).transpose()
 
         self.MotionMatrix = self.getMotionMat()
         self.CurveFunction = self.getCurveFunction()

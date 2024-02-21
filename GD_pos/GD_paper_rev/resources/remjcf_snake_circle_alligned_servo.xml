@@ -55,7 +55,7 @@
             <camera name="ceiling" mode="fixed" fovy="90" pos="0 0 2.5" euler="0 0 0"/>
         </body>
 
-        <body name="head" pos="0 0 0.1318" euler="0 0 0"> 
+        <body name="head" pos="0 0 0.032" euler="0 0 0"> 
             <camera name="head_mount" mode="fixed" fovy="120" pos="0.02 0 0.0" euler="0 -90 -90"/>
             <geom type="box" mass="0.01" condim="6" size="0.03 0.01 0.005"/>
             <site name="s_head" pos="0.02 0 0.01" euler="0 0 0"/>

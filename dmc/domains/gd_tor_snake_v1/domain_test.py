@@ -56,9 +56,9 @@ datas = {"joint_pos":np.empty((0,14)),
          "reward_unhealthy":np.empty((0,1)),
          }
 
-for i in range(3000):
-    # random = np.random.random(14) * 1.5
-    random = np.ones(14) * 0.2
+for i in range(1000):
+    random = np.random.random(14) * 1.5
+    # random = np.ones(14) * 0.2
 
     obs, rew, terminated, _, info = env.step(random)
     if terminated:

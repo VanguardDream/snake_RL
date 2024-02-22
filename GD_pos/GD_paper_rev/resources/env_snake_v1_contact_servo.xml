@@ -1,5 +1,10 @@
 <mujoco model="snake_scene_v1">
     <option timestep="0.005" integrator="implicitfast"/>
+    
+    <visual>
+      <global offwidth="1920"  offheight="1080" />
+    </visual>
+
     <size memory="100M"/>
 
     <include file="remjcf_snake_circle_alligned_servo.xml"/>

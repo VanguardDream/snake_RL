@@ -190,13 +190,13 @@ def J(parameters:np.ndarray, parameters_bar:np.ndarray, visual:bool = False, sav
     if abs(parameters[6]) < 30:  #forward way...
         i_term = i * p_head[-1,0]
         j_term = j * np.abs(p_head[-1,1])
-        l_term = l * np.abs(p_head[-1,1]/p_head[-1,0])
+        l_term = l * np.abs(p_head[-1,1]) / (np.abs(p_head[-1,0]) + 0.01)
         m_term = m * np.sum(np.sum(np.abs(p_head[:,7:21]),axis=1))
 
     else:
         i_term = i * p_head[-1,1]
         j_term = j * np.abs(p_head[-1,0])
-        l_term = l * np.abs(p_head[-1,0]/p_head[-1,1])
+        l_term = l * np.abs(p_head[-1,0]) / (np.abs(p_head[-1,1]) + 0.01)
         m_term = m * np.sum(np.sum(np.abs(p_head[:,7:21]),axis=1))
 
     return i_term + j_term + l_term + m_term
@@ -278,13 +278,13 @@ def J_curve(parameters:np.ndarray, parameters_bar:np.ndarray, visual:bool = Fals
     if abs(parameters[6]) < 30:  #forward way...
         i_term = i * p_head[-1,0]
         j_term = j * np.abs(p_head[-1,1])
-        l_term = l * np.abs(p_head[-1,1]/p_head[-1,0])
+        l_term = l * np.abs(p_head[-1,1]) / (np.abs(p_head[-1,0]) + 0.01)
         m_term = m * np.sum(np.sum(np.abs(p_head[:,7:21]),axis=1))
 
     else:
         i_term = i * p_head[-1,1]
         j_term = j * np.abs(p_head[-1,0])
-        l_term = l * np.abs(p_head[-1,0]/p_head[-1,1])
+        l_term = l * np.abs(p_head[-1,0]) / (np.abs(p_head[-1,1]) + 0.01)
         m_term = m * np.sum(np.sum(np.abs(p_head[:,7:21]),axis=1))
 
     return i_term + j_term + l_term + m_term
@@ -302,6 +302,20 @@ def orderize(param_motion:np.ndarray, basis:np.ndarray, param_bar_iter:np.ndarra
         lambda_bar = np.hstack((i, param_motion[-1]))
 
         U_map[idx[0], idx[1], idx[2], idx[3], idx[4], idx[5], idx[6], :] = J(param_motion, lambda_bar, visual, savelog)
+
+def orderize_curve(param_motion:np.ndarray, basis:np.ndarray, param_bar_iter:np.ndarray, param_coef:np.ndarray, shd_name:str, shd_shape, visual:bool, savelog:bool) -> None:
+    param_coeff = param_coef
+
+    for i in param_bar_iter:
+        exist_shm = shared_memory.SharedMemory(name=shd_name)
+        U_map = np.ndarray(shd_shape, dtype=np.float64, buffer=exist_shm.buf)
+
+        # idx = i - (basis + np.array([0, 0, 1, 1, 0, 0, 1]))
+        idx = np.array(i) - (np.array(basis) + np.array([1,1,0,0,1,1,0]))
+        i = np.multiply(i, param_coeff)
+        lambda_bar = np.hstack((i, param_motion[-1]))
+
+        U_map[idx[0], idx[1], idx[2], idx[3], idx[4], idx[5], idx[6], :] = J_curve(param_motion, lambda_bar, visual, savelog)
 
 def J_minize(param:tuple[float, float, float, float, float]):
     amp_d = param[0]
@@ -371,11 +385,15 @@ def iterator(param_m:np.ndarray, param_min:np.ndarray, param_max:np.ndarray, par
 
     amp_d = np.arange(1,17)[param_min[0]:param_max[0]]
     amp_l = np.arange(1,17)[param_min[1]:param_max[1]]
-    psi_d = np.arange(0,19)[param_min[2]:param_max[2]]
-    psi_l = np.arange(0,19)[param_min[3]:param_max[3]]
+    psi_d = np.arange(0,181)[param_min[2]:param_max[2]]
+    psi_l = np.arange(0,181)[param_min[3]:param_max[3]]
+    # psi_d = np.arange(0,19)[param_min[2]:param_max[2]]
+    # psi_l = np.arange(0,19)[param_min[3]:param_max[3]]
     nu_d = np.arange(1,7)[param_min[4]:param_max[4]]
     nu_l = np.arange(1,7)[param_min[5]:param_max[5]]
     delta = np.arange(0,19)[param_min[6]:param_max[6]]
+
+    print(f'base param : {np.array([amp_d[0], amp_l[0], psi_d[0], psi_l[0], nu_d[0], nu_l[0], delta[0]]) *param_coeff}')
 
     n1 = len(amp_d)
     n2 = len(amp_l)
@@ -456,6 +474,103 @@ def iterator(param_m:np.ndarray, param_min:np.ndarray, param_max:np.ndarray, par
 
     print('done')
 
+def iterator_curve(param_m:np.ndarray, param_min:np.ndarray, param_max:np.ndarray, param_coeff:np.ndarray, visual:bool = False, savelog:bool = False) -> None:
+    motion_param = param_m
+    basis = param_min
+
+    p_coeff = param_coeff
+
+    amp_d = np.arange(1,17)[param_min[0]:param_max[0]]
+    amp_l = np.arange(1,17)[param_min[1]:param_max[1]]
+    psi_d = np.arange(0,181)[param_min[2]:param_max[2]]
+    psi_l = np.arange(0,181)[param_min[3]:param_max[3]]
+    # psi_d = np.arange(0,19)[param_min[2]:param_max[2]]
+    # psi_l = np.arange(0,19)[param_min[3]:param_max[3]]
+    nu_d = np.arange(1,7)[param_min[4]:param_max[4]]
+    nu_l = np.arange(1,7)[param_min[5]:param_max[5]]
+    delta = np.arange(0,19)[param_min[6]:param_max[6]]
+
+    print(f'base param : {np.array([amp_d[0], amp_l[0], psi_d[0], psi_l[0], nu_d[0], nu_l[0], delta[0]]) *param_coeff}')
+
+    n1 = len(amp_d)
+    n2 = len(amp_l)
+    n3 = len(psi_d)
+    n4 = len(psi_l)
+    n5 = len(nu_d)
+    n6 = len(nu_l)
+    n7 = len(delta)
+
+    U_map = np.empty((n1,n2,n3,n4,n5,n6,n7,1), dtype=np.float64)
+    shm = shared_memory.SharedMemory(name="shared_U_map", create=True, size=U_map.nbytes)
+    data = np.ndarray(U_map.shape, dtype=U_map.dtype, buffer=shm.buf)
+
+    combinations = list(itertools.product(amp_d, amp_l, psi_d, psi_l, nu_d, nu_l, delta))
+    print(f'Number of Combinations : {len(combinations)}')
+
+    ea = len(combinations) // 16
+    start_idx = [0, 1 * ea, 2 * ea, 3 * ea, 4 * ea, 5 * ea, 6 * ea, 7 * ea, 8 * ea , 9 * ea, 10 * ea, 11 * ea, 12 * ea, 13 * ea, 14 * ea, 15 * ea] 
+
+    print(f'For 16 processes start indices : {start_idx}')
+
+    pc1 = Process(target=orderize_curve,  args=(np.array(motion_param), basis, list(combinations[start_idx[0]:start_idx[1]]),   p_coeff, shm.name, U_map.shape, visual, savelog))
+    pc2 = Process(target=orderize_curve,  args=(np.array(motion_param), basis, list(combinations[start_idx[1]:start_idx[2]]),   p_coeff, shm.name, U_map.shape, visual, savelog))
+    pc3 = Process(target=orderize_curve,  args=(np.array(motion_param), basis, list(combinations[start_idx[2]:start_idx[3]]),   p_coeff, shm.name, U_map.shape, visual, savelog))
+    pc4 = Process(target=orderize_curve,  args=(np.array(motion_param), basis, list(combinations[start_idx[3]:start_idx[4]]),   p_coeff, shm.name, U_map.shape, visual, savelog))
+    pc5 = Process(target=orderize_curve,  args=(np.array(motion_param), basis, list(combinations[start_idx[4]:start_idx[5]]),   p_coeff, shm.name, U_map.shape, visual, savelog))
+    pc6 = Process(target=orderize_curve,  args=(np.array(motion_param), basis, list(combinations[start_idx[5]:start_idx[6]]),   p_coeff, shm.name, U_map.shape, visual, savelog))
+    pc7 = Process(target=orderize_curve,  args=(np.array(motion_param), basis, list(combinations[start_idx[6]:start_idx[7]]),   p_coeff, shm.name, U_map.shape, visual, savelog))
+    pc8 = Process(target=orderize_curve,  args=(np.array(motion_param), basis, list(combinations[start_idx[7]:start_idx[8]]),   p_coeff, shm.name, U_map.shape, visual, savelog))
+    pc9 = Process(target=orderize_curve,  args=(np.array(motion_param), basis, list(combinations[start_idx[8]:start_idx[9]]),   p_coeff, shm.name, U_map.shape, visual, savelog))
+    pc10 = Process(target=orderize_curve, args=(np.array(motion_param), basis, list(combinations[start_idx[9]:start_idx[10]]),  p_coeff, shm.name, U_map.shape, visual, savelog))
+    pc11 = Process(target=orderize_curve, args=(np.array(motion_param), basis, list(combinations[start_idx[10]:start_idx[11]]), p_coeff, shm.name, U_map.shape, visual, savelog))
+    pc12 = Process(target=orderize_curve, args=(np.array(motion_param), basis, list(combinations[start_idx[11]:start_idx[12]]), p_coeff, shm.name, U_map.shape, visual, savelog))
+    pc13 = Process(target=orderize_curve, args=(np.array(motion_param), basis, list(combinations[start_idx[12]:start_idx[13]]), p_coeff, shm.name, U_map.shape, visual, savelog))
+    pc14 = Process(target=orderize_curve, args=(np.array(motion_param), basis, list(combinations[start_idx[13]:start_idx[14]]), p_coeff, shm.name, U_map.shape, visual, savelog))
+    pc15 = Process(target=orderize_curve, args=(np.array(motion_param), basis, list(combinations[start_idx[14]:start_idx[15]]), p_coeff, shm.name, U_map.shape, visual, savelog))
+    pc16 = Process(target=orderize_curve, args=(np.array(motion_param), basis, list(combinations[start_idx[15]::]),             p_coeff, shm.name, U_map.shape, visual, savelog))
+
+    pc1.start()
+    pc2.start()
+    pc3.start()
+    pc4.start()
+    pc5.start()
+    pc6.start()
+    pc7.start()
+    pc8.start()
+    pc9.start()
+    pc10.start()
+    pc11.start()
+    pc12.start()
+    pc13.start()
+    pc14.start()
+    pc15.start()
+    pc16.start()
+
+    pc1.join()
+    pc2.join()
+    pc3.join()
+    pc4.join()
+    pc5.join()
+    pc6.join()
+    pc7.join()
+    pc8.join()
+    pc9.join()
+    pc10.join()
+    pc11.join()
+    pc12.join()
+    pc13.join()
+    pc14.join()
+    pc15.join()
+    pc16.join()
+
+    data_dict = {'U_map': data, 'min': param_min, 'Motion_lambda': param_m, 'max': param_max, 'param_coefficient': param_coeff}
+    savemat("./data/U_map_Curve_M_"+param2filename(param_m)+'_min_'+param2filename(param_min)+f"_{len(combinations)}"+"_.mat", data_dict)
+
+    shm.close()
+    shm.unlink()
+
+    print('done')
+
 if __name__ == "__main__":
     snake = mujoco.MjModel.from_xml_path("./resources/env_snake_v1_contact_servo.xml")
     data = mujoco.MjData(snake)
@@ -464,13 +579,24 @@ if __name__ == "__main__":
     sidewinding = (45, 45, 30, 30, 30, 30, 45, 0.05)
     rolling = (15, 15, 0, 0, 30, 30, 90, 0.05)
 
-    # #### Grid searching
+    #### Grid searching
     # start_iter = time.time()
     # # iterator(slithering, (9,9,0,0,1,1,0), (10,10,19,19,7,7,19), (5, 5, 10, 10, 10, 10, 5))
-    # iterator(slithering, (8,8,0,0,1,1,0), (9,9,3,3,3,3,3), (5, 5, 10, 10, 10, 10, 5))
+    # # iterator(slithering, (8,8,0,0,1,1,0), (9,9,3,3,3,3,3), (5, 5, 10, 10, 10, 10, 5))
+    # iterator(slithering, (8,8,0,0,5,2,0), (9,9,181,181,6,3,1), (5, 5, 1, 1, 10, 10, 5))
     # end_iter = time.time()
 
     # print(f"Iterating dond... {end_iter-start_iter} seconds elapsed")
+
+    start_iter = time.time()
+    # iterator(slithering, (9,9,0,0,1,1,0), (10,10,19,19,7,7,19), (5, 5, 10, 10, 10, 10, 5))
+    # iterator(slithering, (8,8,0,0,1,1,0), (9,9,3,3,3,3,3), (5, 5, 10, 10, 10, 10, 5))
+    iterator_curve(slithering, (8,8,0,0,5,2,0), (9,9,181,181,6,3,1), (5, 5, 1, 1, 10, 10, 5))
+    end_iter = time.time()
+
+    print(f"Iterating dond... {end_iter-start_iter} seconds elapsed")
+
+
 
     # #### Minimizing...
     # start_iter = time.time()
@@ -483,13 +609,14 @@ if __name__ == "__main__":
     # print(res)
 
     ### Evaluating
-    U = J_curve((4.590e+01,  4.587e+01,  3.174e+01,  3.174e+01,  2 * 2.723e+01,  2.723e+01,  2.381e-04, 0.05), (4.590e+01,  4.587e+01,  3.174e+01,  3.174e+01,  2 * 2.723e+01,  2.723e+01,  2.381e-04, 0.05), False, False)
-    print(U)
-    U = J((4.590e+01,  4.587e+01,  3.174e+01,  3.174e+01,  2 * 2.723e+01,  2.723e+01,  2.381e-04, 0.05), (4.590e+01,  4.587e+01,  3.174e+01,  3.174e+01,  2 * 2.723e+01,  2.723e+01,  2.381e-04, 0.05), False, False)
-    print(U)
-    # U = J(rolling, rolling, False, False)
+    # U = J_curve((4.590e+01,  4.587e+01,  3.174e+01,  3.174e+01,  2 * 2.723e+01,  2.723e+01,  2.381e-04, 0.05), (4.590e+01,  4.587e+01,  3.174e+01,  3.174e+01,  2 * 2.723e+01,  2.723e+01,  2.381e-04, 0.05), False, False)
     # print(U)
-    # U = J_curve(rolling, rolling, False, False)
+    # U = J((4.590e+01,  4.587e+01,  3.174e+01,  3.174e+01,  2 * 2.723e+01,  2.723e+01,  2.381e-04, 0.05), (4.590e+01,  4.587e+01,  3.174e+01,  3.174e+01,  2 * 2.723e+01,  2.723e+01,  2.381e-04, 0.05), False, False)
+    # U = J(slithering, (45,  45,  28,  44,  30,  60,  0, 0.05), False, False)
+    # print(U)
+    # U = J(slithering, slithering, False, False)
+    # print(U)
+    # U = J_curve(slithering, slithering, False, False)
     # print(U)
 
     # U = J((4.687e+01,  4.318e+01,  3.209e+01,  3.209e+01,  3.387e+01 * 2,  3.387e+01, -4.326e-04, 0.05), (4.687e+01,  4.318e+01,  3.209e+01,  3.209e+01,  3.387e+01 * 2,  3.387e+01, -4.326e-04, 0.05), True, False)

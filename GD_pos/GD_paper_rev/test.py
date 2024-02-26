@@ -674,7 +674,7 @@ def iterator_linear(motion:np.ndarray, curve:bool, visual:bool = False, savelog:
     pc16.join()
 
     data_dict = {'U_map': data, 'Motion_lambda': motion_param}
-    savemat("./data/U_map_linear_M_"+str(curve)+"_"+param2filename(motion_param)+f"_{len(combinations)}"+"_.mat", data_dict)
+    savemat("./data/U_map_linear_M2_"+str(curve)+"_"+param2filename(motion_param)+f"_{len(combinations)}"+"_.mat", data_dict)
     
     shm.close()
     shm.unlink()

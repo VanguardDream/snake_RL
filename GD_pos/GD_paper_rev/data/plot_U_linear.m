@@ -1,14 +1,19 @@
 clc; clear;
 
 %% load
-load Slithering_curve.mat;
-% load Sidewinding_curve.mat
+% load Linear_Slithering_Curve.mat;
+% load Linear_Sidewinding_Curve.mat;
+% load Linear_Rolling_Curve.mat;
+load Linear_Serpentine_Curve.mat;
 U_map_curve = U_map;
 
 clear max min Motion_lambda param_coefficient U_map;
 
-load Slithering_mat.mat;
-% load Sidewinding_mat.mat
+% load Linear_Slithering_Mat.mat;
+% load Linear_Sidewinding_Mat.mat;
+% load Linear_Rolling_Mat.mat
+load Linear_Serpentine_Mat.mat;
+
 U_map_mat = U_map;
 
 clear max min Motion_lambda param_coefficient U_map;
@@ -20,8 +25,8 @@ U_map_curve = squeeze(U_map_curve);
 U_map_mat = max(U_map_mat, -2000);
 U_map_curve = max(U_map_curve, -2000);
 
-U_map_mat = min(U_map_mat, 2500);
-U_map_curve = min(U_map_curve, 2500);
+% U_map_mat = min(U_map_mat, 2500);
+% U_map_curve = min(U_map_curve, 2500);
 
 %%
 figure; hAxes = gca;
@@ -54,8 +59,8 @@ yline(91,LineWidth=1,LineStyle="--",Color=[0.8 0.8 0.8]);
 yline(121,LineWidth=1,LineStyle="--",Color=[0.8 0.8 0.8]);
 yline(151,LineWidth=1,LineStyle="--",Color=[0.8 0.8 0.8]);
 
-xlabel("Dorsal spatial (degree)","FontSize",13,"FontName","arial","FontWeight","bold");
-ylabel("Lateral spatial (degree)","FontSize",13,"FontName","arial","FontWeight","bold");
+xlabel("Temporal parameter (rad)","FontSize",13,"FontName","arial","FontWeight","bold");
+ylabel("Spatial parameter (degree)","FontSize",13,"FontName","arial","FontWeight","bold");
 
 %%
 figure; hAxes = gca;
@@ -90,3 +95,10 @@ yline(151,LineWidth=1,LineStyle="--",Color=[0.8 0.8 0.8]);
 
 xlabel("Dorsal spatial (degree)","FontSize",13,"FontName","arial","FontWeight","bold");
 ylabel("Lateral spatial (degree)","FontSize",13,"FontName","arial","FontWeight","bold");
+
+%% 상관계수 비교
+
+norm_U_mat = normalize(U_map_mat);
+norm_U_curve = normalize(U_map_curve);
+
+corr2(U_map_mat, U_map_curve)

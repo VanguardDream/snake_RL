@@ -1,25 +1,27 @@
 clc; clear;
 
 %% load
-% load Linear_Slithering_Curve.mat;
-load Linear_Sidewinding_Curve.mat;
-% load Linear_Rolling_Curve.mat;
-% load Linear_Serpentine_Curve.mat;
-% load Linear_Serpentine2_Curve.mat;
+% load op_slit_curve.mat
+load op_serp_curve.mat
+% load op_side_curve.mat
+% load Compare_M_side_C_Serp.mat
 U_map_curve = U_map;
 
 clear max min Motion_lambda param_coefficient U_map;
 
-% load Linear_Slithering_Mat.mat;
-load Linear_Sidewinding_Mat.mat;
-% load Linear_Rolling_Mat.mat
-% load Linear_Serpentine_Mat.mat;
-% load Linear_Serpentine2_Mat.mat;
-
+% load op_slit_mat.mat
+load op_serp_mat.mat
+% load op_side_mat.mat
+% load Compare_M_Slit_C_Serp.mat
+% load Compare_M_Serp_C_Serp.mat
+% load Compare_M_side_C_Serp.mat
+% load 'Compare_M_side_C_Serp (2).mat'
 U_map_mat = U_map;
 
 clear max min Motion_lambda param_coefficient U_map;
 
+U_map_curve = transpose(U_map_curve);
+U_map_mat = transpose(U_map_mat);
 %%
 U_map_mat = squeeze(U_map_mat);
 U_map_curve = squeeze(U_map_curve);
@@ -34,13 +36,13 @@ U_map_curve = max(U_map_curve, -2000);
 figure; hAxes = gca;
 contourf(U_map_curve);
 
-pbaspect([0.8 0.8 0.8]);
+pbaspect([1.5 1 0.8]);
 
 colormap jet;
 colorbar;
 
-yticks(1:30:181);
-yticklabels(["0","30","60","90","120","150","180"]);
+yticks(0:30:120);
+yticklabels(["0","30","60","90","120"]);
 a = get(gca,'YTickLabel');  
 set(gca,'YTickLabel',a,'fontsize',11,'FontWeight','bold')
 
@@ -58,8 +60,6 @@ xline(151,LineWidth=1,LineStyle="--",Color=[0.8 0.8 0.8]);
 yline(31,LineWidth=1,LineStyle="--",Color=[0.8 0.8 0.8]);
 yline(61,LineWidth=1,LineStyle="--",Color=[0.8 0.8 0.8]);
 yline(91,LineWidth=1,LineStyle="--",Color=[0.8 0.8 0.8]);
-yline(121,LineWidth=1,LineStyle="--",Color=[0.8 0.8 0.8]);
-yline(151,LineWidth=1,LineStyle="--",Color=[0.8 0.8 0.8]);
 
 xlabel("Temporal parameter (rad)","FontSize",13,"FontName","arial","FontWeight","bold");
 ylabel("Spatial parameter (degree)","FontSize",13,"FontName","arial","FontWeight","bold");
@@ -68,13 +68,13 @@ ylabel("Spatial parameter (degree)","FontSize",13,"FontName","arial","FontWeight
 figure; hAxes = gca;
 contourf(U_map_mat);
 
-pbaspect([0.8 0.8 0.8]);
+pbaspect([1.5 1 0.8]);
 
 colormap jet;
 colorbar;
 
-yticks(1:30:181);
-yticklabels(["0","30","60","90","120","150","180"]);
+yticks(0:30:120);
+yticklabels(["0","30","60","90","120"]);
 a = get(gca,'YTickLabel');  
 set(gca,'YTickLabel',a,'fontsize',11,'FontWeight','bold')
 
@@ -92,12 +92,9 @@ xline(151,LineWidth=1,LineStyle="--",Color=[0.8 0.8 0.8]);
 yline(31,LineWidth=1,LineStyle="--",Color=[0.8 0.8 0.8]);
 yline(61,LineWidth=1,LineStyle="--",Color=[0.8 0.8 0.8]);
 yline(91,LineWidth=1,LineStyle="--",Color=[0.8 0.8 0.8]);
-yline(121,LineWidth=1,LineStyle="--",Color=[0.8 0.8 0.8]);
-yline(151,LineWidth=1,LineStyle="--",Color=[0.8 0.8 0.8]);
 
-xlabel("Dorsal spatial (degree)","FontSize",13,"FontName","arial","FontWeight","bold");
-ylabel("Lateral spatial (degree)","FontSize",13,"FontName","arial","FontWeight","bold");
-
+xlabel("Temporal parameter (rad)","FontSize",13,"FontName","arial","FontWeight","bold");
+ylabel("Spatial parameter (degree)","FontSize",13,"FontName","arial","FontWeight","bold");
 %% 상관계수 비교
 
 norm_U_mat = normalize(U_map_mat);

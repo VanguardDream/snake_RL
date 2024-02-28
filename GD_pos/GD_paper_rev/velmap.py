@@ -332,11 +332,8 @@ if __name__ == "__main__":
     # J_vm(serpentine, serpentine, True, False)
 
     start_iter = time.time()
-    iterator_linear(serpentine, False)
     iterator_linear(serpentine, True)
-    iterator_linear(slithering, False)
     iterator_linear(slithering, True)
-    iterator_linear(sidewinding, False)
     iterator_linear(sidewinding, True)
 
     end_iter = time.time()

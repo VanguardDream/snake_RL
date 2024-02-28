@@ -14,93 +14,6 @@ import serpenoid
 from scipy.spatial.transform import Rotation
 from multiprocessing import Process, Queue, shared_memory
 
-def randomize_parameter_rad() -> np.ndarray:
-
-    amp_d = np.random.randint(1,15) / 10 # Radian
-    amp_l = np.random.randint(1,15) / 10 # Radian
-    psi_d = np.random.randint(0,17) / 16 * np.pi # Radian
-    psi_l = np.random.randint(0,17) / 16 * np.pi # Radian
-    nu_d = np.random.randint(1,61) / 10  # Radian
-    nu_l = np.random.randint(1,61) / 10  # Radian
-    delta = np.random.randint(0,17) / 16 * np.pi
-
-    return np.array([amp_d, amp_l, psi_d, psi_l, nu_d, nu_l, delta])
-
-def randomize_parameter_deg() -> np.ndarray:
-
-    amp_d = np.random.randint(1,17) * 5 # Degree
-    amp_l = np.random.randint(1,17) * 5 # Degree
-    psi_d = np.random.randint(0,19) * 10 # Degree
-    psi_l = np.random.randint(0,19) * 10 # Degree
-    nu_d = np.random.randint(1,61) / 10  # Degree
-    nu_l = np.random.randint(1,61) / 10  # Degree
-    delta = np.random.randint(0,19) * 10 # Degree
-
-    return np.array([amp_d, amp_l, psi_d, psi_l, nu_d, nu_l, delta])
-
-def sim_start() -> None:
-    global data, snake
-    data = mujoco.MjData(snake)
-
-    l_bar = randomize_parameter_deg()
-
-    # gait = serpenoid.Gait((45, 45, 30, 30, 60, 30, 0, 0.05), (l_bar[0], l_bar[1], l_bar[2], l_bar[3], l_bar[4], l_bar[5], l_bar[6], 0.05))
-    gait = serpenoid.Gait((45, 45, 45, 45, 120, 120, 0, 0.05), (45, 45, 45, 45, 120, 120, 0, 0.05))
-
-    q = gait.Gk
-    print(q.shape)
-
-    with mujoco.viewer.launch_passive(snake, data) as viewer:
-        # time_start_sim = time.time()
-        # for t in range(1401):
-        #     time_step = time.time()
-        #     slot = t // 10
-        #     data.ctrl= q[slot,:]
-
-        #     mujoco.mj_step(snake, data)
-
-        #     viewer.sync()
-
-        #     while snake.opt.timestep - (time.time() - time_step) > 0:
-        #         time.sleep(0)
-        #         pass
-
-        time_start_sim = time.time()
-        step = 0
-        for k in range(8000):
-            time_step = time.time()
-            if k % 10 == 0 and k != 0:
-                step += 1
-
-            # Motion Matrix
-            index = np.nonzero(gait.Gk[:,step])
-
-            for idx in index:
-                data.ctrl[idx] = gait.Gk[idx,step]
-
-            # # Serpenoid
-            # data.ctrl = gait.CurveFunction[:,step]
-
-            mujoco.mj_step(snake, data)
-
-            viewer.sync()
-
-        # for i in q.transpose():
-        #     time_step = time.time()
-        #     index = np.nonzero(i)
-
-        #     for idx in index:
-        #         data.ctrl[idx] = i[idx]
-
-        #     mujoco.mj_step(snake, data)
-
-        #     viewer.sync()
-
-            while snake.opt.timestep - (time.time() - time_step) > 0:
-                time.sleep(0)
-
-    print(time.time() - time_start_sim)
-
 def param2filename(params:np.ndarray)->str:
     f_name = str(params)
     f_name = f_name.replace('(','')
@@ -327,7 +240,7 @@ def orderize_linear(param_motion:np.ndarray, curve:bool, param_bar_iter:np.ndarr
         idx2 = i[3] - 1 # nu start 1
 
         amp_d, amp_l, psi, nu, delta = i
-        lambda_bar = (amp_d, amp_l, psi, psi, (nu) * (1/2), (nu) * (1/2), delta, param_motion[-1])
+        lambda_bar = (amp_d, amp_l, psi, psi, nu, nu, delta, param_motion[-1])
 
         if curve:
             U_map[idx1, idx2, :] = J_curve(param_motion, lambda_bar, visual, savelog)
@@ -350,67 +263,6 @@ def orderize_linear_fine(param_motion:np.ndarray, curve:bool, param_bar_iter:np.
             U_map[idx1, idx2, :] = J_curve(param_motion, lambda_bar, visual, savelog)
         else:
             U_map[idx1, idx2, :] = J(param_motion, lambda_bar, visual, savelog)
-            
-
-def J_minize(param:tuple[float, float, float, float, float]):
-    amp_d = param[0]
-    amp_l = param[1]
-    psi = param[2]
-    nu = param[3]
-    delta = param[4]
-
-    parameters = (amp_d, amp_l, psi, psi, 2 * nu, nu, delta, 0.05)
-    parameters_bar = parameters
-
-    snake = mujoco.MjModel.from_xml_path("./resources/env_snake_v1_contact_servo.xml")
-    data = mujoco.MjData(snake)
-    mujoco.mj_forward(snake, data)
-
-    gait = serpenoid.Gait(tuple(parameters), tuple(parameters_bar))
-
-    # q = gait.CurveFunction
-    q = gait.Gk
-    
-    expand_q = np.repeat(q, 10, axis=1)
-
-    p_head = np.empty((0,21))
-    step_data = np.hstack((data.body('head').xpos.copy(), data.sensordata[28:32].copy(), np.zeros(14)))
-    p_head = np.vstack((p_head, step_data))
-
-    for i in expand_q.transpose():
-        index = np.nonzero(i)
-        for idx in index:
-            data.ctrl[idx] = i[idx]
-
-        mujoco.mj_step(snake, data)
-
-        step_data = np.hstack((data.body('head').xpos.copy(), data.sensordata[28:32].copy(), data.ctrl))
-        p_head = np.vstack((p_head, step_data))
-
-
-    i = 1500
-    j = -800
-    l = -900
-    m = 0.0001
-
-    i_term = 0
-    j_term = 0
-    l_term = 0
-    m_term = 0
-
-    if abs(parameters[6]) < 30:  #forward way...
-        i_term = i * p_head[-1,0]
-        j_term = j * np.abs(p_head[-1,1])
-        l_term = l * np.abs(p_head[-1,1]/p_head[-1,0])
-        m_term = m * np.sum(np.sum(np.abs(p_head[:,7:21]),axis=1))
-
-    else:
-        i_term = i * p_head[-1,1]
-        j_term = j * np.abs(p_head[-1,0])
-        l_term = l * np.abs(p_head[-1,0]/p_head[-1,1])
-        m_term = m * np.sum(np.sum(np.abs(p_head[:,7:21]),axis=1))
-
-    return -1 * (i_term + j_term + l_term + m_term)
 
 def iterator(param_m:np.ndarray, param_min:np.ndarray, param_max:np.ndarray, param_coeff:np.ndarray, visual:bool = False, savelog:bool = False) -> None:
     motion_param = param_m
@@ -692,7 +544,7 @@ def iterator_linear(motion:np.ndarray, curve:bool, visual:bool = False, savelog:
     pc16.join()
 
     data_dict = {'U_map': data, 'Motion_lambda': motion_param}
-    savemat("./opti_step/U_map_linear_serp_compare_"+str(curve)+"_"+param2filename(motion_param)+f"_{len(combinations)}"+"_.mat", data_dict)
+    savemat("./U_map_fine_grid_"+str(curve)+"_"+param2filename(motion_param)+f"_{len(combinations)}"+"_.mat", data_dict)
     
     shm.close()
     shm.unlink()
@@ -800,57 +652,12 @@ if __name__ == "__main__":
     sidewinding_op = (45, 45, 27, 27, 53, 53, 45, 0.05)
     rolling = (15, 15, 0, 0, 30, 30, 90, 0.05)
 
-    # print(J_curve((45, 45, 27, 27, 53, 53, 45, 0.05), (45, 45, 27, 27, 53, 53, 45, 0.05), True, False))
-    # exit()
-
-    # #### Grid searching
-    # start_iter = time.time()
-    # # iterator(slithering, (9,9,0,0,1,1,0), (10,10,19,19,7,7,19), (5, 5, 10, 10, 10, 10, 5))
-    # # iterator(slithering, (8,8,0,0,1,1,0), (9,9,3,3,3,3,3), (5, 5, 10, 10, 10, 10, 5))
-    # iterator(sidewinding, (8,8,0,0,2,2,10), (9,9,181,181,3,3,11), (5, 5, 1, 1, 10, 10, 5))
-    # end_iter = time.time()
-
-    # print(f"Iterating dond... {end_iter-start_iter} seconds elapsed")
-
-    # start_iter = time.time()
-    # # iterator(slithering, (9,9,0,0,1,1,0), (10,10,19,19,7,7,19), (5, 5, 10, 10, 10, 10, 5))
-    # # iterator(slithering, (8,8,0,0,1,1,0), (9,9,3,3,3,3,3), (5, 5, 10, 10, 10, 10, 5))
-    # iterator_curve(sidewinding, (8,8,0,0,2,2,10), (9,9,181,181,3,3,11), (5, 5, 1, 1, 10, 10, 5))
-    # end_iter = time.time()
-
-    # print(f"Iterating dond... {end_iter-start_iter} seconds elapsed")
-
     # #### Linear Searching...
     start_iter = time.time()
-    # iterator_linear(serpentine_op, False)
-    iterator_linear(sidewinding_op,False)
-    # iterator_linear(slithering_op,False)
-
-    iterator(rolling, (2,2,0,0,0,0,10), (3,3,1,1,121,121,11), (5, 5, 1, 1, 0.5, 0.5, 5))
-    # iterator_curve(rolling, (2,2,0,0,0,0,10), (3,3,1,1,121,121,11), (5, 5, 1, 1, 0.5, 0.5, 5))
+    iterator_linear(serpentine_op,True)
+    iterator_linear(slithering_op,True)
+    iterator_linear(sidewinding_op,True)
 
     end_iter = time.time()
     print(f"Iterating dond... {end_iter-start_iter} seconds elapsed")
 
-    # #### Minimizing...
-    # start_iter = time.time()
-    # xv0 = np.array([45,45,30,30,0])
-    # xvbound = ((0,90), (0,90), (0,180), (10,60), (-25,25))
-    # options={'xatol': 3, 'fatol' : 10, 'disp': True}
-    # res = minimize(J_minize, xv0, method='Nelder-Mead', bounds=xvbound, options=options)
-    # end_iter = time.time()
-    # print(f"Iterating dond... {end_iter-start_iter} seconds elapsed")
-    # print(res)
-
-    ### Evaluating
-    # U = J_curve((4.590e+01,  4.587e+01,  3.174e+01,  3.174e+01,  2 * 2.723e+01,  2.723e+01,  2.381e-04, 0.05), (4.590e+01,  4.587e+01,  3.174e+01,  3.174e+01,  2 * 2.723e+01,  2.723e+01,  2.381e-04, 0.05), False, False)
-    # print(U)
-    # U = J((4.590e+01,  4.587e+01,  3.174e+01,  3.174e+01,  2 * 2.723e+01,  2.723e+01,  2.381e-04, 0.05), (4.590e+01,  4.587e+01,  3.174e+01,  3.174e+01,  2 * 2.723e+01,  2.723e+01,  2.381e-04, 0.05), False, False)
-    # U = J(slithering, (45,  45,  28,  44,  30,  60,  0, 0.05), False, False)
-    # print(U)
-    # U = J(slithering, slithering, False, False)
-    # print(U)
-    # U = J_curve(slithering, slithering, False, False)
-    # print(U)
-
-    # U = J((4.687e+01,  4.318e+01,  3.209e+01,  3.209e+01,  3.387e+01 * 2,  3.387e+01, -4.326e-04, 0.05), (4.687e+01,  4.318e+01,  3.209e+01,  3.209e+01,  3.387e+01 * 2,  3.387e+01, -4.326e-04, 0.05), True, False)

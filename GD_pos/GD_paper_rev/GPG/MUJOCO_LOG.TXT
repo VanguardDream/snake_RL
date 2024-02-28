@@ -1,0 +1,3 @@
+Wed Feb 28 14:08:02 2024
+WARNING: mju_openResource: unknown file './resources/env_snake_v1_contact_servo.xml'
+

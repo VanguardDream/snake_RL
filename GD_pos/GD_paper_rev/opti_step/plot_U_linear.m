@@ -2,16 +2,16 @@ clc; clear;
 
 %% load
 % load op_slit_curve.mat
-load op_serp_curve.mat
-% load op_side_curve.mat
+% load op_serp_curve.mat
+load op_side_curve.mat
 % load Compare_M_side_C_Serp.mat
 U_map_curve = U_map;
 
 clear max min Motion_lambda param_coefficient U_map;
 
 % load op_slit_mat.mat
-load op_serp_mat.mat
-% load op_side_mat.mat
+% load op_serp_mat.mat
+load op_side_mat.mat
 % load Compare_M_Slit_C_Serp.mat
 % load Compare_M_Serp_C_Serp.mat
 % load Compare_M_side_C_Serp.mat

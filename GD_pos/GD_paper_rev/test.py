@@ -800,8 +800,8 @@ if __name__ == "__main__":
     sidewinding_op = (45, 45, 27, 27, 53, 53, 45, 0.05)
     rolling = (15, 15, 0, 0, 30, 30, 90, 0.05)
 
-    # print(J_curve((45, 45, 27, 27, 53, 53, 45, 0.05), (45, 45, 27, 27, 53, 53, 45, 0.05), True, False))
-    # exit()
+    print(J_curve(serpentine_op, serpentine_op, True, False))
+    exit()
 
     # #### Grid searching
     # start_iter = time.time()
@@ -821,16 +821,16 @@ if __name__ == "__main__":
     # print(f"Iterating dond... {end_iter-start_iter} seconds elapsed")
 
     # #### Linear Searching...
-    start_iter = time.time()
-    # iterator_linear(serpentine_op, False)
-    iterator_linear(sidewinding_op,False)
-    # iterator_linear(slithering_op,False)
+    # start_iter = time.time()
+    # # iterator_linear(serpentine_op, False)
+    # iterator_linear(sidewinding_op,False)
+    # # iterator_linear(slithering_op,False)
 
-    iterator(rolling, (2,2,0,0,0,0,10), (3,3,1,1,121,121,11), (5, 5, 1, 1, 0.5, 0.5, 5))
-    # iterator_curve(rolling, (2,2,0,0,0,0,10), (3,3,1,1,121,121,11), (5, 5, 1, 1, 0.5, 0.5, 5))
+    # iterator(rolling, (2,2,0,0,0,0,10), (3,3,1,1,121,121,11), (5, 5, 1, 1, 0.5, 0.5, 5))
+    # # iterator_curve(rolling, (2,2,0,0,0,0,10), (3,3,1,1,121,121,11), (5, 5, 1, 1, 0.5, 0.5, 5))
 
-    end_iter = time.time()
-    print(f"Iterating dond... {end_iter-start_iter} seconds elapsed")
+    # end_iter = time.time()
+    # print(f"Iterating dond... {end_iter-start_iter} seconds elapsed")
 
     # #### Minimizing...
     # start_iter = time.time()

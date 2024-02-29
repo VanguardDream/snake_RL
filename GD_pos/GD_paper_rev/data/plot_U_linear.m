@@ -2,8 +2,8 @@ clc; clear;
 
 %% load
 % load Linear_Slithering_Curve.mat;
-load Linear_Sidewinding_Curve.mat;
-% load Linear_Rolling_Curve.mat;
+% load Linear_Sidewinding_Curve.mat;
+load Linear_Rolling_Curve.mat;
 % load Linear_Serpentine_Curve.mat;
 % load Linear_Serpentine2_Curve.mat;
 U_map_curve = U_map;
@@ -11,8 +11,8 @@ U_map_curve = U_map;
 clear max min Motion_lambda param_coefficient U_map;
 
 % load Linear_Slithering_Mat.mat;
-load Linear_Sidewinding_Mat.mat;
-% load Linear_Rolling_Mat.mat
+% load Linear_Sidewinding_Mat.mat;
+load Linear_Rolling_Mat.mat
 % load Linear_Serpentine_Mat.mat;
 % load Linear_Serpentine2_Mat.mat;
 
@@ -24,8 +24,8 @@ clear max min Motion_lambda param_coefficient U_map;
 U_map_mat = squeeze(U_map_mat);
 U_map_curve = squeeze(U_map_curve);
 
-U_map_mat = max(U_map_mat, -2000);
-U_map_curve = max(U_map_curve, -2000);
+U_map_mat = max(U_map_mat, -1000);
+U_map_curve = max(U_map_curve, -1000);
 
 % U_map_mat = min(U_map_mat, 500);
 % U_map_curve = min(U_map_curve, 500);
@@ -104,3 +104,9 @@ norm_U_mat = normalize(U_map_mat);
 norm_U_curve = normalize(U_map_curve);
 
 corr2(norm_U_mat, norm_U_curve)
+
+figure;
+contourf(norm_U_curve);
+
+figure;
+contourf(norm_U_mat);

@@ -1,0 +1,227 @@
+<!-- © 2022 Bongsub Song <doorebong@gmail.com> -->
+<!-- All right reserved -->
+<!-- Description : BRM snake robot Mujoco simulation xml and axis alligned version. -->
+<!-- v20220830 : Circular frame version -->
+<!-- v20221103 : Body Frame Alligned -->
+<!-- v20240122 : mesh contact is convert to default shape -->
+
+<mujoco model="horcrux">
+
+    <!-- <option timestep="0.01" iterations="100" tolerance="1e-8" solver="CG" cone="elliptic"/> -->
+
+    <asset>
+        <mesh name="head_link" file="./asset/Head.stl"/>
+        <mesh name="v_link" file="./asset/Link2.stl"/>
+        <mesh name="h_link" file="./asset/Link3.stl"/>
+        <mesh name="tail_link" file="./asset/Tail.stl"/>
+    </asset>
+
+    <default>
+        <!-- <default class="link_defaults">
+            <body pos="-0.678 0 0" euler="0 0 0"/>
+        </default> -->
+        <default class="joint_defaults">
+            <joint type="hinge" pos="0.0388 0 0" limited="true" range="-75 75" damping="0.13" stiffness="0" armature="0.01" />
+        </default>
+        <default class="C-frame">
+            <geom type="cylinder" mass="0.05" condim="6" size="0.0318 0.01" rgba="0.5 0.5 0.5 0.1" priority="1" friction="0.7 0.015 0.001" pos="0 0 0" euler="0 90 0"/>
+            <!-- <geom type="cylinder" mass="0.05" condim="6" size="0.03 0.01" rgba="0.5 0.5 0.5 0.1" priority="1" friction="0.7 0.015 0.001" margin="0.0018" pos="0 0 0" euler="0 90 0"/> -->
+        </default>
+        <default class="H-link">
+            <geom type="box" mass="0.1" condim="6" size="0.01425 0.017 0.02325" rgba="0.5 0.5 0.5 0.1" priority="1" friction="0.35 0.015 0.001" pos="-0.017 0 0" euler="0 90 0"/>
+        </default>
+        <default class="V-link">
+            <geom type="box" mass="0.1" condim="6" size="0.01425 0.017 0.02325" rgba="0.5 0.5 0.5 0.1" priority="1" friction="0.35 0.015 0.001" pos="-0.017 0 0" euler="90 90 0"/>
+        </default>
+        <default class="Mesh-head">
+            <geom type="mesh" mesh="head_link" mass="0" pos="-0.029 0 0" euler="180 0 0" contype="0" conaffinity="0" group="2" rgba="0.7 0.4 0.4 1"/>
+        </default>
+        <default class="Mesh-H-link">
+            <geom type="mesh" mesh="h_link" mass="0" pos="-0.029 0 0" euler="180 0 0" contype="0" conaffinity="0" group="2" rgba="0.7 0.4 0.4 1"/>
+        </default>
+        <default class="Mesh-V-link">
+            <geom type="mesh" mesh="v_link" mass="0" pos="-0.029 0 0" euler="0 0 0" contype="0" conaffinity="0" group="2" rgba="0.4 0.4 0.7 1"/>
+        </default>
+        <default class="Mesh-tail">
+            <geom type="mesh" mesh="tail_link" mass="0" pos="0.001875 0 0" euler="0 0 0" contype="0" conaffinity="0" group="2" rgba="0.7 0.4 0.4 1"/>
+        </default>
+    </default>
+
+    <worldbody>
+        <light directional="false" diffuse="1 1 1" specular="0 0 0" pos="0 0 15" dir="0 0 -1" castshadow="false"/>
+
+        <!-- Celing camera -->
+        <body>
+            <camera name="ceiling" mode="fixed" fovy="90" pos="0 0 2.5" euler="0 0 0"/>
+        </body>
+
+        <body name="head" pos="0 0 0.1318" euler="0 0 0"> 
+            <camera name="head_mount" mode="fixed" fovy="120" pos="0.02 0 0.0" euler="0 -90 -90"/>
+            <geom type="box" mass="0.01" condim="6" size="0.03 0.01 0.005"/>
+            <site name="s_head" pos="0.02 0 0.01" euler="0 0 0"/>
+            <freejoint name="root"/>
+            <geom class="Mesh-head"/>    
+            <geom name="c-head" class="C-frame"/>
+            <geom class="H-link"/>
+            <body name="link1" pos="-0.0678 0 0" euler="0 0 0">
+                <joint class="joint_defaults" name="joint1" axis="0 1 0"/>
+                <geom class="Mesh-V-link"/> 
+                <geom name="c-link1" class="C-frame"/>
+                <geom class="V-link"/>
+                <body name="link2" pos="-0.0678 0 0" euler="0 0 0">
+                    <joint class="joint_defaults" name="joint2" axis="0 0 1"/>
+                    <geom class="Mesh-H-link"/> 
+                    <geom name="c-link2" class="C-frame"/>
+                    <geom class="H-link"/>
+                    <body name="link3" pos="-0.0678 0 0" euler="0 0 0">
+                        <joint class="joint_defaults" name="joint3" axis="0 1 0"/>
+                        <geom class="Mesh-V-link"/> 
+                        <geom name="c-link3" class="C-frame"/>
+                        <geom class="V-link"/>
+                        <body name="link4" pos="-0.0678 0 0" euler="0 0 0">
+                            <joint class="joint_defaults" name="joint4" axis="0 0 1"/>
+                            <geom class="Mesh-H-link"/> 
+                            <geom name="c-link4" class="C-frame"/>
+                            <geom class="H-link"/>
+                            <body name="link5" pos="-0.0678 0 0" euler="0 0 0">
+                                <joint class="joint_defaults" name="joint5" axis="0 1 0"/>
+                                <geom class="Mesh-V-link"/> 
+                                <geom name="c-link5" class="C-frame"/>
+                                <geom class="V-link"/>
+                                <body name="link6" pos="-0.0678 0 0" euler="0 0 0">
+                                    <joint class="joint_defaults" name="joint6" axis="0 0 1"/>
+                                    <geom class="Mesh-H-link"/> 
+                                    <geom name="c-link6" class="C-frame"/>
+                                    <geom class="H-link"/>
+                                    <body name="link7" pos="-0.0678 0 0" euler="0 0 0">
+                                        <joint class="joint_defaults" name="joint7" axis="0 1 0"/>
+                                        <geom class="Mesh-V-link"/> 
+                                        <geom name="c-link7" class="C-frame"/>
+                                        <geom class="V-link"/>
+                                        <body name="link8" pos="-0.0678 0 0" euler="0 0 0">
+                                            <joint class="joint_defaults" name="joint8" axis="0 0 1"/>
+                                            <geom class="Mesh-H-link"/> 
+                                            <geom name="c-link8" class="C-frame"/>
+                                            <geom class="H-link"/>
+                                            <body name="link9" pos="-0.0678 0 0" euler="0 0 0">
+                                                <joint class="joint_defaults" name="joint9" axis="0 1 0"/>
+                                                <geom class="Mesh-V-link"/> 
+                                                <geom name="c-link9" class="C-frame"/>
+                                                <geom class="V-link"/>
+                                                <body name="link10" pos="-0.0678 0 0" euler="0 0 0">
+                                                    <joint class="joint_defaults" name="joint10" axis="0 0 1"/>
+                                                    <geom class="Mesh-H-link"/> 
+                                                    <geom name="c-link10" class="C-frame"/>
+                                                    <geom class="H-link"/>
+                                                    <body name="link11" pos="-0.0678 0 0" euler="0 0 0">
+                                                        <joint class="joint_defaults" name="joint11" axis="0 1 0"/>
+                                                        <geom class="Mesh-V-link"/> 
+                                                        <geom name="c-link11" class="C-frame"/>
+                                                        <geom class="V-link"/>
+                                                        <body name="link12" pos="-0.0678 0 0" euler="0 0 0">
+                                                            <joint class="joint_defaults" name="joint12" axis="0 0 1"/>
+                                                            <geom class="Mesh-H-link"/> 
+                                                            <geom name="c-link12" class="C-frame"/>
+                                                            <geom class="H-link"/>
+                                                            <body name="link13" pos="-0.0678 0 0" euler="0 0 0">
+                                                                <joint class="joint_defaults" name="joint13" axis="0 1 0"/>
+                                                                <geom class="Mesh-V-link"/> 
+                                                                <geom name="c-link13" class="C-frame"/>
+                                                                <geom class="V-link"/>
+                                                                <body name="tail" pos="-0.0678 0 0" euler="0 0 0">
+                                                                    <joint class="joint_defaults" name="joint14" axis="0 0 1"/>
+                                                                    <geom class="Mesh-tail"/> 
+                                                                    <geom name="c-tail" class="C-frame"/>
+                                                                </body>
+                                                            </body>
+                                                        </body>
+                                                    </body>
+                                                </body>
+                                            </body>
+                                        </body>
+                                    </body>
+                                </body>
+                            </body>
+                        </body>
+                    </body>
+                </body>
+            </body>
+            <body>
+                <camera name="com" mode="trackcom" fovy="45" pos="-1.8 0 1.8" euler="0 -45 -90"/>
+            </body>
+        </body>
+    </worldbody>
+
+    <!-- Motor -->
+    <actuator>
+        <motor name="servo_1"  ctrllimited="true" ctrlrange="-3.5 3.5" gear="1" joint="joint1"/>
+        <motor name="servo_2"  ctrllimited="true" ctrlrange="-3.5 3.5" gear="1" joint="joint2"/>
+        <motor name="servo_3"  ctrllimited="true" ctrlrange="-3.5 3.5" gear="1" joint="joint3"/>
+        <motor name="servo_4"  ctrllimited="true" ctrlrange="-3.5 3.5" gear="1" joint="joint4"/>
+        <motor name="servo_5"  ctrllimited="true" ctrlrange="-3.5 3.5" gear="1" joint="joint5"/>
+        <motor name="servo_6"  ctrllimited="true" ctrlrange="-3.5 3.5" gear="1" joint="joint6"/>
+        <motor name="servo_7"  ctrllimited="true" ctrlrange="-3.5 3.5" gear="1" joint="joint7"/>
+        <motor name="servo_8"  ctrllimited="true" ctrlrange="-3.5 3.5" gear="1" joint="joint8"/>
+        <motor name="servo_9"  ctrllimited="true" ctrlrange="-3.5 3.5" gear="1" joint="joint9"/>
+        <motor name="servo_10" ctrllimited="true" ctrlrange="-3.5 3.5" gear="1" joint="joint10"/>
+        <motor name="servo_11" ctrllimited="true" ctrlrange="-3.5 3.5" gear="1" joint="joint11"/>
+        <motor name="servo_12" ctrllimited="true" ctrlrange="-3.5 3.5" gear="1" joint="joint12"/>
+        <motor name="servo_13" ctrllimited="true" ctrlrange="-3.5 3.5" gear="1" joint="joint13"/>
+        <motor name="servo_14" ctrllimited="true" ctrlrange="-3.5 3.5" gear="1" joint="joint14"/>
+    </actuator>
+
+    <!-- Servo -->
+    <!-- <actuator>
+        <position name="servo_1"  ctrllimited="true" ctrlrange="-1.4 1.4" forcelimited="true" forcerange="-3.5 3.5" joint="joint1"  kp="1.9"/>
+        <position name="servo_2"  ctrllimited="true" ctrlrange="-1.4 1.4" forcelimited="true" forcerange="-3.5 3.5" joint="joint2"  kp="1.9"/>
+        <position name="servo_3"  ctrllimited="true" ctrlrange="-1.4 1.4" forcelimited="true" forcerange="-3.5 3.5" joint="joint3"  kp="1.9"/>
+        <position name="servo_4"  ctrllimited="true" ctrlrange="-1.4 1.4" forcelimited="true" forcerange="-3.5 3.5" joint="joint4"  kp="1.9"/>
+        <position name="servo_5"  ctrllimited="true" ctrlrange="-1.4 1.4" forcelimited="true" forcerange="-3.5 3.5" joint="joint5"  kp="1.9"/>
+        <position name="servo_6"  ctrllimited="true" ctrlrange="-1.4 1.4" forcelimited="true" forcerange="-3.5 3.5" joint="joint6"  kp="1.9"/>
+        <position name="servo_7"  ctrllimited="true" ctrlrange="-1.4 1.4" forcelimited="true" forcerange="-3.5 3.5" joint="joint7"  kp="1.9"/>
+        <position name="servo_8"  ctrllimited="true" ctrlrange="-1.4 1.4" forcelimited="true" forcerange="-3.5 3.5" joint="joint8"  kp="1.9"/>
+        <position name="servo_9"  ctrllimited="true" ctrlrange="-1.4 1.4" forcelimited="true" forcerange="-3.5 3.5" joint="joint9"  kp="1.9"/>
+        <position name="servo_10" ctrllimited="true" ctrlrange="-1.4 1.4" forcelimited="true" forcerange="-3.5 3.5" joint="joint10" kp="1.9"/>
+        <position name="servo_11" ctrllimited="true" ctrlrange="-1.4 1.4" forcelimited="true" forcerange="-3.5 3.5" joint="joint11" kp="1.9"/>
+        <position name="servo_12" ctrllimited="true" ctrlrange="-1.4 1.4" forcelimited="true" forcerange="-3.5 3.5" joint="joint12" kp="1.9"/>
+        <position name="servo_13" ctrllimited="true" ctrlrange="-1.4 1.4" forcelimited="true" forcerange="-3.5 3.5" joint="joint13" kp="1.9"/>
+        <position name="servo_14" ctrllimited="true" ctrlrange="-1.4 1.4" forcelimited="true" forcerange="-3.5 3.5" joint="joint14" kp="1.9"/>
+    </actuator> -->
+    <sensor>
+        <jointpos name="pos_joint1"  joint="joint1" />
+        <jointpos name="pos_joint2"  joint="joint2" />
+        <jointpos name="pos_joint3"  joint="joint3" />
+        <jointpos name="pos_joint4"  joint="joint4" />
+        <jointpos name="pos_joint5"  joint="joint5" />
+        <jointpos name="pos_joint6"  joint="joint6" />
+        <jointpos name="pos_joint7"  joint="joint7" />
+        <jointpos name="pos_joint8"  joint="joint8" />
+        <jointpos name="pos_joint9"  joint="joint9" />
+        <jointpos name="pos_joint10" joint="joint10"/>
+        <jointpos name="pos_joint11" joint="joint11"/>
+        <jointpos name="pos_joint12" joint="joint12"/>
+        <jointpos name="pos_joint13" joint="joint13"/>
+        <jointpos name="pos_joint14" joint="joint14"/>
+
+        <jointvel name="vel_joint1"  joint="joint1" />
+        <jointvel name="vel_joint2"  joint="joint2" />
+        <jointvel name="vel_joint3"  joint="joint3" />
+        <jointvel name="vel_joint4"  joint="joint4" />
+        <jointvel name="vel_joint5"  joint="joint5" />
+        <jointvel name="vel_joint6"  joint="joint6" />
+        <jointvel name="vel_joint7"  joint="joint7" />
+        <jointvel name="vel_joint8"  joint="joint8" />
+        <jointvel name="vel_joint9"  joint="joint9" />
+        <jointvel name="vel_joint10" joint="joint10"/>
+        <jointvel name="vel_joint11" joint="joint11"/>
+        <jointvel name="vel_joint12" joint="joint12"/>
+        <jointvel name="vel_joint13" joint="joint13"/>
+        <jointvel name="vel_joint14" joint="joint14"/>
+
+        <framequat name="head_quat" objtype="site" objname="s_head"/>
+        <gyro name="head_angvel" site="s_head"/>
+        <accelerometer name="head_linacc" site="s_head"/>
+
+    </sensor>
+
+</mujoco>

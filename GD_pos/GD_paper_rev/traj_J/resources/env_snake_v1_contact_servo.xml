@@ -1,0 +1,67 @@
+<mujoco model="snake_scene_v1">
+    <option timestep="0.005" integrator="implicitfast"/>
+    
+    <visual>
+      <global offwidth="1920"  offheight="1080" />
+    </visual>
+
+    <size memory="100M"/>
+
+    <include file="remjcf_snake_circle_alligned_servo.xml"/>
+
+    <asset>
+        <texture type="skybox" builtin="gradient" rgb1=".3 .5 .7" rgb2="0 0 0" width="512" height="512"/>
+        <texture name="body" type="cube" builtin="flat" mark="cross" width="128" height="128"
+                 rgb1="0.8 0.6 0.4" rgb2="0.8 0.6 0.4" markrgb="1 1 1" random="0.01"/>
+        <material name="body" texture="body" texuniform="true" rgba="0.8 0.6 .4 1"/>
+        <texture name="grid" type="2d" builtin="checker" width="512" height="512" rgb1=".1 .2 .3" rgb2=".2 .3 .4"/>
+        <material name="grid" texture="grid" texrepeat="1 1" texuniform="true" reflectance=".2"/>
+        <texture type="2d" name="groundplane" builtin="checker" mark="edge" rgb1="0.2 0.3 0.4" rgb2="0.1 0.2 0.3" markrgb="0.8 0.8 0.8" width="300" height="300"/>
+        <texture name="texplane" type="2d" builtin="checker" rgb1=".8 .8 .8" rgb2=".1 0.15 0.2" width="512" height="512" mark="cross" markrgb=".8 .8 .8"/>  
+        <texture name="texgeom" type="cube" builtin="flat" mark="cross" width="127" height="1278" rgb1="0.8 0.6 0.4" rgb2="0.8 0.6 0.4" markrgb="1 1 1" random="0.01"/>  
+        <material name="matplane" reflectance="0.3" texture="texplane" texrepeat="2 2" texuniform="true"/>
+        <material name="matgeom" texture="texgeom" texuniform="true" rgba="0.8 0.6 .4 1"/>
+        <hfield name="terrain" ncol="201" nrow="201" size="30 30 5 .1"/>
+    </asset>
+
+      <worldbody>
+        <!-- Flat plane -->
+        <geom name="floor" pos="0 0 0" size="0 0 .25" type="plane" material="matplane" condim="6" friction="0.5 0.1 0.01"/> 
+      </worldbody>
+
+    <contact>
+        <!-- friction="normal tangential" -->
+        <pair name="con_head" geom1="floor"   geom2="c-head" condim="3"   friction="0.55 0.55"/>
+        <pair name="con_link1" geom1="floor"  geom2="c-link1" condim="3"  friction="0.55 0.55"/>
+        <pair name="con_link2" geom1="floor"  geom2="c-link2" condim="3"  friction="0.55 0.55"/>
+        <pair name="con_link3" geom1="floor"  geom2="c-link3" condim="3"  friction="0.55 0.55"/>
+        <pair name="con_link4" geom1="floor"  geom2="c-link4" condim="3"  friction="0.55 0.55"/>
+        <pair name="con_link5" geom1="floor"  geom2="c-link5" condim="3"  friction="0.55 0.55"/>
+        <pair name="con_link6" geom1="floor"  geom2="c-link6" condim="3"  friction="0.55 0.55"/>
+        <pair name="con_link7" geom1="floor"  geom2="c-link7" condim="3"  friction="0.55 0.55"/>
+        <pair name="con_link8" geom1="floor"  geom2="c-link8" condim="3"  friction="0.55 0.55"/>
+        <pair name="con_link9" geom1="floor"  geom2="c-link9" condim="3"  friction="0.55 0.55"/>
+        <pair name="con_link10" geom1="floor" geom2="c-link10" condim="3" friction="0.55 0.55"/>
+        <pair name="con_link11" geom1="floor" geom2="c-link11" condim="3" friction="0.55 0.55"/>
+        <pair name="con_link12" geom1="floor" geom2="c-link12" condim="3" friction="0.55 0.55"/>
+        <pair name="con_link13" geom1="floor" geom2="c-link13" condim="3" friction="0.55 0.55"/>
+        <pair name="con_tail" geom1="floor"   geom2="c-tail" condim="3"   friction="0.55 0.55"/>
+
+        <!-- 기본 -->
+        <!-- <pair name="con_head" geom1="floor"   geom2="c-head" condim="3"   friction="1.5 1.3"/>
+        <pair name="con_link1" geom1="floor"  geom2="c-link1" condim="3"  friction="1.5 1.3"/>
+        <pair name="con_link2" geom1="floor"  geom2="c-link2" condim="3"  friction="1.5 1.3"/>
+        <pair name="con_link3" geom1="floor"  geom2="c-link3" condim="3"  friction="1.5 1.3"/>
+        <pair name="con_link4" geom1="floor"  geom2="c-link4" condim="3"  friction="1.5 1.3"/>
+        <pair name="con_link5" geom1="floor"  geom2="c-link5" condim="3"  friction="1.5 1.3"/>
+        <pair name="con_link6" geom1="floor"  geom2="c-link6" condim="3"  friction="1.5 1.3"/>
+        <pair name="con_link7" geom1="floor"  geom2="c-link7" condim="3"  friction="1.5 1.3"/>
+        <pair name="con_link8" geom1="floor"  geom2="c-link8" condim="3"  friction="1.5 1.3"/>
+        <pair name="con_link9" geom1="floor"  geom2="c-link9" condim="3"  friction="1.5 1.3"/>
+        <pair name="con_link10" geom1="floor" geom2="c-link10" condim="3" friction="1.5 1.3"/>
+        <pair name="con_link11" geom1="floor" geom2="c-link11" condim="3" friction="1.5 1.3"/>
+        <pair name="con_link12" geom1="floor" geom2="c-link12" condim="3" friction="1.5 1.3"/>
+        <pair name="con_link13" geom1="floor" geom2="c-link13" condim="3" friction="1.5 1.3"/>
+        <pair name="con_tail" geom1="floor"   geom2="c-tail" condim="3"   friction="1.5 1.3"/> -->
+    </contact>  
+</mujoco>

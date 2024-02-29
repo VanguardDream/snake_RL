@@ -2,16 +2,14 @@ clc; clear;
 
 %% load
 
-% load U_map_gamma_chgd_True_45x45x19x19x59x59x0x0_05_21720_.mat
-% load U_map_gamma_chgd_True_45x45x15x15x56_5x28_25x0x0_05_21720_.mat
-load U_map_gamma_chgd_True_45x45x27x27x53x53x45x0_05_21720_.mat
+load U_traj_linear_True_45x45x19x19x59x59x0x0_05_21720_.mat
 U_map_curve = U_map;
 
 clear max min Motion_lambda param_coefficient U_map;
 
-% load U_map_gamma_chgd_False_45x45x15x15x56_5x28_25x0x0_05_21720_.mat
-load U_map_gamma_chgd_False_45x45x27x27x53x53x45x0_05_21720_.mat
-U_map_mat = U_map;
+% load U_traj_linear_True_45x45x19x19x59x59x0x0_05_21720_.mat
+% U_map_mat = U_map;
+U_map_mat = (Rot_vec(:,:,3));
 
 clear max min Motion_lambda param_coefficient U_map;
 

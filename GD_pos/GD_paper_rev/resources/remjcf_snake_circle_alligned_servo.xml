@@ -21,7 +21,7 @@
             <body pos="-0.678 0 0" euler="0 0 0"/>
         </default> -->
         <default class="joint_defaults">
-            <joint type="hinge" pos="0.0388 0 0" limited="true" range="-75 75" damping="0.13" stiffness="0" armature="0.01" />
+            <joint type="hinge" pos="0.0388 0 0" limited="true" range="-75 75" damping="0.6" stiffness="0" armature="0.01" />
         </default>
         <default class="C-frame">
             <geom type="cylinder" mass="0.05" condim="6" size="0.0318 0.01" rgba="0.5 0.5 0.5 0.1" priority="1" friction="0.7 0.015 0.001" pos="0 0 0" euler="0 90 0"/>
@@ -172,20 +172,20 @@
 
     <!-- Servo -->
     <actuator>
-        <position name="servo_1"  ctrllimited="true" ctrlrange="-1.4 1.4" forcelimited="true" forcerange="-3.5 3.5" joint="joint1"  kp="1.9"/>
-        <position name="servo_2"  ctrllimited="true" ctrlrange="-1.4 1.4" forcelimited="true" forcerange="-3.5 3.5" joint="joint2"  kp="1.9"/>
-        <position name="servo_3"  ctrllimited="true" ctrlrange="-1.4 1.4" forcelimited="true" forcerange="-3.5 3.5" joint="joint3"  kp="1.9"/>
-        <position name="servo_4"  ctrllimited="true" ctrlrange="-1.4 1.4" forcelimited="true" forcerange="-3.5 3.5" joint="joint4"  kp="1.9"/>
-        <position name="servo_5"  ctrllimited="true" ctrlrange="-1.4 1.4" forcelimited="true" forcerange="-3.5 3.5" joint="joint5"  kp="1.9"/>
-        <position name="servo_6"  ctrllimited="true" ctrlrange="-1.4 1.4" forcelimited="true" forcerange="-3.5 3.5" joint="joint6"  kp="1.9"/>
-        <position name="servo_7"  ctrllimited="true" ctrlrange="-1.4 1.4" forcelimited="true" forcerange="-3.5 3.5" joint="joint7"  kp="1.9"/>
-        <position name="servo_8"  ctrllimited="true" ctrlrange="-1.4 1.4" forcelimited="true" forcerange="-3.5 3.5" joint="joint8"  kp="1.9"/>
-        <position name="servo_9"  ctrllimited="true" ctrlrange="-1.4 1.4" forcelimited="true" forcerange="-3.5 3.5" joint="joint9"  kp="1.9"/>
-        <position name="servo_10" ctrllimited="true" ctrlrange="-1.4 1.4" forcelimited="true" forcerange="-3.5 3.5" joint="joint10" kp="1.9"/>
-        <position name="servo_11" ctrllimited="true" ctrlrange="-1.4 1.4" forcelimited="true" forcerange="-3.5 3.5" joint="joint11" kp="1.9"/>
-        <position name="servo_12" ctrllimited="true" ctrlrange="-1.4 1.4" forcelimited="true" forcerange="-3.5 3.5" joint="joint12" kp="1.9"/>
-        <position name="servo_13" ctrllimited="true" ctrlrange="-1.4 1.4" forcelimited="true" forcerange="-3.5 3.5" joint="joint13" kp="1.9"/>
-        <position name="servo_14" ctrllimited="true" ctrlrange="-1.4 1.4" forcelimited="true" forcerange="-3.5 3.5" joint="joint14" kp="1.9"/>
+        <position name="servo_1"  ctrllimited="true" ctrlrange="-1.4 1.4" forcelimited="true" forcerange="-3.5 3.5" joint="joint1"  kp="40"/>
+        <position name="servo_2"  ctrllimited="true" ctrlrange="-1.4 1.4" forcelimited="true" forcerange="-3.5 3.5" joint="joint2"  kp="40"/>
+        <position name="servo_3"  ctrllimited="true" ctrlrange="-1.4 1.4" forcelimited="true" forcerange="-3.5 3.5" joint="joint3"  kp="40"/>
+        <position name="servo_4"  ctrllimited="true" ctrlrange="-1.4 1.4" forcelimited="true" forcerange="-3.5 3.5" joint="joint4"  kp="40"/>
+        <position name="servo_5"  ctrllimited="true" ctrlrange="-1.4 1.4" forcelimited="true" forcerange="-3.5 3.5" joint="joint5"  kp="40"/>
+        <position name="servo_6"  ctrllimited="true" ctrlrange="-1.4 1.4" forcelimited="true" forcerange="-3.5 3.5" joint="joint6"  kp="40"/>
+        <position name="servo_7"  ctrllimited="true" ctrlrange="-1.4 1.4" forcelimited="true" forcerange="-3.5 3.5" joint="joint7"  kp="40"/>
+        <position name="servo_8"  ctrllimited="true" ctrlrange="-1.4 1.4" forcelimited="true" forcerange="-3.5 3.5" joint="joint8"  kp="40"/>
+        <position name="servo_9"  ctrllimited="true" ctrlrange="-1.4 1.4" forcelimited="true" forcerange="-3.5 3.5" joint="joint9"  kp="40"/>
+        <position name="servo_10" ctrllimited="true" ctrlrange="-1.4 1.4" forcelimited="true" forcerange="-3.5 3.5" joint="joint10" kp="40"/>
+        <position name="servo_11" ctrllimited="true" ctrlrange="-1.4 1.4" forcelimited="true" forcerange="-3.5 3.5" joint="joint11" kp="40"/>
+        <position name="servo_12" ctrllimited="true" ctrlrange="-1.4 1.4" forcelimited="true" forcerange="-3.5 3.5" joint="joint12" kp="40"/>
+        <position name="servo_13" ctrllimited="true" ctrlrange="-1.4 1.4" forcelimited="true" forcerange="-3.5 3.5" joint="joint13" kp="40"/>
+        <position name="servo_14" ctrllimited="true" ctrlrange="-1.4 1.4" forcelimited="true" forcerange="-3.5 3.5" joint="joint14" kp="40"/>
     </actuator>
 
     <sensor>

@@ -1,7 +1,7 @@
 import numpy as np
 
 class Gait():
-    def __init__(self, param:tuple[float, float, float, float, float, float, float, float], param_bar:tuple[float, float, float, float, float, float, float, float]) -> None:
+    def __init__(self, param:tuple[float, float, float, float, float, float, float, float], param_bar:tuple[float, float, float, float, float, float, float, float], gamma:float = 0.7071) -> None:
         self.gait_sampling_interval = 0.1
 
         # For motion matrix
@@ -30,6 +30,8 @@ class Gait():
 
         self._time_step_bar = param_bar[7]
 
+        self._gamma = gamma
+
         self._t = np.arange(0, 10, self._time_step).transpose()
 
         self.MotionMatrix = self.getMotionMat()
@@ -50,7 +52,7 @@ class Gait():
     def getMotionMat(self)->np.ndarray:
         raw_serp = self.serpenoid_dot(self._t, self._ed1, self._el1, self._ed2 / 10, self._el2 / 10, self._delta)
         max = np.max(raw_serp, axis=1)
-        gamma = 0.7071
+        gamma = self._gamma
         # gamma = 0.38
 
         M_mat = np.where(np.abs(raw_serp.transpose()) > max * gamma, 1, 0)

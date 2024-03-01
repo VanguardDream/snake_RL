@@ -2,16 +2,27 @@ clc; clear;
 
 %% load
 
-load U_traj_linear_True_45x45x19x19x59x59x0x0_05_21720_.mat
+% load U_traj_linear_True_45x45x19x19x59x59x0x0_05_21720_.mat %Serp
+% load U_traj_linear_True_45x45x15x15x56_5x28_25x0x0_05_21720_.mat %Slit
+% load U_traj_linear_True_45x45x27x27x53x53x45x0_05_21720_.mat %Side
+load U_traj_linear_True_15x15x0x0x30x30x90x0_05_21720_.mat %Roll
+
 U_map_curve = U_map;
+Rot_vec_curve = Rot_vec;
+% Tf_orientation_curve = Tf_orientation;
 
-clear max min Motion_lambda param_coefficient U_map;
+clear max min Motion_lambda param_coefficient U_map Rot_vec Tf_orientation;
 
-% load U_traj_linear_True_45x45x19x19x59x59x0x0_05_21720_.mat
-% U_map_mat = U_map;
-U_map_mat = (Rot_vec(:,:,3));
+% load U_traj_linear_False_45x45x19x19x59x59x0x0_05_21720_.mat  %Serp
+% load U_traj_linear_False_45x45x15x15x56_5x28_25x0x0_05_21720_.mat %Slit
+% load U_traj_linear_False_45x45x27x27x53x53x45x0_05_21720_.mat %Side
+load U_traj_linear_False_15x15x0x0x30x30x90x0_05_21720_.mat %Roll
 
-clear max min Motion_lambda param_coefficient U_map;
+U_map_mat = U_map;
+Rot_vec_mat = Rot_vec;
+Tf_orientation_mat = Tf_orientation;
+
+clear max min Motion_lambda param_coefficient U_map Rot_vec Tf_orientation;
 
 U_map_curve = transpose(U_map_curve);
 U_map_mat = transpose(U_map_mat);
@@ -58,7 +69,6 @@ xlabel("Spatial parameter (degree)","FontSize",13,"FontName","arial","FontWeight
 ylabel("Temporal parameter (rad)","FontSize",13,"FontName","arial","FontWeight","bold");
 
 %%
-%%
 figure; hAxes = gca;
 contourf(U_map_mat);
 
@@ -89,6 +99,14 @@ yline(91,LineWidth=1,LineStyle="--",Color=[0.8 0.8 0.8]);
 
 xlabel("Spatial parameter (degree)","FontSize",13,"FontName","arial","FontWeight","bold");
 ylabel("Temporal parameter (rad)","FontSize",13,"FontName","arial","FontWeight","bold");
+
+%%
+figure;
+contourf(rad2deg(Rot_vec_curve(:,:,3)))
+
+%%
+figure
+contourf(rad2deg(Rot_vec_mat(:,:,3)))
 
 %% 상관계수 비교
 

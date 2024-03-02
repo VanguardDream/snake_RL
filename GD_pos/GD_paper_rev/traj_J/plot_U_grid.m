@@ -1,22 +1,28 @@
 clc; clear;
 
 %% load
-
-% load U_traj_linear_True_45x45x19x19x59x59x0x0_05_21720_.mat %Serp
-% load U_traj_linear_True_45x45x15x15x56_5x28_25x0x0_05_21720_.mat %Slit
-% load U_traj_linear_True_45x45x27x27x53x53x45x0_05_21720_.mat %Side
-load U_traj_linear_True_15x15x0x0x30x30x90x0_05_21720_.mat %Roll
+% load U_traj_linear_curve_roll.mat
+% load U_traj_linear_curve_serp.mat
+% load U_traj_linear_curve_slit.mat
+load U_traj_linear_curve_side.mat
 
 U_map_curve = U_map;
 Rot_vec_curve = Rot_vec;
-% Tf_orientation_curve = Tf_orientation;
+Tf_orientation_curve = Tf_orientation;
 
 clear max min Motion_lambda param_coefficient U_map Rot_vec Tf_orientation;
 
-% load U_traj_linear_False_45x45x19x19x59x59x0x0_05_21720_.mat  %Serp
-% load U_traj_linear_False_45x45x15x15x56_5x28_25x0x0_05_21720_.mat %Slit
-% load U_traj_linear_False_45x45x27x27x53x53x45x0_05_21720_.mat %Side
-load U_traj_linear_False_15x15x0x0x30x30x90x0_05_21720_.mat %Roll
+% load U_traj_linear_mat_0.3_roll.mat
+% load U_traj_linear_mat_0.5_roll.mat
+% 
+% load U_traj_linear_mat_0.3_serp.mat
+% load U_traj_linear_mat_0.5_serp.mat
+% 
+% load U_traj_linear_mat_0.3_slit.mat
+% load U_traj_linear_mat_0.5_slit.mat
+
+% load U_traj_linear_mat_0.3_side.mat
+load U_traj_linear_mat_0.5_side.mat
 
 U_map_mat = U_map;
 Rot_vec_mat = Rot_vec;
@@ -33,8 +39,8 @@ U_map_curve = squeeze(U_map_curve);
 U_map_mat = max(U_map_mat, -1000);
 U_map_curve = max(U_map_curve, -1000);
 % 
-% U_map_mat = min(U_map_mat, 1000);
-% U_map_curve = min(U_map_curve, 1000);
+% U_map_mat = min(U_map_mat, 700);
+% U_map_curve = min(U_map_curve, 700);
 
 %%
 figure; hAxes = gca;

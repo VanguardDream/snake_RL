@@ -320,44 +320,48 @@ if __name__ == "__main__":
     data = mujoco.MjData(snake)
 
     serpentine = (45, 45, 30, 30, 30, 30, 0, 0.05)
-    serpentine_op = (45, 45, 19, 19, 59, 59, 0, 0.05)
+    serpentine_op = (45, 45, 158, 158, 115, 115, 0, 0.05)
     slithering = (45, 45, 30, 30, 60, 30, 0, 0.05)
-    slithering_op = (45, 45, 15, 15, 56.5, 28.25, 0, 0.05)
+    slithering_op = (45, 45, 32, 32, 116, 58, 0, 0.05)
     sidewinding = (45, 45, 30, 30, 30, 30, 45, 0.05)
-    sidewinding_op = (45, 45, 27, 27, 53, 53, 45, 0.05)
+    sidewinding_op = (45, 45, 159, 159, 85, 85, 45, 0.05)
     rolling = (15, 15, 0, 0, 30, 30, 90, 0.05)
+    rolling_op = (15, 15, 169, 169, 119, 119, 90, 0.05)
 
-    # print(J_view(serpentine_op,slithering, True, 0.7071)[0])
+    # print(J_view(serpentine_op,serpentine_op, True, 0.7071)[0])
+    # print(J_view(serpentine_op,slithering_op, True, 0.7071)[0])
+    # print(J_view(serpentine_op,sidewinding_op, True, 0.7071)[0])
+    # print(J_view(serpentine_op,rolling_op, True, 0.7071)[0])
     # exit()
 
     #### Linear Searching...
     start_iter = time.time()
     # Curves
-    iterator_linear(serpentine_op, True, 0.7071)
-    iterator_linear(slithering_op, True, 0.7071)
-    iterator_linear(sidewinding_op,True, 0.7071)
-    iterator_linear(rolling,       True, 0.7071)
+    # iterator_linear(serpentine_op, True, 0.7071)
+    # iterator_linear(slithering_op, True, 0.7071)
+    # iterator_linear(sidewinding_op,True, 0.7071)
+    # iterator_linear(rolling,       True, 0.7071)
 
     # Mats
     iterator_linear(serpentine_op, False, 0.3)
     iterator_linear(slithering_op, False, 0.3)
     iterator_linear(sidewinding_op,False, 0.3)
-    iterator_linear(rolling,       False, 0.3)
+    iterator_linear(rolling_op,       False, 0.3)
 
     iterator_linear(serpentine_op, False, 0.5)
     iterator_linear(slithering_op, False, 0.5)
     iterator_linear(sidewinding_op,False, 0.5)
-    iterator_linear(rolling,       False, 0.5)
+    iterator_linear(rolling_op,       False, 0.5)
 
     iterator_linear(serpentine_op, False, 0.7071)
     iterator_linear(slithering_op, False, 0.7071)
     iterator_linear(sidewinding_op,False, 0.7071)
-    iterator_linear(rolling,       False, 0.7071)
+    iterator_linear(rolling_op,       False, 0.7071)
 
     iterator_linear(serpentine_op, False, 0.9)
     iterator_linear(slithering_op, False, 0.9)
     iterator_linear(sidewinding_op,False, 0.9)
-    iterator_linear(rolling,       False, 0.9)
+    iterator_linear(rolling_op,       False, 0.9)
 
     end_iter = time.time()
     print(f"Iterating dond... {end_iter-start_iter} seconds elapsed")

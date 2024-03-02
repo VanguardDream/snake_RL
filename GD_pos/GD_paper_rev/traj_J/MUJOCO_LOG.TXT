@@ -7,3 +7,51 @@ WARNING: Nan, Inf or huge value in QACC at DOF 0. The simulation is unstable. Ti
 Fri Mar  1 11:35:34 2024
 ERROR: mjv_updateSceneState: m->nu changed
 
+Fri Mar  1 11:42:49 2024
+WARNING: Nan, Inf or huge value in QACC at DOF 4. The simulation is unstable. Time = 6.2700.
+
+Fri Mar  1 11:42:49 2024
+WARNING: Nan, Inf or huge value in QACC at DOF 0. The simulation is unstable. Time = 7.9000.
+
+Fri Mar  1 11:44:12 2024
+WARNING: Nan, Inf or huge value in QACC at DOF 1. The simulation is unstable. Time = 6.9250.
+
+Fri Mar  1 11:44:16 2024
+WARNING: Nan, Inf or huge value in QACC at DOF 0. The simulation is unstable. Time = 5.1950.
+
+Fri Mar  1 11:45:43 2024
+WARNING: Nan, Inf or huge value in QACC at DOF 0. The simulation is unstable. Time = 7.7600.
+
+Fri Mar  1 11:47:19 2024
+WARNING: Nan, Inf or huge value in QACC at DOF 0. The simulation is unstable. Time = 8.8800.
+
+Fri Mar  1 11:57:15 2024
+WARNING: Nan, Inf or huge value in QACC at DOF 0. The simulation is unstable. Time = 6.8250.
+
+Fri Mar  1 12:03:03 2024
+WARNING: Nan, Inf or huge value in QACC at DOF 0. The simulation is unstable. Time = 5.8500.
+
+Fri Mar  1 12:04:23 2024
+WARNING: Nan, Inf or huge value in QACC at DOF 2. The simulation is unstable. Time = 3.0400.
+
+Fri Mar  1 12:04:35 2024
+WARNING: Nan, Inf or huge value in QACC at DOF 0. The simulation is unstable. Time = 8.9900.
+
+Fri Mar  1 12:05:53 2024
+WARNING: Nan, Inf or huge value in QACC at DOF 3. The simulation is unstable. Time = 7.9050.
+
+Fri Mar  1 12:06:28 2024
+WARNING: Nan, Inf or huge value in QACC at DOF 0. The simulation is unstable. Time = 9.5900.
+
+Fri Mar  1 12:18:40 2024
+WARNING: Nan, Inf or huge value in QACC at DOF 0. The simulation is unstable. Time = 4.7450.
+
+Fri Mar  1 12:18:41 2024
+WARNING: Nan, Inf or huge value in QACC at DOF 3. The simulation is unstable. Time = 6.2650.
+
+Fri Mar  1 13:27:22 2024
+WARNING: Nan, Inf or huge value in QACC at DOF 0. The simulation is unstable. Time = 8.9000.
+
+Fri Mar  1 13:28:55 2024
+WARNING: Nan, Inf or huge value in QACC at DOF 0. The simulation is unstable. Time = 4.9150.
+

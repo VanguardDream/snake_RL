@@ -315,6 +315,122 @@ def iterator_linear(motion:np.ndarray, curve:bool, gamma:float) -> None:
 
     print('done')
 
+def iterator_fine(motion:np.ndarray, curve:bool, gamma:float) -> None:
+    motion_param = motion
+
+    amp_d = np.array([motion_param[0]])
+    amp_l = np.array([motion_param[1]])
+
+    psi = np.arange(-90,91)
+
+    nu = np.arange(-60,61)
+
+    delta = np.array([motion_param[-2]])
+
+    isSlit = False
+    if motion_param[-3] == motion_param[-4]:
+        isSlit = False
+        print('Serp, Side or Roll gait...')
+    else:
+        isSlit = True
+        print('Slithering gait...')
+
+    n1 = len(psi)
+    n2 = len(nu)
+
+    U_map = np.empty((n1,n2,5), dtype=np.float64)
+    shm = shared_memory.SharedMemory(name="shared_U_map", create=True, size=U_map.nbytes)
+    data = np.ndarray(U_map.shape, dtype=U_map.dtype, buffer=shm.buf)
+
+    combinations = list(itertools.product(amp_d, amp_l, psi, nu, delta))
+    print(f'Number of Combinations : {len(combinations)}')
+
+    ea = len(combinations) // 16
+    start_idx = [0, 1 * ea, 2 * ea, 3 * ea, 4 * ea, 5 * ea, 6 * ea, 7 * ea, 8 * ea , 9 * ea, 10 * ea, 11 * ea, 12 * ea, 13 * ea, 14 * ea, 15 * ea] 
+
+    print(f'For 16 processes start indices : {start_idx}')
+
+    pc1 = Process(target= orderize_fine, args=(np.array(motion_param), curve, isSlit, gamma, list(combinations[start_idx[0]:start_idx[1]]),   shm.name, U_map.shape))
+    pc2 = Process(target= orderize_fine, args=(np.array(motion_param), curve, isSlit, gamma, list(combinations[start_idx[1]:start_idx[2]]),   shm.name, U_map.shape))
+    pc3 = Process(target= orderize_fine, args=(np.array(motion_param), curve, isSlit, gamma, list(combinations[start_idx[2]:start_idx[3]]),   shm.name, U_map.shape))
+    pc4 = Process(target= orderize_fine, args=(np.array(motion_param), curve, isSlit, gamma, list(combinations[start_idx[3]:start_idx[4]]),   shm.name, U_map.shape))
+    pc5 = Process(target= orderize_fine, args=(np.array(motion_param), curve, isSlit, gamma, list(combinations[start_idx[4]:start_idx[5]]),   shm.name, U_map.shape))
+    pc6 = Process(target= orderize_fine, args=(np.array(motion_param), curve, isSlit, gamma, list(combinations[start_idx[5]:start_idx[6]]),   shm.name, U_map.shape))
+    pc7 = Process(target= orderize_fine, args=(np.array(motion_param), curve, isSlit, gamma, list(combinations[start_idx[6]:start_idx[7]]),   shm.name, U_map.shape))
+    pc8 = Process(target= orderize_fine, args=(np.array(motion_param), curve, isSlit, gamma, list(combinations[start_idx[7]:start_idx[8]]),   shm.name, U_map.shape))
+    pc9 = Process(target= orderize_fine, args=(np.array(motion_param), curve, isSlit, gamma, list(combinations[start_idx[8]:start_idx[9]]),   shm.name, U_map.shape))
+    pc10 = Process(target=orderize_fine, args=(np.array(motion_param), curve, isSlit, gamma, list(combinations[start_idx[9]:start_idx[10]]),  shm.name, U_map.shape))
+    pc11 = Process(target=orderize_fine, args=(np.array(motion_param), curve, isSlit, gamma, list(combinations[start_idx[10]:start_idx[11]]), shm.name, U_map.shape))
+    pc12 = Process(target=orderize_fine, args=(np.array(motion_param), curve, isSlit, gamma, list(combinations[start_idx[11]:start_idx[12]]), shm.name, U_map.shape))
+    pc13 = Process(target=orderize_fine, args=(np.array(motion_param), curve, isSlit, gamma, list(combinations[start_idx[12]:start_idx[13]]), shm.name, U_map.shape))
+    pc14 = Process(target=orderize_fine, args=(np.array(motion_param), curve, isSlit, gamma, list(combinations[start_idx[13]:start_idx[14]]), shm.name, U_map.shape))
+    pc15 = Process(target=orderize_fine, args=(np.array(motion_param), curve, isSlit, gamma, list(combinations[start_idx[14]:start_idx[15]]), shm.name, U_map.shape))
+    pc16 = Process(target=orderize_fine, args=(np.array(motion_param), curve, isSlit, gamma, list(combinations[start_idx[15]::]),             shm.name, U_map.shape))
+
+    pc1.start()
+    pc2.start()
+    pc3.start()
+    pc4.start()
+    pc5.start()
+    pc6.start()
+    pc7.start()
+    pc8.start()
+    pc9.start()
+    pc10.start()
+    pc11.start()
+    pc12.start()
+    pc13.start()
+    pc14.start()
+    pc15.start()
+    pc16.start()
+
+    pc1.join()
+    pc2.join()
+    pc3.join()
+    pc4.join()
+    pc5.join()
+    pc6.join()
+    pc7.join()
+    pc8.join()
+    pc9.join()
+    pc10.join()
+    pc11.join()
+    pc12.join()
+    pc13.join()
+    pc14.join()
+    pc15.join()
+    pc16.join()
+
+    data_dict = {'U_map': data[:,:,0], 'Rot_vec':data[:,:,1:4], 'Tf_orientation':data[:,:,4], 'Motion_lambda': motion_param, 'Curve':curve, 'Gamma':gamma}
+    savemat("./U_traj_fine_"+str(curve)+"_"+str(gamma)+"_"+param2filename(motion_param)+f"_{len(combinations)}"+"_.mat", data_dict)
+    
+    shm.close()
+    shm.unlink()
+
+    print('done')
+
+def orderize_fine(param_motion:np.ndarray, curve:bool, isSlit:bool, gamma:float, param_bar_iter:np.ndarray, shd_name:str, shd_shape) -> None:
+
+    for i in param_bar_iter:
+        exist_shm = shared_memory.SharedMemory(name=shd_name)
+        U_map = np.ndarray(shd_shape, dtype=np.float64, buffer=exist_shm.buf)
+
+        idx1 = i[2] + 90# psi start 0
+        idx2 = i[3] + 60 # nu start 1
+
+        amp_d, amp_l, psi, nu, delta = i
+
+        psi = param_motion[2] + psi * (1/30)
+        nu = param_motion[4] + nu * (1/6)
+
+        if isSlit:
+            lambda_bar = (amp_d, amp_l, psi, psi, (nu), (nu) * (1/2), delta, param_motion[-1])
+        else:
+            lambda_bar = (amp_d, amp_l, psi, psi, (nu), (nu), delta, param_motion[-1])
+
+
+        U_map[idx1, idx2, :] = J_traj(param_motion, lambda_bar, curve, gamma)
+
 if __name__ == "__main__":
     snake = mujoco.MjModel.from_xml_path("./resources/env_snake_v1_contact_servo.xml")
     data = mujoco.MjData(snake)
@@ -328,10 +444,7 @@ if __name__ == "__main__":
     rolling = (15, 15, 0, 0, 30, 30, 90, 0.05)
     rolling_op = (15, 15, 169, 169, 119, 119, 90, 0.05)
 
-    # print(J_view(serpentine_op,serpentine_op, True, 0.7071)[0])
-    # print(J_view(serpentine_op,slithering_op, True, 0.7071)[0])
-    # print(J_view(serpentine_op,sidewinding_op, True, 0.7071)[0])
-    # print(J_view(serpentine_op,rolling_op, True, 0.7071)[0])
+    # print(J_view(sidewinding_op, (45, 45, 113, 113, 111, 111, 45, 0.05), False, 0.9)[0])
     # exit()
 
     #### Linear Searching...
@@ -342,26 +455,47 @@ if __name__ == "__main__":
     # iterator_linear(sidewinding_op,True, 0.7071)
     # iterator_linear(rolling,       True, 0.7071)
 
-    # Mats
-    iterator_linear(serpentine_op, False, 0.3)
-    iterator_linear(slithering_op, False, 0.3)
-    iterator_linear(sidewinding_op,False, 0.3)
-    iterator_linear(rolling_op,       False, 0.3)
+    # # Mats
+    # iterator_linear(serpentine_op, False, 0.3)
+    # iterator_linear(slithering_op, False, 0.3)
+    # iterator_linear(sidewinding_op,False, 0.3)
+    # iterator_linear(rolling_op,       False, 0.3)
 
-    iterator_linear(serpentine_op, False, 0.5)
-    iterator_linear(slithering_op, False, 0.5)
-    iterator_linear(sidewinding_op,False, 0.5)
-    iterator_linear(rolling_op,       False, 0.5)
+    # iterator_linear(serpentine_op, False, 0.5)
+    # iterator_linear(slithering_op, False, 0.5)
+    # iterator_linear(sidewinding_op,False, 0.5)
+    # iterator_linear(rolling_op,       False, 0.5)
 
-    iterator_linear(serpentine_op, False, 0.7071)
-    iterator_linear(slithering_op, False, 0.7071)
-    iterator_linear(sidewinding_op,False, 0.7071)
-    iterator_linear(rolling_op,       False, 0.7071)
+    # iterator_linear(serpentine_op, False, 0.7071)
+    # iterator_linear(slithering_op, False, 0.7071)
+    # iterator_linear(sidewinding_op,False, 0.7071)
+    # iterator_linear(rolling_op,       False, 0.7071)
 
-    iterator_linear(serpentine_op, False, 0.9)
-    iterator_linear(slithering_op, False, 0.9)
-    iterator_linear(sidewinding_op,False, 0.9)
-    iterator_linear(rolling_op,       False, 0.9)
+    # iterator_linear(serpentine_op, False, 0.9)
+    # iterator_linear(slithering_op, False, 0.9)
+    # iterator_linear(sidewinding_op,False, 0.9)
+    # iterator_linear(rolling_op,       False, 0.9)
+
+    # Fines
+    iterator_fine(serpentine_op, True, 0.3)
+    iterator_fine(slithering_op, True, 0.3)
+    iterator_fine(sidewinding_op,True, 0.3)
+    iterator_fine(rolling_op,       True, 0.3)
+
+    iterator_fine(serpentine_op, True, 0.5)
+    iterator_fine(slithering_op, True, 0.5)
+    iterator_fine(sidewinding_op,True, 0.5)
+    iterator_fine(rolling_op,       True, 0.5)
+
+    iterator_fine(serpentine_op, True, 0.7071)
+    iterator_fine(slithering_op, True, 0.7071)
+    iterator_fine(sidewinding_op,True, 0.7071)
+    iterator_fine(rolling_op,       True, 0.7071)
+
+    iterator_fine(serpentine_op, True, 0.9)
+    iterator_fine(slithering_op, True, 0.9)
+    iterator_fine(sidewinding_op,True, 0.9)
+    iterator_fine(rolling_op,       True, 0.9)
 
     end_iter = time.time()
     print(f"Iterating dond... {end_iter-start_iter} seconds elapsed")

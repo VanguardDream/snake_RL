@@ -114,7 +114,7 @@ def J_view(parameters:np.ndarray, parameters_bar:np.ndarray, curve:bool, gamma:f
     except Exception as e:
         print(e)
         t_orientation = np.nan
-    
+
     return np.hstack((i_term + j_term + l_term, mean_rot, t_orientation))
 
 def J_traj(parameters:np.ndarray, parameters_bar:np.ndarray, curve:bool, gamma:float) -> np.ndarray:
@@ -202,6 +202,88 @@ def J_traj(parameters:np.ndarray, parameters_bar:np.ndarray, curve:bool, gamma:f
     
     return np.hstack((i_term + j_term + l_term, mean_rot, t_orientation))
 
+def J_traj_each(parameters:np.ndarray, parameters_bar:np.ndarray, curve:bool, gamma:float) -> np.ndarray:
+    """
+    return : [U, avg. yaw]
+    """
+    _robot_body_names = ["head","link1","link2","link3","link4","link5","link6","link7","link8","link9","link10","link11","link12","link13","tail"]
+
+    def get_robot_rot(data)->np.ndarray:
+        com_roll = 0
+        com_pitch = 0
+        com_yaw = 0
+
+        robot_quats = np.empty((0,4))
+        for name in _robot_body_names:
+            robot_quats = np.vstack((robot_quats, data.body(name).xquat.copy()))
+
+        robot_quats = robot_quats[:, [1, 2, 3, 0]]
+        robot_rot = Rotation(robot_quats)
+
+        # com_roll, com_pitch, com_yaw = robot_rot.mean().as_rotvec(False)
+        x, y, z, w = robot_rot.mean().as_quat()
+
+        # return np.array([com_roll, com_pitch, com_yaw])
+        return np.array([w, x, y, z])
+
+    snake = mujoco.MjModel.from_xml_path("./resources/env_snake_v1_contact_servo.xml")
+    data = mujoco.MjData(snake)
+    mujoco.mj_forward(snake, data)
+
+    M_name = param2filename(parameters)
+    Bar_name = param2filename(parameters_bar)
+
+    # gait = serpenoid.Gait(tuple(parameters), tuple(parameters_bar))
+    gait = serpenoid_gamma.Gait(tuple(parameters), tuple(parameters_bar), gamma)
+
+    if curve:
+        q = gait.CurveFunction
+    else:
+        q = gait.Gk
+
+    expand_q = np.repeat(q, 10, axis=1)
+
+    p_head = np.empty((expand_q.shape[1], 21))
+
+    for i in range(expand_q.shape[1]):
+        index = np.nonzero(expand_q[:, i])
+        for idx in index:
+            data.ctrl[idx] = expand_q[idx, i]
+
+        mujoco.mj_step(snake, data)
+
+        step_data = np.hstack((data.body('head').xpos.copy(), get_robot_rot(data), data.ctrl))
+        p_head[i] = step_data
+
+    p_head_diff = np.diff(p_head[:,0:2],axis=0)
+    p_head_diff_l2_norm = np.linalg.norm(p_head_diff,2,axis=1)
+
+    l_traj = np.sum(p_head_diff_l2_norm)
+    l_dist = np.linalg.norm(p_head[-1,0:2],2)
+
+    i_term = l_dist
+    j_term = (l_traj + 1)/(l_dist + 1)
+    l_term = np.sum(np.sum(np.abs(p_head[:,7:21]),axis=1))
+
+    # Position & Orientation
+    ori_head = p_head[:,3:7]
+    quat_p_head = Rotation.from_quat(ori_head[:, [1, 2, 3, 0]].copy())
+    mean_rot = Rotation.mean(quat_p_head).as_rotvec()
+
+    # Terminal orientation
+    t_x = p_head[-1,0]
+    t_y = p_head[-1,1]
+
+    t_orientation = 0
+    try:
+        t_orientation = np.arctan2(t_y, t_x)
+    except Exception as e:
+        print(e)
+        t_orientation = np.nan
+    
+    return np.hstack((i_term, j_term, l_term, mean_rot, t_orientation))
+
+
 def orderize_linear(param_motion:np.ndarray, curve:bool, isSlit:bool, gamma:float, param_bar_iter:np.ndarray, shd_name:str, shd_shape) -> None:
 
     for i in param_bar_iter:
@@ -219,7 +301,7 @@ def orderize_linear(param_motion:np.ndarray, curve:bool, isSlit:bool, gamma:floa
             lambda_bar = (amp_d, amp_l, psi, psi, (nu), (nu), delta, param_motion[-1])
 
 
-        U_map[idx1, idx2, :] = J_traj(param_motion, lambda_bar, curve, gamma)
+        U_map[idx1, idx2, :] = J_traj_each(param_motion, lambda_bar, curve, gamma)
         
 def iterator_linear(motion:np.ndarray, curve:bool, gamma:float) -> None:
     motion_param = motion
@@ -244,7 +326,7 @@ def iterator_linear(motion:np.ndarray, curve:bool, gamma:float) -> None:
     n1 = len(psi)
     n2 = len(nu)
 
-    U_map = np.empty((n1,n2,5), dtype=np.float64)
+    U_map = np.empty((n1,n2,7), dtype=np.float64)
     shm = shared_memory.SharedMemory(name="shared_U_map", create=True, size=U_map.nbytes)
     data = np.ndarray(U_map.shape, dtype=U_map.dtype, buffer=shm.buf)
 
@@ -307,8 +389,8 @@ def iterator_linear(motion:np.ndarray, curve:bool, gamma:float) -> None:
     pc15.join()
     pc16.join()
 
-    data_dict = {'U_map': data[:,:,0], 'Rot_vec':data[:,:,1:4], 'Tf_orientation':data[:,:,4], 'Motion_lambda': motion_param, 'Curve':curve, 'Gamma':gamma}
-    savemat("./U_traj_linear_"+str(curve)+"_"+str(gamma)+"_"+param2filename(motion_param)+f"_{len(combinations)}"+"_.mat", data_dict)
+    data_dict = {'U_map': data[:,:,0:3], 'Rot_vec':data[:,:,3:6], 'Tf_orientation':data[:,:,6], 'Motion_lambda': motion_param, 'Curve':curve, 'Gamma':gamma}
+    savemat("./U_traj_linear_each_"+str(curve)+"_"+str(gamma)+"_"+param2filename(motion_param)+f"_{len(combinations)}"+"_.mat", data_dict)
     
     shm.close()
     shm.unlink()
@@ -431,12 +513,37 @@ def orderize_fine(param_motion:np.ndarray, curve:bool, isSlit:bool, gamma:float,
 
         U_map[idx1, idx2, :] = J_traj(param_motion, lambda_bar, curve, gamma)
 
+def finetuning(param_motion:np.ndarray, gamma:float)->None:
+    def scalar_J_traj(param_motion:np.ndarray, param_bar:np.ndarray, curve:bool, gamma:float) -> np.ndarray:
+        return J_traj(param_motion, param_bar, curve, gamma)[0]
+    
+    def J_minimize(x0:np.ndarray):
+        lambda_bar = np.hstack((x0, param_motion[-1]))
+        result = -1 * scalar_J_traj(param_motion, lambda_bar, False, gamma)
+        return result
+    # 최적 파라미터 실험
+    lower_bound = scalar_J_traj(param_motion, param_motion, True, gamma)
+
+    print(f"Lower Bound : {lower_bound}")
+    print(f"Gamma : {gamma}")
+
+    x0 = param_motion[0:-1]
+    bound_coeff = [3, 3, 6, 6, 7, 7, 5]
+    min_param = np.subtract(x0, bound_coeff)
+    max_param = np.add(x0, bound_coeff)
+    bounds = ((min_param[0], max_param[0]), (min_param[1], max_param[1]), (min_param[2], max_param[2]), (min_param[3], max_param[3]), (min_param[4], max_param[4]), (min_param[5], max_param[5]), (min_param[6], max_param[6]))
+
+    result = minimize(J_minimize, x0, method='Nelder-Mead', bounds=bounds, options={'disp':True,'maxfev':2400})
+
+    print(result)
+
 if __name__ == "__main__":
     snake = mujoco.MjModel.from_xml_path("./resources/env_snake_v1_contact_servo.xml")
     data = mujoco.MjData(snake)
 
     serpentine = (45, 45, 30, 30, 30, 30, 0, 0.05)
-    serpentine_op = (45, 45, 158, 158, 115, 115, 0, 0.05)
+    # serpentine_op = (45, 45, 158, 158, 115, 115, 0, 0.05) #너무 빨라서 취소 이걸로 최적화하면 sidewinding됨
+    serpentine_op = (45, 45, 154, 154, 55, 55, 0, 0.05) 
     slithering = (45, 45, 30, 30, 60, 30, 0, 0.05)
     slithering_op = (45, 45, 32, 32, 116, 58, 0, 0.05)
     sidewinding = (45, 45, 30, 30, 30, 30, 45, 0.05)
@@ -444,58 +551,89 @@ if __name__ == "__main__":
     rolling = (15, 15, 0, 0, 30, 30, 90, 0.05)
     rolling_op = (15, 15, 169, 169, 119, 119, 90, 0.05)
 
-    # print(J_view(sidewinding_op, (45, 45, 113, 113, 111, 111, 45, 0.05), False, 0.9)[0])
-    # exit()
+    # GD Scipy Finetuning
+    serpcurve_op = (4.508e+01,  4.509e+01,  1.540e+02,  1.600e+02,  5.512e+01,  5.508e+01,  -7.749e-05,  0.05)
+
+    slitcurve_op = (4.526e+01,  4.526e+01,  3.195e+01,  3.318e+01,  1.160e+02,  5.801e+01,  1.173e-05,  0.05) #275.72
+
+    sidecurve_op = (4.639e+01,  4.532e+01,  1.594e+02,  1.593e+02,  8.493e+01,  8.498e+01,  4.522e+01,  0.05) #2455.46
+
+    rollcurve_op = (1.144e+01,  1.579e+01,  1.644e+02,  1.719e+02,  1.196e+02,  1.182e+02,  5.794e+01, 0.05) #1151.44 바운더리 없이
+    rollcurve_op2 = (1.508e+01,  1.507e+01,  1.692e+02,  1.697e+02,  1.191e+02,  1.187e+02,  9.240e+01, 0.05) #867.43 바운더리 준 값
+    
+    roll07_op = (1.455e+01, 1.495e+01, 1.741e+02, 1.718e+02, 1.192e+02, 1.185e+02, 9.079e+01, 0.05) #907.53
+
+    # print('serpentine')
+    # finetuning(serpentine_op, 0.7071)
+    # print('slithering')
+    # finetuning(slithering_op, 0.3)
+    # finetuning(slithering_op, 0.5)
+    # finetuning(slithering_op, 0.7071)
+    # finetuning(slithering_op, 0.9)
+    # print('sidewinding')
+    # finetuning(sidewinding_op, 0.3)
+    # finetuning(sidewinding_op, 0.5)
+    # finetuning(sidewinding_op, 0.7071)
+    # finetuning(sidewinding_op, 0.9)
+    # print('rolling')
+    # finetuning(rolling_op, 0.3)
+    # finetuning(rolling_op, 0.5)
+    # finetuning(rolling_op, 0.9)
+
+    # print(J_view(slithering_op,(4.563e+1, 4.545e+1, 3.255e+1, 3.086e1, 1.180e+2, 5.718e+1, 1.317e-4, 0.05),False,0.7071)[0])
+    # print(J_view(sidewinding_op,(4.215e1, 4.625e+1, 1.613e+2, 1.619e2, 8.698e+1, 8.673e+1, 4.578e+1, 0.05),False,0.9)[0])
+    print(J_view(slithering_op,(45,45,156,156,116,116/2,0, 0.05),True,0.9)[0])
+    exit()
 
     #### Linear Searching...
     start_iter = time.time()
     # Curves
-    # iterator_linear(serpentine_op, True, 0.7071)
-    # iterator_linear(slithering_op, True, 0.7071)
-    # iterator_linear(sidewinding_op,True, 0.7071)
-    # iterator_linear(rolling,       True, 0.7071)
+    # iterator_linear(serpentine_op,  True, 0.7071)
+    # iterator_linear(slithering_op,  True, 0.7071)
+    # iterator_linear(sidewinding_op, True, 0.7071)
+    # iterator_linear(rolling_op,     True, 0.7071)
 
-    # # Mats
-    # iterator_linear(serpentine_op, False, 0.3)
-    # iterator_linear(slithering_op, False, 0.3)
-    # iterator_linear(sidewinding_op,False, 0.3)
-    # iterator_linear(rolling_op,       False, 0.3)
+    # Mats
+    iterator_linear(serpentine_op, False, 0.3)
+    iterator_linear(slithering_op, False, 0.3)
+    iterator_linear(sidewinding_op,False, 0.3)
+    iterator_linear(rolling_op,       False, 0.3)
 
-    # iterator_linear(serpentine_op, False, 0.5)
-    # iterator_linear(slithering_op, False, 0.5)
-    # iterator_linear(sidewinding_op,False, 0.5)
-    # iterator_linear(rolling_op,       False, 0.5)
+    iterator_linear(serpentine_op, False, 0.5)
+    iterator_linear(slithering_op, False, 0.5)
+    iterator_linear(sidewinding_op,False, 0.5)
+    iterator_linear(rolling_op,       False, 0.5)
 
     # iterator_linear(serpentine_op, False, 0.7071)
     # iterator_linear(slithering_op, False, 0.7071)
     # iterator_linear(sidewinding_op,False, 0.7071)
     # iterator_linear(rolling_op,       False, 0.7071)
 
-    # iterator_linear(serpentine_op, False, 0.9)
-    # iterator_linear(slithering_op, False, 0.9)
-    # iterator_linear(sidewinding_op,False, 0.9)
-    # iterator_linear(rolling_op,       False, 0.9)
+    iterator_linear(serpentine_op, False, 0.9)
+    iterator_linear(slithering_op, False, 0.9)
+    iterator_linear(sidewinding_op,False, 0.9)
+    iterator_linear(rolling_op,       False, 0.9)
 
-    # Fines
-    iterator_fine(serpentine_op, True, 0.3)
-    iterator_fine(slithering_op, True, 0.3)
-    iterator_fine(sidewinding_op,True, 0.3)
-    iterator_fine(rolling_op,       True, 0.3)
+    # # Fines
+    # iterator_fine(serpentine_op, True, 0.3)
+    # iterator_fine(slithering_op, True, 0.3)
+    # iterator_fine(sidewinding_op,True, 0.3)
+    # iterator_fine(rolling_op,       True, 0.3)
 
-    iterator_fine(serpentine_op, True, 0.5)
-    iterator_fine(slithering_op, True, 0.5)
-    iterator_fine(sidewinding_op,True, 0.5)
-    iterator_fine(rolling_op,       True, 0.5)
+    # iterator_fine(serpentine_op, True, 0.5)
+    # iterator_fine(slithering_op, True, 0.5)
+    # iterator_fine(sidewinding_op,True, 0.5)
+    # iterator_fine(rolling_op,       True, 0.5)
 
-    iterator_fine(serpentine_op, True, 0.7071)
-    iterator_fine(slithering_op, True, 0.7071)
-    iterator_fine(sidewinding_op,True, 0.7071)
-    iterator_fine(rolling_op,       True, 0.7071)
+    # iterator_fine(serpentine_op, True, 0.7071)
+    # iterator_fine(slithering_op, True, 0.7071)
+    # iterator_fine(sidewinding_op,True, 0.7071)
+    # iterator_fine(rolling_op,       True, 0.7071)
 
-    iterator_fine(serpentine_op, True, 0.9)
-    iterator_fine(slithering_op, True, 0.9)
-    iterator_fine(sidewinding_op,True, 0.9)
-    iterator_fine(rolling_op,       True, 0.9)
+    # iterator_fine(serpentine_op, True, 0.9)
+    # iterator_fine(slithering_op, True, 0.9)
+    # iterator_fine(sidewinding_op,True, 0.9)
+    # iterator_fine(rolling_op,       True, 0.9)
 
     end_iter = time.time()
     print(f"Iterating dond... {end_iter-start_iter} seconds elapsed")

@@ -6,6 +6,8 @@ clc; clear;
 % load U_traj_fine_True_0.3_45x45x159x159x85x85x45x0_05_21901_.mat
 load U_traj_fine_True_0.3_15x15x169x169x119x119x90x0_05_21901_.mat
 
+load U_traj_fine_False_0.5_roll.mat
+
 U_map_curve = U_map;
 Rot_vec_curve = Rot_vec;
 Tf_orientation_curve = Tf_orientation;
@@ -28,9 +30,9 @@ clear max min Motion_lambda param_coefficient U_map Rot_vec Tf_orientation;
 % load U_traj_fine_False_0.9_side.mat
 
 % load U_traj_fine_False_0.3_roll.mat
-load U_traj_fine_False_0.5_roll.mat
+% load U_traj_fine_False_0.5_roll.mat
 % load U_traj_fine_False_0.7_roll.mat
-% load U_traj_fine_False_0.9_roll.mat
+load U_traj_fine_False_0.9_roll.mat
 
 U_map_mat = U_map;
 Rot_vec_mat = Rot_vec;
@@ -47,9 +49,9 @@ Tf_orientation_mat = transpose(Tf_orientation_mat);
 U_map_mat = squeeze(U_map_mat);
 U_map_curve = squeeze(U_map_curve);
 
-U_map_mat = max(U_map_mat, -1000);
-U_map_curve = max(U_map_curve, -1000);
-% 
+% U_map_mat = max(U_map_mat, -1000);
+% U_map_curve = max(U_map_curve, -1000);
+% % 
 % U_map_mat = min(U_map_mat, 900);
 % U_map_curve = min(U_map_curve, 900);
 
@@ -134,17 +136,18 @@ ylabel("Temporal parameter (rad)","FontSize",13,"FontName","arial","FontWeight",
 % figure
 % contourf(rad2deg(Rot_vec_mat(:,:,3)))
 % 
-% %% 상관계수 비교
-% 
-% norm_U_mat = normalize(U_map_mat);
-% norm_U_curve = normalize(U_map_curve);
-% 
-% corr2(norm_U_mat, norm_U_curve)
-% 
-%% 종료 머리 오리엔테이션
-figure;
-contourf(rad2deg(Tf_orientation_curve));
+%% 상관계수 비교
 
-%%
-figure;
-contourf(rad2deg(Tf_orientation_mat));
+norm_U_mat = normalize(U_map_mat);
+norm_U_curve = normalize(U_map_curve);
+% 
+corr2(norm_U_mat, norm_U_curve)
+bhattacharyyaDistance(norm_U_mat, norm_U_curve)
+% 
+% %% 종료 머리 오리엔테이션
+% figure;
+% contourf(rad2deg(Tf_orientation_curve));
+% 
+% %%
+% figure;
+% contourf(rad2deg(Tf_orientation_mat));

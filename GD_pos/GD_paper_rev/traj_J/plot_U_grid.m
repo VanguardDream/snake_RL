@@ -3,8 +3,8 @@ clc; clear;
 %% load
 % load U_traj_linear_curve_roll.mat
 % load U_traj_linear_curve_serp.mat
-% load U_traj_linear_curve_slit.mat
-load U_traj_linear_curve_side.mat
+load U_traj_linear_curve_slit.mat
+% load U_traj_linear_curve_side.mat
 
 U_map_curve = U_map;
 Rot_vec_curve = Rot_vec;
@@ -24,7 +24,7 @@ clear max min Motion_lambda param_coefficient U_map Rot_vec Tf_orientation;
 % 
 % load U_traj_linear_mat_0.3_slit.mat
 % load U_traj_linear_mat_0.5_slit.mat
-% load U_traj_linear_mat_0.7_slit.mat
+load U_traj_linear_mat_0.7_slit.mat
 % load U_traj_linear_mat_0.9_slit.mat
 
 % load U_traj_linear_mat_0.3_side.mat
@@ -43,6 +43,14 @@ U_map_mat = transpose(U_map_mat);
 
 Tf_orientation_curve = transpose(Tf_orientation_curve);
 Tf_orientation_mat = transpose(Tf_orientation_mat);
+%% 끝점 방위 값 연동
+% U_map_curve = U_map_curve - 500 * abs(Tf_orientation_curve);
+% U_map_mat = U_map_mat - 500 * abs(Tf_orientation_mat);
+
+%% CoM 회전 값 연동
+% U_map_curve = U_map_curve - 10 * abs(Rot_vec_curve(:,:,3)');
+% U_map_mat = U_map_mat - 10 * abs(Rot_vec_mat(:,:,3)');
+
 %%
 U_map_mat = squeeze(U_map_mat);
 U_map_curve = squeeze(U_map_curve);
@@ -50,13 +58,8 @@ U_map_curve = squeeze(U_map_curve);
 U_map_mat = max(U_map_mat, -300);
 U_map_curve = max(U_map_curve, -300);
 % 
-U_map_mat = min(U_map_mat, 300);
-U_map_curve = min(U_map_curve, 300);
-
-%% 끝점 방위 값 연동
-% U_map_curve = U_map_curve - 50 * Tf_orientation_curve;
-% U_map_mat = U_map_mat - 50 * Tf_orientation_mat;
-
+U_map_mat = min(U_map_mat, 500);
+U_map_curve = min(U_map_curve, 500);
 %%
 figure; hAxes = gca;
 contourf(U_map_curve);

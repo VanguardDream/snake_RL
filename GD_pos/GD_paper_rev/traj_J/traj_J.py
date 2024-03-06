@@ -69,12 +69,15 @@ def J_view(parameters:np.ndarray, parameters_bar:np.ndarray, curve:bool, gamma:f
     p_head = np.empty((expand_q.shape[1], 21))
 
 
+    ctrl_log = np.empty((0,14))
+    p_head_log = np.empty((0,2))
     with mujoco.viewer.launch_passive(snake, data) as viewer:
         for i in range(expand_q.shape[1]):
             time_step = time.time()
             index = np.nonzero(expand_q[:, i])
             for idx in index:
                 data.ctrl[idx] = expand_q[idx, i]
+                ctrl_log = np.vstack((ctrl_log, data.ctrl))
 
             mujoco.mj_step(snake, data)
             viewer.sync()
@@ -84,6 +87,7 @@ def J_view(parameters:np.ndarray, parameters_bar:np.ndarray, curve:bool, gamma:f
 
             step_data = np.hstack((data.body('head').xpos.copy(), get_robot_rot(data), data.ctrl))
             p_head[i] = step_data
+            p_head_log = np.vstack((p_head_log, step_data[0:2]))
 
     i = 300
     j = -30
@@ -121,6 +125,8 @@ def J_view(parameters:np.ndarray, parameters_bar:np.ndarray, curve:bool, gamma:f
     rot = -30 * np.abs(mean_rot[2])
     tf = -60 * np.abs(t_orientation)
 
+    ctrl_log = {'ctrl_log':ctrl_log, 'p_head_log':p_head_log}
+    savemat("./ctrl_log_"+str(gamma)+"_"+M_name+"_"+Bar_name+".mat", ctrl_log)
 
     # return np.hstack((i_term + j_term + l_term, mean_rot, t_orientation))
     return i_term + j_term + l_term + rot + tf
@@ -623,7 +629,11 @@ if __name__ == "__main__":
     # finetuning_each(slithering_op, 0.9)
 
     # print(J_view(slithering_op,(4.563e+1, 4.545e+1, 3.255e+1, 3.086e1, 1.180e+2, 5.718e+1, 1.317e-4, 0.05),False,0.7071)[0])
-    print(J_view(serpentine_op,serpentine_op,False,0.5))
+    print(J_view(slitcurve_op,slit03_op,True,0))
+    print(J_view(slitcurve_op,slit03_op,False,0.3))
+    print(J_view(slitcurve_op,slit05_op,False,0.5))
+    print(J_view(slitcurve_op,slit07_op,False,0.7071))
+    print(J_view(slitcurve_op,slit09_op,False,0.9))
     # print(J_view(slithering_op,slit03_op,False,0.3))
     # print(J_view(slithering_op,(45,45,156,156,116,116/2,0, 0.05),True,0.9)[0])
     exit()

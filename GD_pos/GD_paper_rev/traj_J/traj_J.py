@@ -87,7 +87,7 @@ def J_view(parameters:np.ndarray, parameters_bar:np.ndarray, curve:bool, gamma:f
 
     i = 300
     j = -30
-    l = -0.01
+    l = -0.05
 
     p_head_diff = np.diff(p_head[:,0:2],axis=0)
     p_head_diff_l2_norm = np.linalg.norm(p_head_diff,2,axis=1)
@@ -115,7 +115,15 @@ def J_view(parameters:np.ndarray, parameters_bar:np.ndarray, curve:bool, gamma:f
         print(e)
         t_orientation = np.nan
 
-    return np.hstack((i_term + j_term + l_term, mean_rot, t_orientation))
+    if parameters[-2] > 38:
+        t_orientation = np.abs(t_orientation)  - (np.pi / 2)
+
+    rot = -30 * np.abs(mean_rot[2])
+    tf = -60 * np.abs(t_orientation)
+
+
+    # return np.hstack((i_term + j_term + l_term, mean_rot, t_orientation))
+    return i_term + j_term + l_term + rot + tf
 
 def J_traj(parameters:np.ndarray, parameters_bar:np.ndarray, curve:bool, gamma:float) -> np.ndarray:
     """
@@ -537,6 +545,44 @@ def finetuning(param_motion:np.ndarray, gamma:float)->None:
 
     print(result)
 
+def finetuning_each(param_motion:np.ndarray, gamma:float)->None:
+    def scalar_J_traj(param_motion:np.ndarray, param_bar:np.ndarray, curve:bool, gamma:float) -> np.ndarray:
+        i = 300
+        j = -30
+        l = -0.05
+        rot = -30
+        tf = -60
+
+        # i_term, j_term, l_term, rot_term, tf_term = J_traj_each(param_motion, param_bar, curve, gamma)
+        each = J_traj_each(param_motion, param_bar, curve, gamma)
+
+        if param_motion[-2] > 38:
+            each[-1] = np.abs(each[-1]) - (np.pi / 2)
+
+        return i * each[0] + j * each[1] + l * each[2] + rot * np.abs(each[-2]) + tf * np.abs(each[-1])
+    
+    def J_minimize(x0:np.ndarray):
+        lambda_bar = np.hstack((x0, param_motion[-1]))
+
+        result = -1 * scalar_J_traj(param_motion, lambda_bar, False, gamma)
+        return result
+    # 최적 파라미터 실험
+    lower_bound = scalar_J_traj(param_motion, param_motion, True, gamma)
+
+    print(f"Lower Bound : {lower_bound}")
+    print(f"Gamma : {gamma}")
+
+    x0 = param_motion[0:-1]
+    bound_coeff = [3, 3, 6, 6, 7, 7, 5]
+    min_param = np.subtract(x0, bound_coeff)
+    max_param = np.add(x0, bound_coeff)
+    bounds = ((min_param[0], max_param[0]), (min_param[1], max_param[1]), (min_param[2], max_param[2]), (min_param[3], max_param[3]), (min_param[4], max_param[4]), (min_param[5], max_param[5]), (min_param[6], max_param[6]))
+
+    result = minimize(J_minimize, x0, method='Nelder-Mead', bounds=bounds, options={'disp':True,'maxfev':5000, 'xatol':5e-1, 'fatol':50})
+
+    print(f'Optimal Parameters : {result.x}')
+    print(result)
+
 if __name__ == "__main__":
     snake = mujoco.MjModel.from_xml_path("./resources/env_snake_v1_contact_servo.xml")
     data = mujoco.MjData(snake)
@@ -554,35 +600,32 @@ if __name__ == "__main__":
     # GD Scipy Finetuning
     serpcurve_op = (4.508e+01,  4.509e+01,  1.540e+02,  1.600e+02,  5.512e+01,  5.508e+01,  -7.749e-05,  0.05)
 
-    slitcurve_op = (4.526e+01,  4.526e+01,  3.195e+01,  3.318e+01,  1.160e+02,  5.801e+01,  1.173e-05,  0.05) #275.72
+    slitcurve_op = (4.526e+01,  4.526e+01,  3.195e+01,  3.318e+01,  1.160e+02,  5.801e+01,  1.173e-05,  0.05) #-325.95
+    slit03_op = (4.57874610e+01, 4.47749476e+01, 3.19154641e+01, 3.29436457e+01, 1.16131232e+02, 5.79724657e+01, 2.49956662e-05,  0.05) #
+    slit05_op = (4.520e+01,  4.566e+01,  3.346e+01,  3.130e+01,  1.162e+02, 5.721e+01,  4.014e-05,  0.05) #
+    slit07_op = (4.538e+01,  4.664e+01,  3.252e+01,  3.115e+01,  1.179e+02, 5.738e+01, -7.195e-07,  0.05) #
+    slit09_op = (4.59704920e+01, 4.52503234e+01, 3.23554338e+01, 3.18049948e+01, 1.16461515e+02, 5.74362020e+01, 4.90678713e-05,  0.05) #
 
     sidecurve_op = (4.639e+01,  4.532e+01,  1.594e+02,  1.593e+02,  8.493e+01,  8.498e+01,  4.522e+01,  0.05) #2455.46
+    side03_op = (46.42750657,  45.55030688, 158.67435609, 159.05461942,  85.22372179,  85.10662228,  44.91307382,  0.05) #1809.522
+    side05_op = (45.67394843,  44.99912165, 160.03427455, 159.63206874,  85.43994966,  85.37658725,  45.86496331,  0.05) #1714.17
+    side07_op = (4.539e+01,  4.539e+01,  1.630e+02,  1.594e+02,  8.578e+01,  8.500e+01,  4.539e+01,  0.05) #1487.80
+    side09_op = (4.307e+01,  4.617e+01,  1.616e+02,  1.622e+02,  8.739e+01,  8.705e+01,  4.445e+01,  0.05) #1146.74
 
     rollcurve_op = (1.144e+01,  1.579e+01,  1.644e+02,  1.719e+02,  1.196e+02,  1.182e+02,  5.794e+01, 0.05) #1151.44 바운더리 없이
     rollcurve_op2 = (1.508e+01,  1.507e+01,  1.692e+02,  1.697e+02,  1.191e+02,  1.187e+02,  9.240e+01, 0.05) #867.43 바운더리 준 값
     
     roll07_op = (1.455e+01, 1.495e+01, 1.741e+02, 1.718e+02, 1.192e+02, 1.185e+02, 9.079e+01, 0.05) #907.53
 
-    # print('serpentine')
-    # finetuning(serpentine_op, 0.7071)
-    # print('slithering')
-    # finetuning(slithering_op, 0.3)
-    # finetuning(slithering_op, 0.5)
-    # finetuning(slithering_op, 0.7071)
-    # finetuning(slithering_op, 0.9)
-    # print('sidewinding')
-    # finetuning(sidewinding_op, 0.3)
-    # finetuning(sidewinding_op, 0.5)
-    # finetuning(sidewinding_op, 0.7071)
-    # finetuning(sidewinding_op, 0.9)
-    # print('rolling')
-    # finetuning(rolling_op, 0.3)
-    # finetuning(rolling_op, 0.5)
-    # finetuning(rolling_op, 0.9)
+    # finetuning_each(slithering_op, 0.3)
+    # finetuning_each(slithering_op, 0.5)
+    # finetuning_each(slithering_op, 0.7071)
+    # finetuning_each(slithering_op, 0.9)
 
     # print(J_view(slithering_op,(4.563e+1, 4.545e+1, 3.255e+1, 3.086e1, 1.180e+2, 5.718e+1, 1.317e-4, 0.05),False,0.7071)[0])
-    # print(J_view(sidewinding_op,(4.215e1, 4.625e+1, 1.613e+2, 1.619e2, 8.698e+1, 8.673e+1, 4.578e+1, 0.05),False,0.9)[0])
-    print(J_view(slithering_op,(45,45,156,156,116,116/2,0, 0.05),True,0.9)[0])
+    print(J_view(serpentine_op,serpentine_op,False,0.5))
+    # print(J_view(slithering_op,slit03_op,False,0.3))
+    # print(J_view(slithering_op,(45,45,156,156,116,116/2,0, 0.05),True,0.9)[0])
     exit()
 
     #### Linear Searching...

@@ -49,8 +49,8 @@ rot = -30;
 
 if Motion_lambda(7)> 38
     tf = -60;
-    abs(Tf_orientation_curve) - pi/2;
-    abs(Tf_orientation_mat) - pi/2;
+    Tf_orientation_curve = abs(Tf_orientation_curve) - pi/2;
+    Tf_orientation_mat = abs(Tf_orientation_mat) - pi/2;
 else
     tf = -60;
 end
@@ -68,8 +68,8 @@ U_map_curve = squeeze(U_map_curve);
 U_map_mat = max(U_map_mat, -1500);
 U_map_curve = max(U_map_curve, -1500);
 
-U_map_mat = min(U_map_mat, 1500);
-U_map_curve = min(U_map_curve, 1500);
+% U_map_mat = min(U_map_mat, 1500);
+% U_map_curve = min(U_map_curve, 1500);
 %%
 figure; hAxes = gca;
 contourf(U_map_curve);

@@ -172,20 +172,21 @@
 
     <!-- Servo -->
     <actuator>
-        <position name="servo_1"  ctrllimited="true" ctrlrange="-1.4 1.4" forcelimited="true" forcerange="-3.5 3.5" joint="joint1"  kp="7"/>
-        <position name="servo_2"  ctrllimited="true" ctrlrange="-1.4 1.4" forcelimited="true" forcerange="-3.5 3.5" joint="joint2"  kp="7"/>
-        <position name="servo_3"  ctrllimited="true" ctrlrange="-1.4 1.4" forcelimited="true" forcerange="-3.5 3.5" joint="joint3"  kp="7"/>
-        <position name="servo_4"  ctrllimited="true" ctrlrange="-1.4 1.4" forcelimited="true" forcerange="-3.5 3.5" joint="joint4"  kp="7"/>
-        <position name="servo_5"  ctrllimited="true" ctrlrange="-1.4 1.4" forcelimited="true" forcerange="-3.5 3.5" joint="joint5"  kp="7"/>
-        <position name="servo_6"  ctrllimited="true" ctrlrange="-1.4 1.4" forcelimited="true" forcerange="-3.5 3.5" joint="joint6"  kp="7"/>
-        <position name="servo_7"  ctrllimited="true" ctrlrange="-1.4 1.4" forcelimited="true" forcerange="-3.5 3.5" joint="joint7"  kp="7"/>
-        <position name="servo_8"  ctrllimited="true" ctrlrange="-1.4 1.4" forcelimited="true" forcerange="-3.5 3.5" joint="joint8"  kp="7"/>
-        <position name="servo_9"  ctrllimited="true" ctrlrange="-1.4 1.4" forcelimited="true" forcerange="-3.5 3.5" joint="joint9"  kp="7"/>
-        <position name="servo_10" ctrllimited="true" ctrlrange="-1.4 1.4" forcelimited="true" forcerange="-3.5 3.5" joint="joint10" kp="7"/>
-        <position name="servo_11" ctrllimited="true" ctrlrange="-1.4 1.4" forcelimited="true" forcerange="-3.5 3.5" joint="joint11" kp="7"/>
-        <position name="servo_12" ctrllimited="true" ctrlrange="-1.4 1.4" forcelimited="true" forcerange="-3.5 3.5" joint="joint12" kp="7"/>
-        <position name="servo_13" ctrllimited="true" ctrlrange="-1.4 1.4" forcelimited="true" forcerange="-3.5 3.5" joint="joint13" kp="7"/>
-        <position name="servo_14" ctrllimited="true" ctrlrange="-1.4 1.4" forcelimited="true" forcerange="-3.5 3.5" joint="joint14" kp="7"/>
+        <!-- 논문 작성중 모터 토크를 변경함... 3.5 -> 2.0 으로 감쇄 -->
+        <position name="servo_1"  ctrllimited="true" ctrlrange="-1.4 1.4" forcelimited="true" forcerange="-2.0 2.0" joint="joint1"  kp="7"/>
+        <position name="servo_2"  ctrllimited="true" ctrlrange="-1.4 1.4" forcelimited="true" forcerange="-2.0 2.0" joint="joint2"  kp="7"/>
+        <position name="servo_3"  ctrllimited="true" ctrlrange="-1.4 1.4" forcelimited="true" forcerange="-2.0 2.0" joint="joint3"  kp="7"/>
+        <position name="servo_4"  ctrllimited="true" ctrlrange="-1.4 1.4" forcelimited="true" forcerange="-2.0 2.0" joint="joint4"  kp="7"/>
+        <position name="servo_5"  ctrllimited="true" ctrlrange="-1.4 1.4" forcelimited="true" forcerange="-2.0 2.0" joint="joint5"  kp="7"/>
+        <position name="servo_6"  ctrllimited="true" ctrlrange="-1.4 1.4" forcelimited="true" forcerange="-2.0 2.0" joint="joint6"  kp="7"/>
+        <position name="servo_7"  ctrllimited="true" ctrlrange="-1.4 1.4" forcelimited="true" forcerange="-2.0 2.0" joint="joint7"  kp="7"/>
+        <position name="servo_8"  ctrllimited="true" ctrlrange="-1.4 1.4" forcelimited="true" forcerange="-2.0 2.0" joint="joint8"  kp="7"/>
+        <position name="servo_9"  ctrllimited="true" ctrlrange="-1.4 1.4" forcelimited="true" forcerange="-2.0 2.0" joint="joint9"  kp="7"/>
+        <position name="servo_10" ctrllimited="true" ctrlrange="-1.4 1.4" forcelimited="true" forcerange="-2.0 2.0" joint="joint10" kp="7"/>
+        <position name="servo_11" ctrllimited="true" ctrlrange="-1.4 1.4" forcelimited="true" forcerange="-2.0 2.0" joint="joint11" kp="7"/>
+        <position name="servo_12" ctrllimited="true" ctrlrange="-1.4 1.4" forcelimited="true" forcerange="-2.0 2.0" joint="joint12" kp="7"/>
+        <position name="servo_13" ctrllimited="true" ctrlrange="-1.4 1.4" forcelimited="true" forcerange="-2.0 2.0" joint="joint13" kp="7"/>
+        <position name="servo_14" ctrllimited="true" ctrlrange="-1.4 1.4" forcelimited="true" forcerange="-2.0 2.0" joint="joint14" kp="7"/>
     </actuator>
 
     <sensor>

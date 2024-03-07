@@ -638,39 +638,39 @@ if __name__ == "__main__":
     # print(J_view(rolling_op,roll03_op,False,0.3))
     # print(J_view(rolling_op,roll05_op,False,0.5))
     # print(J_view(rolling_op,roll07_op,False,0.7071))
-    print(J_view(rolling_op,roll09_op,False,0.9))
+    # print(J_view(rolling_op,roll09_op,False,0.9))
     # print(J_view(slithering_op,slit03_op,False,0.3))
     # print(J_view(slithering_op,(45,45,156,156,116,116/2,0, 0.05),True,0.9)[0])
-    exit()
+    # exit()
 
     #### Linear Searching...
     start_iter = time.time()
     # Curves
-    # iterator_linear(serpentine_op,  True, 0.7071)
-    # iterator_linear(slithering_op,  True, 0.7071)
-    # iterator_linear(sidewinding_op, True, 0.7071)
-    # iterator_linear(rolling_op,     True, 0.7071)
+    iterator_linear(serpentine_op,  True, 0.7071)
+    iterator_linear(slithering_op,  True, 0.7071)
+    iterator_linear(sidewinding_op, True, 0.7071)
+    iterator_linear(rolling_op,     True, 0.7071)
 
     # Mats
-    iterator_linear(serpentine_op, False, 0.3)
-    iterator_linear(slithering_op, False, 0.3)
-    iterator_linear(sidewinding_op,False, 0.3)
-    iterator_linear(rolling_op,       False, 0.3)
+    # iterator_linear(serpentine_op, False, 0.3)
+    # iterator_linear(slithering_op, False, 0.3)
+    # iterator_linear(sidewinding_op,False, 0.3)
+    # iterator_linear(rolling_op,       False, 0.3)
 
-    iterator_linear(serpentine_op, False, 0.5)
-    iterator_linear(slithering_op, False, 0.5)
-    iterator_linear(sidewinding_op,False, 0.5)
-    iterator_linear(rolling_op,       False, 0.5)
+    # iterator_linear(serpentine_op, False, 0.5)
+    # iterator_linear(slithering_op, False, 0.5)
+    # iterator_linear(sidewinding_op,False, 0.5)
+    # iterator_linear(rolling_op,       False, 0.5)
 
     # iterator_linear(serpentine_op, False, 0.7071)
     # iterator_linear(slithering_op, False, 0.7071)
     # iterator_linear(sidewinding_op,False, 0.7071)
     # iterator_linear(rolling_op,       False, 0.7071)
 
-    iterator_linear(serpentine_op, False, 0.9)
-    iterator_linear(slithering_op, False, 0.9)
-    iterator_linear(sidewinding_op,False, 0.9)
-    iterator_linear(rolling_op,       False, 0.9)
+    # iterator_linear(serpentine_op, False, 0.9)
+    # iterator_linear(slithering_op, False, 0.9)
+    # iterator_linear(sidewinding_op,False, 0.9)
+    # iterator_linear(rolling_op,       False, 0.9)
 
     # # Fines
     # iterator_fine(serpentine_op, True, 0.3)

@@ -36,10 +36,10 @@ xlim([1 46]);
 % a = get(gca,'YTickLabel');  
 % set(gca,'YTickLabel',a,'fontsize',11,'FontWeight','bold')
 
-pos = -pi/6:pi/12:pi/3;
+pos = -pi/3:pi/6:pi/2;
 yticks(pos);
-yticklabels({"-\pi/6", "-\pi/12", "0", "\pi/12", "\pi/6", "\pi/4", "\pi/3"});
-ylim([-pi/6 pi/4]);
+yticklabels({"-\pi/3", "-\pi/6", "0", "\pi/6", "\pi/3", "\pi/2"});
+ylim([-pi/5.9999 pi/2.999]);
 % a = get(gca,'XTickLabel');  
 % set(gca,'XTickLabel',a,'fontsize',11,'FontWeight','bold')
 
@@ -92,10 +92,10 @@ xlim([1 46]);
 % a = get(gca,'YTickLabel');  
 % set(gca,'YTickLabel',a,'fontsize',11,'FontWeight','bold')
 
-pos = -pi/6:pi/12:pi/3;
+pos = -pi/3:pi/6:pi/2;
 yticks(pos);
-yticklabels({"-\pi/6", "-\pi/12", "0", "\pi/12", "\pi/6", "\pi/4", "\pi/3"});
-ylim([-pi/6 pi/4]);
+yticklabels({"-\pi/3", "-\pi/6", "0", "\pi/6", "\pi/3", "\pi/2"});
+ylim([-pi/5.9999 pi/2.999]);
 % a = get(gca,'XTickLabel');  
 % set(gca,'XTickLabel',a,'fontsize',11,'FontWeight','bold')
 
@@ -217,7 +217,7 @@ rad_07 = norm(r_tra_07(end,:));
 rad_09 = norm(r_tra_09(end,:));
 theta = linspace(0, 2*pi, 3000);
 
-x=rad_07*cos(theta);y=rad_curve*sin(theta);plot(x,y,LineWidth=1,LineStyle="-.",Color=[0.1 0.1 0.1 0.8])
+x=rad_07*cos(theta);y=rad_07*sin(theta);plot(x,y,LineWidth=1,LineStyle="-.",Color=[0.1 0.1 0.1 0.8])
 x=rad_09*cos(theta);y=rad_09*sin(theta);plot(x,y,LineWidth=1,LineStyle=":",Color=[0.1 0.1 0.1 0.8])
 % x=rad_03*cos(theta);y=rad_03*sin(theta);plot(x,y)
 % x=rad_05*cos(theta);y=rad_05*sin(theta);plot(x,y)

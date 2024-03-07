@@ -1,9 +1,9 @@
 clc; clear;
 
 %%
-% load side_data.mat;
+load side_data.mat;
 % load slit_data.mat;
-load roll_data.mat;
+% load roll_data.mat;
 
 slit_curve = slit_curve(1:10:end,:);
 slit_03 = slit_03(1:10:end,:);
@@ -36,10 +36,10 @@ xlim([1 46]);
 % a = get(gca,'YTickLabel');  
 % set(gca,'YTickLabel',a,'fontsize',11,'FontWeight','bold')
 
-pos = -pi/6:pi/12:pi/3;
+pos = -pi/2:pi/6:pi/2;
 yticks(pos);
-yticklabels({"-\pi/6", "-\pi/12", "0", "\pi/12", "\pi/6", "\pi/4", "\pi/3"});
-ylim([-pi/6 pi/4]);
+yticklabels({"-\pi/2", "-\pi/3", "-\pi/6", "0", "\pi/6", "\pi/3", "\pi/2"});
+ylim([-pi/2.99 pi/2]);
 % a = get(gca,'XTickLabel');  
 % set(gca,'XTickLabel',a,'fontsize',11,'FontWeight','bold')
 
@@ -92,10 +92,10 @@ xlim([1 46]);
 % a = get(gca,'YTickLabel');  
 % set(gca,'YTickLabel',a,'fontsize',11,'FontWeight','bold')
 
-pos = -pi/6:pi/12:pi/3;
+pos = -pi/2:pi/6:pi/2;
 yticks(pos);
-yticklabels({"-\pi/6", "-\pi/12", "0", "\pi/12", "\pi/6", "\pi/4", "\pi/3"});
-ylim([-pi/6 pi/4]);
+yticklabels({"-\pi/2", "-\pi/3", "-\pi/6", "0", "\pi/6", "\pi/3", "\pi/2"});
+ylim([-pi/2.99 pi/2]);
 % a = get(gca,'XTickLabel');  
 % set(gca,'XTickLabel',a,'fontsize',11,'FontWeight','bold')
 
@@ -182,6 +182,7 @@ grid_ax = gca;
 grid_ax.LineWidth = 1;
 grid_ax.GridLineStyle = "--";
 grid_ax.GridColor = [0.2 0.2 0.2];
+grid_ax.Color = '#FEF9D7';
 
 pbaspect([sum(abs(default_x)) sum(abs(default_y)) 0.8]);
 
@@ -192,17 +193,17 @@ ylabel("y (m)","FontSize",13,"FontName","arial","FontWeight","bold");
 figure;
 
 hold on;
-% r_tra_curve = [tra_curve(:,1) -tra_curve(:,2)];
-% r_tra_03 = [tra_03(:,1) -tra_03(:,2)];
-% r_tra_05 = [tra_05(:,1) -tra_05(:,2)];
-% r_tra_07 = [tra_07(:,1) -tra_07(:,2)];
-% r_tra_09 = [tra_09(:,1) -tra_09(:,2)];
+r_tra_curve = [tra_curve(:,1) -tra_curve(:,2)];
+r_tra_03 = [tra_03(:,1) -tra_03(:,2)];
+r_tra_05 = [tra_05(:,1) -tra_05(:,2)];
+r_tra_07 = [tra_07(:,1) -tra_07(:,2)];
+r_tra_09 = [tra_09(:,1) -tra_09(:,2)];
 
-r_tra_curve = [tra_curve(:,1) tra_curve(:,2)];
-r_tra_03 = [tra_03(:,1) tra_03(:,2)];
-r_tra_05 = [tra_05(:,1) tra_05(:,2)];
-r_tra_07 = [tra_07(:,1) tra_07(:,2)];
-r_tra_09 = [tra_09(:,1) tra_09(:,2)];
+% r_tra_curve = [tra_curve(:,1) tra_curve(:,2)];
+% r_tra_03 = [tra_03(:,1) tra_03(:,2)];
+% r_tra_05 = [tra_05(:,1) tra_05(:,2)];
+% r_tra_07 = [tra_07(:,1) tra_07(:,2)];
+% r_tra_09 = [tra_09(:,1) tra_09(:,2)];
 
 p1 = plot(r_tra_curve(:,2),r_tra_curve(:,1),LineWidth=1.5,LineStyle=":",Color=[0.1 0.1 0.1]); p1.Color(4) = 0.7;
 p2 = plot(r_tra_03(:,2),r_tra_03(:,1),LineWidth=1.5,LineStyle="-",Color="#000080"); p2.Color(4) = 0.7;
@@ -217,7 +218,7 @@ rad_07 = norm(r_tra_07(end,:));
 rad_09 = norm(r_tra_09(end,:));
 theta = linspace(0, 2*pi, 3000);
 
-x=rad_07*cos(theta);y=rad_curve*sin(theta);plot(x,y,LineWidth=1,LineStyle="-.",Color=[0.1 0.1 0.1 0.8])
+x=rad_curve*cos(theta);y=rad_curve*sin(theta);plot(x,y,LineWidth=1,LineStyle="-.",Color=[0.1 0.1 0.1 0.8])
 x=rad_09*cos(theta);y=rad_09*sin(theta);plot(x,y,LineWidth=1,LineStyle=":",Color=[0.1 0.1 0.1 0.8])
 % x=rad_03*cos(theta);y=rad_03*sin(theta);plot(x,y)
 % x=rad_05*cos(theta);y=rad_05*sin(theta);plot(x,y)
@@ -248,19 +249,20 @@ Y.FontWeight = 'bold';
 xtickformat('%.1f')
 ytickformat('%.1f')
 
-g_ratio = 1.15;
+g_ratio = 1.35;
 
 default_x = [-1 * 7 * g_ratio /2, 7 * g_ratio /2];
 default_y = [-1 * 4 * g_ratio /2, 4 * g_ratio /2];
 
-xlim(default_x + 0.00)
-ylim(default_y - 0.70)
+xlim(default_x + 4.3)
+ylim(default_y + 0.5)
 
 grid on;
 grid_ax = gca;
 grid_ax.LineWidth = 1;
 grid_ax.GridLineStyle = "--";
 grid_ax.GridColor = [0.2 0.2 0.2];
+grid_ax.Color = '#FEF9D7';
 
 pbaspect([sum(abs(default_x)) sum(abs(default_y)) 0.8]);
 % pbaspect([3.5 2 0.8]);

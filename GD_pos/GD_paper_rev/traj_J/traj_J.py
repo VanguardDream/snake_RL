@@ -71,6 +71,7 @@ def J_view(parameters:np.ndarray, parameters_bar:np.ndarray, curve:bool, gamma:f
 
     ctrl_log = np.empty((0,14))
     p_head_log = np.empty((0,2))
+    qpos_log = np.empty((0,21))
     with mujoco.viewer.launch_passive(snake, data) as viewer:
         for i in range(expand_q.shape[1]):
             time_step = time.time()
@@ -88,6 +89,7 @@ def J_view(parameters:np.ndarray, parameters_bar:np.ndarray, curve:bool, gamma:f
             step_data = np.hstack((data.body('head').xpos.copy(), get_robot_rot(data), data.ctrl))
             p_head[i] = step_data
             p_head_log = np.vstack((p_head_log, step_data[0:2]))
+            qpos_log = np.vstack((qpos_log, data.qpos.copy()))
 
     i = 300
     j = -30
@@ -125,7 +127,7 @@ def J_view(parameters:np.ndarray, parameters_bar:np.ndarray, curve:bool, gamma:f
     rot = -30 * np.abs(mean_rot[2])
     tf = -60 * np.abs(t_orientation)
 
-    ctrl_log = {'ctrl_log':ctrl_log, 'p_head_log':p_head_log}
+    ctrl_log = {'ctrl_log':ctrl_log, 'p_head_log':p_head_log, 'qpos_log':qpos_log}
     savemat("./ctrl_log_"+str(gamma)+"_"+M_name+"_"+Bar_name+".mat", ctrl_log)
 
     # return np.hstack((i_term + j_term + l_term, mean_rot, t_orientation))
@@ -618,22 +620,25 @@ if __name__ == "__main__":
     side07_op = (4.539e+01,  4.539e+01,  1.630e+02,  1.594e+02,  8.578e+01,  8.500e+01,  4.539e+01,  0.05) #1487.80
     side09_op = (4.307e+01,  4.617e+01,  1.616e+02,  1.622e+02,  8.739e+01,  8.705e+01,  4.445e+01,  0.05) #1146.74
 
-    rollcurve_op = (1.144e+01,  1.579e+01,  1.644e+02,  1.719e+02,  1.196e+02,  1.182e+02,  5.794e+01, 0.05) #1151.44 바운더리 없이
-    rollcurve_op2 = (1.508e+01,  1.507e+01,  1.692e+02,  1.697e+02,  1.191e+02,  1.187e+02,  9.240e+01, 0.05) #867.43 바운더리 준 값
+    rollcurve_op2 = (1.508e+01,  1.507e+01,  1.692e+02,  1.697e+02,  1.191e+02,  1.187e+02,  9.240e+01, 0.05) #606.61 바운더리 준 값
+    roll03_op =(1.495e+01,  1.517e+01,  1.694e+02,  1.688e+02,  1.192e+02,  1.189e+02,  9.247e+01, 0.05) #705.76
+    roll05_op =(1.502e+01,  1.506e+01,  1.715e+02,  1.682e+02,  1.189e+02,  1.187e+02,  9.305e+01, 0.05) #784.05
+    roll07_op =(14.87815899,  14.90831926, 171.33492883, 174.94054222, 119.32329542,  118.04336397,  88.83467804, 0.05) #807.28
+    roll09_op =(15.15487732,  15.23185306, 169.75254068, 167.53307839, 122.03266542, 117.04890007,  91.17241511, 0.05) #485.12
+    # roll09_op =(1.564e+1,  1.516e+1, 1.736e+2, 1.669e+2, 1.231e+2, 1.134e+2,  9.340e+1, 0.05) #485.12
     
-    roll07_op = (1.455e+01, 1.495e+01, 1.741e+02, 1.718e+02, 1.192e+02, 1.185e+02, 9.079e+01, 0.05) #907.53
 
-    # finetuning_each(slithering_op, 0.3)
-    # finetuning_each(slithering_op, 0.5)
-    # finetuning_each(slithering_op, 0.7071)
-    # finetuning_each(slithering_op, 0.9)
+    # finetuning_each(rolling_op, 0.3)
+    # finetuning_each(rolling_op, 0.5)
+    # finetuning_each(rolling_op, 0.7071)
+    # finetuning_each(rolling_op, 0.9)
 
     # print(J_view(slithering_op,(4.563e+1, 4.545e+1, 3.255e+1, 3.086e1, 1.180e+2, 5.718e+1, 1.317e-4, 0.05),False,0.7071)[0])
-    print(J_view(slitcurve_op,slit03_op,True,0))
-    print(J_view(slitcurve_op,slit03_op,False,0.3))
-    print(J_view(slitcurve_op,slit05_op,False,0.5))
-    print(J_view(slitcurve_op,slit07_op,False,0.7071))
-    print(J_view(slitcurve_op,slit09_op,False,0.9))
+    # print(J_view(rolling_op,rolling_op,True,0))
+    # print(J_view(rolling_op,roll03_op,False,0.3))
+    # print(J_view(rolling_op,roll05_op,False,0.5))
+    # print(J_view(rolling_op,roll07_op,False,0.7071))
+    print(J_view(rolling_op,roll09_op,False,0.9))
     # print(J_view(slithering_op,slit03_op,False,0.3))
     # print(J_view(slithering_op,(45,45,156,156,116,116/2,0, 0.05),True,0.9)[0])
     exit()

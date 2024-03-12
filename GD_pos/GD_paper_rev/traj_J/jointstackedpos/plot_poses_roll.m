@@ -27,12 +27,12 @@ p3 = plot(slit_05(1:46,1),LineWidth=1.5,LineStyle="--",Color="#004d00"); p3.Colo
 p4 = plot(slit_07(1:46,1),LineWidth=1.5,LineStyle="-",Color="#800020"); p4.Color(4) = 0.7;
 p5 = plot(slit_09(1:46,1),LineWidth=1.5,LineStyle="--",Color="#B8860B"); p5.Color(4) = 0.7;
 
-legend({"Serpenoid", "gamma = 0.3", "gamma = 0.5", "gamma = 0.7", "gamma = 0.9"},'NumColumns',2,FontSize=9,FontName='arial',Location='northwest',Fontweight='bold');
+legend({"Serpenoid", "gamma = 0.3", "gamma = 0.5", "gamma = 0.7", "gamma = 0.9"},'NumColumns',3,FontSize=9,FontName='arial',Location='northwest',Fontweight='bold');
 
 t = 1:5:200;
 xticks(t);
 xticklabels((t-1)*0.05);
-xlim([1 46]);
+xlim([1 41]);
 % a = get(gca,'YTickLabel');  
 % set(gca,'YTickLabel',a,'fontsize',11,'FontWeight','bold')
 
@@ -62,9 +62,9 @@ grid_ax.GridColor = [0.2 0.2 0.2];
 % grid_ax.YGrid = "off";
 
 xlabel("Time (sec)","FontSize",13,"FontName","arial","FontWeight","bold");
-ylabel("Dorsal joint position (rad)","FontSize",13,"FontName","arial","FontWeight","bold");
+ylabel("Dorsal joint input (rad)","FontSize",13,"FontName","arial","FontWeight","bold");
 
-pbaspect([2 1.1 0.8]);
+pbaspect([2 0.8 0.8]);
 clear a;
 
 %%
@@ -83,12 +83,12 @@ p3 = plot(slit_05(1:46,2),LineWidth=1.5,LineStyle="--",Color="#004d00"); p3.Colo
 p4 = plot(slit_07(1:46,2),LineWidth=1.5,LineStyle="-",Color="#800020"); p4.Color(4) = 0.7;
 p5 = plot(slit_09(1:46,2),LineWidth=1.5,LineStyle="--",Color="#B8860B"); p5.Color(4) = 0.7;
 
-legend({"Serpenoid", "gamma = 0.3", "gamma = 0.5", "gamma = 0.7", "gamma = 0.9"},'NumColumns',2,FontSize=9,FontName='arial',Location='northwest',Fontweight='bold');
+legend({"Serpenoid", "gamma = 0.3", "gamma = 0.5", "gamma = 0.7", "gamma = 0.9"},'NumColumns',3,FontSize=9,FontName='arial',Location='northwest',Fontweight='bold');
 
 t = 1:5:200;
 xticks(t);
 xticklabels((t-1)*0.05);
-xlim([1 46]);
+xlim([1 41]);
 % a = get(gca,'YTickLabel');  
 % set(gca,'YTickLabel',a,'fontsize',11,'FontWeight','bold')
 
@@ -118,9 +118,9 @@ grid_ax.GridColor = [0.2 0.2 0.2];
 % grid_ax.YGrid = "off";
 
 xlabel("Time (sec)","FontSize",13,"FontName","arial","FontWeight","bold");
-ylabel("Lateral joint position (rad)","FontSize",13,"FontName","arial","FontWeight","bold");
+ylabel("Lateral joint input (rad)","FontSize",13,"FontName","arial","FontWeight","bold");
 
-pbaspect([2 1.1 0.8]);
+pbaspect([2 0.8 0.8]);
 clear a;
 
 %%
@@ -182,6 +182,7 @@ grid_ax = gca;
 grid_ax.LineWidth = 1;
 grid_ax.GridLineStyle = "--";
 grid_ax.GridColor = [0.2 0.2 0.2];
+grid_ax.Color = '#FEF9D7';
 
 pbaspect([sum(abs(default_x)) sum(abs(default_y)) 0.8]);
 
@@ -261,6 +262,7 @@ grid_ax = gca;
 grid_ax.LineWidth = 1;
 grid_ax.GridLineStyle = "--";
 grid_ax.GridColor = [0.2 0.2 0.2];
+grid_ax.Color = '#FEF9D7';
 
 pbaspect([sum(abs(default_x)) sum(abs(default_y)) 0.8]);
 % pbaspect([3.5 2 0.8]);

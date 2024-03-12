@@ -17,7 +17,7 @@ Tf_orientation_curve = Tf_orientation;
 
 clear max min param_coefficient U_map Rot_vec Tf_orientation;
 
-load U_traj_linear_each_weak_side_curve.mat
+
 
 % load U_traj_linear_each_False_0.3_roll.mat
 % load U_traj_linear_each_False_0.5_roll.mat

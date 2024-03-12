@@ -27,12 +27,12 @@ p3 = plot(slit_05(1:46,1),LineWidth=1.5,LineStyle="--",Color="#004d00"); p3.Colo
 p4 = plot(slit_07(1:46,1),LineWidth=1.5,LineStyle="-",Color="#800020"); p4.Color(4) = 0.7;
 p5 = plot(slit_09(1:46,1),LineWidth=1.5,LineStyle="--",Color="#B8860B"); p5.Color(4) = 0.7;
 
-legend({"Serpenoid", "gamma = 0.3", "gamma = 0.5", "gamma = 0.7", "gamma = 0.9"},'NumColumns',2,FontSize=9,FontName='arial',Location='northwest',Fontweight='bold');
+legend({"Serpenoid", "gamma = 0.3", "gamma = 0.5", "gamma = 0.7", "gamma = 0.9"},'NumColumns',3,FontSize=9,FontName='arial',Location='northwest',Fontweight='bold');
 
 t = 1:5:200;
 xticks(t);
 xticklabels((t-1)*0.05);
-xlim([1 46]);
+xlim([1 41]);
 % a = get(gca,'YTickLabel');  
 % set(gca,'YTickLabel',a,'fontsize',11,'FontWeight','bold')
 
@@ -62,9 +62,9 @@ grid_ax.GridColor = [0.2 0.2 0.2];
 % grid_ax.YGrid = "off";
 
 xlabel("Time (sec)","FontSize",13,"FontName","arial","FontWeight","bold");
-ylabel("Dorsal joint position (rad)","FontSize",13,"FontName","arial","FontWeight","bold");
+ylabel("Dorsal joint input (rad)","FontSize",13,"FontName","arial","FontWeight","bold");
 
-pbaspect([2 1.1 0.8]);
+pbaspect([2 0.8 0.8]);
 clear a;
 
 %%
@@ -83,12 +83,12 @@ p3 = plot(slit_05(1:46,2),LineWidth=1.5,LineStyle="--",Color="#004d00"); p3.Colo
 p4 = plot(slit_07(1:46,2),LineWidth=1.5,LineStyle="-",Color="#800020"); p4.Color(4) = 0.7;
 p5 = plot(slit_09(1:46,2),LineWidth=1.5,LineStyle="--",Color="#B8860B"); p5.Color(4) = 0.7;
 
-legend({"Serpenoid", "gamma = 0.3", "gamma = 0.5", "gamma = 0.7", "gamma = 0.9"},'NumColumns',2,FontSize=9,FontName='arial',Location='northwest',Fontweight='bold');
+legend({"Serpenoid", "gamma = 0.3", "gamma = 0.5", "gamma = 0.7", "gamma = 0.9"},'NumColumns',3,FontSize=9,FontName='arial',Location='northwest',Fontweight='bold');
 
 t = 1:5:200;
 xticks(t);
 xticklabels((t-1)*0.05);
-xlim([1 46]);
+xlim([1 41]);
 % a = get(gca,'YTickLabel');  
 % set(gca,'YTickLabel',a,'fontsize',11,'FontWeight','bold')
 
@@ -118,9 +118,9 @@ grid_ax.GridColor = [0.2 0.2 0.2];
 % grid_ax.YGrid = "off";
 
 xlabel("Time (sec)","FontSize",13,"FontName","arial","FontWeight","bold");
-ylabel("Lateral joint position (rad)","FontSize",13,"FontName","arial","FontWeight","bold");
+ylabel("Lateral joint input (rad)","FontSize",13,"FontName","arial","FontWeight","bold");
 
-pbaspect([2 1.1 0.8]);
+pbaspect([2 0.8 0.8]);
 clear a;
 
 %%
@@ -159,7 +159,7 @@ plot(tra_05(end,1),tra_05(end,2),Marker="o",MarkerSize=5,MarkerEdgeColor=[0.8 0.
 plot(tra_07(end,1),tra_07(end,2),Marker="o",MarkerSize=5,MarkerEdgeColor=[0.8 0.8 0.8],MarkerFaceColor="#800020");
 plot(tra_09(end,1),tra_09(end,2),Marker="o",MarkerSize=5,MarkerEdgeColor=[0.8 0.8 0.8],MarkerFaceColor="#B8860B");
 
-legend({"Serpenoid", "gamma = 0.3", "gamma = 0.5", "gamma = 0.7", "gamma = 0.9"},'NumColumns',2,FontSize=9,FontName='arial',Location='southwest',Fontweight='bold');
+legend({"Serpenoid", "gamma = 0.3", "gamma = 0.5", "gamma = 0.7", "gamma = 0.9"},'NumColumns',1,FontSize=9,FontName='arial',Location='northwest',Fontweight='bold');
 
 ax = gca;
 X = ax.XAxis;
@@ -171,11 +171,14 @@ Y.FontName = 'arial';
 X.FontWeight = 'bold';
 Y.FontWeight = 'bold';
 
-default_x = [-1.75 1.75];
-default_y = [-1 1];
+% default_x = [-1.75 1.75];
+% default_y = [-1 1];
 
-xlim(default_x + 0.75)
-ylim(default_y + 0.2)
+default_x = [-1.50 1.50];
+default_y = [-0.86 0.86];
+
+xlim(default_x + 0.5)
+ylim(default_y + 0.3)
 
 grid on;
 grid_ax = gca;
@@ -231,7 +234,7 @@ plot(r_tra_05(end,2),r_tra_05(end,1),Marker="o",MarkerSize=5,MarkerEdgeColor=[0.
 plot(r_tra_07(end,2),r_tra_07(end,1),Marker="o",MarkerSize=5,MarkerEdgeColor=[0.8 0.8 0.8],MarkerFaceColor="#800020");
 plot(r_tra_09(end,2),r_tra_09(end,1),Marker="o",MarkerSize=5,MarkerEdgeColor=[0.8 0.8 0.8],MarkerFaceColor="#B8860B");
 
-legend({"Serpenoid", "gamma = 0.3", "gamma = 0.5", "gamma = 0.7", "gamma = 0.9"},'NumColumns',2,FontSize=9,FontName='arial',Location='northwest',Fontweight='bold');
+legend({"Serpenoid", "gamma = 0.3", "gamma = 0.5", "gamma = 0.7", "gamma = 0.9"},'NumColumns',1,FontSize=9,FontName='arial',Location='northwest',Fontweight='bold');
 % 
 % xticks(-9:1:9);
 % yticks(-9:0.5:9);

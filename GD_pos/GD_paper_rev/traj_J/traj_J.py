@@ -128,7 +128,7 @@ def J_view(parameters:np.ndarray, parameters_bar:np.ndarray, curve:bool, gamma:f
     tf = -60 * np.abs(t_orientation)
 
     ctrl_log = {'ctrl_log':ctrl_log, 'p_head_log':p_head_log, 'qpos_log':qpos_log}
-    savemat("./ctrl_log_"+str(gamma)+"_"+M_name+"_"+Bar_name+".mat", ctrl_log)
+    # savemat("./ctrl_log_"+str(gamma)+"_"+M_name+"_"+Bar_name+".mat", ctrl_log)
 
     # return np.hstack((i_term + j_term + l_term, mean_rot, t_orientation))
     return i_term + j_term + l_term + rot + tf
@@ -641,7 +641,9 @@ if __name__ == "__main__":
     # print(J_view(rolling_op,roll09_op,False,0.9))
     # print(J_view(slithering_op,slit03_op,False,0.3))
     # print(J_view(slithering_op,(45,45,156,156,116,116/2,0, 0.05),True,0.9)[0])
-    # exit()
+    
+    print(J_view(serpentine_op,(45, 45, 154, 154, 55, 55, 0, 0.05),False,0.7071)[0])
+    exit()
 
     #### Linear Searching...
     start_iter = time.time()

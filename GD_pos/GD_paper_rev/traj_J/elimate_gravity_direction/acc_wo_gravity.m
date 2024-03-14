@@ -12,13 +12,15 @@ for idx = 1:1:2000
     
     rotm_Origin2This = test_rotm * inv(plane_rotm);
     
-    rotated_g = plane_rotm * [0; 0; 9.81];
+    rotated_g = [0 0 9.81] * plane_rotm;
+    rotated_g = transpose(rotated_g);
     % acc_test = rotm_Origin2This * head_acc_log(idx,:)' 
     
     g_elimated_acc = head_acc_log(idx,:)' - rotated_g;
     % head_acc_log(idx,:)'
     
-    express_acc_in_origin_frame = inv(rotm_Origin2This) * g_elimated_acc;
+    express_acc_in_origin_frame = transpose(g_elimated_acc) * inv(rotm_Origin2This);
+    express_acc_in_origin_frame = transpose(express_acc_in_origin_frame)
 
     data = [data express_acc_in_origin_frame];
 end
@@ -33,3 +35,4 @@ figure
 stackedplot(head_acc_log);
 
 mean(data)
+mean(head_acc_log)

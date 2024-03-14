@@ -103,10 +103,10 @@ def J_view(parameters:np.ndarray, parameters_bar:np.ndarray, curve:bool, gamma:f
             plane_rotm = plane_quat.as_matrix()
             head_rotm = head_quat.as_matrix()
 
-            rotated_g = np.dot(plane_rotm, np.array([0, 0, 9.81]))
+            rotated_g = np.dot(np.array([0, 0, 9.81]), plane_rotm)
             g_elimated_acc = data.sensordata[-3::] - rotated_g
 
-            g_elimated_acc = np.dot(head_rotm.T, g_elimated_acc)
+            g_elimated_acc = np.dot(g_elimated_acc, head_rotm.T)
 
             head_acc_wo_gravity_log = np.vstack((head_acc_wo_gravity_log, g_elimated_acc))
 
@@ -309,10 +309,10 @@ def J_traj_each(parameters:np.ndarray, parameters_bar:np.ndarray, curve:bool, ga
         plane_rotm = plane_quat.as_matrix()
         head_rotm = head_quat.as_matrix()
 
-        rotated_g = np.dot(plane_rotm, np.array([0, 0, 9.81]))
+        rotated_g = np.dot(np.array([0, 0, 9.81]), plane_rotm)
         g_elimated_acc = data.sensordata[-3::] - rotated_g
 
-        g_elimated_acc = np.dot(head_rotm.T, g_elimated_acc)
+        g_elimated_acc = np.dot(g_elimated_acc, head_rotm.T)
 
         acc_head[i,:] = g_elimated_acc
 

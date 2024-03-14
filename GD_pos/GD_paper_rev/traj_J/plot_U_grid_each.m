@@ -1,15 +1,7 @@
 clc; clear;
 
 %% load
-% load U_traj_linear_each_curve_roll.mat
-% load U_traj_linear_each_curve_serp2.mat
-% load U_traj_linear_each_curve_side.mat
-% load U_traj_linear_each_curve_slit.mat
-
-% load U_traj_linear_each_weak_serp_curve.mat
-% load U_traj_linear_each_weak_slit_curve.mat
-load U_traj_linear_each_weak_side_curve.mat
-% load U_traj_linear_each_weak_roll_curve.mat
+load U_traj_linear_each_acc_True_0.7071_45x45x32x32x116x58x0x0_05_21720_.mat
 
 U_map_each_curve = U_map;
 Rot_vec_curve = Rot_vec;
@@ -17,7 +9,8 @@ Tf_orientation_curve = Tf_orientation;
 
 clear max min param_coefficient U_map Rot_vec Tf_orientation;
 
-load U_traj_linear_each_weak_side_curve.mat
+% load U_traj_linear_each_weak_side_curve.mat
+load U_traj_linear_each_acc_True_0.7071_45x45x32x32x116x58x0x0_05_21720_.mat
 
 % load U_traj_linear_each_False_0.3_roll.mat
 % load U_traj_linear_each_False_0.5_roll.mat
@@ -48,10 +41,14 @@ clear max min param_coefficient U_map Rot_vec Tf_orientation;
 % Tf_orientation_curve = transpose(Tf_orientation_curve);
 % Tf_orientation_mat = transpose(Tf_orientation_mat);
 %% U map 계수 설정
-i = 300;
-j = -30;
+i = 300
+% i = 10;
+j = -30
+% j = -1;
 l = -0.05;
-rot = -30;
+% l = 0;
+rot = -30
+% rot = -0;
 
 if Motion_lambda(7)> 38
     tf = -60;
@@ -71,8 +68,8 @@ U_map_mat = transpose(U_map_mat);
 U_map_mat = squeeze(U_map_mat);
 U_map_curve = squeeze(U_map_curve);
 % % 
-U_map_mat = max(U_map_mat, -1500);
-U_map_curve = max(U_map_curve, -1500);
+% U_map_mat = max(U_map_mat, 70);
+% U_map_curve = max(U_map_curve, 70);
 
 % U_map_mat = min(U_map_mat, 1500);
 % U_map_curve = min(U_map_curve, 1500);
@@ -172,3 +169,42 @@ norm_com_mat = normalize(Rot_vec_mat(:,:,3));
 norm_com_curve = normalize(Rot_vec_curve(:,:,3));
 
 corr2(norm_com_mat, norm_com_curve)
+
+%% 가속도 그림과 비교
+figure;
+contourf(transpose(head_acc))
+
+figure; hAxes = gca;
+
+U_new = U_map_curve - 20 * transpose(head_acc);
+
+contourf(U_new);
+
+colormap jet;
+colorbar;
+
+yticks(0:30:181);
+yticklabels(["0","30","60","90","120","150","180"]);
+a = get(gca,'YTickLabel');  
+set(gca,'YTickLabel',a,'fontsize',11,'FontWeight','bold')
+
+xticks(1:30:181);
+xticklabels(["0","30","60","90","120","150","180"]);
+a = get(gca,'XTickLabel');  
+set(gca,'XTickLabel',a,'fontsize',11,'FontWeight','bold')
+
+xline(31,LineWidth=1,LineStyle="--",Color=[0.8 0.8 0.8]);
+xline(61,LineWidth=1,LineStyle="--",Color=[0.8 0.8 0.8]);
+xline(91,LineWidth=1,LineStyle="--",Color=[0.8 0.8 0.8]);
+xline(121,LineWidth=1,LineStyle="--",Color=[0.8 0.8 0.8]);
+xline(151,LineWidth=1,LineStyle="--",Color=[0.8 0.8 0.8]);
+
+yline(30,LineWidth=1,LineStyle="--",Color=[0.8 0.8 0.8]);
+yline(60,LineWidth=1,LineStyle="--",Color=[0.8 0.8 0.8]);
+yline(90,LineWidth=1,LineStyle="--",Color=[0.8 0.8 0.8]);
+
+xlabel("Spatial parameter (degree)","FontSize",13,"FontName","arial","FontWeight","bold");
+ylabel("Temporal parameter (rad)","FontSize",13,"FontName","arial","FontWeight","bold");
+
+pbaspect([6 4 0.8]);
+

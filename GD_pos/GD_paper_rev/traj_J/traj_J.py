@@ -49,6 +49,7 @@ def J_view(parameters:np.ndarray, parameters_bar:np.ndarray, curve:bool, gamma:f
         # return np.array([com_roll, com_pitch, com_yaw])
         return np.array([w, x, y, z])
 
+
     snake = mujoco.MjModel.from_xml_path("./resources/env_snake_v1_contact_servo.xml")
     data = mujoco.MjData(snake)
     mujoco.mj_forward(snake, data)
@@ -72,7 +73,10 @@ def J_view(parameters:np.ndarray, parameters_bar:np.ndarray, curve:bool, gamma:f
     ctrl_log = np.empty((0,14))
     p_head_log = np.empty((0,2))
     qpos_log = np.empty((0,21))
+    head_acc_log = np.empty((0,3))
+    head_acc_wo_gravity_log = np.empty((0,3))
     with mujoco.viewer.launch_passive(snake, data) as viewer:
+        input("Press Enter to continue...")
         for i in range(expand_q.shape[1]):
             time_step = time.time()
             index = np.nonzero(expand_q[:, i])
@@ -90,6 +94,23 @@ def J_view(parameters:np.ndarray, parameters_bar:np.ndarray, curve:bool, gamma:f
             p_head[i] = step_data
             p_head_log = np.vstack((p_head_log, step_data[0:2]))
             qpos_log = np.vstack((qpos_log, data.qpos.copy()))
+            head_acc_log = np.vstack((head_acc_log, data.sensordata[-3::]))
+
+            # head_quat = Rotation.from_quat([data.body('head').xquat[1], data.body('head').xquat[2], data.body('head').xquat[3], data.body('head').xquat[0]])
+            head_quat = Rotation.from_quat([data.qpos.copy()[4], data.qpos.copy()[5], data.qpos.copy()[6], data.qpos.copy()[3]])
+            plane_quat = Rotation.from_quat([0, 0, 0, 1])
+
+            plane_rotm = plane_quat.as_matrix()
+            head_rotm = head_quat.as_matrix()
+
+            rotated_g = np.dot(plane_rotm, np.array([0, 0, 9.81]))
+            g_elimated_acc = data.sensordata[-3::] - rotated_g
+
+            g_elimated_acc = np.dot(head_rotm.T, g_elimated_acc)
+
+            head_acc_wo_gravity_log = np.vstack((head_acc_wo_gravity_log, g_elimated_acc))
+
+    # print(np.mean(head_acc_wo_gravity_log, axis=0))
 
     i = 300
     j = -30
@@ -104,6 +125,8 @@ def J_view(parameters:np.ndarray, parameters_bar:np.ndarray, curve:bool, gamma:f
     i_term = i * l_dist
     j_term = j * (l_traj + 1)/(l_dist + 1)
     l_term = l * np.sum(np.sum(np.abs(p_head[:,7:21]),axis=1))
+
+    # print(f"l_dist : {l_dist}, j_term : {((l_traj + 1) / (l_dist + 1))}, l_term :{(np.sum(np.sum(np.abs(p_head[:,7:21]),axis=1)))}")
 
     # Position & Orientation
     ori_head = p_head[:,3:7]
@@ -127,7 +150,13 @@ def J_view(parameters:np.ndarray, parameters_bar:np.ndarray, curve:bool, gamma:f
     rot = -30 * np.abs(mean_rot[2])
     tf = -60 * np.abs(t_orientation)
 
-    ctrl_log = {'ctrl_log':ctrl_log, 'p_head_log':p_head_log, 'qpos_log':qpos_log}
+    h_acc_norm = np.linalg.norm(head_acc_log, 2, axis=1)
+    # print(np.mean(head_acc_log[:,0]))
+    # print(np.mean(head_acc_log[:,1]))
+    # print(np.mean(head_acc_log[:,2]))
+    # print(np.mean(h_acc_norm))
+
+    ctrl_log = {'ctrl_log':ctrl_log, 'p_head_log':p_head_log, 'qpos_log':qpos_log, 'head_acc_log':head_acc_log}
     # savemat("./ctrl_log_"+str(gamma)+"_"+M_name+"_"+Bar_name+".mat", ctrl_log)
 
     # return np.hstack((i_term + j_term + l_term, mean_rot, t_orientation))
@@ -259,7 +288,8 @@ def J_traj_each(parameters:np.ndarray, parameters_bar:np.ndarray, curve:bool, ga
 
     expand_q = np.repeat(q, 10, axis=1)
 
-    p_head = np.empty((expand_q.shape[1], 21))
+    p_head = np.empty((expand_q.shape[1], 24)) # xpos, ypos, quat, ctrl, h_acc
+    acc_head = np.empty((expand_q.shape[1], 3)) # For head acceleration without gravity
 
     for i in range(expand_q.shape[1]):
         index = np.nonzero(expand_q[:, i])
@@ -268,8 +298,24 @@ def J_traj_each(parameters:np.ndarray, parameters_bar:np.ndarray, curve:bool, ga
 
         mujoco.mj_step(snake, data)
 
-        step_data = np.hstack((data.body('head').xpos.copy(), get_robot_rot(data), data.ctrl))
+        step_data = np.hstack((data.body('head').xpos.copy(), get_robot_rot(data), data.ctrl, data.sensordata[-3::]))
         p_head[i] = step_data
+
+        # Head acceleration without gravity
+        tmp_qpos = data.qpos.copy()
+        head_quat = Rotation.from_quat([tmp_qpos[4], tmp_qpos[5], tmp_qpos[6], tmp_qpos[3]])
+        plane_quat = Rotation.from_quat([0, 0, 0, 1])
+
+        plane_rotm = plane_quat.as_matrix()
+        head_rotm = head_quat.as_matrix()
+
+        rotated_g = np.dot(plane_rotm, np.array([0, 0, 9.81]))
+        g_elimated_acc = data.sensordata[-3::] - rotated_g
+
+        g_elimated_acc = np.dot(head_rotm.T, g_elimated_acc)
+
+        acc_head[i,:] = g_elimated_acc
+
 
     p_head_diff = np.diff(p_head[:,0:2],axis=0)
     p_head_diff_l2_norm = np.linalg.norm(p_head_diff,2,axis=1)
@@ -290,6 +336,19 @@ def J_traj_each(parameters:np.ndarray, parameters_bar:np.ndarray, curve:bool, ga
     t_x = p_head[-1,0]
     t_y = p_head[-1,1]
 
+    # Head acceleration norm
+    # h_acc_norm = np.linalg.norm(p_head[:,21:24], 2, axis=1)
+    # h_acc_mean = np.mean(h_acc_norm)
+
+    # Head acceleration each axis
+    h_acc_x = np.mean(p_head[:,21])
+    h_acc_y = np.mean(p_head[:,22])
+    h_acc_z = np.mean(p_head[:,23])
+
+    # Head acceleration without gravity
+    h_acc_wo_gravity_x,  h_acc_wo_gravity_y,  h_acc_wo_gravity_z = np.mean(acc_head, axis=0)
+    # print(f"h_acc_wo_gravity_x : {h_acc_wo_gravity_x}, h_acc_wo_gravity_y : {h_acc_wo_gravity_y}, h_acc_wo_gravity_z : {h_acc_wo_gravity_z}")
+
     t_orientation = 0
     try:
         t_orientation = np.arctan2(t_y, t_x)
@@ -297,7 +356,7 @@ def J_traj_each(parameters:np.ndarray, parameters_bar:np.ndarray, curve:bool, ga
         print(e)
         t_orientation = np.nan
     
-    return np.hstack((i_term, j_term, l_term, mean_rot, t_orientation))
+    return np.hstack((i_term, j_term, l_term, mean_rot, t_orientation, h_acc_wo_gravity_x, h_acc_wo_gravity_y, h_acc_wo_gravity_z))
 
 
 def orderize_linear(param_motion:np.ndarray, curve:bool, isSlit:bool, gamma:float, param_bar_iter:np.ndarray, shd_name:str, shd_shape) -> None:
@@ -318,7 +377,25 @@ def orderize_linear(param_motion:np.ndarray, curve:bool, isSlit:bool, gamma:floa
 
 
         U_map[idx1, idx2, :] = J_traj_each(param_motion, lambda_bar, curve, gamma)
-        
+
+def orderize_linear_amp(param_motion:np.ndarray, curve:bool, isSlit:bool, gamma:float, param_bar_iter:np.ndarray, shd_name:str, shd_shape) -> None:
+
+    for i in param_bar_iter:
+        exist_shm = shared_memory.SharedMemory(name=shd_name)
+        U_map = np.ndarray(shd_shape, dtype=np.float64, buffer=exist_shm.buf)
+
+        idx1 = i[0] - 1 # psi start 0
+        idx2 = i[1] - 1 # nu start 1
+
+        amp_d, amp_l, psi_d, psi_l, nu_d, nu_l, delta = i
+
+        if isSlit:
+            lambda_bar = (amp_d, amp_l, psi_d, psi_l, nu_d, nu_l, delta, param_motion[-1])
+        else:
+            lambda_bar = (amp_d, amp_l, psi_d, psi_l, nu_d, nu_l, delta, param_motion[-1])
+
+        U_map[idx1, idx2, :] = J_traj_each(param_motion, lambda_bar, curve, gamma)
+
 def iterator_linear(motion:np.ndarray, curve:bool, gamma:float) -> None:
     motion_param = motion
 
@@ -342,7 +419,7 @@ def iterator_linear(motion:np.ndarray, curve:bool, gamma:float) -> None:
     n1 = len(psi)
     n2 = len(nu)
 
-    U_map = np.empty((n1,n2,7), dtype=np.float64)
+    U_map = np.empty((n1,n2,10), dtype=np.float64)
     shm = shared_memory.SharedMemory(name="shared_U_map", create=True, size=U_map.nbytes)
     data = np.ndarray(U_map.shape, dtype=U_map.dtype, buffer=shm.buf)
 
@@ -405,8 +482,17 @@ def iterator_linear(motion:np.ndarray, curve:bool, gamma:float) -> None:
     pc15.join()
     pc16.join()
 
-    data_dict = {'U_map': data[:,:,0:3], 'Rot_vec':data[:,:,3:6], 'Tf_orientation':data[:,:,6], 'Motion_lambda': motion_param, 'Curve':curve, 'Gamma':gamma}
-    savemat("./U_traj_linear_each_"+str(curve)+"_"+str(gamma)+"_"+param2filename(motion_param)+f"_{len(combinations)}"+"_.mat", data_dict)
+    data_dict = {'U_map': data[:,:,0:3], 'Rot_vec':data[:,:,3:6], 'Tf_orientation':data[:,:,6], 'head_acc':data[:,:,7:10],'Motion_lambda': motion_param, 'Curve':curve, 'Gamma':gamma}
+    # data_dict = {'U_dist' : data[:,:,0],
+    #              'U_traj' : data[:,:,1],
+    #              'U_ctrl' : data[:,:,2],
+    #              'Rot_vec': data[:,:,3:6],
+    #              'Tf_orientation': data[:,:,6],
+    #              'head_acc': data[:,:,7]
+    #     ,'Motion_lambda': motion_param, 
+    #     'Curve':curve, 'Gamma':gamma}
+
+    savemat("./U_traj_linear_each_acc_g_"+str(curve)+"_"+str(gamma)+"_"+param2filename(motion_param)+f"_{len(combinations)}"+"_.mat", data_dict)
     
     shm.close()
     shm.unlink()
@@ -506,6 +592,112 @@ def iterator_fine(motion:np.ndarray, curve:bool, gamma:float) -> None:
     shm.unlink()
 
     print('done')
+
+def iterator_linear_amp(motion:np.ndarray, curve:bool, gamma:float) -> None:
+    motion_param = motion
+
+    amp_d = np.arange(1,75)
+    amp_l = np.arange(1,75)
+
+    psi_d = np.array([motion_param[1]])
+    psi_l = np.array([motion_param[2]])
+
+    nu_d = np.array([motion_param[3]])
+    nu_l = np.array([motion_param[4]])
+
+    delta = np.array([motion_param[-2]])
+
+    isSlit = False
+    if motion_param[-3] == motion_param[-4]:
+        isSlit = False
+        print('Serp, Side or Roll gait...')
+    else:
+        isSlit = True
+        print('Slithering gait...')
+
+    n1 = len(amp_d)
+    n2 = len(amp_l)
+
+    U_map = np.empty((n1,n2,8), dtype=np.float64)
+    shm = shared_memory.SharedMemory(name="shared_U_map", create=True, size=U_map.nbytes)
+    data = np.ndarray(U_map.shape, dtype=U_map.dtype, buffer=shm.buf)
+
+    combinations = list(itertools.product(amp_d, amp_l, psi_d, psi_l, nu_d, nu_l, delta))
+    print(f'Number of Combinations : {len(combinations)}')
+
+    ea = len(combinations) // 16
+    start_idx = [0, 1 * ea, 2 * ea, 3 * ea, 4 * ea, 5 * ea, 6 * ea, 7 * ea, 8 * ea , 9 * ea, 10 * ea, 11 * ea, 12 * ea, 13 * ea, 14 * ea, 15 * ea] 
+
+    print(f'For 16 processes start indices : {start_idx}')
+
+    pc1 = Process(target= orderize_linear_amp, args=(np.array(motion_param), curve, isSlit, gamma, list(combinations[start_idx[0]:start_idx[1]]),   shm.name, U_map.shape))
+    pc2 = Process(target= orderize_linear_amp, args=(np.array(motion_param), curve, isSlit, gamma, list(combinations[start_idx[1]:start_idx[2]]),   shm.name, U_map.shape))
+    pc3 = Process(target= orderize_linear_amp, args=(np.array(motion_param), curve, isSlit, gamma, list(combinations[start_idx[2]:start_idx[3]]),   shm.name, U_map.shape))
+    pc4 = Process(target= orderize_linear_amp, args=(np.array(motion_param), curve, isSlit, gamma, list(combinations[start_idx[3]:start_idx[4]]),   shm.name, U_map.shape))
+    pc5 = Process(target= orderize_linear_amp, args=(np.array(motion_param), curve, isSlit, gamma, list(combinations[start_idx[4]:start_idx[5]]),   shm.name, U_map.shape))
+    pc6 = Process(target= orderize_linear_amp, args=(np.array(motion_param), curve, isSlit, gamma, list(combinations[start_idx[5]:start_idx[6]]),   shm.name, U_map.shape))
+    pc7 = Process(target= orderize_linear_amp, args=(np.array(motion_param), curve, isSlit, gamma, list(combinations[start_idx[6]:start_idx[7]]),   shm.name, U_map.shape))
+    pc8 = Process(target= orderize_linear_amp, args=(np.array(motion_param), curve, isSlit, gamma, list(combinations[start_idx[7]:start_idx[8]]),   shm.name, U_map.shape))
+    pc9 = Process(target= orderize_linear_amp, args=(np.array(motion_param), curve, isSlit, gamma, list(combinations[start_idx[8]:start_idx[9]]),   shm.name, U_map.shape))
+    pc10 = Process(target=orderize_linear_amp, args=(np.array(motion_param), curve, isSlit, gamma, list(combinations[start_idx[9]:start_idx[10]]),  shm.name, U_map.shape))
+    pc11 = Process(target=orderize_linear_amp, args=(np.array(motion_param), curve, isSlit, gamma, list(combinations[start_idx[10]:start_idx[11]]), shm.name, U_map.shape))
+    pc12 = Process(target=orderize_linear_amp, args=(np.array(motion_param), curve, isSlit, gamma, list(combinations[start_idx[11]:start_idx[12]]), shm.name, U_map.shape))
+    pc13 = Process(target=orderize_linear_amp, args=(np.array(motion_param), curve, isSlit, gamma, list(combinations[start_idx[12]:start_idx[13]]), shm.name, U_map.shape))
+    pc14 = Process(target=orderize_linear_amp, args=(np.array(motion_param), curve, isSlit, gamma, list(combinations[start_idx[13]:start_idx[14]]), shm.name, U_map.shape))
+    pc15 = Process(target=orderize_linear_amp, args=(np.array(motion_param), curve, isSlit, gamma, list(combinations[start_idx[14]:start_idx[15]]), shm.name, U_map.shape))
+    pc16 = Process(target=orderize_linear_amp, args=(np.array(motion_param), curve, isSlit, gamma, list(combinations[start_idx[15]::]),             shm.name, U_map.shape))
+
+    pc1.start()
+    pc2.start()
+    pc3.start()
+    pc4.start()
+    pc5.start()
+    pc6.start()
+    pc7.start()
+    pc8.start()
+    pc9.start()
+    pc10.start()
+    pc11.start()
+    pc12.start()
+    pc13.start()
+    pc14.start()
+    pc15.start()
+    pc16.start()
+
+    pc1.join()
+    pc2.join()
+    pc3.join()
+    pc4.join()
+    pc5.join()
+    pc6.join()
+    pc7.join()
+    pc8.join()
+    pc9.join()
+    pc10.join()
+    pc11.join()
+    pc12.join()
+    pc13.join()
+    pc14.join()
+    pc15.join()
+    pc16.join()
+
+    data_dict = {'U_map': data[:,:,0:3], 'Rot_vec':data[:,:,3:6], 'Tf_orientation':data[:,:,6], 'head_acc':data[:,:,7],'Motion_lambda': motion_param, 'Curve':curve, 'Gamma':gamma}
+    # data_dict = {'U_dist' : data[:,:,0],
+    #              'U_traj' : data[:,:,1],
+    #              'U_ctrl' : data[:,:,2],
+    #              'Rot_vec': data[:,:,3:6],
+    #              'Tf_orientation': data[:,:,6],
+    #              'head_acc': data[:,:,7]
+    #     ,'Motion_lambda': motion_param, 
+    #     'Curve':curve, 'Gamma':gamma}
+
+    savemat("./U_amp_"+str(curve)+"_"+str(gamma)+"_"+param2filename(motion_param)+f"_{len(combinations)}"+"_.mat", data_dict)
+    
+    shm.close()
+    shm.unlink()
+
+    print('done')
+
 
 def orderize_fine(param_motion:np.ndarray, curve:bool, isSlit:bool, gamma:float, param_bar_iter:np.ndarray, shd_name:str, shd_shape) -> None:
 
@@ -627,6 +819,8 @@ if __name__ == "__main__":
     roll09_op =(15.15487732,  15.23185306, 169.75254068, 167.53307839, 122.03266542, 117.04890007,  91.17241511, 0.05) #485.12
     # roll09_op =(1.564e+1,  1.516e+1, 1.736e+2, 1.669e+2, 1.231e+2, 1.134e+2,  9.340e+1, 0.05) #485.12
     
+    # 머리 덜 움직이는 OP
+    slit_acc_op = (45, 45, 155, 155, 71, 71/2, 0, 0.05)
 
     # finetuning_each(rolling_op, 0.3)
     # finetuning_each(rolling_op, 0.5)
@@ -642,8 +836,11 @@ if __name__ == "__main__":
     # print(J_view(slithering_op,slit03_op,False,0.3))
     # print(J_view(slithering_op,(45,45,156,156,116,116/2,0, 0.05),True,0.9)[0])
     
-    print(J_view(serpentine_op,(45, 45, 154, 154, 55, 55, 0, 0.05),False,0.7071)[0])
-    exit()
+    # print(J_view(slithering_op,(19, 32, 32, 32, 116, 58, 0, 0.05),True,0.7071))
+    # print(J_view(slithering_op,(36, 38, 154, 154, 55, 55, 0, 0.05),True,0.7071))
+    # print(J_view(serpentine_op,(45, 45, 153, 153, 73, 73/2, 0, 0.05),True,0.7071))
+    # print(J_traj_each(serpentine_op,(45, 45, 153, 153, 73, 73/2, 0, 0.05),True,0.7071))
+    # exit()
 
     #### Linear Searching...
     start_iter = time.time()
@@ -694,6 +891,12 @@ if __name__ == "__main__":
     # iterator_fine(slithering_op, True, 0.9)
     # iterator_fine(sidewinding_op,True, 0.9)
     # iterator_fine(rolling_op,       True, 0.9)
+
+    # # Linear Amplitude
+    # iterator_linear_amp(serpentine_op, True, 0.3)
+    # iterator_linear_amp(slithering_op, True, 0.3)
+    # iterator_linear_amp(sidewinding_op, True, 0.3)
+    # iterator_linear_amp(rolling_op, True, 0.3)
 
     end_iter = time.time()
     print(f"Iterating dond... {end_iter-start_iter} seconds elapsed")

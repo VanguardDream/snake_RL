@@ -97,7 +97,8 @@ def J_view(parameters:np.ndarray, parameters_bar:np.ndarray, curve:bool, gamma:f
             head_acc_log = np.vstack((head_acc_log, data.sensordata[-3::]))
 
             # head_quat = Rotation.from_quat([data.body('head').xquat[1], data.body('head').xquat[2], data.body('head').xquat[3], data.body('head').xquat[0]])
-            head_quat = Rotation.from_quat([data.qpos.copy()[4], data.qpos.copy()[5], data.qpos.copy()[6], data.qpos.copy()[3]])
+            # head_quat = Rotation.from_quat([data.qpos.copy()[4], data.qpos.copy()[5], data.qpos.copy()[6], data.qpos.copy()[3]])
+            head_quat = Rotation.from_matrix(data.site('s_head').xmat.copy().reshape(3,3))
             plane_quat = Rotation.from_quat([0, 0, 0, 1])
 
             plane_rotm = plane_quat.as_matrix()
@@ -156,8 +157,8 @@ def J_view(parameters:np.ndarray, parameters_bar:np.ndarray, curve:bool, gamma:f
     # print(np.mean(head_acc_log[:,2]))
     # print(np.mean(h_acc_norm))
 
-    ctrl_log = {'ctrl_log':ctrl_log, 'p_head_log':p_head_log, 'qpos_log':qpos_log, 'head_acc_log':head_acc_log}
-    # savemat("./ctrl_log_"+str(gamma)+"_"+M_name+"_"+Bar_name+".mat", ctrl_log)
+    ctrl_log = {'ctrl_log':ctrl_log, 'p_head_log':p_head_log, 'qpos_log':qpos_log, 'head_acc_log':head_acc_log, 'head_acc_wo_gravity_log':head_acc_wo_gravity_log}
+    savemat("./ctrl_log_"+str(gamma)+"_"+M_name+"_"+Bar_name+".mat", ctrl_log)
 
     # return np.hstack((i_term + j_term + l_term, mean_rot, t_orientation))
     return i_term + j_term + l_term + rot + tf
@@ -838,9 +839,9 @@ if __name__ == "__main__":
     
     # print(J_view(slithering_op,(19, 32, 32, 32, 116, 58, 0, 0.05),True,0.7071))
     # print(J_view(slithering_op,(36, 38, 154, 154, 55, 55, 0, 0.05),True,0.7071))
-    # print(J_view(serpentine_op,(45, 45, 153, 153, 73, 73/2, 0, 0.05),True,0.7071))
+    print(J_view(serpentine_op,(15, 15, 46, 46, 17, 17, 90, 0.05),True,0.7071))
     # print(J_traj_each(serpentine_op,(45, 45, 153, 153, 73, 73/2, 0, 0.05),True,0.7071))
-    # exit()
+    exit()
 
     #### Linear Searching...
     start_iter = time.time()

@@ -222,7 +222,7 @@
 
         <framequat name="head_quat" objtype="site" objname="s_head"/>
         <gyro name="head_angvel" site="s_head"/>
-        <accelerometer name="head_linacc" site="s_head"/>
+        <accelerometer name="head_linacc" cutoff="80" site="s_head"/>
 
     </sensor>
 

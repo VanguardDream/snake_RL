@@ -29,4 +29,5 @@ PROTOCOL_VERSION            = 2.0
 
 # ex) Windows: "COM*", Linux: "/dev/ttyUSB*", Mac: "/dev/tty.usbserial-*"
 # DEVICENAME                    = '/dev/ttyDXL'
-DEVICENAME                    = '/dev/tty.usbserial-FT7WBAA4'
+# DEVICENAME                    = '/dev/tty.usbserial-FT7WBAA4'
+DEVICENAME                    = '/dev/tty.usbserial-FT3M9YHP'

@@ -53,7 +53,7 @@ def comm_config()->List[Union[PortHandler, Protocol2PacketHandler, GroupSyncWrit
 
     return [porth, packh, gs_pos_write, gs_pos_read, gs_vel_read, gs_cur_read]
 
-def motors_reset(port:PortHandler,packet:Protocol2PacketHandler)->None:
+def motors_reset(port:PortHandler,packet:Protocol2PacketHandler,en:bool)->None:
 
     for i in range(14):
         packet.write1ByteTxOnly(port,i,ADDR_TORQUE_ENABLE,0)
@@ -65,28 +65,33 @@ def motors_reset(port:PortHandler,packet:Protocol2PacketHandler)->None:
 
     time.sleep(0.5)
 
-    for i in range(14):
-        packet.write1ByteTxOnly(port,i,ADDR_TORQUE_ENABLE,1)
+    if en:
+        for i in range(14):
+            packet.write1ByteTxOnly(port,i,ADDR_TORQUE_ENABLE,1)
 
-    time.sleep(0.5)
+        time.sleep(0.5)
 
-    for i in range(14):
-        packet.write1ByteTxOnly(port,i,ADDR_TORQUE_ENABLE,1)
+        for i in range(14):
+            packet.write1ByteTxOnly(port,i,ADDR_TORQUE_ENABLE,1)
 
-    print("\033[32m Motor enabling done...\033[0m")
+        print("\033[32m Motor enabling done...\033[0m")
 
-    time.sleep(0.5)
+        time.sleep(0.5)
+        for i in range(14):
+            packet.write4ByteTxOnly(port,i,ADDR_GOAL_POSITION,2048)
 
-    for i in range(14):
-        packet.write4ByteTxOnly(port,i,ADDR_GOAL_POSITION,2048)
+        print("\033[32m Motor homing done...\033[0m")
+    else:
+        for i in range(14):
+            packet.write1ByteTxOnly(port,i,ADDR_TORQUE_ENABLE,0)
 
-    print("\033[32m Motor homing done...\033[0m")
+        print("\033[32m Motor torque off...\033[0m")
         
 def rad2dynamixel(rad:float)->int:
     deg = np.rad2deg(rad)
     pulse = np.round(deg/0.088)
 
-    return int(4048 + pulse)
+    return int(2048 + pulse)
 
 if __name__ == "__main__":
     ac_roll_op = (15, 15, 171, 171, 118, 118, 90, 0.05)
@@ -98,9 +103,9 @@ if __name__ == "__main__":
     q = gait_config(ac_slit_op, ac_slit_op, False, 0.7071)
     print('Gait creating done...')
 
-    [poh, pah, pos_writer, pos_reader, vel_reader, cur_reader] = comm_config()
+    poh, pah, pos_writer, pos_reader, vel_reader, cur_reader = comm_config()
 
-    motors_reset(poh,pah)
+    motors_reset(poh,pah,True)
 
     input("Press any key to move")
 
@@ -113,12 +118,13 @@ if __name__ == "__main__":
         index = np.nonzero(i)[0]
 
         for idx in index:
-            dxl_add_param_result = pos_writer.addParam(idx, [DXL_LOBYTE(rad2dynamixel(i[idx])),DXL_HIBYTE(rad2dynamixel(i[idx]))])
+            param_goal_position = [DXL_LOBYTE(DXL_LOWORD(rad2dynamixel(i[idx]))), DXL_HIBYTE(DXL_LOWORD(rad2dynamixel(i[idx]))), DXL_LOBYTE(DXL_HIWORD(rad2dynamixel(i[idx]))), DXL_HIBYTE(DXL_HIWORD(rad2dynamixel(i[idx])))]
+
+            dxl_add_param_result = pos_writer.addParam(idx, param_goal_position)
             if dxl_add_param_result != True:
                 print("\033[31m [ID:%03d] Addparam fail(action)...\033[0m" % idx)
 
         dxl_comm_result = pos_writer.txPacket()
-        pos_writer.txPacket()
         if dxl_comm_result != COMM_SUCCESS:
             print("\033[31m GBPP_Tx fail with error %s \033[0m" % pah.getTxRxResult(dxl_comm_result))
 
@@ -167,29 +173,31 @@ if __name__ == "__main__":
         pos = np.zeros(14)
         vel = np.zeros(14)
         cur = np.zeros(14)
+
         for id in range(14):
-            pos[id] = pos_reader.getData(id,ADDR_PRESENT_POSITION,LEN_PRESENT_POSITION)
-            if pos[idx] > 0x7fffffff:
-                pos[idx] -= 4294967296 
-            vel[id] = vel_reader.getData(id,ADDR_PRESENT_VELOCITY,LEN_PRESENT_VELOCITY)
-            if vel[idx] > 0x7fffffff:
-                vel[idx] -= 4294967296 
+            # pos[id] = pos_reader.getData(id,ADDR_PRESENT_POSITION,LEN_PRESENT_POSITION)
+            # if pos[id] > 0x7fffffff:
+                # pos[id] -= 4294967296 
+            # vel[id] = vel_reader.getData(id,ADDR_PRESENT_VELOCITY,LEN_PRESENT_VELOCITY)
+            # if vel[id] > 0x7fffffff:
+            #     vel[id] -= 4294967296 
             cur[id] = cur_reader.getData(id,ADDR_PRESENT_CURRENT,LEN_PRESENT_CURRENT)
-            if cur[idx] > 0x7fff:
-                cur[idx] -= 65536
+            if cur[id] > 0x7fff:
+                cur[id] -= 65536
 
         pos_stack = np.vstack((pos_stack,pos))
         vel_stack = np.vstack((vel_stack,vel))
         cur_stack = np.vstack((cur_stack,cur))
 
-        pos_writer.clearParam()
         pos_reader.clearParam()
         vel_reader.clearParam()
         cur_reader.clearParam()
-
+        pos_writer.clearParam()
+        # print(time.time() - up_t)
         while time.time() - up_t < 0.05:
             pass
 
+    motors_reset(poh,pah,False)
     poh.closePort()
 
     

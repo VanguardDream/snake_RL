@@ -1,14 +1,23 @@
 figure
 
-acc = sqrt(head_acc(:,:,1).^2+head_acc(:,:,2).^2+head_acc(:,:,3).^2) + 1;
+acc_wo_x = head_acc_wo_g(:,:,1);
 dist = U_map(:,:,1);
+x_dist = cos(Tf_orientation) .* dist;
 rot = sqrt(Rot_vec(:,:,1).^2 + Rot_vec(:,:,2).^2 + Rot_vec(:,:,3).^2);
 
+data = 1.0 * acc_wo_x + 1.5 * x_dist - 0.2 * rot;
 
-% data = dist ./ acc - rot;
-data = dist + acc - rot;
-% 
-% data = min(data, 40);
-% data = max(data, -40);
+contourf(transpose(data),15)
 
-contourf(transpose(data))
+%% Y축
+
+figure
+
+acc_wo_y = head_acc_wo_g(:,:,2);
+dist = U_map(:,:,1);
+y_dist = abs(sin(Tf_orientation) .* dist);
+rot = sqrt(Rot_vec(:,:,1).^2 + Rot_vec(:,:,2).^2 + Rot_vec(:,:,3).^2);
+
+data = 1.0 * acc_wo_y + 1.5 * y_dist - 0.2 * rot;
+
+contourf(transpose(data),15)

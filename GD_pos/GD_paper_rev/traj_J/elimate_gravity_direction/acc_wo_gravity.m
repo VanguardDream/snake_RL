@@ -11,7 +11,7 @@ for idx = 1:1:2000
     
     rotm_Origin2This = test_rotm * inv(plane_rotm);
     
-    rotated_g = [0 0 9.81] * plane_rotm;
+    rotated_g = [0 0 9.81] * test_rotm;
     rotated_g = transpose(rotated_g);
     % acc_test = rotm_Origin2This * head_acc_log(idx,:)' 
     
@@ -44,3 +44,4 @@ stackedplot(lowpass(head_acc_log,10,200));
 %%
 mean(data)
 mean(head_acc_log)
+mean(head_acc_only_log)

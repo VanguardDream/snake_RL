@@ -852,31 +852,31 @@ if __name__ == "__main__":
     #### Linear Searching...
     start_iter = time.time()
     # Curves
-    iterator_linear(serpentine_op,  True, 0.7071)
-    iterator_linear(slithering_op,  True, 0.7071)
-    iterator_linear(sidewinding_op, True, 0.7071)
-    iterator_linear(rolling_op,     True, 0.7071)
+    # iterator_linear(serpentine_op,  True, 0.7071)
+    # iterator_linear(slithering_op,  True, 0.7071)
+    # iterator_linear(sidewinding_op, True, 0.7071)
+    # iterator_linear(rolling_op,     True, 0.7071)
 
     # Mats
-    # iterator_linear(serpentine_op, False, 0.3)
-    # iterator_linear(slithering_op, False, 0.3)
-    # iterator_linear(sidewinding_op,False, 0.3)
-    # iterator_linear(rolling_op,       False, 0.3)
+    iterator_linear(ac_serp_op,     False,  0.3)
+    iterator_linear(ac_slit_op,     False,  0.3)
+    iterator_linear(ac_side_op,     False,  0.3)
+    iterator_linear(ac_roll_op,     False,  0.3)
 
-    # iterator_linear(serpentine_op, False, 0.5)
-    # iterator_linear(slithering_op, False, 0.5)
-    # iterator_linear(sidewinding_op,False, 0.5)
-    # iterator_linear(rolling_op,       False, 0.5)
+    iterator_linear(ac_serp_op,     False,  0.5)
+    iterator_linear(ac_slit_op,     False,  0.5)
+    iterator_linear(ac_side_op,     False,  0.5)
+    iterator_linear(ac_roll_op,     False,  0.5)
 
-    # iterator_linear(serpentine_op, False, 0.7071)
-    # iterator_linear(slithering_op, False, 0.7071)
-    # iterator_linear(sidewinding_op,False, 0.7071)
-    # iterator_linear(rolling_op,       False, 0.7071)
+    iterator_linear(ac_serp_op,     False,  0.7071)
+    iterator_linear(ac_slit_op,     False,  0.7071)
+    iterator_linear(ac_side_op,     False,  0.7071)
+    iterator_linear(ac_roll_op,     False,  0.7071)
 
-    # iterator_linear(serpentine_op, False, 0.9)
-    # iterator_linear(slithering_op, False, 0.9)
-    # iterator_linear(sidewinding_op,False, 0.9)
-    # iterator_linear(rolling_op,       False, 0.9)
+    iterator_linear(ac_serp_op,     False,  0.9)
+    iterator_linear(ac_slit_op,     False,  0.9)
+    iterator_linear(ac_side_op,     False,  0.9)
+    iterator_linear(ac_roll_op,     False,  0.9)
 
     # # Fines
     # iterator_fine(serpentine_op, True, 0.3)

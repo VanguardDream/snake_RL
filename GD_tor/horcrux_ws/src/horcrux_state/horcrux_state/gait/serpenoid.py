@@ -8,14 +8,25 @@ class util():
         self._el1 = e_l1
         self._el2 = e_l2
         self._delta = delta
-        self._t = np.arange(0, 2 * np.pi * np.lcm(self._el2, self._ed2) / 10, 0.1).transpose()
+        # self._t = np.arange(0, 2 * np.pi * np.lcm(self._el2, self._ed2) / 10, 0.1).transpose()
+
+        self._t = np.arange(0, 300, 0.1).transpose()
+
+        self.MotionMatrix = self.getMotionMat()
+        self.joints = self.MotionMatrix.shape[0]
+        self.Mvecs = self.MotionMatrix.shape[1]
 
     def getMotionMat(self)->np.ndarray:
         raw_serp = self.serpenoid(self._t, self._ed1, self._el1, self._ed2 / 10, self._el2 / 10, self._delta)
         M_mat = self.__genMotionMat(raw_serp)
 
         return M_mat
-        
+
+    def getMvec(self, k):
+        k = k % self.Mvecs
+
+        return self.MotionMatrix[:,k]
+            
     ## Predefined functions
     def serpenoid(self, t, e_d1, e_l1, e_d2, e_l2, delta)->np.ndarray:
         #Hirose (1993) serpenoid curve implementations

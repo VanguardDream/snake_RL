@@ -845,9 +845,9 @@ if __name__ == "__main__":
     
     # print(J_view(slithering_op,(19, 32, 32, 32, 116, 58, 0, 0.05),True,0.7071))
     # print(J_view(slithering_op,(36, 38, 154, 154, 55, 55, 0, 0.05),True,0.7071))
-    # print(J_view((45, 45, 160, 160, 88, 88, 0, 0.05),(45, 45, 162, 162, 84, 84, 0, 0.05),True,0.7071))
+    print(J_view((45, 45, 160, 160, 88, 88, 0, 0.05),(45, 45, 162, 162, 84, 84, 0, 0.05),True,0.7071))
     # print(J_traj_each(serpentine_op,(45, 45, 20, 20, 108, 108/2, 0, 0.05),True,0.7071))
-    # exit()
+    exit()
 
     #### Linear Searching...
     start_iter = time.time()

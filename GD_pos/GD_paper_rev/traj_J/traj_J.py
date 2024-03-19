@@ -171,7 +171,7 @@ def J_view(parameters:np.ndarray, parameters_bar:np.ndarray, curve:bool, gamma:f
     # print(np.mean(h_acc_norm))
 
     ctrl_log = {'ctrl_log':ctrl_log, 'p_head_log':p_head_log, 'qpos_log':qpos_log, 'head_acc_log':head_acc_log, 'head_acc_wo_gravity_log':head_acc_wo_gravity_log, 'head_gyro_log':head_gyro_log, 'head_ang_acc_from_gyro':head_ang_acc_from_gyro, 'head_acc_only_log':head_acc_only_log}
-    savemat("./ctrl_log_"+str(gamma)+"_"+M_name+"_"+Bar_name+".mat", ctrl_log)
+    # savemat("./ctrl_log_"+str(gamma)+"_"+M_name+"_"+Bar_name+".mat", ctrl_log)
 
     # return np.hstack((i_term + j_term + l_term, mean_rot, t_orientation))
     return i_term + j_term + l_term + rot + tf
@@ -803,7 +803,8 @@ if __name__ == "__main__":
 
     # Optimal with acceleration values
     ac_roll_op = (15, 15, 171, 171, 118, 118, 90, 0.05)
-    ac_side_op = (45, 45, 24, 24, 62, 62, 45, 0.05)
+    # ac_side_op_bad = (45, 45, 158, 158, 62, 62, 45, 0.05)
+    ac_side_op = (45, 45, 26, 26, 59, 59, 45, 0.05)
     ac_slit_op = (45, 45, 32, 32, 117, 117/2, 0, 0.05)
     ac_serp_op = (45, 45, 162, 162, 84, 84, 0, 0.05)
 
@@ -845,9 +846,9 @@ if __name__ == "__main__":
     
     # print(J_view(slithering_op,(19, 32, 32, 32, 116, 58, 0, 0.05),True,0.7071))
     # print(J_view(slithering_op,(36, 38, 154, 154, 55, 55, 0, 0.05),True,0.7071))
-    # print(J_view(ac_side_op,(45, 45, 160, 160, 44, 44, 45, 0.05),False,0.7071))
+    print(J_view(ac_side_op,(45, 45, 10, 10, 107, 107, 45, 0.05),True,0.7071))
     # print(J_traj_each(serpentine_op,(45, 45, 20, 20, 108, 108/2, 0, 0.05),True,0.7071))
-    # exit()
+    exit()
 
     #### Linear Searching...
     start_iter = time.time()
@@ -879,10 +880,15 @@ if __name__ == "__main__":
     # iterator_linear(ac_roll_op,     False,  0.9)
 
     # 20240319 Side만 다시
-    iterator_linear(sidewinding_op, False, 0.3)
-    iterator_linear(sidewinding_op, False, 0.5)
-    iterator_linear(sidewinding_op, False, 0.7071)
-    iterator_linear(sidewinding_op, False, 0.9)
+    # iterator_linear(sidewinding_op, False, 0.3)
+    # iterator_linear(sidewinding_op, False, 0.5)
+    # iterator_linear(sidewinding_op, False, 0.7071)
+    # iterator_linear(sidewinding_op, False, 0.9)
+
+    iterator_linear(ac_side_op, False, 0.3)
+    iterator_linear(ac_side_op, False, 0.5)
+    iterator_linear(ac_side_op, False, 0.7071)
+    iterator_linear(ac_side_op, False, 0.9)
 
     # # Fines
     # iterator_fine(serpentine_op, True, 0.3)

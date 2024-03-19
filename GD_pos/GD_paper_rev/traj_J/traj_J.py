@@ -845,9 +845,9 @@ if __name__ == "__main__":
     
     # print(J_view(slithering_op,(19, 32, 32, 32, 116, 58, 0, 0.05),True,0.7071))
     # print(J_view(slithering_op,(36, 38, 154, 154, 55, 55, 0, 0.05),True,0.7071))
-    print(J_view((45, 45, 160, 160, 88, 88, 0, 0.05),(45, 45, 162, 162, 84, 84, 0, 0.05),True,0.7071))
+    # print(J_view(ac_side_op,(45, 45, 160, 160, 44, 44, 45, 0.05),False,0.7071))
     # print(J_traj_each(serpentine_op,(45, 45, 20, 20, 108, 108/2, 0, 0.05),True,0.7071))
-    exit()
+    # exit()
 
     #### Linear Searching...
     start_iter = time.time()
@@ -858,25 +858,31 @@ if __name__ == "__main__":
     # iterator_linear(rolling_op,     True, 0.7071)
 
     # Mats
-    iterator_linear(ac_serp_op,     False,  0.3)
-    iterator_linear(ac_slit_op,     False,  0.3)
-    iterator_linear(ac_side_op,     False,  0.3)
-    iterator_linear(ac_roll_op,     False,  0.3)
+    # iterator_linear(ac_serp_op,     False,  0.3)
+    # iterator_linear(ac_slit_op,     False,  0.3)
+    # iterator_linear(ac_side_op,     False,  0.3)
+    # iterator_linear(ac_roll_op,     False,  0.3)
 
-    iterator_linear(ac_serp_op,     False,  0.5)
-    iterator_linear(ac_slit_op,     False,  0.5)
-    iterator_linear(ac_side_op,     False,  0.5)
-    iterator_linear(ac_roll_op,     False,  0.5)
+    # iterator_linear(ac_serp_op,     False,  0.5)
+    # iterator_linear(ac_slit_op,     False,  0.5)
+    # iterator_linear(ac_side_op,     False,  0.5)
+    # iterator_linear(ac_roll_op,     False,  0.5)
 
-    iterator_linear(ac_serp_op,     False,  0.7071)
-    iterator_linear(ac_slit_op,     False,  0.7071)
-    iterator_linear(ac_side_op,     False,  0.7071)
-    iterator_linear(ac_roll_op,     False,  0.7071)
+    # iterator_linear(ac_serp_op,     False,  0.7071)
+    # iterator_linear(ac_slit_op,     False,  0.7071)
+    # iterator_linear(ac_side_op,     False,  0.7071)
+    # iterator_linear(ac_roll_op,     False,  0.7071)
 
-    iterator_linear(ac_serp_op,     False,  0.9)
-    iterator_linear(ac_slit_op,     False,  0.9)
-    iterator_linear(ac_side_op,     False,  0.9)
-    iterator_linear(ac_roll_op,     False,  0.9)
+    # iterator_linear(ac_serp_op,     False,  0.9)
+    # iterator_linear(ac_slit_op,     False,  0.9)
+    # iterator_linear(ac_side_op,     False,  0.9)
+    # iterator_linear(ac_roll_op,     False,  0.9)
+
+    # 20240319 Side만 다시
+    iterator_linear(sidewinding_op, False, 0.3)
+    iterator_linear(sidewinding_op, False, 0.5)
+    iterator_linear(sidewinding_op, False, 0.7071)
+    iterator_linear(sidewinding_op, False, 0.9)
 
     # # Fines
     # iterator_fine(serpentine_op, True, 0.3)

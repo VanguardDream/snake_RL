@@ -129,13 +129,13 @@ if __name__ == "__main__":
     ac_roll_op = (15, 15, 171, 171, 118, 118, 90, 0.05)
     ac_side_op = (45, 45, 24, 24, 62, 62, 45, 0.05)
     ac_slit_op = (45, 45, 32, 32, 117, 117/2, 0, 0.05)
-    ac_serp_op = (45, 45, 162, 162, 84, 84, 0, 0.05)
+    # ac_serp_op = (45, 45, 162, 162, 84, 84, 0, 0.05)
 
     used_gait = 0
     used_gamma = 0.7071
 
     print('Initiating...')
-    q = gait_config(ac_roll_op, ac_roll_op, True, 0.7071)
+    q = gait_config(ac_slit_op, ac_roll_op, False, 0.5)
     print('Gait creating done...')
 
     poh, pah, pos_writer, pos_reader, vel_reader, cur_reader = comm_config()

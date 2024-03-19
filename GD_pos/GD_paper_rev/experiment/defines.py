@@ -29,8 +29,9 @@ PROTOCOL_VERSION            = 2.0
 
 # ex) Windows: "COM*", Linux: "/dev/ttyUSB*", Mac: "/dev/tty.usbserial-*"
 # DEVICENAME                    = '/dev/ttyDXL'
+DEVICENAME                    = '/dev/ttyUSB0'
 # DEVICENAME                    = '/dev/tty.usbserial-FT7WBAA4'
-DEVICENAME                    = '/dev/tty.usbserial-FT3M9YHP'
+# DEVICENAME                    = '/dev/tty.usbserial-FT3M9YHP'
 
 VALUE_STATUS_RETURN_NO_RETURN = 0
 VALUE_STATUS_RETURN_ONLY_READ = 1

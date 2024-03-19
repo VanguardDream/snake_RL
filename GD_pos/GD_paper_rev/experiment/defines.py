@@ -31,3 +31,7 @@ PROTOCOL_VERSION            = 2.0
 # DEVICENAME                    = '/dev/ttyDXL'
 # DEVICENAME                    = '/dev/tty.usbserial-FT7WBAA4'
 DEVICENAME                    = '/dev/tty.usbserial-FT3M9YHP'
+
+VALUE_STATUS_RETURN_NO_RETURN = 0
+VALUE_STATUS_RETURN_ONLY_READ = 1
+VALUE_STATUS_RETURN_ALL = 2

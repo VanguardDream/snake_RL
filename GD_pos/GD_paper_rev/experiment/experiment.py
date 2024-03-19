@@ -5,9 +5,13 @@ import time
 from defines import *
 from dynamixel_sdk import *
 from typing import List, Union
+from scipy.io import savemat
 
 def gait_config(motion:tuple[float, float, float, float, float, float, float, float], curve:tuple[float, float, float, float, float, float, float, float], en:bool, gamma:float)->np.ndarray:
     # Optimal with acceleration values
+    global used_gait, used_gamma
+    used_gait = str(motion)+ '||' + str(curve)
+    used_gamma = gamma
 
     gait = serpenoid_gamma.Gait(motion,curve,gamma)
     q = 0
@@ -77,6 +81,19 @@ def motors_reset(port:PortHandler,packet:Protocol2PacketHandler,en:bool)->None:
         print("\033[32m Motor enabling done...\033[0m")
 
         time.sleep(0.5)
+
+        for i in range(14):
+            packet.write1ByteTxOnly(port,i,ADDR_STATUS_RETURN_LEVEL,VALUE_STATUS_RETURN_ONLY_READ)
+
+        time.sleep(0.5)
+
+        for i in range(14):
+            packet.write1ByteTxOnly(port,i,ADDR_STATUS_RETURN_LEVEL,VALUE_STATUS_RETURN_ONLY_READ)
+
+        time.sleep(0.5)
+        
+        print("\033[32m Status level set done...\033[0m")
+
         for i in range(14):
             packet.write4ByteTxOnly(port,i,ADDR_GOAL_POSITION,2048)
 
@@ -93,22 +110,37 @@ def rad2dynamixel(rad:float)->int:
 
     return int(2048 + pulse)
 
+def saving_experiment_data(pos:np.ndarray, vel:np.ndarray, cur:np.ndarray)->None:
+    global used_gait, used_gamma
+    datetime = time.strftime("%Y%m%d-%H%M%S")
+    gait_param = used_gait
+    gamma_param = used_gamma
+    filename = 'Experiment_data_' + datetime + '.mat'
+
+    pos = (pos - 2048) * 0.088 # 0.088 is the conversion factor from dynamixel value to degree
+    vel = vel * 0.229 # 0.229 is the conversion factor from dynamixel value to rad/s
+    cur = cur * 2.69 # 2.69 is the conversion factor from dynamixel value to mA
+
+    savemat(filename,{'position':pos, 'velocity':vel, 'current':cur, 'gait':gait_param, 'gamma':gamma_param})
+
+    print("\033[32m Saving data done...\033[0m")
+
 if __name__ == "__main__":
     ac_roll_op = (15, 15, 171, 171, 118, 118, 90, 0.05)
     ac_side_op = (45, 45, 24, 24, 62, 62, 45, 0.05)
     ac_slit_op = (45, 45, 32, 32, 117, 117/2, 0, 0.05)
     ac_serp_op = (45, 45, 162, 162, 84, 84, 0, 0.05)
 
+    used_gait = 0
+    used_gamma = 0.7071
+
     print('Initiating...')
-    q = gait_config(ac_slit_op, ac_slit_op, False, 0.7071)
+    q = gait_config(ac_roll_op, ac_roll_op, True, 0.7071)
     print('Gait creating done...')
 
     poh, pah, pos_writer, pos_reader, vel_reader, cur_reader = comm_config()
 
     motors_reset(poh,pah,True)
-    pos_reader = GroupSyncRead(poh, pah, ADDR_PRESENT_POSITION, LEN_PRESENT_POSITION)
-    vel_reader = GroupSyncRead(poh, pah, ADDR_PRESENT_VELOCITY, LEN_PRESENT_VELOCITY)
-    cur_reader = GroupSyncRead(poh, pah, ADDR_PRESENT_CURRENT, LEN_PRESENT_CURRENT)
 
     input("Press any key to move")
 
@@ -204,5 +236,6 @@ if __name__ == "__main__":
     motors_reset(poh,pah,False)
     poh.closePort()
 
+    saving_experiment_data(pos_stack,vel_stack,cur_stack)
     
 

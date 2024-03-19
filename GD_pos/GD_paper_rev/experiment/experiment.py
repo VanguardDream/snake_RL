@@ -106,6 +106,9 @@ if __name__ == "__main__":
     poh, pah, pos_writer, pos_reader, vel_reader, cur_reader = comm_config()
 
     motors_reset(poh,pah,True)
+    pos_reader = GroupSyncRead(poh, pah, ADDR_PRESENT_POSITION, LEN_PRESENT_POSITION)
+    vel_reader = GroupSyncRead(poh, pah, ADDR_PRESENT_VELOCITY, LEN_PRESENT_VELOCITY)
+    cur_reader = GroupSyncRead(poh, pah, ADDR_PRESENT_CURRENT, LEN_PRESENT_CURRENT)
 
     input("Press any key to move")
 
@@ -127,6 +130,8 @@ if __name__ == "__main__":
         dxl_comm_result = pos_writer.txPacket()
         if dxl_comm_result != COMM_SUCCESS:
             print("\033[31m GBPP_Tx fail with error %s \033[0m" % pah.getTxRxResult(dxl_comm_result))
+
+        pos_writer.clearParam()
 
         ### Sensing add params
         for id in range(14):
@@ -170,29 +175,28 @@ if __name__ == "__main__":
                 print("\033[31m [ID:%03d] Getdata failed (p vel)... \033[0m" % id)
 
         ### Saving data
-        pos = np.zeros(14)
-        vel = np.zeros(14)
-        cur = np.zeros(14)
+        ppos = np.zeros(14)
+        pvel = np.zeros(14)
+        pcur = np.zeros(14)
 
         for id in range(14):
-            # pos[id] = pos_reader.getData(id,ADDR_PRESENT_POSITION,LEN_PRESENT_POSITION)
-            # if pos[id] > 0x7fffffff:
-                # pos[id] -= 4294967296 
-            # vel[id] = vel_reader.getData(id,ADDR_PRESENT_VELOCITY,LEN_PRESENT_VELOCITY)
-            # if vel[id] > 0x7fffffff:
-            #     vel[id] -= 4294967296 
-            cur[id] = cur_reader.getData(id,ADDR_PRESENT_CURRENT,LEN_PRESENT_CURRENT)
-            if cur[id] > 0x7fff:
-                cur[id] -= 65536
+            ppos[id] = pos_reader.getData(id,ADDR_PRESENT_POSITION,LEN_PRESENT_POSITION)
+            if ppos[id] > 0x7fffffff:
+                ppos[id] -= 4294967296 
+            pvel[id] = vel_reader.getData(id,ADDR_PRESENT_VELOCITY,LEN_PRESENT_VELOCITY)
+            if pvel[id] > 0x7fffffff:
+                pvel[id] -= 4294967296 
+            pcur[id] = cur_reader.getData(id,ADDR_PRESENT_CURRENT,LEN_PRESENT_CURRENT)
+            if pcur[id] > 0x7fff:
+                pcur[id] -= 65536
 
-        pos_stack = np.vstack((pos_stack,pos))
-        vel_stack = np.vstack((vel_stack,vel))
-        cur_stack = np.vstack((cur_stack,cur))
+        pos_stack = np.vstack((pos_stack,ppos))
+        vel_stack = np.vstack((vel_stack,pvel))
+        cur_stack = np.vstack((cur_stack,pcur))
 
         pos_reader.clearParam()
         vel_reader.clearParam()
         cur_reader.clearParam()
-        pos_writer.clearParam()
         # print(time.time() - up_t)
         while time.time() - up_t < 0.05:
             pass

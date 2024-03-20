@@ -2,9 +2,9 @@ clc; clear;
 %%
 gait_name = ["Slithering" "Sidewinding" "Rolling"];
 
-gamma_data = [0.6207 0.4721 0.3417 0.2745;
-              0.6347 0.5196 0.4519 0.3506;
-              0.8751 0.7017 0.6847 0.6701];
+gamma_data = [0.8921 0.7700 0.6760 0.5808;
+              0.8823 0.6818 0.4543 0.3604;
+              0.9728 0.9196 0.8169 0.7174];
 
 legends = ["gamma = 0.3" "gamma = 0.5" "gamma = 0.7" "gamma = 0.9"];
 
@@ -28,7 +28,7 @@ xticklabels(gait_name);
 a = get(gca,'XTickLabel');  
 set(gca,'XTickLabel',a,'fontsize',11,'FontWeight','bold')
 
-legend({"gamma = 0.3" "gamma = 0.5" "gamma = 0.7" "gamma = 0.9"},FontSize=9,FontName='arial',Location='northwest');
+legend({"gamma = 0.3" "gamma = 0.5" "gamma = 0.7" "gamma = 0.9"},FontSize=9,FontName='arial',Location='southeast');
 
 grid on;
 % 

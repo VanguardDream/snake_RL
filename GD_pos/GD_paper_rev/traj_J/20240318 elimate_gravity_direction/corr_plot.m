@@ -2,7 +2,7 @@ clc; clear;
 %%
 % load Slit_c.mat
 % load Serp_c.mat
-% load Side_c.mat
+load Side_c.mat
 % load Roll_c.mat
 c_acc = head_acc_wo_g;
 c_dist = U_map(:,:,1);
@@ -20,9 +20,10 @@ clear Curve Gamma head_acc head_acc_wo_g Motion_lambda Rot_vec Tf_orientation U_
 % load Slit_0.9.mat
 % load Serp_0.9.mat
 % load Side_0.3.mat
-load Roll_0.9.mat
+% load Roll_0.9.mat
 
-% load new_side_0.3.mat
+% load new_side_0.7.mat
+load newnew_side_0.7.mat
 m_acc = head_acc_wo_g;
 m_dist = U_map(:,:,1);
 m_rot = sqrt(Rot_vec(:,:,1).^2 + Rot_vec(:,:,2).^2 + Rot_vec(:,:,3).^2);

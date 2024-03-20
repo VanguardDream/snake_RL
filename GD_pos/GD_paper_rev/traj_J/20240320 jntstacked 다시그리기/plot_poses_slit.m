@@ -6,8 +6,8 @@ clc; clear;
 % load roll_data.mat;
 
 % load slit_acc_data.mat
-% load side_acc_data.mat
-load roll_acc_data.mat
+load side_acc_data.mat
+% load roll_acc_data.mat
 
 slit_curve = slit_curve(1:10:end,:);
 slit_03 = slit_03(1:10:end,:);
@@ -150,7 +150,7 @@ rad_07 = norm(tra_07(end,:));
 rad_09 = norm(tra_09(end,:));
 theta = linspace(0, 2*pi, 3000);
 
-x=rad_07*cos(theta);y=rad_07*sin(theta);plot(x,y,LineWidth=1,LineStyle="-.",Color=[0.1 0.1 0.1 0.8])
+x=rad_03*cos(theta);y=rad_03*sin(theta);plot(x,y,LineWidth=1,LineStyle="-.",Color=[0.1 0.1 0.1 0.8])
 x=rad_09*cos(theta);y=rad_09*sin(theta);plot(x,y,LineWidth=1,LineStyle=":",Color=[0.1 0.1 0.1 0.8])
 % x=rad_03*cos(theta);y=rad_03*sin(theta);plot(x,y)
 % x=rad_05*cos(theta);y=rad_05*sin(theta);plot(x,y)
@@ -178,11 +178,13 @@ Y.FontWeight = 'bold';
 % default_x = [-1.75 1.75];
 % default_y = [-1 1];
 
-default_x = [-1.50 1.50];
-default_y = [-0.86 0.86];
+g_ratio = 0.25;
 
-xlim(default_x + 0.5)
-ylim(default_y + 0.3)
+default_x = [-1 * 7 * g_ratio /2, 7 * g_ratio /2];
+default_y = [-1 * 4 * g_ratio /2, 4 * g_ratio /2];
+
+xlim(default_x + 0.3)
+ylim(default_y + 0)
 
 grid on;
 grid_ax = gca;
@@ -200,11 +202,11 @@ ylabel("y (m)","FontSize",13,"FontName","arial","FontWeight","bold");
 figure;
 
 hold on;
-r_tra_curve = [tra_curve(:,1) -tra_curve(:,2)];
-r_tra_03 = [tra_03(:,1) -tra_03(:,2)];
-r_tra_05 = [tra_05(:,1) -tra_05(:,2)];
-r_tra_07 = [tra_07(:,1) -tra_07(:,2)];
-r_tra_09 = [tra_09(:,1) -tra_09(:,2)];
+r_tra_curve = [tra_curve(:,1) tra_curve(:,2)];
+r_tra_03 = [tra_03(:,1) tra_03(:,2)];
+r_tra_05 = [tra_05(:,1) tra_05(:,2)];
+r_tra_07 = [tra_07(:,1) tra_07(:,2)];
+r_tra_09 = [tra_09(:,1) tra_09(:,2)];
 
 % r_tra_curve = [tra_curve(:,1) tra_curve(:,2)];
 % r_tra_03 = [tra_03(:,1) tra_03(:,2)];
@@ -226,7 +228,7 @@ rad_09 = norm(r_tra_09(end,:));
 theta = linspace(0, 2*pi, 3000);
 
 x=rad_curve*cos(theta);y=rad_curve*sin(theta);plot(x,y,LineWidth=1,LineStyle="-.",Color=[0.1 0.1 0.1 0.8])
-x=rad_09*cos(theta);y=rad_09*sin(theta);plot(x,y,LineWidth=1,LineStyle=":",Color=[0.1 0.1 0.1 0.8])
+x=rad_07*cos(theta);y=rad_07*sin(theta);plot(x,y,LineWidth=1,LineStyle=":",Color=[0.1 0.1 0.1 0.8])
 % x=rad_03*cos(theta);y=rad_03*sin(theta);plot(x,y)
 % x=rad_05*cos(theta);y=rad_05*sin(theta);plot(x,y)
 % x=rad_07*cos(theta);y=rad_07*sin(theta);plot(x,y)
@@ -238,7 +240,7 @@ plot(r_tra_05(end,2),r_tra_05(end,1),Marker="o",MarkerSize=5,MarkerEdgeColor=[0.
 plot(r_tra_07(end,2),r_tra_07(end,1),Marker="o",MarkerSize=5,MarkerEdgeColor=[0.8 0.8 0.8],MarkerFaceColor="#800020");
 plot(r_tra_09(end,2),r_tra_09(end,1),Marker="o",MarkerSize=5,MarkerEdgeColor=[0.8 0.8 0.8],MarkerFaceColor="#B8860B");
 
-legend({"Serpenoid", "gamma = 0.3", "gamma = 0.5", "gamma = 0.7", "gamma = 0.9"},'NumColumns',1,FontSize=9,FontName='arial',Location='northwest',Fontweight='bold');
+legend({"Serpenoid", "gamma = 0.3", "gamma = 0.5", "gamma = 0.7", "gamma = 0.9"},'NumColumns',1,FontSize=9,FontName='arial',Location='southwest',Fontweight='bold');
 % 
 % xticks(-9:1:9);
 % yticks(-9:0.5:9);
@@ -256,13 +258,13 @@ Y.FontWeight = 'bold';
 xtickformat('%.1f')
 ytickformat('%.1f')
 
-g_ratio = 1.35;
+g_ratio = 1.05;
 
 default_x = [-1 * 7 * g_ratio /2, 7 * g_ratio /2];
 default_y = [-1 * 4 * g_ratio /2, 4 * g_ratio /2];
 
-xlim(default_x + 4.3)
-ylim(default_y + 0.5)
+xlim(default_x + 2.3)
+ylim(default_y - 1.2)
 
 grid on;
 grid_ax = gca;

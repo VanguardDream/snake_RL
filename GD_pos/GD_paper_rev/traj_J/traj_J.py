@@ -109,10 +109,8 @@ def J_view(parameters:np.ndarray, parameters_bar:np.ndarray, curve:bool, gamma:f
             head_ang_acc_from_gyro = np.vstack((head_ang_acc_from_gyro, temp_acc_from_gyro))
 
             # head_quat = Rotation.from_quat([data.body('head').xquat[1], data.body('head').xquat[2], data.body('head').xquat[3], data.body('head').xquat[0]])
-            # head_quat = Rotation.from_quat([data.qpos.copy()[4], data.qpos.copy()[5], data.qpos.copy()[6], data.qpos.copy()[3]])
-            head_quat = Rotation.from_matrix(data.site('s_head').xmat.copy().reshape(3,3))
-
-            plane_quat = Rotation.from_quat([0, 0, 0, 1])
+            head_quat = Rotation.from_quat([data.qpos.copy()[4], data.qpos.copy()[5], data.qpos.copy()[6], data.qpos.copy()[3]])
+            # head_quat = Rotation.from_matrix(data.site('s_head').xmat.copy().reshape(3,3))
 
             head_rotm = head_quat.as_matrix()
 
@@ -126,6 +124,7 @@ def J_view(parameters:np.ndarray, parameters_bar:np.ndarray, curve:bool, gamma:f
 
     # print(np.mean(head_acc_wo_gravity_log, axis=0))
 
+    ### 예전 방식의 U 계산
     i = 300
     j = -30
     l = -0.05
@@ -141,6 +140,7 @@ def J_view(parameters:np.ndarray, parameters_bar:np.ndarray, curve:bool, gamma:f
     l_term = l * np.sum(np.sum(np.abs(p_head[:,7:21]),axis=1))
 
     # print(f"l_dist : {l_dist}, j_term : {((l_traj + 1) / (l_dist + 1))}, l_term :{(np.sum(np.sum(np.abs(p_head[:,7:21]),axis=1)))}")
+    #######
 
     # Position & Orientation
     ori_head = p_head[:,3:7]
@@ -158,8 +158,8 @@ def J_view(parameters:np.ndarray, parameters_bar:np.ndarray, curve:bool, gamma:f
         print(e)
         t_orientation = np.nan
 
-    if parameters[-2] > 38:
-        t_orientation = np.abs(t_orientation)  - (np.pi / 2)
+    # if parameters[-2] > 38:
+    #     t_orientation = np.abs(t_orientation)  - (np.pi / 2)
 
     rot = -30 * np.abs(mean_rot[2])
     tf = -60 * np.abs(t_orientation)
@@ -170,11 +170,20 @@ def J_view(parameters:np.ndarray, parameters_bar:np.ndarray, curve:bool, gamma:f
     # print(np.mean(head_acc_log[:,2]))
     # print(np.mean(h_acc_norm))
 
+    ### ACC 기반 U 계산
+    if parameters_bar[-2] > 38:
+        forward_dist = l_dist * np.sin(t_orientation)
+        forward_acc = np.mean(head_acc_wo_gravity_log, axis=0)[1]
+    else:
+        forward_dist = l_dist * np.cos(t_orientation)
+        forward_acc = np.mean(head_acc_wo_gravity_log, axis=0)[0]
+
     ctrl_log = {'ctrl_log':ctrl_log, 'p_head_log':p_head_log, 'qpos_log':qpos_log, 'head_acc_log':head_acc_log, 'head_acc_wo_gravity_log':head_acc_wo_gravity_log, 'head_gyro_log':head_gyro_log, 'head_ang_acc_from_gyro':head_ang_acc_from_gyro, 'head_acc_only_log':head_acc_only_log}
-    # savemat("./ctrl_log_"+str(gamma)+"_"+M_name+"_"+Bar_name+".mat", ctrl_log)
+    savemat("./ctrl_log_"+str(gamma)+"_"+M_name+"_"+Bar_name+".mat", ctrl_log)
 
     # return np.hstack((i_term + j_term + l_term, mean_rot, t_orientation))
-    return i_term + j_term + l_term + rot + tf
+    # return i_term + j_term + l_term + rot + tf
+    return forward_acc + (1.5 * forward_dist) - (0.2 * np.linalg.norm(mean_rot, 2))
 
 def J_traj(parameters:np.ndarray, parameters_bar:np.ndarray, curve:bool, gamma:float) -> np.ndarray:
     """
@@ -260,6 +269,160 @@ def J_traj(parameters:np.ndarray, parameters_bar:np.ndarray, curve:bool, gamma:f
         t_orientation = np.nan
     
     return np.hstack((i_term + j_term + l_term, mean_rot, t_orientation))
+
+def J_traj_acc(parameters:np.ndarray, parameters_bar:np.ndarray, curve:bool, gamma:float) -> np.ndarray:
+    """
+    return : [U, avg. yaw]
+    """
+    _robot_body_names = ["head","link1","link2","link3","link4","link5","link6","link7","link8","link9","link10","link11","link12","link13","tail"]
+
+    def get_robot_rot(data)->np.ndarray:
+        com_roll = 0
+        com_pitch = 0
+        com_yaw = 0
+
+        robot_quats = np.empty((0,4))
+        for name in _robot_body_names:
+            robot_quats = np.vstack((robot_quats, data.body(name).xquat.copy()))
+
+        robot_quats = robot_quats[:, [1, 2, 3, 0]]
+        robot_rot = Rotation(robot_quats)
+
+        # com_roll, com_pitch, com_yaw = robot_rot.mean().as_rotvec(False)
+        x, y, z, w = robot_rot.mean().as_quat()
+
+        # return np.array([com_roll, com_pitch, com_yaw])
+        return np.array([w, x, y, z])
+
+
+    snake = mujoco.MjModel.from_xml_path("./resources/env_snake_v1_contact_servo.xml")
+    data = mujoco.MjData(snake)
+    mujoco.mj_forward(snake, data)
+
+    M_name = param2filename(parameters)
+    Bar_name = param2filename(parameters_bar)
+
+    # gait = serpenoid.Gait(tuple(parameters), tuple(parameters_bar))
+    gait = serpenoid_gamma.Gait(tuple(parameters), tuple(parameters_bar), gamma)
+
+    if curve:
+        q = gait.CurveFunction
+    else:
+        q = gait.Gk
+
+    expand_q = np.repeat(q, 10, axis=1)
+
+    p_head = np.empty((expand_q.shape[1], 21))
+
+
+    ctrl_log = np.empty((0,14))
+    p_head_log = np.empty((0,2))
+    qpos_log = np.empty((0,21))
+    head_acc_log = np.empty((0,3))
+    head_acc_wo_gravity_log = np.empty((0,3))
+    head_gyro_log = np.empty((0,3))
+    head_ang_acc_from_gyro = np.empty((0,3))
+    head_acc_only_log = np.empty((0,3))
+
+    for i in range(expand_q.shape[1]):
+        index = np.nonzero(expand_q[:, i])
+        for idx in index:
+            data.ctrl[idx] = expand_q[idx, i]
+            ctrl_log = np.vstack((ctrl_log, data.ctrl))
+
+        mujoco.mj_step(snake, data)
+
+        step_data = np.hstack((data.body('head').xpos.copy(), get_robot_rot(data), data.ctrl))
+        p_head[i] = step_data
+        p_head_log = np.vstack((p_head_log, step_data[0:2]))
+        qpos_log = np.vstack((qpos_log, data.qpos.copy()))
+        head_acc_log = np.vstack((head_acc_log, data.sensordata[-3::]))
+        head_gyro_log = np.vstack((head_gyro_log, data.sensordata[-6:-3]))
+
+        temp_acc_from_gyro = np.zeros(3)
+        if head_gyro_log.shape[0] == 1:
+            pass
+        else:
+            temp_acc_from_gyro = (data.sensordata[-6:-3] - head_gyro_log[i-1]) / snake.opt.timestep
+
+        head_ang_acc_from_gyro = np.vstack((head_ang_acc_from_gyro, temp_acc_from_gyro))
+
+        # head_quat = Rotation.from_quat([data.body('head').xquat[1], data.body('head').xquat[2], data.body('head').xquat[3], data.body('head').xquat[0]])
+        head_quat = Rotation.from_quat([data.qpos.copy()[4], data.qpos.copy()[5], data.qpos.copy()[6], data.qpos.copy()[3]])
+        # head_quat = Rotation.from_matrix(data.site('s_head').xmat.copy().reshape(3,3))
+
+        head_rotm = head_quat.as_matrix()
+
+        rotated_g = np.dot(np.array([0, 0, 9.81]), head_rotm)
+        g_elimated_acc = data.sensordata[-3::] - rotated_g
+        g_elimated_acc = np.dot(g_elimated_acc, head_rotm.T)
+        g_ang_elimated_acc = g_elimated_acc - temp_acc_from_gyro
+
+        head_acc_wo_gravity_log = np.vstack((head_acc_wo_gravity_log, g_elimated_acc))
+        head_acc_only_log = np.vstack((head_acc_only_log, g_ang_elimated_acc))
+
+    # print(np.mean(head_acc_wo_gravity_log, axis=0))
+
+    ### 예전 방식의 U 계산
+    i = 300
+    j = -30
+    l = -0.05
+
+    p_head_diff = np.diff(p_head[:,0:2],axis=0)
+    p_head_diff_l2_norm = np.linalg.norm(p_head_diff,2,axis=1)
+
+    l_traj = np.sum(p_head_diff_l2_norm)
+    l_dist = np.linalg.norm(p_head[-1,0:2],2)
+
+    i_term = i * l_dist
+    j_term = j * (l_traj + 1)/(l_dist + 1)
+    l_term = l * np.sum(np.sum(np.abs(p_head[:,7:21]),axis=1))
+
+    # print(f"l_dist : {l_dist}, j_term : {((l_traj + 1) / (l_dist + 1))}, l_term :{(np.sum(np.sum(np.abs(p_head[:,7:21]),axis=1)))}")
+    #######
+
+    # Position & Orientation
+    ori_head = p_head[:,3:7]
+    quat_p_head = Rotation.from_quat(ori_head[:, [1, 2, 3, 0]].copy())
+    mean_rot = Rotation.mean(quat_p_head).as_rotvec()
+
+    # Terminal orientation
+    t_x = p_head[-1,0]
+    t_y = p_head[-1,1]
+
+    t_orientation = 0
+    try:
+        t_orientation = np.arctan2(t_y, t_x)
+    except Exception as e:
+        print(e)
+        t_orientation = np.nan
+
+    # if parameters[-2] > 38:
+    #     t_orientation = np.abs(t_orientation)  - (np.pi / 2)
+
+    rot = -30 * np.abs(mean_rot[2])
+    tf = -60 * np.abs(t_orientation)
+
+    h_acc_norm = np.linalg.norm(head_acc_log, 2, axis=1)
+    # print(np.mean(head_acc_log[:,0]))
+    # print(np.mean(head_acc_log[:,1]))
+    # print(np.mean(head_acc_log[:,2]))
+    # print(np.mean(h_acc_norm))
+
+    ### ACC 기반 U 계산
+    if parameters_bar[-2] > 38:
+        forward_dist = l_dist * np.sin(t_orientation)
+        forward_acc = np.mean(head_acc_wo_gravity_log, axis=0)[1]
+    else:
+        forward_dist = l_dist * np.cos(t_orientation)
+        forward_acc = np.mean(head_acc_wo_gravity_log, axis=0)[0]
+
+    ctrl_log = {'ctrl_log':ctrl_log, 'p_head_log':p_head_log, 'qpos_log':qpos_log, 'head_acc_log':head_acc_log, 'head_acc_wo_gravity_log':head_acc_wo_gravity_log, 'head_gyro_log':head_gyro_log, 'head_ang_acc_from_gyro':head_ang_acc_from_gyro, 'head_acc_only_log':head_acc_only_log}
+    # savemat("./ctrl_log_"+str(gamma)+"_"+M_name+"_"+Bar_name+".mat", ctrl_log)
+
+    # return np.hstack((i_term + j_term + l_term, mean_rot, t_orientation))
+    # return i_term + j_term + l_term + rot + tf
+    return forward_acc + (1.5 * forward_dist) - (0.2 * np.linalg.norm(mean_rot, 2))
 
 def J_traj_each(parameters:np.ndarray, parameters_bar:np.ndarray, curve:bool, gamma:float) -> np.ndarray:
     """
@@ -727,7 +890,7 @@ def orderize_fine(param_motion:np.ndarray, curve:bool, isSlit:bool, gamma:float,
 
 def finetuning(param_motion:np.ndarray, gamma:float)->None:
     def scalar_J_traj(param_motion:np.ndarray, param_bar:np.ndarray, curve:bool, gamma:float) -> np.ndarray:
-        return J_traj(param_motion, param_bar, curve, gamma)[0]
+        return J_traj_acc(param_motion, param_bar, curve, gamma)
     
     def J_minimize(x0:np.ndarray):
         lambda_bar = np.hstack((x0, param_motion[-1]))
@@ -836,17 +999,30 @@ if __name__ == "__main__":
     # finetuning_each(rolling_op, 0.9)
 
     # print(J_view(slithering_op,(4.563e+1, 4.545e+1, 3.255e+1, 3.086e1, 1.180e+2, 5.718e+1, 1.317e-4, 0.05),False,0.7071)[0])
-    # print(J_view(rolling_op,rolling_op,True,0))
-    # print(J_view(rolling_op,roll03_op,False,0.3))
-    # print(J_view(rolling_op,roll05_op,False,0.5))
-    # print(J_view(rolling_op,roll07_op,False,0.7071))
-    # print(J_view(rolling_op,roll09_op,False,0.9))
-    # print(J_view(slithering_op,slit03_op,False,0.3))
-    # print(J_view(slithering_op,(45,45,156,156,116,116/2,0, 0.05),True,0.9)[0])
+
+
+    # print(J_view(ac_slit_op,[4.530e+01,  4.506e+01,  3.205e+01,  3.197e+01,  1.170e+02,   5.852e+01,  9.103e-06, 0.05], False,0.3))
+    # print(J_view(ac_slit_op,[4.483e+01,  4.522e+01,  3.197e+01,  3.214e+01,  1.173e+02,  6.145e+01, -9.759e-07, 0.05], False,0.5))
+    # print(J_view(ac_slit_op,[4.416e+01,  4.571e+01,  3.282e+01,  3.217e+01,  1.172e+02,   5.905e+01,  4.471e-05, 0.05], False,0.7071))
+    # print(J_view(ac_slit_op,[4.473e+01,  4.507e+01,  3.335e+01,  3.065e+01,  1.219e+02,   5.956e+01,  1.284e-05, 0.05], False,0.9))
+
+    # print(J_view(ac_side_op,[4.593e+01,  4.590e+01,  2.601e+01,  2.584e+01,  5.874e+01,  5.892e+01,  4.541e+01, 0.05], False,0.3))
+    # print(J_view(ac_side_op,[4.612e+01,  4.324e+01,  2.584e+01,  2.643e+01,  5.968e+01,  5.929e+01,  4.618e+01, 0.05], False,0.5))
+    # print(J_view(ac_side_op,[4.420e+01,  4.613e+01,  2.623e+01,  2.648e+01,  6.003e+01,  5.965e+01,  4.511e+01, 0.05], False,0.7071))
+    # print(J_view(ac_side_op,[4.462e+01,  4.419e+01,  2.732e+01,  2.619e+01,  6.053e+01,  5.890e+01,  4.484e+01, 0.05], False,0.9))
     
-    # print(J_view(slithering_op,(19, 32, 32, 32, 116, 58, 0, 0.05),True,0.7071))
-    # print(J_view(slithering_op,(36, 38, 154, 154, 55, 55, 0, 0.05),True,0.7071))
-    print(J_view(ac_side_op,(45, 45, 10, 10, 107, 107, 45, 0.05),True,0.7071))
+    # print(J_view(ac_roll_op,[1.491e+01,  1.508e+01,  1.710e+02,  1.720e+02,  1.186e+02,   1.175e+02,  9.038e+01, 0.05], False,0.3))
+    # print(J_view(ac_roll_op,[1.504e+01,  1.505e+01,  1.719e+02,  1.712e+02,  1.177e+02,   1.184e+02,  8.987e+01, 0.05], False,0.5))
+    # print(J_view(ac_roll_op,[1.499e+01,  1.496e+01,  1.745e+02,  1.715e+02,  1.183e+02,  1.183e+02,  9.003e+01, 0.05], False,0.7071))
+    # print(J_view(ac_roll_op,[1.473e+01,  1.524e+01,  1.724e+02,  1.723e+02,  1.194e+02,   1.187e+02,  8.968e+01, 0.05], False,0.9))
+
+    print(J_view(ac_slit_op, ac_slit_op, True, 0.1))
+    print(J_view(ac_side_op, ac_side_op, True, 0.1))
+    print(J_view(ac_roll_op, ac_roll_op, True, 0.1))
+
+
+
+
     # print(J_traj_each(serpentine_op,(45, 45, 20, 20, 108, 108/2, 0, 0.05),True,0.7071))
     exit()
 
@@ -885,10 +1061,10 @@ if __name__ == "__main__":
     # iterator_linear(sidewinding_op, False, 0.7071)
     # iterator_linear(sidewinding_op, False, 0.9)
 
-    iterator_linear(ac_side_op, False, 0.3)
-    iterator_linear(ac_side_op, False, 0.5)
-    iterator_linear(ac_side_op, False, 0.7071)
-    iterator_linear(ac_side_op, False, 0.9)
+    # iterator_linear(ac_side_op, False, 0.3)
+    # iterator_linear(ac_side_op, False, 0.5)
+    # iterator_linear(ac_side_op, False, 0.7071)
+    # iterator_linear(ac_side_op, False, 0.9)
 
     # # Fines
     # iterator_fine(serpentine_op, True, 0.3)
@@ -916,6 +1092,22 @@ if __name__ == "__main__":
     # iterator_linear_amp(slithering_op, True, 0.3)
     # iterator_linear_amp(sidewinding_op, True, 0.3)
     # iterator_linear_amp(rolling_op, True, 0.3)
+
+    ### Finetuning
+    finetuning(ac_slit_op, 0.3)
+    finetuning(ac_slit_op, 0.5)
+    finetuning(ac_slit_op, 0.7071)
+    finetuning(ac_slit_op, 0.9)
+
+    finetuning(ac_side_op, 0.3)
+    finetuning(ac_side_op, 0.5)
+    finetuning(ac_side_op, 0.7071)
+    finetuning(ac_side_op, 0.9)
+
+    finetuning(ac_roll_op, 0.3)
+    finetuning(ac_roll_op, 0.5)
+    finetuning(ac_roll_op, 0.7071)
+    finetuning(ac_roll_op, 0.9)
 
     end_iter = time.time()
     print(f"Iterating dond... {end_iter-start_iter} seconds elapsed")

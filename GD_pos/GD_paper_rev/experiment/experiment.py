@@ -150,7 +150,7 @@ if __name__ == "__main__":
     used_gamma = 0.7071
 
     print('Initiating...')
-    q = gait_config(ac_roll_op, roll_09_gpg, False, 0.9)
+    q = gait_config(ac_side_op, side_03_gpg, False, 0.3)
     print('Gait creating done...')
 
     poh, pah, pos_writer, pos_reader, vel_reader, cur_reader = comm_config()

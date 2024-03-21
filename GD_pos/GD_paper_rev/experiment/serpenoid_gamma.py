@@ -33,7 +33,7 @@ class Gait():
         self._gamma = gamma
 
         # self._t = np.arange(0, 10, self._time_step).transpose()
-        self._t = np.arange(0, 5, self._time_step).transpose()
+        self._t = np.arange(0, 10, self._time_step).transpose()
 
         self.MotionMatrix = self.getMotionMat()
         self.CurveFunction = self.getCurveFunction()

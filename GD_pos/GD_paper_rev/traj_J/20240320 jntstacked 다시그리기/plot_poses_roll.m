@@ -1,5 +1,4 @@
 clc; clear;
-
 %%
 % load side_data.mat;
 load slit_acc_data.mat;

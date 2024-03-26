@@ -25,6 +25,43 @@ def param2filename(params:np.ndarray)->str:
 
     return f_name
 
+def J_log(parameters:np.ndarray, parameters_bar:np.ndarray, curve:bool, gamma:float) -> np.ndarray:
+
+    snake = mujoco.MjModel.from_xml_path("./resources/env_snake_v1_contact_servo.xml")
+    data = mujoco.MjData(snake)
+    renderer = mujoco.Renderer(snake, 720, 1280)
+    frames = []
+
+    mujoco.mj_forward(snake, data)
+
+    M_name = param2filename(parameters)
+    Bar_name = param2filename(parameters_bar)
+
+    gait = serpenoid_gamma.Gait(tuple(parameters), tuple(parameters_bar), gamma)
+
+    if curve:
+        q = gait.CurveFunction
+    else:
+        q = gait.Gk
+
+    expand_q = np.repeat(q, 10, axis=1)
+
+    for i in range(expand_q.shape[1]):
+        time_step = time.time()
+        index = np.nonzero(expand_q[:, i])
+        for idx in index:
+            data.ctrl[idx] = expand_q[idx, i]
+
+        mujoco.mj_step(snake, data)
+        renderer.update_scene(data)
+        pixel = renderer.render()
+
+        frames.append(pixel)
+
+    media.write_video(Bar_name+str(gamma)+'_.mp4',frames, fps=200)
+            
+    return 0
+
 def J_view(parameters:np.ndarray, parameters_bar:np.ndarray, curve:bool, gamma:float) -> np.ndarray:
     """
     return : [U, avg. yaw]
@@ -991,6 +1028,21 @@ if __name__ == "__main__":
     roll05_op =(1.502e+01,  1.506e+01,  1.715e+02,  1.682e+02,  1.189e+02,  1.187e+02,  9.305e+01, 0.05) #784.05
     roll07_op =(14.87815899,  14.90831926, 171.33492883, 174.94054222, 119.32329542,  118.04336397,  88.83467804, 0.05) #807.28
     roll09_op =(15.15487732,  15.23185306, 169.75254068, 167.53307839, 122.03266542, 117.04890007,  91.17241511, 0.05) #485.12
+
+    slit_03_gpg = (4.530e+01,  4.506e+01,  3.205e+01,  3.197e+01,  1.170e+02,  5.852e+01,  9.103e-06,  0.05)
+    slit_05_gpg = (4.483e+01,  4.522e+01,  3.197e+01,  3.214e+01,  1.173e+02,  6.145e+01, -9.759e-07,  0.05)
+    slit_07_gpg = (4.416e+01,  4.571e+01,  3.282e+01,  3.217e+01,  1.172e+02,  5.905e+01,  4.471e-05,  0.05)
+    slit_09_gpg = (4.473e+01,  4.507e+01,  3.335e+01,  3.065e+01,  1.219e+02,  5.956e+01,  1.284e-05,  0.05)
+
+    side_03_gpg = (4.593e+01,  4.590e+01,  2.601e+01,  2.584e+01,  5.874e+01,  5.892e+01,  4.541e+01,  0.05)
+    side_05_gpg = (4.612e+01,  4.324e+01,  2.584e+01,  2.643e+01,  5.968e+01,  5.929e+01,  4.618e+01,  0.05)
+    side_07_gpg = (4.420e+01,  4.613e+01,  2.623e+01,  2.648e+01,  6.003e+01,  5.965e+01,  4.511e+01,  0.05)
+    side_09_gpg = (4.462e+01,  4.419e+01,  2.732e+01,  2.619e+01,  6.053e+01,  5.890e+01,  4.484e+01,  0.05)
+
+    roll_03_gpg = (1.491e+01,  1.508e+01,  1.710e+02,  1.720e+02,  1.186e+02,  1.175e+02,  9.038e+01,  0.05)
+    roll_05_gpg = (1.504e+01,  1.505e+01,  1.719e+02,  1.712e+02,  1.177e+02,  1.184e+02,  8.987e+01,  0.05)
+    roll_07_gpg = (1.499e+01,  1.496e+01,  1.745e+02,  1.715e+02,  1.183e+02,  1.183e+02,  9.003e+01,  0.05)
+    roll_09_gpg = (1.473e+01,  1.524e+01,  1.724e+02,  1.723e+02,  1.194e+02,  1.187e+02,  8.968e+01,  0.05)
     # roll09_op =(1.564e+1,  1.516e+1, 1.736e+2, 1.669e+2, 1.231e+2, 1.134e+2,  9.340e+1, 0.05) #485.12
 
     # finetuning_each(rolling_op, 0.3)
@@ -1016,11 +1068,15 @@ if __name__ == "__main__":
     # print(J_view(ac_roll_op,[1.499e+01,  1.496e+01,  1.745e+02,  1.715e+02,  1.183e+02,  1.183e+02,  9.003e+01, 0.05], False,0.7071))
     # print(J_view(ac_roll_op,[1.473e+01,  1.524e+01,  1.724e+02,  1.723e+02,  1.194e+02,   1.187e+02,  8.968e+01, 0.05], False,0.9))
 
-    print(J_view(ac_slit_op, ac_slit_op, True, 0.1))
-    print(J_view(ac_side_op, ac_side_op, True, 0.1))
-    print(J_view(ac_roll_op, ac_roll_op, True, 0.1))
+    # print(J_view(ac_slit_op, ac_slit_op, True, 0.1))
+    # print(J_view(ac_side_op, ac_side_op, True, 0.1))
+    # print(J_view(ac_roll_op, ac_roll_op, True, 0.1))
 
-
+    J_log(ac_roll_op, ac_roll_op, True, 0.3)
+    J_log(ac_roll_op, roll_03_gpg, False, 0.3)
+    J_log(ac_roll_op, roll_05_gpg, False, 0.5)
+    J_log(ac_roll_op, roll_07_gpg, False, 0.7)
+    J_log(ac_roll_op, roll_09_gpg, False, 0.9)
 
 
     # print(J_traj_each(serpentine_op,(45, 45, 20, 20, 108, 108/2, 0, 0.05),True,0.7071))

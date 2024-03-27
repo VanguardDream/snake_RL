@@ -1,14 +1,14 @@
 clc; clear;
 %% load
-% load roll_data.mat;
-% data = videorolldata;
+load roll_data.mat;
+data = videorolldata;
 
 % load side_data.mat;
 % load side_cover_data.mat;
 % data = videosidedata;
 
-load slit_data.mat;
-data = videoslitdata;
+% load slit_data.mat;
+% data = videoslitdata;
 
 
 clear videorolldata videosidedata videoslitdata
@@ -232,7 +232,7 @@ p3 = plot(gamma05.x,gamma05.y,LineWidth=1.5,LineStyle="-",Color="#004d00"); p3.C
 p4 = plot(gamma07.x,gamma07.y,LineWidth=1.5,LineStyle="-",Color="#800020"); p4.Color(4) = 0.5;
 p5 = plot(gamma09.x,gamma09.y,LineWidth=1.5,LineStyle="-",Color="#B8860B"); p5.Color(4) = 0.5;
 
-legend({"Serpenoid", "gamma = 0.3", "gamma = 0.5", "gamma = 0.7", "gamma = 0.9"},'NumColumns',1,FontSize=9,FontName='arial',Location='southwest',Fontweight='bold');
+legend({"Serpenoid", "gamma = 0.3", "gamma = 0.5", "gamma = 0.7", "gamma = 0.9"},'NumColumns',1,FontSize=9,FontName='arial',Location='northeast',Fontweight='bold');
 % legend({"Serpenoid", "gamma = 0.3", "gamma = 0.5", "gamma = 0.7", "gamma = 0.9"},'NumColumns',2,FontSize=9,FontName='arial',Location='northwest',Fontweight='bold');
 
 ax = gca;
@@ -245,12 +245,15 @@ Y.FontName = 'arial';
 X.FontWeight = 'bold';
 Y.FontWeight = 'bold';
 
-scale = 0.85;
+scale = 0.70;
 defaultx = [-1 * scale * 2, scale * 2];
 defaulty = [-1 * scale, scale];
 
-xlim(defaultx + 0)
-ylim(defaulty - 0.25)
+y_tick = -5:0.5:5;
+yticks(y_tick);
+
+xlim(defaultx + 0.75)
+ylim(defaulty - 0.05)
 
 grid on;
 grid_ax = gca;

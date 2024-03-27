@@ -1,40 +1,39 @@
 clc;clear;
-%% load
-load roll_curve_2.mat
+%% load slit
+load slit_curve_2.mat
 slit_curve = position;
 slit_curve = deg2rad(slit_curve);
 rpm_curve = velocity;
 tor_curve = current;
 clear position current gait velocity gamma
 
-load roll_3_2.mat
+load slit_3_2.mat
 slit_03 = position;
 slit_03 = deg2rad(slit_03);
 rpm_03 = velocity;
 tor_03 = current;
 clear position current gait velocity gamma
 
-load roll_5_2.mat
+load slit_5_2.mat
 slit_05 = position;
 slit_05 = deg2rad(slit_05);
 rpm_05 = velocity;
 tor_05 = current;
 clear position current gait velocity gamma
 
-load roll_7_2.mat
+load slit_7_3.mat
 slit_07 = position;
 slit_07 = deg2rad(slit_07);
 rpm_07 = velocity;
 tor_07 = current;
 clear position current gait velocity gamma
 
-load roll_9_2.mat
+load slit_9_3.mat
 slit_09 = position;
 slit_09 = deg2rad(slit_09);
 rpm_09 = velocity;
 tor_09 = current;
 clear position current gait velocity gamma
-
 %% Roll Dorsal Position
 figure;
 hold on;
@@ -45,11 +44,11 @@ hold on;
 % plot(slit_09(1:41,1),LineWidth=1.5,LineStyle="-",Color=[0.7 0.7 0.7])
 
 % [“#1984c5”, "#22a7f0”, “#63bff0”, “#a7d5ed”, “#e2e2e2”, “#e1a692”, “#de6e56”, “#e14b31”, “#c23728”]
-p1 = plot(slit_curve(1:46,1),LineWidth=1.5,LineStyle=":",Color=[0.1 0.1 0.1]); p1.Color(4) = 0.7;
-p2 = plot(slit_03(1:46,1),LineWidth=1.5,LineStyle="-",Color="#000080"); p2.Color(4) = 0.7;
-p3 = plot(slit_05(1:46,1),LineWidth=1.5,LineStyle="--",Color="#004d00"); p3.Color(4) = 0.7;
-p4 = plot(slit_07(1:46,1),LineWidth=1.5,LineStyle="-",Color="#800020"); p4.Color(4) = 0.7;
-p5 = plot(slit_09(1:46,1),LineWidth=1.5,LineStyle="--",Color="#B8860B"); p5.Color(4) = 0.7;
+p1 = plot(slit_curve(1:46,1),LineWidth=1.5,LineStyle=":",Color=[0.1 0.1 0.1]); p1.Color(4) = 0.6;
+p2 = plot(slit_03(1:46,1),LineWidth=1.5,LineStyle="-",Color="#000080"); p2.Color(4) = 0.6;
+p3 = plot(slit_05(1:46,1),LineWidth=1.5,LineStyle="--",Color="#004d00"); p3.Color(4) = 0.6;
+p4 = plot(slit_07(1:46,1),LineWidth=1.5,LineStyle="-",Color="#800020"); p4.Color(4) = 0.6;
+p5 = plot(slit_09(1:46,1),LineWidth=1.5,LineStyle="--",Color="#B8860B"); p5.Color(4) = 0.6;
 
 legend({"Serpenoid", "gamma = 0.3", "gamma = 0.5", "gamma = 0.7", "gamma = 0.9"},'NumColumns',3,FontSize=9,FontName='arial',Location='northwest',Fontweight='bold');
 
@@ -63,7 +62,7 @@ xlim([1 41]);
 pos = -pi/3:pi/6:pi/2;
 yticks(pos);
 yticklabels({"-\pi/3", "-\pi/6", "0", "\pi/6", "\pi/3", "\pi/2"});
-ylim([-pi/5.9999 pi/2.999]);
+ylim([-pi/2.9999 pi/2.099]);
 % a = get(gca,'XTickLabel');  
 % set(gca,'XTickLabel',a,'fontsize',11,'FontWeight','bold')
 
@@ -119,7 +118,7 @@ xlim([1 41]);
 pos = -pi/3:pi/6:pi/2;
 yticks(pos);
 yticklabels({"-\pi/3", "-\pi/6", "0", "\pi/6", "\pi/3", "\pi/2"});
-ylim([-pi/5.9999 pi/2.999]);
+ylim([-pi/2.9999 pi/2.099]);
 % a = get(gca,'XTickLabel');  
 % set(gca,'XTickLabel',a,'fontsize',11,'FontWeight','bold')
 
@@ -172,10 +171,10 @@ xlim([1 41]);
 % a = get(gca,'YTickLabel');  
 % set(gca,'YTickLabel',a,'fontsize',11,'FontWeight','bold')
 
-vel = -60:10:60;
+vel = -70:20:130;
 yticks(vel);
 % yticklabels({"-\pi/3", "-\pi/6", "0", "\pi/6", "\pi/3", "\pi/2"});
-ylim([-30 50]);
+ylim([-70 130]);
 % a = get(gca,'XTickLabel');  
 % set(gca,'XTickLabel',a,'fontsize',11,'FontWeight','bold')
 
@@ -228,10 +227,10 @@ xlim([1 41]);
 % a = get(gca,'YTickLabel');  
 % set(gca,'YTickLabel',a,'fontsize',11,'FontWeight','bold')
 
-vel = -60:10:60;
+vel = -70:20:130;
 yticks(vel);
 % yticklabels({"-\pi/3", "-\pi/6", "0", "\pi/6", "\pi/3", "\pi/2"});
-ylim([-30 50]);
+ylim([-70 130]);
 % a = get(gca,'XTickLabel');  
 % set(gca,'XTickLabel',a,'fontsize',11,'FontWeight','bold')
 
@@ -283,10 +282,10 @@ xlim([1 41]);
 % a = get(gca,'YTickLabel');  
 % set(gca,'YTickLabel',a,'fontsize',11,'FontWeight','bold')
 
-vel = -1200:200:1800;
+vel = -1200:300:1800;
 yticks(vel);
 % yticklabels({"-\pi/3", "-\pi/6", "0", "\pi/6", "\pi/3", "\pi/2"});
-ylim([-600 1000]);
+ylim([-800 1400]);
 % a = get(gca,'XTickLabel');  
 % set(gca,'XTickLabel',a,'fontsize',11,'FontWeight','bold')
 
@@ -338,10 +337,10 @@ xlim([1 41]);
 % a = get(gca,'YTickLabel');  
 % set(gca,'YTickLabel',a,'fontsize',11,'FontWeight','bold')
 
-vel = -1200:200:1800;
+vel = -1100:400:1700;
 yticks(vel);
 % yticklabels({"-\pi/3", "-\pi/6", "0", "\pi/6", "\pi/3", "\pi/2"});
-ylim([-600 1000]);
+ylim([-1100 1700]);
 % a = get(gca,'XTickLabel');  
 % set(gca,'XTickLabel',a,'fontsize',11,'FontWeight','bold')
 

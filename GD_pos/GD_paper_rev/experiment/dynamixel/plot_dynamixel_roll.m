@@ -146,6 +146,7 @@ X.FontName = 'arial';
 Y.FontName = 'arial';
 X.FontWeight = 'bold';
 Y.FontWeight = 'bold';
+ax.Color = '#f3f4fe';
 
 grid on;
 % 
@@ -156,7 +157,7 @@ grid_ax.GridColor = [0.2 0.2 0.2];
 % grid_ax.YGrid = "off";
 
 xlabel("Time (sec)","FontSize",13,"FontName","arial","FontWeight","bold");
-ylabel("Dorsal joint input (rad)","FontSize",13,"FontName","arial","FontWeight","bold");
+ylabel("Dorsal joint position (rad)","FontSize",13,"FontName","arial","FontWeight","bold");
 
 pbaspect([2 0.8 0.8]);
 clear a;
@@ -202,6 +203,7 @@ X.FontName = 'arial';
 Y.FontName = 'arial';
 X.FontWeight = 'bold';
 Y.FontWeight = 'bold';
+ax.Color = '#f3f4fe';
 
 grid on;
 % 
@@ -212,7 +214,7 @@ grid_ax.GridColor = [0.2 0.2 0.2];
 % grid_ax.YGrid = "off";
 
 xlabel("Time (sec)","FontSize",13,"FontName","arial","FontWeight","bold");
-ylabel("Lateral joint input (rad)","FontSize",13,"FontName","arial","FontWeight","bold");
+ylabel("Lateral joint position (rad)","FontSize",13,"FontName","arial","FontWeight","bold");
 
 pbaspect([2 0.8 0.8]);
 clear a;
@@ -258,6 +260,7 @@ X.FontName = 'arial';
 Y.FontName = 'arial';
 X.FontWeight = 'bold';
 Y.FontWeight = 'bold';
+ax.Color = '#f6fef5';
 
 grid on;
 % 
@@ -314,6 +317,7 @@ X.FontName = 'arial';
 Y.FontName = 'arial';
 X.FontWeight = 'bold';
 Y.FontWeight = 'bold';
+ax.Color = '#f6fef5';
 
 grid on;
 % 
@@ -353,10 +357,10 @@ xlim([1 41]);
 % a = get(gca,'YTickLabel');  
 % set(gca,'YTickLabel',a,'fontsize',11,'FontWeight','bold')
 
-vel = -1200:200:1800;
+vel = -1000:400:1800;
 yticks(vel);
 % yticklabels({"-\pi/3", "-\pi/6", "0", "\pi/6", "\pi/3", "\pi/2"});
-ylim([-600 1000]);
+ylim([-1000 1400]);
 % a = get(gca,'XTickLabel');  
 % set(gca,'XTickLabel',a,'fontsize',11,'FontWeight','bold')
 
@@ -369,6 +373,7 @@ X.FontName = 'arial';
 Y.FontName = 'arial';
 X.FontWeight = 'bold';
 Y.FontWeight = 'bold';
+ax.Color = '#fdf4ec';
 
 grid on;
 % 
@@ -426,7 +431,7 @@ X.FontWeight = 'bold';
 Y.FontWeight = 'bold';
 
 %#EEFC9C,#FEF9D7,#BCFB63 #FEF9D7
-ax.Color = '#FEF9D7';
+ax.Color = '#fdf4ec';
 
 
 grid on;

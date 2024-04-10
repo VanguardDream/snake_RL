@@ -1,14 +1,14 @@
 clc; clear;
 %% load
-load roll_data.mat;
-data = videorolldata;
+% load roll_data.mat;
+% data = videorolldata;
 
 % load side_data.mat;
 % load side_cover_data.mat;
 % data = videosidedata;
 
-% load slit_data.mat;
-% data = videoslitdata;
+load slit_data.mat;
+data = videoslitdata;
 
 
 clear videorolldata videosidedata videoslitdata
@@ -226,11 +226,11 @@ hold on;
 % plot(gamma07.y,gamma07.x)
 % plot(gamma09.y,gamma09.x)
 
-p1 = plot(curve.x,curve.y,LineWidth=1.5,LineStyle=":",Color=[0.1 0.1 0.1]); p1.Color(4) = 0.5;
-p2 = plot(gamma03.x,gamma03.y,LineWidth=1.5,LineStyle="-",Color="#000080"); p2.Color(4) = 0.5;
-p3 = plot(gamma05.x,gamma05.y,LineWidth=1.5,LineStyle="-",Color="#004d00"); p3.Color(4) = 0.5;
-p4 = plot(gamma07.x,gamma07.y,LineWidth=1.5,LineStyle="-",Color="#800020"); p4.Color(4) = 0.5;
-p5 = plot(gamma09.x,gamma09.y,LineWidth=1.5,LineStyle="-",Color="#B8860B"); p5.Color(4) = 0.5;
+p1 = plot(curve.x,-curve.y,LineWidth=1.5,LineStyle=":",Color=[0.1 0.1 0.1]); p1.Color(4) = 0.5;
+p2 = plot(gamma03.x,-gamma03.y,LineWidth=1.5,LineStyle="-",Color="#000080"); p2.Color(4) = 0.5;
+p3 = plot(gamma05.x,-gamma05.y,LineWidth=1.5,LineStyle="-",Color="#004d00"); p3.Color(4) = 0.5;
+p4 = plot(gamma07.x,-gamma07.y,LineWidth=1.5,LineStyle="-",Color="#800020"); p4.Color(4) = 0.5;
+p5 = plot(gamma09.x,-gamma09.y,LineWidth=1.5,LineStyle="-",Color="#B8860B"); p5.Color(4) = 0.5;
 
 legend({"Serpenoid", "gamma = 0.3", "gamma = 0.5", "gamma = 0.7", "gamma = 0.9"},'NumColumns',1,FontSize=9,FontName='arial',Location='northeast',Fontweight='bold');
 % legend({"Serpenoid", "gamma = 0.3", "gamma = 0.5", "gamma = 0.7", "gamma = 0.9"},'NumColumns',2,FontSize=9,FontName='arial',Location='northwest',Fontweight='bold');

@@ -39,8 +39,10 @@ void setup() {
 void loop() {
   for(int idx = 0; idx < 16; idx++){
     Wire.requestFrom(idx, 2);
-
+    delay(1);
     while (Wire.available()) {
+      int t_start = millis();
+
       byte data[2];
       data[0] = Wire.read(); // 첫 번째 바이트 읽기
       data[1] = Wire.read(); // 두 번째 바이트 읽기
@@ -49,6 +51,10 @@ void loop() {
       int sensorValue = data[1] << 8 | data[0];
 
       sensordata[idx] = sensorValue;
+
+      if(millis() - t_start > 300){
+        break;
+      }
     }
   }
 

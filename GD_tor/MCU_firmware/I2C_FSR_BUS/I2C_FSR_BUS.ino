@@ -3,6 +3,8 @@
 // volatile boolean timer1_out = HIGH;
 volatile int LED_BRIGHT = 0;
 int sensordata[16] = {0};
+int sensordata2[16] = {0};
+long t_ex = 0;
 
 // Timer1 interrupt
 ISR (TIMER1_COMPA_vect) {
@@ -37,30 +39,67 @@ void setup() {
 }
 
 void loop() {
-  for(int idx = 0; idx < 16; idx++){
-    Wire.requestFrom(idx, 2);
-    delay(1);
-    while (Wire.available()) {
-      int t_start = millis();
+  if(abs(millis() - t_ex) > 300){
+    t_ex = millis();
+    for(int idx = 0; idx < 16; idx++){
+      Wire.requestFrom(idx, 4);
+      delay(1);
+      while (Wire.available()) {
+        int t_start = millis();
 
-      byte data[2];
-      data[0] = Wire.read(); // 첫 번째 바이트 읽기
-      data[1] = Wire.read(); // 두 번째 바이트 읽기
-      
-      // 받은 데이터를 정수로 변환
-      int sensorValue = data[1] << 8 | data[0];
+        byte data[4];
+        data[0] = Wire.read(); // 첫 번째 바이트 읽기
+        data[1] = Wire.read(); // 두 번째 바이트 읽기
 
-      sensordata[idx] = sensorValue;
+        data[2] = Wire.read();
+        data[3] = Wire.read();
+        
+        // 받은 데이터를 정수로 변환
+        int sensorValue = data[1] << 8 | data[0];
+        int sensorValue2 = data[3] << 8 | data[2];
 
-      if(millis() - t_start > 300){
-        break;
+        sensordata[idx] = sensorValue;
+        sensordata2[idx] = sensorValue2;
+
+        if(millis() - t_start > 10){
+          break;
+        }
       }
-    }
+
+  }
+
+  // for(int idx = 0; idx < 16; idx++){
+  //   Wire.requestFrom(idx, 4);
+  //   delay(1);
+  //   while (Wire.available()) {
+  //     int t_start = millis();
+
+  //     byte data[4];
+  //     data[0] = Wire.read(); // 첫 번째 바이트 읽기
+  //     data[1] = Wire.read(); // 두 번째 바이트 읽기
+
+  //     data[2] = Wire.read();
+  //     data[3] = Wire.read();
+      
+  //     // 받은 데이터를 정수로 변환
+  //     int sensorValue = data[1] << 8 | data[0];
+  //     int sensorValue2 = data[3] << 8 | data[2];
+
+  //     sensordata[idx] = sensorValue;
+  //     sensordata2[idx] = sensorValue2;
+
+  //     if(millis() - t_start > 300){
+  //       break;
+  //     }
+  //   }
   }
 
   for(int i=0; i < sizeof(sensordata)/2; i++){
     Serial.print(sensordata[i]);
     Serial.print(", ");
+    Serial.print(sensordata2[i]);
+    Serial.print(", ");
+    // Serial.print("|");
   }
   Serial.println("");
   delay(100);

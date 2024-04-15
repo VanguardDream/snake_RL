@@ -1,20 +1,26 @@
 #include <Wire.h>
 
-unsigned char ID = 4;
+unsigned char ID = 2;
 volatile int LED_TIME = 1;
 float alpha = 0.5;
 int sensordata = 0;
+int sensordata2 = 0;
 
 // Timer1 interrupt
 ISR (TIMER1_COMPA_vect) {
-  Serial.println(sensordata);
+  Serial.print(sensordata);
+  Serial.print(", ");
+  Serial.print(sensordata2);
+  Serial.println("");
 }
 
 // Timer3 interrupt
 ISR (TIMER3_COMPA_vect) {
   int tmpdata = analogRead(A0);
+  int tmpdata2 = analogRead(A1);
   // sensordata = tmpdata;
   sensordata = alpha * tmpdata + (1 - alpha) * sensordata;
+  sensordata2 = alpha * tmpdata2 + (1 - alpha) * sensordata2;
 }
 
 void setup() {
@@ -100,5 +106,8 @@ void startupLED() {
 }
 
 void requestEvent() {
-  Wire.write((byte*)&sensordata, 2);
+  delay(5);
+  int txdata[2] = {sensordata, sensordata2};
+  // Wire.write((byte*)&sensordata, 2);
+  Wire.write((byte*)&txdata, 4);
 }

@@ -1,6 +1,6 @@
 #include <Wire.h>
 
-unsigned char ID = 2;
+unsigned char ID = 3;
 volatile int LED_TIME = 1;
 float alpha = 0.5;
 int sensordata = 0;

@@ -1,3 +1,5 @@
+#include<math.h>
+
 bool blink = false;
 unsigned long previousMillis = 0;
 
@@ -23,16 +25,21 @@ void loop() {
     if (millis() - previousMillis > 200) {
         previousMillis = millis();
         blink = !blink;
-        digitalWrite(13, blink);
+        digitalWrite(LED_BUILTIN, blink);
         // Serial.print("Up: ");
         Serial.print(prevUp);
         Serial.print(",");
         Serial.println(prevDown);
     }
 
-    int up = analogRead(A3);
-    int down = analogRead(A2);
+    // //For RP2040
+    // int up = analogRead(A3);
+    // int down = analogRead(A2);
     
+    //For ATmega328P
+    int up = analogRead(A0);
+    int down = analogRead(A9);
+
     lowPassFilter(up, prevUp, alpha);
     lowPassFilter(down, prevDown, alpha);
 

@@ -1,0 +1,104 @@
+<!-- Copyright 2024 Bongsub Song
+ doorebong@gmail.com
+ -->
+
+<mujoco model="Horcrux v2 body">
+<!--    DGIST BRM Horcrux snake robot
+        DOF : 20
+        Actuators : 14
+        Sensors : 30
+
+        각 링크에 FSR 센서가 장착된 뱀로봇 V2 입니다. 
+    -->
+<!-- 메시 파일 불러오기 -->
+<asset>
+    <mesh name="link_collision" file="./assets/link_collision_mesh.STL"/>
+</asset>
+
+<!-- 디폴트 설정 -->
+<default>
+    <!-- Robotis XM430-W250 -->
+    <motor ctrlrange="-3 3" ctrllimited="true"/>
+
+    <default class="joint_defaults">
+        <joint type="hinge" pos="0.0685 0 0" limited="true" range="-75 75" damping="0.13" armature="0.01" />
+    </default>
+
+    <default class="collision-mesh">
+        <geom type="mesh" mesh="link_collision" mass="0.05" condim="4" rgba="0.5 0.5 0.5 0.9" priority="1" friction="0.7 0.015 0.001" euler="90 90 0"/>
+    </default>
+</default>
+
+<visual>
+    <map force="0.1" zfar="30"/>
+    <rgba haze="0.15 0.25 0.35 1"/>
+    <quality shadowsize="4096"/>
+    <global offwidth="1280" offheight="1280"/>
+</visual>
+
+<!-- 바디 정의 시작 -->
+<worldbody>
+
+<body name="link1" pos="0 0 0" euler="0 0 0"> 
+    <freejoint name="root"/>
+    <geom class="collision-mesh"/> 
+    <body name="link2" pos="-0.0685 0 0" euler="0 0 0">
+        <joint class="joint_defaults" name="joint1" axis="0 1 0"/>
+        <geom class="collision-mesh"/> 
+        <body name="link3" pos="-0.0685 0 0" euler="0 0 0">
+            <joint class="joint_defaults" name="joint2" axis="0 0 1"/>
+            <geom class="collision-mesh"/> 
+            <body name="link4" pos="-0.0685 0 0" euler="0 0 0">
+                <joint class="joint_defaults" name="joint3" axis="0 1 0"/>
+                <geom class="collision-mesh"/> 
+                <body name="link5" pos="-0.0685 0 0" euler="0 0 0">
+                    <joint class="joint_defaults" name="joint4" axis="0 0 1"/>
+                    <geom class="collision-mesh"/> 
+                    <body name="link6" pos="-0.0685 0 0" euler="0 0 0">
+                        <joint class="joint_defaults" name="joint5" axis="0 1 0"/>
+                        <geom class="collision-mesh"/> 
+                        <body name="link7" pos="-0.0685 0 0" euler="0 0 0">
+                            <joint class="joint_defaults" name="joint6" axis="0 0 1"/>
+                            <geom class="collision-mesh"/> 
+                            <body name="link8" pos="-0.0685 0 0" euler="0 0 0">
+                                <joint class="joint_defaults" name="joint7" axis="0 1 0"/>
+                                <geom class="collision-mesh"/> 
+                                <body name="link9" pos="-0.0685 0 0" euler="0 0 0">
+                                    <joint class="joint_defaults" name="joint8" axis="0 0 1"/>
+                                    <geom class="collision-mesh"/> 
+                                    <body name="link10" pos="-0.0685 0 0" euler="0 0 0">
+                                        <joint class="joint_defaults" name="joint9" axis="0 1 0"/>
+                                        <geom class="collision-mesh"/> 
+                                        <body name="link11" pos="-0.0685 0 0" euler="0 0 0">
+                                            <joint class="joint_defaults" name="joint10" axis="0 0 1"/>
+                                            <geom class="collision-mesh"/> 
+                                            <body name="link12" pos="-0.0685 0 0" euler="0 0 0">
+                                                <joint class="joint_defaults" name="joint11" axis="0 1 0"/>
+                                                <geom class="collision-mesh"/> 
+                                                <body name="link13" pos="-0.0685 0 0" euler="0 0 0">
+                                                    <joint class="joint_defaults" name="joint12" axis="0 0 1"/>
+                                                    <geom class="collision-mesh"/> 
+                                                    <body name="link14" pos="-0.0685 0 0" euler="0 0 0">
+                                                        <joint class="joint_defaults" name="joint13" axis="0 1 0"/>
+                                                        <geom class="collision-mesh"/> 
+                                                        <body name="link15" pos="-0.0685 0 0" euler="0 0 0">
+                                                            <joint class="joint_defaults" name="joint14" axis="0 0 1"/>
+                                                            <geom class="collision-mesh"/> 
+                                                        </body>
+                                                    </body>
+                                                </body>
+                                            </body>
+                                        </body>
+                                    </body>
+                                </body>
+                            </body>
+                        </body>
+                    </body>
+                </body>
+            </body>
+        </body>
+    </body>
+</body>
+
+</worldbody>
+</mujoco>

@@ -3,7 +3,7 @@
  -->
 
  <mujoco model="Horcrux v2 with flat plane">
-    <!-- <include file="horcrux.xml"/> -->
+    <include file="horcrux.xml"/>
     <option timestep="0.005"/>
     <size memory="1000M"/>
 
@@ -13,7 +13,7 @@
                  rgb1="0.6 0.6 0.6" rgb2="0.6 0.6 0.6" markrgb="1 1 1"/>
         <texture name="texplane" type="2d" builtin="checker" rgb1=".4 .4 .4" rgb2=".6 .6 .6"
                  width="512" height="512"/>
-        <material name="MatPlane" reflectance="0.3" texture="texplane" texrepeat="1 1" texuniform="true"
+        <material name="MatPlane" reflectance="0.0" texture="texplane" texrepeat="1 1" texuniform="true"
                   rgba=".7 .7 .7 1"/>
         <material name="capsule" texture="texgeom" texuniform="true" rgba=".4 .9 .6 1" />
         <material name="ellipsoid" texture="texgeom" texuniform="true" rgba=".4 .6 .9 1" />
@@ -26,12 +26,8 @@
     </asset>
 
 <worldbody>
-    <composite type="box" count="18 18 40" spacing="0.015">
-        <skin texcoord="true" material="matsponge" rgba=".7 .7 .7 1"/>
-        <geom type="sphere" size=".0015" rgba=".8 .2 .1 1"/>
-        <joint kind="main" solreffix="0.03 1" solimpfix="0 .1 .01"/>
-    </composite>
-    <geom name="floor" type="plane" size="3 3 .5" priority="2" friction="1.1 0.015 0.001" material="MatPlane"/>
+    <!-- solimp default : "0.9 0.95 0.001 0.5 2" // solref default : "0.02 1" -->
+    <geom name="floor" type="plane" size="3 3 .5" priority="2" friction="0.55 0.015 0.001" solimp="0.1 0.95 0.001 0.9 4" solref="0.02 1" material="MatPlane"/>
 </worldbody>
 
 </mujoco>

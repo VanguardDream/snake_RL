@@ -23,7 +23,7 @@
     </asset>
 
 <worldbody>
-    <geom name="floor" type="plane" size="3 3 .5" material="MatPlane"/>
+    <geom name="floor" type="plane" size="3 3 .5" priority="2" friction="1.1 0.015 0.001" material="MatPlane"/>
 </worldbody>
 
- </mujoco>
+</mujoco>

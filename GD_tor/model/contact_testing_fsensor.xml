@@ -4,7 +4,7 @@
 
  <mujoco model="contact testing">
     <option timestep="0.001"/>
-    <size memory="1000M"/>
+    <size memory="10M"/>
 
     <asset>
         <texture type="skybox" builtin="gradient" width="512" height="512" rgb1=".4 .6 .8" rgb2="0 0 0"/>
@@ -20,12 +20,12 @@
         <material name="cylinder" texture="texgeom" texuniform="true" rgba=".8 .6 .8 1" />
         <material name="sphere" texture="texgeom" texuniform="true" rgba=".9 .1 .1 1" />
 
-        <mesh name="link_collision" file="./assets/link_collision_mesh.STL"/>
+        <mesh name="link_collision" file="./assets/dummy_contact_testing.STL"/>
     </asset>
 
     <default>
         <default class="collision-mesh">
-            <geom type="mesh" mesh="link_collision" mass="0.165" condim="4" rgba="0.5 0.5 0.5 1.0" priority="1" friction="0.7 0.015 0.001" euler="90 90 0"/>
+            <geom type="mesh" mesh="link_collision" mass="0.165" condim="4" rgba="0.5 0.5 0.5 0.4" priority="1" friction="0.7 0.015 0.001" euler="90 90 0"/>
         </default>
     </default>
 
@@ -38,19 +38,20 @@
 
 <worldbody>
     <!-- solimp default : "0.9 0.95 0.001 0.5 2" // solref default : "0.02 1" -->
-    <geom name="floor" type="plane" size="3 3 .5" priority="2" friction="0.55 0.015 0.001" solimp="0.9 0.95 0.001 0.5 2" solref="0.02 1" material="MatPlane"/>
+    <geom name="floor" type="plane" size="3 3 .5" priority="2" friction="0.55 0.015 0.001" solimp="0.8 0.95 0.8 0.5 2" solref="0.01 0.8" material="MatPlane"/>
 
-    <body name="debris" pos="0 0 1" euler="0 0 0"> 
+    <body name="debris" pos="0 0 0.1" euler="0 0 0"> 
         <freejoint name="root"/>
-        <site name="s_link1_top" type="box" size="0.021 0.038 0.014" pos="0.016 0 0.018" rgba="0.8 0.1 0.2 0.1"/>
-        <site name="s_link1_bot" type="box" size="0.021 0.038 0.014" pos="0.016 0 -0.018" rgba="0.8 0.1 0.2 0.1"/>
         <geom class="collision-mesh"/> 
+        <body>
+            <geom name="sensor_body" type="cylinder" size="0.009 0.00075" pos="0.02 -0.00338 -0.0362" mass="0" priority="1" friction="0.7 0.015 0.001"/>
+            <site name="sensor" type="cylinder" size="0.009 0.00075" pos="0.02 -0.00338 -0.0362"/>
+        </body>
     </body>
 </worldbody>
 
 <sensor>
-    <touch name="top_link1" site="s_link1_top"/>
-    <touch name="bot_link1" site="s_link1_bot"/>
+    <force name="force" site="sensor"/>
 </sensor>
 
 </mujoco>

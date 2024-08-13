@@ -3,7 +3,7 @@
  -->
 
  <mujoco model="contact testing">
-    <option timestep="0.001"/>
+    <option timestep="0.00093750"/>
     <size memory="10M"/>
 
     <asset>
@@ -25,7 +25,7 @@
 
     <default>
         <default class="collision-mesh">
-            <geom type="mesh" mesh="link_collision" mass="0.165" condim="4" rgba="0.5 0.5 0.5 0.4" priority="1" friction="0.7 0.015 0.001" euler="90 90 0"/>
+            <geom type="mesh" mesh="link_collision" mass="0.250" condim="4" rgba="0.5 0.5 0.5 0.4" priority="1" friction="0.7 0.015 0.001" euler="90 90 0"/>
         </default>
     </default>
 
@@ -38,9 +38,10 @@
 
 <worldbody>
     <!-- solimp default : "0.9 0.95 0.001 0.5 2" // solref default : "0.02 1" -->
-    <geom name="floor" type="plane" size="3 3 .5" priority="2" friction="0.55 0.015 0.001" solimp="0.8 0.95 0.8 0.5 2" solref="0.01 0.8" material="MatPlane"/>
+     <!-- sand [ 5.351e-01  9.629e-01  2.736e-04  5.061e-01  2.063e+00  4.050e-02  5.733e-01] -->
+    <geom name="floor" type="plane" size="3 3 .5" priority="2" friction="0.55 0.015 0.001" solimp="0.53 0.9629 0.0002736 0.506 2" solref="0.0405 0.5733" material="MatPlane"/>
 
-    <body name="debris" pos="0 0 0.1" euler="0 0 0"> 
+    <body name="debris" pos="0 0 0.43655" euler="0 0 0"> 
         <freejoint name="root"/>
         <geom class="collision-mesh"/> 
         <body>

@@ -48,7 +48,7 @@ def varying_xml(val:list):
         <!-- solimp default : "0.9 0.95 0.001 0.5 2" // solref default : "0.02 1" -->
         <geom name="floor" type="plane" size="3 3 .5" priority="2" friction="0.55 0.015 0.001" solimp="{val[0]} {val[1]} {val[2]} {val[3]} {val[4]}" solref="{val[5]} {val[6]}" material="MatPlane"/>
 
-        <body name="debris" pos="0 0 0.1" euler="0 0 0"> 
+        <body name="debris" pos="0 0 0.43655" euler="0 0 0"> 
             <freejoint name="root"/>
             <site name="s_link1_top" type="box" size="0.021 0.038 0.014" pos="0.016 0 0.018" rgba="0.8 0.1 0.2 0.1"/>
             <site name="s_link1_bot" type="box" size="0.021 0.038 0.014" pos="0.016 0 -0.018" rgba="0.8 0.1 0.2 0.1"/>

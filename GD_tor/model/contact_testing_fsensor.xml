@@ -40,8 +40,10 @@
     <!-- solimp default : "0.9 0.95 0.001 0.5 2" // solref default : "0.02 1" -->
      <!-- sand [ 5.351e-01  9.629e-01  2.736e-04  5.061e-01  2.063e+00  4.050e-02  5.733e-01] -->
      <!-- sand2 [ 8.923e-01  9.560e-01  1.000e-04  5.914e-01  1.460e+00 4.367e-02  1.562e+00] -->
-      <!-- grass6 7.085e-01  9.762e-01  9.312e-04  4.342e-01  1.513e+00 4.038e-02  2.410e-01] -->
-    <geom name="floor" type="plane" size="3 3 .5" priority="2" friction="0.55 0.015 0.001" solimp="8.923e-01  9.560e-01  1.000e-04  5.914e-01  1.460e+00" solref="4.367e-02  1.562e+00" material="MatPlane"/>
+     <!-- sand3 [ 4.005e-01  6.011e-01  1.954e-03  5.386e-01  1.000e+00 5.336e-02  2.242e+00] -->
+    <!-- grass6 7.085e-01  9.762e-01  9.312e-04  4.342e-01  1.513e+00 4.038e-02  2.410e-01] -->
+    <!-- <geom name="floor" type="plane" size="3 3 .5" priority="2" friction="0.55 0.015 0.001" solimp="0.9 0.95 0.001 0.5 2" solref="0.02 1" material="MatPlane"/> -->
+    <geom name="floor" type="plane" size="3 3 .5" priority="2" friction="0.55 0.015 0.001" solimp=" 4.005e-01  6.011e-01  1.954e-03  5.386e-01  1.000e+00" solref="5.336e-02  2.242e+00" material="MatPlane"/>
 
     <body name="debris" pos="0 0 0.43655" euler="0 0 0"> 
         <freejoint name="root"/>

@@ -1,5 +1,3 @@
-#include<math.h>
-
 bool blink = false;
 unsigned long previousMillis = 0;
 
@@ -17,29 +15,27 @@ void lowPassFilter(int& value, int& prevValue, float alpha) {
 void setup() {
     // 초기 설정
     Serial.begin(9600);
-    pinMode(A3, INPUT);
-    pinMode(A2, INPUT);
+    // pinMode(A0, INPUT);
+    // pinMode(A9, INPUT);
 }
 
 void loop() {
     if (millis() - previousMillis > 200) {
         previousMillis = millis();
         blink = !blink;
-        digitalWrite(LED_BUILTIN, blink);
+        digitalWrite(13, blink);
         // Serial.print("Up: ");
-        Serial.print(prevUp);
+        Serial.print(prevUp); //A9
         Serial.print(",");
-        Serial.println(prevDown);
+        Serial.println(prevDown); //A0
     }
 
-    // //For RP2040
-    // int up = analogRead(A3);
-    // int down = analogRead(A2);
-    
-    //For ATmega328P
-    int up = analogRead(A0);
-    int down = analogRead(A9);
+    int up = analogRead(A9);
+    int down = analogRead(A0);
 
+    // int up = analogRead(A0);
+    // int down = analogRead(A9);
+    
     lowPassFilter(up, prevUp, alpha);
     lowPassFilter(down, prevDown, alpha);
 

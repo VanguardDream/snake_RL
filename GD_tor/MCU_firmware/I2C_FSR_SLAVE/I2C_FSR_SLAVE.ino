@@ -1,23 +1,37 @@
 #include <Wire.h>
 
-unsigned char ID = 3;
+unsigned char ID = 1;
 volatile int LED_TIME = 1;
-float alpha = 0.5;
+float alpha = 0.9;
 int sensordata = 0;
 int sensordata2 = 0;
+
+// 시리얼 앞 핀 : A9, 뒷 핀 : A0
+// 워드 파일상 Top핀 앞?
+// 앞
+uint8_t top_pin = A9;
+uint8_t bot_pin = A0;
+// 뒤
+// uint8_t top_pin = A0;
+// uint8_t bot_pin = A9;
+
+int is_connected = 0;
 
 // Timer1 interrupt
 ISR (TIMER1_COMPA_vect) {
   Serial.print(sensordata);
-  Serial.print(", ");
+  Serial.print(": ");
   Serial.print(sensordata2);
+  if(is_connected == 1){
+    Serial.print(", conned");
+  }
   Serial.println("");
 }
 
 // Timer3 interrupt
 ISR (TIMER3_COMPA_vect) {
-  int tmpdata = analogRead(A0);
-  int tmpdata2 = analogRead(A1);
+  int tmpdata = analogRead(bot_pin);
+  int tmpdata2 = analogRead(top_pin);
   // sensordata = tmpdata;
   sensordata = alpha * tmpdata + (1 - alpha) * sensordata;
   sensordata2 = alpha * tmpdata2 + (1 - alpha) * sensordata2;
@@ -43,9 +57,9 @@ void loop() {
     digitalWrite(LED_BUILTIN, HIGH); // LED 켜기
     delay(200); // 500ms 동안 유지
     digitalWrite(LED_BUILTIN, LOW); // LED 끄기
-    delay(100); // 500ms 동안 유지
+    delay(200); // 500ms 동안 유지
   }
-  delay(400);
+  delay(700);
 }
 void setupTimer() {
   cli();
@@ -106,8 +120,8 @@ void startupLED() {
 }
 
 void requestEvent() {
-  delay(5);
   int txdata[2] = {sensordata, sensordata2};
   // Wire.write((byte*)&sensordata, 2);
   Wire.write((byte*)&txdata, 4);
+  is_connected = 1;
 }

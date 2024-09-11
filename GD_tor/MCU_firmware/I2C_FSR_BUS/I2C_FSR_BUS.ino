@@ -2,8 +2,8 @@
 
 // volatile boolean timer1_out = HIGH;
 volatile int LED_BRIGHT = 0;
-int sensordata[16] = {0};
-int sensordata2[16] = {0};
+int sensordata[14] = {0};
+int sensordata2[14] = {0};
 long t_ex = 0;
 
 // Timer1 interrupt
@@ -30,8 +30,9 @@ ISR (TIMER3_COMPA_vect) {
 void setup() {
   pinMode(LED_BUILTIN, OUTPUT);
   Wire.begin();
-  Serial.begin(9600);
+  Serial.begin(115200);
 
+  delay(750);
   setupTimer();
   // setTimer1(1);
   setTimer3(0.05);
@@ -39,62 +40,29 @@ void setup() {
 }
 
 void loop() {
-  if(abs(millis() - t_ex) > 300){
-    t_ex = millis();
-    for(int idx = 0; idx < 16; idx++){
-      Wire.requestFrom(idx, 4);
-      delay(1);
-      while (Wire.available()) {
-        int t_start = millis();
+  unsigned long HZTime = millis();
+  for(int idx = 0; idx < 14; idx++){
+  Wire.requestFrom(idx, 4); // 슬레이브 주소: 1~14
+  unsigned long startTime = millis();
+  
+  // 타임아웃 설정 (예: 100ms)
+  while(Wire.available() < 4 && (millis() - startTime) < 5);
 
-        byte data[4];
-        data[0] = Wire.read(); // 첫 번째 바이트 읽기
-        data[1] = Wire.read(); // 두 번째 바이트 읽기
-
-        data[2] = Wire.read();
-        data[3] = Wire.read();
-        
-        // 받은 데이터를 정수로 변환
-        int sensorValue = data[1] << 8 | data[0];
-        int sensorValue2 = data[3] << 8 | data[2];
-
-        sensordata[idx] = sensorValue;
-        sensordata2[idx] = sensorValue2;
-
-        if(millis() - t_start > 10){
-          break;
-        }
-      }
-
+  byte data[4];
+  for(int i = 0; i < 4; i++){
+    data[i] = Wire.read();
+  }
+  int sensorValue1 = (data[1] << 8) | data[0];
+  int sensorValue2 = (data[3] << 8) | data[2];
+  sensordata[idx] = sensorValue1;
+  sensordata2[idx] = sensorValue2;
   }
 
-  // for(int idx = 0; idx < 16; idx++){
-  //   Wire.requestFrom(idx, 4);
-  //   delay(1);
-  //   while (Wire.available()) {
-  //     int t_start = millis();
+  while(millis() - HZTime < 50);
 
-  //     byte data[4];
-  //     data[0] = Wire.read(); // 첫 번째 바이트 읽기
-  //     data[1] = Wire.read(); // 두 번째 바이트 읽기
-
-  //     data[2] = Wire.read();
-  //     data[3] = Wire.read();
-      
-  //     // 받은 데이터를 정수로 변환
-  //     int sensorValue = data[1] << 8 | data[0];
-  //     int sensorValue2 = data[3] << 8 | data[2];
-
-  //     sensordata[idx] = sensorValue;
-  //     sensordata2[idx] = sensorValue2;
-
-  //     if(millis() - t_start > 300){
-  //       break;
-  //     }
-  //   }
-  }
-
-  for(int i=0; i < sizeof(sensordata)/2; i++){
+  for(int i=0; i < (sizeof(sensordata)/sizeof(sensordata[0])); i++){
+    // Serial.print(i+1);
+    // Serial.print(": ");
     Serial.print(sensordata[i]);
     Serial.print(", ");
     Serial.print(sensordata2[i]);
@@ -102,7 +70,8 @@ void loop() {
     // Serial.print("|");
   }
   Serial.println("");
-  delay(100);
+  // delay(400);
+  Wire.flush();
 }
 void setupTimer() {
   cli();

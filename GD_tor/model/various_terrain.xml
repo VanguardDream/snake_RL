@@ -1,0 +1,65 @@
+<!-- Copyright 2024 Bongsub Song
+ doorebong@gmail.com
+ -->
+
+ <mujoco model="terrain_testing">
+    <option timestep="0.00093750" solver="CG" tolerance="1e-6"/>
+    <compiler convexhull="false"/>
+    <size memory="10G"/>
+
+    <asset>
+        <texture type="skybox" builtin="gradient" width="512" height="512" rgb1=".4 .6 .8" rgb2="0 0 0"/>
+        <texture name="texgeom" type="cube" builtin="flat" mark="cross" width="128" height="128"
+                 rgb1="0.6 0.6 0.6" rgb2="0.6 0.6 0.6" markrgb="1 1 1"/>
+        <texture name="texplane" type="2d" builtin="checker" rgb1=".4 .4 .4" rgb2=".6 .6 .6"
+                 width="512" height="512"/>
+        <material name="MatPlane" reflectance="0.0" texture="texplane" texrepeat="1 1" texuniform="true"
+                  rgba=".7 .7 .7 1"/>
+        <material name="capsule" texture="texgeom" texuniform="true" rgba=".4 .9 .6 1" />
+        <material name="ellipsoid" texture="texgeom" texuniform="true" rgba=".4 .6 .9 1" />
+        <material name="box" texture="texgeom" texuniform="true" rgba=".4 .9 .9 1" />
+        <material name="cylinder" texture="texgeom" texuniform="true" rgba=".8 .6 .8 1" />
+        <material name="sphere" texture="texgeom" texuniform="true" rgba=".9 .1 .1 1" />
+
+        <mesh name="link_collision" file="./assets/dummy_contact_testing.STL"/>
+        <mesh name="sand_terrain"   file="./assets/sand_terrain2.obj"/>
+    </asset>
+
+    <default>
+        <default class="collision-mesh">
+            <geom type="mesh" mesh="link_collision" mass="0.250" condim="4" rgba="0.5 0.5 0.5 0.4" priority="1" friction="0.7 0.015 0.001" euler="90 90 0"/>
+        </default>
+    </default>
+
+    <visual>
+        <map force="0.1" zfar="30"/>
+        <rgba haze="0.15 0.25 0.35 1"/>
+        <quality shadowsize="4096"/>
+        <global offwidth="1280" offheight="1280"/>
+    </visual>
+
+<worldbody>
+    <!-- 사용할것 정리 -->
+    <!-- grass [0.000e+00  9.899e-01  1.023e-04  8.031e-01  1.000e+00  3.958e-02  2.402e-01] -->
+    <!-- sand  [0.000e+00  6.008e-01  1.249e-03  5.279e-01  1.000e+00  2.603e-02  1.000e+00] -->
+    <!-- granite [0.000e+00  9.895e-01  1.422e-03  4.520e-01  1.000e+00  1.911e-02  3.844e-01] -->
+    <!-- gravel [0.000e+00  9.689e-01  1.024e-03  5.118e-01  1.000e+00  1.963e-02  1.000e+00] -->
+    <!-- rigid [0.000e+00  9.869e-01  1.672e-03  4.209e-01  1.000e+00  1.011e-02  3.182e-01] -->
+
+    <geom name="floor" type="mesh" mesh="sand_terrain" priority="2" friction="0.55 0.015 0.001" solimp="0.000e+00  6.008e-01  1.249e-03  5.279e-01  1.000e+00" solref="2.603e-02  1.000e+00" euler="0 0 0"/>
+
+    <body name="debris" pos="0 0 0.43655" euler="0 0 0"> 
+        <freejoint name="root"/>
+        <geom class="collision-mesh"/> 
+        <body>
+            <geom name="sensor_body" type="cylinder" size="0.009 0.00075" pos="0.02 -0.00338 -0.0362" mass="0" priority="1" friction="0.7 0.015 0.001"/>
+            <site name="sensor" type="cylinder" size="0.009 0.00075" pos="0.02 -0.00338 -0.0362"/>
+        </body>
+    </body>
+</worldbody>
+
+<sensor>
+    <force name="force" site="sensor"/>
+</sensor>
+
+</mujoco>

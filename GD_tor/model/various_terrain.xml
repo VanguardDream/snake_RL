@@ -3,9 +3,8 @@
  -->
 
  <mujoco model="terrain_testing">
-    <option timestep="0.00093750" solver="CG" tolerance="1e-6"/>
-    <compiler convexhull="false"/>
-    <size memory="10G"/>
+    <option timestep="0.00093750"/>
+    <size memory="32G"/>
 
     <asset>
         <texture type="skybox" builtin="gradient" width="512" height="512" rgb1=".4 .6 .8" rgb2="0 0 0"/>
@@ -23,6 +22,7 @@
 
         <mesh name="link_collision" file="./assets/dummy_contact_testing.STL"/>
         <mesh name="sand_terrain"   file="./assets/sand_terrain2.obj"/>
+        <hfield name="sand_png"   file="./assets/sand0505_15comp.png" size="20 20 1.5 0.1"/>
     </asset>
 
     <default>
@@ -46,9 +46,10 @@
     <!-- gravel [0.000e+00  9.689e-01  1.024e-03  5.118e-01  1.000e+00  1.963e-02  1.000e+00] -->
     <!-- rigid [0.000e+00  9.869e-01  1.672e-03  4.209e-01  1.000e+00  1.011e-02  3.182e-01] -->
 
-    <geom name="floor" type="mesh" mesh="sand_terrain" priority="2" friction="0.55 0.015 0.001" solimp="0.000e+00  6.008e-01  1.249e-03  5.279e-01  1.000e+00" solref="2.603e-02  1.000e+00" euler="0 0 0"/>
+    <!-- <geom name="floor" type="mesh" mesh="sand_terrain" priority="2" friction="0.55 0.015 0.001" solimp="0.000e+00  6.008e-01  1.249e-03  5.279e-01  1.000e+00" solref="2.603e-02  1.000e+00" euler="0 0 0"/> -->
+    <geom name="floor" type="hfield" hfield="sand_png" rgba="0.957 0.643 0.376 1" priority="2" friction="0.55 0.015 0.001" solimp="0.000e+00  6.008e-01  1.249e-03  5.279e-01  1.000e+00" solref="2.603e-02  1.000e+00" euler="0 0 0"/>
 
-    <body name="debris" pos="0 0 0.43655" euler="0 0 0"> 
+    <body name="debris" pos="0 0 2.43655" euler="0 0 0"> 
         <freejoint name="root"/>
         <geom class="collision-mesh"/> 
         <body>

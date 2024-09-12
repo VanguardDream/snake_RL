@@ -33,3 +33,5 @@ science-contest2022/DynamixelSDK/*
 GD_tor/horcrux_ws/build/*
 GD_tor/horcrux_ws/install/*
 GD_tor/horcrux_ws/log/*
+GD_tor/model/assets/sand88_0comp.png
+GD_tor/model/assets/sand88_15comp.png

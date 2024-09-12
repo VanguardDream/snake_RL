@@ -5,7 +5,7 @@
  <mujoco model="Horcrux v2 with flat plane">
     <include file="horcrux.xml"/>
     <option timestep="0.005"/>
-    <size memory="1000M"/>
+    <size memory="10G"/>
 
     <asset>
         <texture type="skybox" builtin="gradient" width="512" height="512" rgb1=".4 .6 .8" rgb2="0 0 0"/>
@@ -25,12 +25,14 @@
         <material name="matsponge" texture="texsponge" specular="0.3"/>
 
         <hfield name="sand_png"   file="./assets/sand0505_15comp.png" size="20 20 1.5 0.1"/>
+        <texture name="sand_tex" type="2d" file="./assets/sand_texture.png"/>
+        <material name="sand_material" texture="sand_tex" specular="0.3"/>
     </asset>
 
 <worldbody>
     <!-- solimp default : "0.9 0.95 0.001 0.5 2" // solref default : "0.02 1" -->
     <!-- sand  [0.000e+00  6.008e-01  1.249e-03  5.279e-01  1.000e+00  2.603e-02  1.000e+00] -->
-    <geom name="floor" type="hfield" hfield="sand_png" rgba="0.957 0.643 0.376 1" priority="2" friction="0.55 0.015 0.001" solimp="0.000e+00  6.008e-01  1.249e-03  5.279e-01  1.000e+00" solref="2.603e-02  1.000e+00"/>
+    <geom name="floor" type="hfield" hfield="sand_png" material="sand_material" priority="2" friction="0.55 0.015 0.001" solimp="0.000e+00  6.008e-01  1.249e-03  5.279e-01  1.000e+00" solref="2.603e-02  1.000e+00"/>
 
     <geom name="wall1" type="box" condim="1" size="20 0.25 2" rgba="0.8 0.8 0.8 1" pos="0 20 1.9"/>
     <geom name="wall2" type="box" condim="1" size="20 0.25 2" rgba="0.8 0.8 0.8 1" pos="0 -20 1.9"/>

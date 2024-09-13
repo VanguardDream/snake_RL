@@ -15,11 +15,10 @@ from gymnasium.utils.save_video import save_video
 # (45,45,10,10,45) # sidewinding
 # (0,0,30,30,90) # rolling
 # (30,30,40,40,90) # helix
-env = gym.make("horcrux_terrain_v1/grass-v1", 
-            #    model_path = __contact_model_path__,
+env = gym.make("horcrux_terrain_v1/sand-v1", 
                terminate_when_unhealthy = False, 
-               render_mode = 'human', 
-               render_camera_name = "head_mount", 
+               render_mode = "rgb_array", 
+               render_camera_name = 'ceiling', 
                use_gait = True,
                gait_params = (30,30,15,15,0)
                ,) 
@@ -50,13 +49,15 @@ datas = {"joint_pos":np.empty((0,14)),
          "reward_unhealthy":np.empty((0,1)),
          }
 
-for i in range(1000):
-    random = np.random.random(14) * 1.5
+for i in range(3000):
+    random = np.random.random(14) * 2
     # random = np.ones(14) * 0.2
 
     obs, rew, terminated, _, info = env.step(random)
+
     if terminated:
         env.reset()
+        print("terminated")
 
     # if i % 300 == 0:
     #     env.reset()
@@ -87,7 +88,7 @@ for i in range(1000):
 
 env.reset()
 
-# save_video(frames,"../videos", name_prefix=video_prefix, fps=env.metadata["render_fps"], step_starting_index = step_starting_index, episode_index = episode_index)
+save_video(frames,"./videos", name_prefix=video_prefix, fps=env.metadata["render_fps"], step_starting_index = step_starting_index, episode_index = episode_index)
 
 env.close()
 

@@ -5,6 +5,7 @@ from horcrux_terrain_v1.envs.gait import Gait
 import numpy as np
 import os
 import pathlib
+import pkg_resources
 
 from gymnasium import utils
 from gymnasium.envs.mujoco import MujocoEnv
@@ -14,9 +15,11 @@ from scipy.spatial.transform import Rotation
 
 DEFAULT_CAMERA_CONFIG = {}
 
-__pkg_dir__ = pathlib.Path(os.path.dirname(__file__))
-__resource_dir__ = os.path.join(__pkg_dir__.parent,'resources')
-__mjcf_model_path__ = os.path.join(__resource_dir__, 'horcrux_sand.xml')
+# __pkg_dir__ = pathlib.Path(os.path.dirname(__file__))
+# __resource_dir__ = os.path.join(__pkg_dir__.parent,'resources')
+# __mjcf_model_path__ = os.path.join(__resource_dir__, 'horcrux_sand.xml')
+
+__mjcf_model_path__ = pkg_resources.resource_filename("horcrux_terrain_v1", "resources/horcrux_sand.xml")
 
 class SandWorld(MujocoEnv, utils.EzPickle):
     metadata = {
@@ -39,7 +42,7 @@ class SandWorld(MujocoEnv, utils.EzPickle):
             healthy_reward: float = 0,
             main_body: Union[int, str] = 2,
             render_camera_name = "ceiling",
-            terminate_when_unhealthy: bool = False,
+            terminate_when_unhealthy: bool = True,
             unhealthy_max_steps: int = 30,
             healthy_roll_range: Tuple[float, float] = (-45, 45),
             terminating_roll_range: Tuple[float, float] = (-120, 120),
@@ -272,7 +275,10 @@ class SandWorld(MujocoEnv, utils.EzPickle):
 
 
     def _get_obs(self, mVec : np.ndarray):
-          return np.concatenate((self.data.sensordata.flatten(), mVec))
+        tmp = self.data.sensordata.copy()
+        tmp[42:56] = (tmp[42:56]>1).astype(int)
+        tmp[56:70] = (tmp[56:70]>1).astype(int)
+        return np.concatenate((tmp.flatten(), mVec))
     
     def reset_model(self):
         # Unhealthy step reset

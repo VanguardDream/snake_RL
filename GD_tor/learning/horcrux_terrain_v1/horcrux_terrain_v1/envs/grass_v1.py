@@ -242,7 +242,7 @@ class GrassWorld(MujocoEnv, utils.EzPickle):
         }
 
         if self.render_mode == "human":
-            self.render()
+            self.render()   
         # truncation=False as the time limit is handled by the `TimeLimit` wrapper added during `make`
         return observation, reward, terminated, False, info
 
@@ -272,7 +272,10 @@ class GrassWorld(MujocoEnv, utils.EzPickle):
 
 
     def _get_obs(self, mVec : np.ndarray):
-          return np.concatenate((self.data.sensordata.flatten(), mVec))
+        tmp = self.data.sensordata.copy()
+        tmp[42:56] = (tmp[42:56]>1).astype(int)
+        tmp[56:70] = (tmp[56:70]>1).astype(int)
+        return np.concatenate((tmp.flatten(), mVec))
     
     def reset_model(self):
         # Unhealthy step reset

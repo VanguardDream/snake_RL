@@ -47,7 +47,7 @@ class SandWorld(MujocoEnv, utils.EzPickle):
             healthy_roll_range: Tuple[float, float] = (-45, 45),
             terminating_roll_range: Tuple[float, float] = (-120, 120),
             contact_force_range: Tuple[float, float] = (-1.0, 1.0),
-            reset_noise_scale: float = 0.03,
+            reset_noise_scale: float = 1.2,
             use_gait: bool = True,
             gait_params: Tuple[float, float, float, float, float] = (30, 30, 40, 40, 0),
             **kwargs,
@@ -92,6 +92,7 @@ class SandWorld(MujocoEnv, utils.EzPickle):
         self._unhealthy_max_steps = unhealthy_max_steps
         self._unhealth_steps = 0
         self._robot_body_names = ["link1","link2","link3","link4","link5","link6","link7","link8","link9","link10","link11","link12","link13","link14","link15"]
+        self._n_step = 0
 
         MujocoEnv.__init__(
                 self,
@@ -117,11 +118,11 @@ class SandWorld(MujocoEnv, utils.EzPickle):
         obs_size = self.data.sensordata.size + 14
 
         self.observation_space = Box(
-                low=-np.inf, high= np.inf, shape=(obs_size,), dtype=np.float64
+                low=-np.inf, high= np.inf, shape=(obs_size,)
         )
 
         self.action_space = Box(
-                low=0, high=1.5, shape=(14,), dtype=np.float32
+                low=0, high=2.7, shape=(14,)
         )
 
         self.motion_vector = np.array([0] * 14)
@@ -193,6 +194,8 @@ class SandWorld(MujocoEnv, utils.EzPickle):
         com_pos_after = self.get_robot_com()
         com_rpy_after = self.get_robot_rot()
 
+        self._n_step += 1
+
         # ## Head based
         # forward_dist = np.linalg.norm(xy_head_pos_after - xy_head_pos_before)
 
@@ -246,8 +249,14 @@ class SandWorld(MujocoEnv, utils.EzPickle):
 
         if self.render_mode == "human":
             self.render()
+
+        truncation = False
+        if self._n_step >= 6000:
+            terminated = True
+            truncation = True
+
         # truncation=False as the time limit is handled by the `TimeLimit` wrapper added during `make`
-        return observation, reward, terminated, False, info
+        return observation, reward, terminated, truncation, info
 
     def _get_rew(self, x_vel, y_vel, action):
         forward_reward = x_vel * self._forward_reward_weight
@@ -278,11 +287,12 @@ class SandWorld(MujocoEnv, utils.EzPickle):
         tmp = self.data.sensordata.copy()
         tmp[42:56] = (tmp[42:56]>1).astype(int)
         tmp[56:70] = (tmp[56:70]>1).astype(int)
-        return np.concatenate((tmp.flatten(), mVec))
+        return np.concatenate((tmp.flatten(), mVec), dtype=np.float32)
     
     def reset_model(self):
         # Unhealthy step reset
         self._unhealth_steps = 0
+        self._n_step = 0
 
         # Gait reset
         if not(self._use_gait):
@@ -297,6 +307,8 @@ class SandWorld(MujocoEnv, utils.EzPickle):
         # System reset
         noise_low = -self._reset_noise_scale
         noise_high = self._reset_noise_scale
+        xpos_low = -15
+        xpos_high = 15
 
         qpos = self.init_qpos + self.np_random.uniform(
             low=noise_low, high=noise_high, size=self.model.nq
@@ -305,9 +317,15 @@ class SandWorld(MujocoEnv, utils.EzPickle):
             self.init_qvel
             + self._reset_noise_scale * self.np_random.standard_normal(self.model.nv)
         )
+        x_xpos = self.np_random.uniform(low=xpos_low, high=xpos_high)
+        y_xpos = self.np_random.uniform(low=xpos_low, high=xpos_high)
+
+        qpos[0] = x_xpos
+        qpos[1] = y_xpos
+
         self.set_state(qpos, qvel)
 
-        observation = self._get_obs(np.array([0] * 14))
+        observation = self._get_obs(np.array([1] * 14))
 
         return observation
     

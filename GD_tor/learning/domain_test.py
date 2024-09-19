@@ -17,7 +17,7 @@ from gymnasium.utils.save_video import save_video
 # (30,30,40,40,90) # helix
 env = gym.make("horcrux_terrain_v1/sand-v1", 
                terminate_when_unhealthy = False, 
-               render_mode = "rgb_array", 
+               render_mode = "human", 
                render_camera_name = 'ceiling', 
                use_gait = True,
                gait_params = (30,30,15,15,0)
@@ -48,51 +48,51 @@ datas = {"joint_pos":np.empty((0,14)),
          "reward_side":np.empty((0,1)),
          "reward_unhealthy":np.empty((0,1)),
          }
+for j in range(30):
+    for i in range(30):
+        random = np.random.random(14) * 2
+        # random = np.ones(14) * 0.2
 
-for i in range(3000):
-    random = np.random.random(14) * 2
-    # random = np.ones(14) * 0.2
+        obs, rew, terminated, _, info = env.step(random)
 
-    obs, rew, terminated, _, info = env.step(random)
+        if terminated:
+            env.reset()
+            print("terminated")
 
-    if terminated:
-        env.reset()
-        print("terminated")
+        # if i % 300 == 0:
+        #     env.reset()
+            
+        # datas['joint_pos'] = np.vstack((datas['joint_pos'], info['joint_pos'])).tolist()
+        # datas['joint_vel'] = np.vstack((datas['joint_vel'], info['joint_vel'])).tolist()
+        # datas['head_quat'] = np.vstack((datas['head_quat'], info['head_quat'])).tolist()
+        # datas['head_ang_vel'] = np.vstack((datas['head_ang_vel'], info['head_ang_vel'])).tolist()
+        # datas['head_lin_acc'] = np.vstack((datas['head_lin_acc'], info['head_lin_acc'])).tolist()
+        # datas['motion_vector'] = np.vstack((datas['motion_vector'], info['motion_vector'])).tolist()
+        # datas['head_rpy'] = np.vstack((datas['head_rpy'], info['head_rpy'])).tolist()
+        # datas['com_rpy'] = np.vstack((datas['com_rpy'], info['com_rpy'])).tolist()
 
-    # if i % 300 == 0:
-    #     env.reset()
-        
-    # datas['joint_pos'] = np.vstack((datas['joint_pos'], info['joint_pos'])).tolist()
-    # datas['joint_vel'] = np.vstack((datas['joint_vel'], info['joint_vel'])).tolist()
-    # datas['head_quat'] = np.vstack((datas['head_quat'], info['head_quat'])).tolist()
-    # datas['head_ang_vel'] = np.vstack((datas['head_ang_vel'], info['head_ang_vel'])).tolist()
-    # datas['head_lin_acc'] = np.vstack((datas['head_lin_acc'], info['head_lin_acc'])).tolist()
-    # datas['motion_vector'] = np.vstack((datas['motion_vector'], info['motion_vector'])).tolist()
-    # datas['head_rpy'] = np.vstack((datas['head_rpy'], info['head_rpy'])).tolist()
-    # datas['com_rpy'] = np.vstack((datas['com_rpy'], info['com_rpy'])).tolist()
+        # datas['x_disp'] = np.vstack((datas['x_disp'], info['x_displacement'])).tolist()
+        # datas['y_disp'] = np.vstack((datas['y_disp'], info['y_displacement'])).tolist()
+        # datas['origin_disp'] = np.vstack((datas['origin_disp'], info['distance_from_origin'])).tolist()
+        # datas['x_vel'] = np.vstack((datas['x_vel'], info['x_velocity'])).tolist()
+        # datas['y_vel'] = np.vstack((datas['y_vel'], info['y_velocity'])).tolist()
+        # datas['reward_forward'] = np.vstack((datas['reward_forward'], info['reward_forward'])).tolist()
+        # datas['reward_healthy'] = np.vstack((datas['reward_healthy'], info['reward_healthy'])).tolist()
+        # datas['reward_ctrl'] = np.vstack((datas['reward_ctrl'], info['reward_ctrl'])).tolist()
+        # datas['reward_side'] = np.vstack((datas['reward_side'], info['reward_side'])).tolist()
+        # datas['reward_unhealthy'] = np.vstack((datas['reward_unhealthy'], info['reward_unhealthy'])).tolist()
+            
+        pixels = env.render()
 
-    # datas['x_disp'] = np.vstack((datas['x_disp'], info['x_displacement'])).tolist()
-    # datas['y_disp'] = np.vstack((datas['y_disp'], info['y_displacement'])).tolist()
-    # datas['origin_disp'] = np.vstack((datas['origin_disp'], info['distance_from_origin'])).tolist()
-    # datas['x_vel'] = np.vstack((datas['x_vel'], info['x_velocity'])).tolist()
-    # datas['y_vel'] = np.vstack((datas['y_vel'], info['y_velocity'])).tolist()
-    # datas['reward_forward'] = np.vstack((datas['reward_forward'], info['reward_forward'])).tolist()
-    # datas['reward_healthy'] = np.vstack((datas['reward_healthy'], info['reward_healthy'])).tolist()
-    # datas['reward_ctrl'] = np.vstack((datas['reward_ctrl'], info['reward_ctrl'])).tolist()
-    # datas['reward_side'] = np.vstack((datas['reward_side'], info['reward_side'])).tolist()
-    # datas['reward_unhealthy'] = np.vstack((datas['reward_unhealthy'], info['reward_unhealthy'])).tolist()
-        
-    pixels = env.render()
+        frames.append(pixels)
 
-    frames.append(pixels)
-
-env.reset()
+    env.reset()
+exit()
 
 save_video(frames,"./videos", name_prefix=video_prefix, fps=env.metadata["render_fps"], step_starting_index = step_starting_index, episode_index = episode_index)
 
 env.close()
 
-exit()
 
 import datetime
 __now_str = datetime.datetime.now().strftime("%Y%m%d_%H-%M-%S")

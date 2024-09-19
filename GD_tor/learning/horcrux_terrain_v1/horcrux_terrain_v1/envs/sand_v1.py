@@ -38,6 +38,7 @@ class SandWorld(MujocoEnv, utils.EzPickle):
             forward_reward_weight: float = 60,
             side_cost_weight:float = 60,
             ctrl_cost_weight: float = 0,
+            rotation_norm_cost_weight: float = 0,
             unhealthy_cost_weight: float = 1.0,
             healthy_reward: float = 0,
             main_body: Union[int, str] = 2,
@@ -60,6 +61,7 @@ class SandWorld(MujocoEnv, utils.EzPickle):
             forward_reward_weight,
             side_cost_weight,
             ctrl_cost_weight,
+            rotation_norm_cost_weight,
             unhealthy_cost_weight,
             healthy_reward,
             main_body,
@@ -78,6 +80,7 @@ class SandWorld(MujocoEnv, utils.EzPickle):
         self._forward_reward_weight = forward_reward_weight
         self._side_cost_weight = side_cost_weight
         self._ctrl_cost_weight = ctrl_cost_weight
+        self._rotation_norm_cost_weight = rotation_norm_cost_weight
         self._unhealthy_cost_weight = unhealthy_cost_weight
         self._healthy_reward = healthy_reward
         self._healthy_roll_range = healthy_roll_range
@@ -175,25 +178,39 @@ class SandWorld(MujocoEnv, utils.EzPickle):
          return control_cost
             
     def step(self, action):
-        xy_head_pos_before = self.data.body(self._main_body).xpos[:2].copy()
-        head_quat_before = self.data.body(self._main_body).xquat.copy()
-        rpy_before = Rotation([head_quat_before[1], head_quat_before[2], head_quat_before[3], head_quat_before[0]]).as_rotvec(False)
+        # xy_head_pos_before = self.data.body(self._main_body).xpos[:2].copy()
+        # head_quat_before = self.data.body(self._main_body).xquat.copy()
+        # rpy_before = Rotation([head_quat_before[1], head_quat_before[2], head_quat_before[3], head_quat_before[0]]).as_rotvec(False)
         
         com_pos_before = self.get_robot_com()
         com_rpy_before = self.get_robot_rot()
+
+        T_1 = np.eye(4)
+        T_1[:3, :3] = Rotation.from_rotvec(com_rpy_before,True).as_matrix()
+        T_1[:3, 3] = com_pos_before
 
         motion_vector = self.motion_vector
         direction_action = action * motion_vector
 
         self.do_simulation(direction_action, self.frame_skip)
 
-        xy_head_pos_after = self.data.body(self._main_body).xpos[:2].copy()
-        head_quat_after = self.data.body(self._main_body).xquat.copy()
-        rpy_after = Rotation([head_quat_after[1], head_quat_after[2], head_quat_after[3], head_quat_after[0]]).as_rotvec(False)
+        # xy_head_pos_after = self.data.body(self._main_body).xpos[:2].copy()
+        # head_quat_after = self.data.body(self._main_body).xquat.copy()
+        # rpy_after = Rotation([head_quat_after[1], head_quat_after[2], head_quat_after[3], head_quat_after[0]]).as_rotvec(False)
 
         com_pos_after = self.get_robot_com()
         com_rpy_after = self.get_robot_rot()
 
+        T_2 = np.eye(4)
+        T_2[:3, :3] = Rotation.from_rotvec(com_rpy_after,True).as_matrix()
+        T_2[:3, 3] = com_pos_after
+
+        d_T = np.linalg.inv(T_1) @ T_2
+        d_T_p = d_T[:3, 3]
+        d_T_r = d_T[:3, :3]
+        norm_r = np.linalg.norm(Rotation.from_matrix(d_T_r).as_rotvec(False))
+
+        
         self._n_step += 1
 
         # ## Head based
@@ -216,9 +233,16 @@ class SandWorld(MujocoEnv, utils.EzPickle):
         # x_vel = x_disp / self.dt
         # y_vel = y_disp / self.dt
 
-        ## Global CoM Disp
-        x_disp = com_pos_after[0] - com_pos_before[0]
-        y_disp = com_pos_after[1] - com_pos_before[1]
+        # ## Global CoM Disp
+        # x_disp = com_pos_after[0] - com_pos_before[0]
+        # y_disp = com_pos_after[1] - com_pos_before[1]
+
+        # x_vel = x_disp / self.dt
+        # y_vel = y_disp / self.dt
+
+        ## From transformation matrix
+        x_disp = d_T_p[0]
+        y_disp = d_T_p[1]
 
         x_vel = x_disp / self.dt
         y_vel = y_disp / self.dt
@@ -228,7 +252,7 @@ class SandWorld(MujocoEnv, utils.EzPickle):
         self._k += 1
         
         observation = self._get_obs(motion_vector)
-        reward, reward_info = self._get_rew(x_vel, y_vel, action)
+        reward, reward_info = self._get_rew(x_vel, y_vel, action, norm_r)
         terminated = self.is_terminated and self._terminate_when_unhealthy
         info = {
             "x_displacement": x_disp,
@@ -242,7 +266,7 @@ class SandWorld(MujocoEnv, utils.EzPickle):
             "head_ang_vel": observation[-20:-17].copy(),
             "head_lin_acc": observation[-17:-14].copy(),
             "motion_vector": observation[-14:].copy(),
-            "head_rpy": rpy_after,
+            # "head_rpy": rpy_after,
             "com_rpy": com_rpy_after,
             **reward_info,
         }
@@ -258,7 +282,7 @@ class SandWorld(MujocoEnv, utils.EzPickle):
         # truncation=False as the time limit is handled by the `TimeLimit` wrapper added during `make`
         return observation, reward, terminated, truncation, info
 
-    def _get_rew(self, x_vel, y_vel, action):
+    def _get_rew(self, x_vel, y_vel, action, norm_r):
         forward_reward = x_vel * self._forward_reward_weight
         healthy_reward = self.healthy_reward
 
@@ -266,9 +290,10 @@ class SandWorld(MujocoEnv, utils.EzPickle):
 
         ctrl_cost = self.control_cost(action)
         side_cost = np.abs(y_vel) * self._side_cost_weight
+        rot_cost = self._rotation_norm_cost_weight * norm_r
         unhealthy_cost = self.is_terminated * self._unhealthy_cost_weight
 
-        costs = ctrl_cost + side_cost + unhealthy_cost
+        costs = ctrl_cost + side_cost + unhealthy_cost + rot_cost
 
         reward = rewards - costs
 
@@ -277,6 +302,7 @@ class SandWorld(MujocoEnv, utils.EzPickle):
              "reward_healthy":healthy_reward,
              "reward_ctrl":-ctrl_cost,
              "reward_side":-side_cost,
+             "reward_rotation":-rot_cost,
              "reward_unhealthy":-unhealthy_cost,
         }
 
@@ -332,14 +358,16 @@ class SandWorld(MujocoEnv, utils.EzPickle):
     def get_robot_com(self)->np.ndarray:
         accum_x = 0
         accum_y = 0
+        accum_z = 0
         len_names = len(self._robot_body_names)
 
         for name in self._robot_body_names:
-            x, y, _ = self.data.body(name).xpos
+            x, y, z = self.data.body(name).xpos
             accum_x = accum_x + x
             accum_y = accum_y + y
+            accum_z = accum_z + z
 
-        return np.array([accum_x / len_names, accum_y / len_names])
+        return np.array([accum_x / len_names, accum_y / len_names, accum_z / len_names])
 
     def get_robot_rot(self)->np.ndarray:
         com_roll = 0

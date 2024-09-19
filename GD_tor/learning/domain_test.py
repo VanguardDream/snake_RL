@@ -1,4 +1,4 @@
-import horcrux_terrain_v1
+import horcrux_terrain_svd
 import gymnasium as gym
 import numpy as np
 import pandas as pd
@@ -15,7 +15,7 @@ from gymnasium.utils.save_video import save_video
 # (45,45,10,10,45) # sidewinding
 # (0,0,30,30,90) # rolling
 # (30,30,40,40,90) # helix
-env = gym.make("horcrux_terrain_v1/sand-v1", 
+env = gym.make("horcrux_terrain_svd/sand-v1", 
                terminate_when_unhealthy = False, 
                render_mode = "human", 
                render_camera_name = 'ceiling', 
@@ -48,10 +48,10 @@ datas = {"joint_pos":np.empty((0,14)),
          "reward_side":np.empty((0,1)),
          "reward_unhealthy":np.empty((0,1)),
          }
-for j in range(30):
-    for i in range(30):
-        random = np.random.random(14) * 2
-        # random = np.ones(14) * 0.2
+for j in range(1):
+    for i in range(4000):
+        # random = np.random.random(14) * 2
+        random = np.ones(14) * 0.7
 
         obs, rew, terminated, _, info = env.step(random)
 

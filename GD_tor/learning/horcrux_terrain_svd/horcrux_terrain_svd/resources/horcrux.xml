@@ -55,6 +55,16 @@
     <mesh file="./assets/head_17.obj"/>
     <mesh file="./assets/head_18.obj"/>
 
+    <!-- Arrows -->
+    <material name="0,0,255" specular="0.333333" shininess="1.0" rgba="0.000000 0.000000 1.000000 1.000000"/>
+    <material name="0,255,0" specular="0.333333" shininess="1.0" rgba="0.000000 1.000000 0.000000 1.000000"/>
+    <material name="255,0,0" specular="0.333333" shininess="1.0" rgba="1.000000 0.000000 0.000000 1.000000"/>
+    <material name="255,255,0" specular="0.666667" shininess="1.0" rgba="1.000000 1.000000 0.000000 1.000000"/>
+    <mesh file="./assets/axis_arrows_0.obj"/>
+    <mesh file="./assets/axis_arrows_1.obj"/>
+    <mesh file="./assets/axis_arrows_2.obj"/>
+    <mesh file="./assets/axis_arrows_3.obj"/>
+
 <!-- Verical 링크 obj 설정 파일들 -->
     <material name="v-color" specular="1.0" shininess="0.005212761999999999" rgba="0.247059 0.247059 0.247059 1.000000"/>
     <material name="v-color-10" specular="1.0" shininess="0.005212761999999999" rgba="0.749020 0.749020 0.749020 1.000000"/>
@@ -143,7 +153,7 @@
     </default>
 
     <default class="visual">
-        <geom group="2" type="mesh" mass="0" contype="0" conaffinity="0"/>
+        <geom group="2" type="mesh" mass="1" contype="0" conaffinity="0"/>
     </default>
 
     <default class="collision">

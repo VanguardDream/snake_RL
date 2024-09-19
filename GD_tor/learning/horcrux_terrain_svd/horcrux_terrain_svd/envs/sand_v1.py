@@ -179,7 +179,7 @@ class SandWorld(MujocoEnv, utils.EzPickle):
         head_quat_before = self.data.body(self._main_body).xquat.copy()
         rpy_before = Rotation([head_quat_before[1], head_quat_before[2], head_quat_before[3], head_quat_before[0]]).as_rotvec(False)
         
-        com_pos_before = self.get_robot_com()
+        com_pos_before = self.get_robot_comz()
         com_rpy_before = self.get_robot_rot()
 
         motion_vector = self.motion_vector
@@ -191,8 +191,12 @@ class SandWorld(MujocoEnv, utils.EzPickle):
         head_quat_after = self.data.body(self._main_body).xquat.copy()
         rpy_after = Rotation([head_quat_after[1], head_quat_after[2], head_quat_after[3], head_quat_after[0]]).as_rotvec(False)
 
-        com_pos_after = self.get_robot_com()
+        com_pos_after = self.get_robot_comz()
         com_rpy_after = self.get_robot_rot()
+
+        # U, S, V = self.get_SVD(self.get_robot_comz())
+        # print(V)
+        self.set_arrow_qpos(com_pos_after, com_rpy_after)
 
         self._n_step += 1
 
@@ -340,6 +344,21 @@ class SandWorld(MujocoEnv, utils.EzPickle):
             accum_y = accum_y + y
 
         return np.array([accum_x / len_names, accum_y / len_names])
+    
+    def get_robot_comz(self)->np.ndarray:
+        accum_x = 0
+        accum_y = 0
+        accum_z = 0
+
+        len_names = len(self._robot_body_names)
+
+        for name in self._robot_body_names:
+            x, y, z = self.data.body(name).xpos
+            accum_x = accum_x + x
+            accum_y = accum_y + y
+            accum_z = accum_z + z
+
+        return np.array([accum_x / len_names, accum_y / len_names, accum_z / len_names])
 
     def get_robot_rot(self)->np.ndarray:
         com_roll = 0
@@ -365,3 +384,14 @@ class SandWorld(MujocoEnv, utils.EzPickle):
         
         U, S, V = np.linalg.svd(_P)
         return U, S, V
+    
+    def set_arrow_qpos(self, xpos, imat):
+        #  arrow_qpos = self.data.qpos[-7::].copy()
+        tmp = Rotation.from_rotvec(imat)
+        tmp = tmp.as_quat()
+        tmp2 = [tmp[1], tmp[2], tmp[3], tmp[0]]
+
+        print(self.data.qpos.shape)
+        # self.data.qpos[-7::] = np.concatenate((xpos, tmp2))
+
+        return 0

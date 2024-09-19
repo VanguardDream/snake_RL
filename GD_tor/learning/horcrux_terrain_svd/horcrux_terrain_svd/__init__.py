@@ -1,8 +1,8 @@
 from gymnasium.envs.registration import register
 
 register(
-    id="horcrux_terrain_v1/sand-v1",
-    entry_point="horcrux_terrain_v1.envs:SandWorld",
+    id="horcrux_terrain_svd/sand-v1",
+    entry_point="horcrux_terrain_svd.envs:SandWorld",
     max_episode_steps=3000,
 )
 

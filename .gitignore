@@ -33,5 +33,10 @@ science-contest2022/DynamixelSDK/*
 GD_tor/horcrux_ws/build/*
 GD_tor/horcrux_ws/install/*
 GD_tor/horcrux_ws/log/*
+
+#Model assets
 GD_tor/model/assets/sand88_0comp.png
 GD_tor/model/assets/sand88_15comp.png
+
+# Trained agents
+GD_tor/learning/agents/*

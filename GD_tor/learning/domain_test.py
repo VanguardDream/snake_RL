@@ -48,8 +48,8 @@ datas = {"joint_pos":np.empty((0,14)),
          "reward_side":np.empty((0,1)),
          "reward_unhealthy":np.empty((0,1)),
          }
-for j in range(1):
-    for i in range(300):
+for j in range(60):
+    for i in range(1):
         # random = np.random.random(14) * 2
         random = np.ones(14) * 0.7
 

@@ -48,7 +48,7 @@ class SandWorld(MujocoEnv, utils.EzPickle):
             healthy_roll_range: Tuple[float, float] = (-45, 45),
             terminating_roll_range: Tuple[float, float] = (-120, 120),
             contact_force_range: Tuple[float, float] = (-1.0, 1.0),
-            reset_noise_scale: float = 1.2,
+            reset_noise_scale: float = 0.8,
             use_gait: bool = True,
             gait_params: Tuple[float, float, float, float, float] = (30, 30, 40, 40, 0),
             **kwargs,
@@ -96,6 +96,9 @@ class SandWorld(MujocoEnv, utils.EzPickle):
         self._unhealth_steps = 0
         self._robot_body_names = ["link1","link2","link3","link4","link5","link6","link7","link8","link9","link10","link11","link12","link13","link14","link15"]
         self._n_step = 0
+        self._initial_com = np.array([0,0,0])
+        self._initial_rpy = np.array([0,0,0])
+        self._after_com_rpy = np.array([0,0,0])
 
         MujocoEnv.__init__(
                 self,
@@ -147,18 +150,14 @@ class SandWorld(MujocoEnv, utils.EzPickle):
     
     @property
     def is_healthy(self):
-            _q_head_orientation = Rotation([self.data.sensordata[71],self.data.sensordata[72],self.data.sensordata[73],self.data.sensordata[70]])
-            r, p, y = _q_head_orientation.as_rotvec(True)
+            r, p, y = self._after_com_rpy
             min_r, max_r = self._healthy_roll_range
             is_healthy = min_r <= r <= max_r
             return is_healthy
     
     @property
     def is_terminated(self):
-            # _q_head_orientation = Rotation([self.data.sensordata[29],self.data.sensordata[30],self.data.sensordata[31],self.data.sensordata[28]])
-            # r, p, y = _q_head_orientation.as_rotvec(True)
-
-            r, p, y = self.get_robot_rot()
+            r, p, y = self._after_com_rpy
             t_min_r, t_max_r = self._terminating_roll_range
             is_not_over = t_min_r <= r <= t_max_r
 
@@ -178,10 +177,6 @@ class SandWorld(MujocoEnv, utils.EzPickle):
          return control_cost
             
     def step(self, action):
-        # xy_head_pos_before = self.data.body(self._main_body).xpos[:2].copy()
-        # head_quat_before = self.data.body(self._main_body).xquat.copy()
-        # rpy_before = Rotation([head_quat_before[1], head_quat_before[2], head_quat_before[3], head_quat_before[0]]).as_rotvec(False)
-        
         com_pos_before = self.get_robot_com()
         com_rpy_before = self.get_robot_rot()
 
@@ -194,12 +189,9 @@ class SandWorld(MujocoEnv, utils.EzPickle):
 
         self.do_simulation(direction_action, self.frame_skip)
 
-        # xy_head_pos_after = self.data.body(self._main_body).xpos[:2].copy()
-        # head_quat_after = self.data.body(self._main_body).xquat.copy()
-        # rpy_after = Rotation([head_quat_after[1], head_quat_after[2], head_quat_after[3], head_quat_after[0]]).as_rotvec(False)
-
         com_pos_after = self.get_robot_com()
         com_rpy_after = self.get_robot_rot()
+        self._after_com_rpy = com_rpy_after
 
         T_2 = np.eye(4)
         T_2[:3, :3] = Rotation.from_rotvec(com_rpy_after,True).as_matrix()
@@ -210,35 +202,11 @@ class SandWorld(MujocoEnv, utils.EzPickle):
         d_T_r = d_T[:3, :3]
         norm_r = np.linalg.norm(Rotation.from_matrix(d_T_r).as_rotvec(False))
 
-        
+        if self._n_step == 0:
+            self._initial_rpy = com_rpy_before.copy()
+            self._initial_com = com_pos_before.copy()
+
         self._n_step += 1
-
-        # ## Head based
-        # forward_dist = np.linalg.norm(xy_head_pos_after - xy_head_pos_before)
-
-        # d_yaw = rpy_after[2] - rpy_before[2]
-        # x_disp = forward_dist * np.cos(d_yaw)
-        # y_disp = forward_dist * np.sin(d_yaw)
-
-        # x_vel = x_disp / self.dt
-        # y_vel = y_disp / self.dt
-
-        # ## COM based
-        # forward_dist = np.linalg.norm(com_pos_after - com_pos_before)
-
-        # d_yaw = com_rpy_after[2] - com_rpy_before[2]
-        # x_disp = forward_dist * np.cos(d_yaw)
-        # y_disp = forward_dist * np.sin(d_yaw)
-
-        # x_vel = x_disp / self.dt
-        # y_vel = y_disp / self.dt
-
-        # ## Global CoM Disp
-        # x_disp = com_pos_after[0] - com_pos_before[0]
-        # y_disp = com_pos_after[1] - com_pos_before[1]
-
-        # x_vel = x_disp / self.dt
-        # y_vel = y_disp / self.dt
 
         ## From transformation matrix
         x_disp = d_T_p[0]
@@ -274,13 +242,24 @@ class SandWorld(MujocoEnv, utils.EzPickle):
         if self.render_mode == "human":
             self.render()
 
-        truncation = False
         if self._n_step >= 6000:
             terminated = True
-            truncation = True
+
+        if terminated:
+            # Termination reward
+            T_0 = np.eye(4)
+            T_0[:3, :3] = Rotation.from_rotvec(self._initial_rpy,True).as_matrix()
+            T_0[:3, 3] = self._initial_com
+
+            d_T0 = np.linalg.inv(T_0) @ T_2
+            d_T0_p = d_T0[:3, 3]
+
+            terminated_forward = d_T0_p[0] * 100
+
+            reward = reward + terminated_forward
 
         # truncation=False as the time limit is handled by the `TimeLimit` wrapper added during `make`
-        return observation, reward, terminated, truncation, info
+        return observation, reward, terminated, False, info
 
     def _get_rew(self, x_vel, y_vel, action, norm_r):
         forward_reward = x_vel * self._forward_reward_weight
@@ -317,8 +296,12 @@ class SandWorld(MujocoEnv, utils.EzPickle):
     
     def reset_model(self):
         # Unhealthy step reset
-        self._unhealth_steps = 0
         self._n_step = 0
+        self._k = 0
+        self._unhealth_steps = 0
+        self._after_com_rpy = np.array([0,0,0])
+        self._initial_rpy = np.array([0,0,0])
+        self._initial_com = np.array([0,0,0])
 
         # Gait reset
         if not(self._use_gait):
@@ -331,14 +314,20 @@ class SandWorld(MujocoEnv, utils.EzPickle):
             self._gait = Gait((a, b, c, d, e))
 
         # System reset
-        noise_low = -self._reset_noise_scale
-        noise_high = self._reset_noise_scale
+        noise_low = -0.1
+        noise_high = 0.1
         xpos_low = -15
         xpos_high = 15
 
         qpos = self.init_qpos + self.np_random.uniform(
             low=noise_low, high=noise_high, size=self.model.nq
         )
+
+        random_rpy = [float(self.np_random.uniform(low=-25,high=25,size=1)), 0, float(self.np_random.uniform(low=-180,high=180,size=1))]
+        random_rpy = np.array(random_rpy)
+        _reset_rotation = Rotation.from_rotvec(random_rpy,True).as_quat()
+        qpos[3:7] = [_reset_rotation[3], _reset_rotation[0], _reset_rotation[1], _reset_rotation[2]]
+
         qvel = (
             self.init_qvel
             + self._reset_noise_scale * self.np_random.standard_normal(self.model.nv)

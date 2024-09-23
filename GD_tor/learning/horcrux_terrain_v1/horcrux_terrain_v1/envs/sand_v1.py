@@ -36,6 +36,7 @@ class SandWorld(MujocoEnv, utils.EzPickle):
             frame_skip: int = 20, 
             default_camera_config: Dict[str, Union[float, int]] = DEFAULT_CAMERA_CONFIG,
             forward_reward_weight: float = 60,
+            termination_reward: float = 100,
             side_cost_weight:float = 60,
             ctrl_cost_weight: float = 0,
             rotation_norm_cost_weight: float = 0,
@@ -59,6 +60,7 @@ class SandWorld(MujocoEnv, utils.EzPickle):
             frame_skip,
             default_camera_config,
             forward_reward_weight,
+            termination_reward,
             side_cost_weight,
             ctrl_cost_weight,
             rotation_norm_cost_weight,
@@ -78,6 +80,7 @@ class SandWorld(MujocoEnv, utils.EzPickle):
         )
 
         self._forward_reward_weight = forward_reward_weight
+        self.termination_reward = termination_reward
         self._side_cost_weight = side_cost_weight
         self._ctrl_cost_weight = ctrl_cost_weight
         self._rotation_norm_cost_weight = rotation_norm_cost_weight
@@ -254,7 +257,7 @@ class SandWorld(MujocoEnv, utils.EzPickle):
             d_T0 = np.linalg.inv(T_0) @ T_2
             d_T0_p = d_T0[:3, 3]
 
-            terminated_forward = d_T0_p[0] * 100
+            terminated_forward = d_T0_p[0] * self.termination_reward
 
             reward = reward + terminated_forward
 

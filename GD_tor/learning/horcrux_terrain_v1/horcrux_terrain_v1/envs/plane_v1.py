@@ -5,6 +5,7 @@ from horcrux_terrain_v1.envs.gait import Gait
 import numpy as np
 import os
 import pathlib
+import pkg_resources
 
 from gymnasium import utils
 from gymnasium.envs.mujoco import MujocoEnv
@@ -14,9 +15,11 @@ from scipy.spatial.transform import Rotation
 
 DEFAULT_CAMERA_CONFIG = {}
 
-__pkg_dir__ = pathlib.Path(os.path.dirname(__file__))
-__resource_dir__ = os.path.join(__pkg_dir__.parent,'resources')
-__mjcf_model_path__ = os.path.join(__resource_dir__, 'horcrux_plane.xml')
+# __pkg_dir__ = pathlib.Path(os.path.dirname(__file__))
+# __resource_dir__ = os.path.join(__pkg_dir__.parent,'resources')
+# __mjcf_model_path__ = os.path.join(__resource_dir__, 'horcrux_sand.xml')
+
+__mjcf_model_path__ = pkg_resources.resource_filename("horcrux_terrain_v1", "resources/horcrux_plane.xml")
 
 class PlaneWorld(MujocoEnv, utils.EzPickle):
     metadata = {
@@ -33,18 +36,20 @@ class PlaneWorld(MujocoEnv, utils.EzPickle):
             frame_skip: int = 20, 
             default_camera_config: Dict[str, Union[float, int]] = DEFAULT_CAMERA_CONFIG,
             forward_reward_weight: float = 60,
+            termination_reward: float = 100,
             side_cost_weight:float = 60,
             ctrl_cost_weight: float = 0,
+            rotation_norm_cost_weight: float = 0,
             unhealthy_cost_weight: float = 1.0,
             healthy_reward: float = 0,
             main_body: Union[int, str] = 2,
             render_camera_name = "ceiling",
-            terminate_when_unhealthy: bool = False,
+            terminate_when_unhealthy: bool = True,
             unhealthy_max_steps: int = 30,
             healthy_roll_range: Tuple[float, float] = (-45, 45),
             terminating_roll_range: Tuple[float, float] = (-120, 120),
             contact_force_range: Tuple[float, float] = (-1.0, 1.0),
-            reset_noise_scale: float = 0.03,
+            reset_noise_scale: float = 0.1,
             use_gait: bool = True,
             gait_params: Tuple[float, float, float, float, float] = (30, 30, 40, 40, 0),
             **kwargs,
@@ -55,8 +60,10 @@ class PlaneWorld(MujocoEnv, utils.EzPickle):
             frame_skip,
             default_camera_config,
             forward_reward_weight,
+            termination_reward,
             side_cost_weight,
             ctrl_cost_weight,
+            rotation_norm_cost_weight,
             unhealthy_cost_weight,
             healthy_reward,
             main_body,
@@ -73,8 +80,10 @@ class PlaneWorld(MujocoEnv, utils.EzPickle):
         )
 
         self._forward_reward_weight = forward_reward_weight
+        self.termination_reward = termination_reward
         self._side_cost_weight = side_cost_weight
         self._ctrl_cost_weight = ctrl_cost_weight
+        self._rotation_norm_cost_weight = rotation_norm_cost_weight
         self._unhealthy_cost_weight = unhealthy_cost_weight
         self._healthy_reward = healthy_reward
         self._healthy_roll_range = healthy_roll_range
@@ -89,6 +98,10 @@ class PlaneWorld(MujocoEnv, utils.EzPickle):
         self._unhealthy_max_steps = unhealthy_max_steps
         self._unhealth_steps = 0
         self._robot_body_names = ["link1","link2","link3","link4","link5","link6","link7","link8","link9","link10","link11","link12","link13","link14","link15"]
+        self._n_step = 0
+        self._initial_com = np.array([0,0,0])
+        self._initial_rpy = np.array([0,0,0])
+        self._after_com_rpy = np.array([0,0,0])
 
         MujocoEnv.__init__(
                 self,
@@ -114,11 +127,11 @@ class PlaneWorld(MujocoEnv, utils.EzPickle):
         obs_size = self.data.sensordata.size + 14
 
         self.observation_space = Box(
-                low=-np.inf, high= np.inf, shape=(obs_size,), dtype=np.float64
+                low=-np.inf, high= np.inf, shape=(obs_size,)
         )
 
         self.action_space = Box(
-                low=0, high=1.5, shape=(14,), dtype=np.float32
+                low=0, high=2.7, shape=(14,)
         )
 
         self.motion_vector = np.array([0] * 14)
@@ -140,18 +153,14 @@ class PlaneWorld(MujocoEnv, utils.EzPickle):
     
     @property
     def is_healthy(self):
-            _q_head_orientation = Rotation([self.data.sensordata[71],self.data.sensordata[72],self.data.sensordata[73],self.data.sensordata[70]])
-            r, p, y = _q_head_orientation.as_rotvec(True)
+            r, p, y = self._after_com_rpy
             min_r, max_r = self._healthy_roll_range
             is_healthy = min_r <= r <= max_r
             return is_healthy
     
     @property
     def is_terminated(self):
-            # _q_head_orientation = Rotation([self.data.sensordata[29],self.data.sensordata[30],self.data.sensordata[31],self.data.sensordata[28]])
-            # r, p, y = _q_head_orientation.as_rotvec(True)
-
-            r, p, y = self.get_robot_rot()
+            r, p, y = self._after_com_rpy
             t_min_r, t_max_r = self._terminating_roll_range
             is_not_over = t_min_r <= r <= t_max_r
 
@@ -171,48 +180,40 @@ class PlaneWorld(MujocoEnv, utils.EzPickle):
          return control_cost
             
     def step(self, action):
-        xy_head_pos_before = self.data.body(self._main_body).xpos[:2].copy()
-        head_quat_before = self.data.body(self._main_body).xquat.copy()
-        rpy_before = Rotation([head_quat_before[1], head_quat_before[2], head_quat_before[3], head_quat_before[0]]).as_rotvec(False)
-        
         com_pos_before = self.get_robot_com()
         com_rpy_before = self.get_robot_rot()
+
+        T_1 = np.eye(4)
+        T_1[:3, :3] = Rotation.from_rotvec(com_rpy_before,True).as_matrix()
+        T_1[:3, 3] = com_pos_before
 
         motion_vector = self.motion_vector
         direction_action = action * motion_vector
 
         self.do_simulation(direction_action, self.frame_skip)
 
-        xy_head_pos_after = self.data.body(self._main_body).xpos[:2].copy()
-        head_quat_after = self.data.body(self._main_body).xquat.copy()
-        rpy_after = Rotation([head_quat_after[1], head_quat_after[2], head_quat_after[3], head_quat_after[0]]).as_rotvec(False)
-
         com_pos_after = self.get_robot_com()
         com_rpy_after = self.get_robot_rot()
+        self._after_com_rpy = com_rpy_after
 
-        # ## Head based
-        # forward_dist = np.linalg.norm(xy_head_pos_after - xy_head_pos_before)
+        T_2 = np.eye(4)
+        T_2[:3, :3] = Rotation.from_rotvec(com_rpy_after,True).as_matrix()
+        T_2[:3, 3] = com_pos_after
 
-        # d_yaw = rpy_after[2] - rpy_before[2]
-        # x_disp = forward_dist * np.cos(d_yaw)
-        # y_disp = forward_dist * np.sin(d_yaw)
+        d_T = np.linalg.inv(T_1) @ T_2
+        d_T_p = d_T[:3, 3]
+        d_T_r = d_T[:3, :3]
+        norm_r = np.linalg.norm(Rotation.from_matrix(d_T_r).as_rotvec(False))
 
-        # x_vel = x_disp / self.dt
-        # y_vel = y_disp / self.dt
+        if self._n_step == 0:
+            self._initial_rpy = com_rpy_before.copy()
+            self._initial_com = com_pos_before.copy()
 
-        # ## COM based
-        # forward_dist = np.linalg.norm(com_pos_after - com_pos_before)
+        self._n_step += 1
 
-        # d_yaw = com_rpy_after[2] - com_rpy_before[2]
-        # x_disp = forward_dist * np.cos(d_yaw)
-        # y_disp = forward_dist * np.sin(d_yaw)
-
-        # x_vel = x_disp / self.dt
-        # y_vel = y_disp / self.dt
-
-        ## Global CoM Disp
-        x_disp = com_pos_after[0] - com_pos_before[0]
-        y_disp = com_pos_after[1] - com_pos_before[1]
+        ## From transformation matrix
+        x_disp = d_T_p[0]
+        y_disp = d_T_p[1]
 
         x_vel = x_disp / self.dt
         y_vel = y_disp / self.dt
@@ -222,7 +223,7 @@ class PlaneWorld(MujocoEnv, utils.EzPickle):
         self._k += 1
         
         observation = self._get_obs(motion_vector)
-        reward, reward_info = self._get_rew(x_vel, y_vel, action)
+        reward, reward_info = self._get_rew(x_vel, y_vel, action, norm_r)
         terminated = self.is_terminated and self._terminate_when_unhealthy
         info = {
             "x_displacement": x_disp,
@@ -236,17 +237,37 @@ class PlaneWorld(MujocoEnv, utils.EzPickle):
             "head_ang_vel": observation[-20:-17].copy(),
             "head_lin_acc": observation[-17:-14].copy(),
             "motion_vector": observation[-14:].copy(),
-            "head_rpy": rpy_after,
+            # "head_rpy": rpy_after,
             "com_rpy": com_rpy_after,
             **reward_info,
         }
 
         if self.render_mode == "human":
             self.render()
+
+        if self._n_step >= 6000:
+            terminated = True
+
+        if terminated:
+            # Termination reward
+            T_0 = np.eye(4)
+            T_0[:3, :3] = Rotation.from_rotvec(self._initial_rpy,True).as_matrix()
+            T_0[:3, 3] = self._initial_com
+
+            d_T0 = np.linalg.inv(T_0) @ T_2
+            d_T0_p = d_T0[:3, 3]
+
+            terminated_forward = d_T0_p[0] * self.termination_reward - (np.abs(d_T0_p[1]) * 1.5 * self.termination_reward)
+
+            if self.render_mode == "human":
+                print(terminated_forward)
+
+            reward = reward + terminated_forward
+
         # truncation=False as the time limit is handled by the `TimeLimit` wrapper added during `make`
         return observation, reward, terminated, False, info
 
-    def _get_rew(self, x_vel, y_vel, action):
+    def _get_rew(self, x_vel, y_vel, action, norm_r):
         forward_reward = x_vel * self._forward_reward_weight
         healthy_reward = self.healthy_reward
 
@@ -254,9 +275,10 @@ class PlaneWorld(MujocoEnv, utils.EzPickle):
 
         ctrl_cost = self.control_cost(action)
         side_cost = np.abs(y_vel) * self._side_cost_weight
+        rot_cost = self._rotation_norm_cost_weight * norm_r
         unhealthy_cost = self.is_terminated * self._unhealthy_cost_weight
 
-        costs = ctrl_cost + side_cost + unhealthy_cost
+        costs = ctrl_cost + side_cost + unhealthy_cost + rot_cost
 
         reward = rewards - costs
 
@@ -265,6 +287,7 @@ class PlaneWorld(MujocoEnv, utils.EzPickle):
              "reward_healthy":healthy_reward,
              "reward_ctrl":-ctrl_cost,
              "reward_side":-side_cost,
+             "reward_rotation":-rot_cost,
              "reward_unhealthy":-unhealthy_cost,
         }
 
@@ -275,11 +298,16 @@ class PlaneWorld(MujocoEnv, utils.EzPickle):
         tmp = self.data.sensordata.copy()
         tmp[42:56] = (tmp[42:56]>1).astype(int)
         tmp[56:70] = (tmp[56:70]>1).astype(int)
-        return np.concatenate((tmp.flatten(), mVec))
+        return np.concatenate((tmp.flatten(), mVec), dtype=np.float32)
     
     def reset_model(self):
         # Unhealthy step reset
+        self._n_step = 0
+        self._k = 0
         self._unhealth_steps = 0
+        self._after_com_rpy = np.array([0,0,0])
+        self._initial_rpy = np.array([0,0,0])
+        self._initial_com = np.array([0,0,0])
 
         # Gait reset
         if not(self._use_gait):
@@ -292,33 +320,49 @@ class PlaneWorld(MujocoEnv, utils.EzPickle):
             self._gait = Gait((a, b, c, d, e))
 
         # System reset
-        noise_low = -self._reset_noise_scale
-        noise_high = self._reset_noise_scale
+        noise_low = -0.1
+        noise_high = 0.1
+        xpos_low = 0
+        xpos_high = 0
 
         qpos = self.init_qpos + self.np_random.uniform(
             low=noise_low, high=noise_high, size=self.model.nq
         )
+
+        random_rpy = [float(self.np_random.uniform(low=-10,high=10,size=1)), 0, float(self.np_random.uniform(low=-180,high=180,size=1))]
+        random_rpy = np.array(random_rpy)
+        _reset_rotation = Rotation.from_rotvec(random_rpy,True).as_quat()
+        qpos[3:7] = [_reset_rotation[3], _reset_rotation[0], _reset_rotation[1], _reset_rotation[2]]
+
         qvel = (
             self.init_qvel
             + self._reset_noise_scale * self.np_random.standard_normal(self.model.nv)
         )
+        x_xpos = self.np_random.uniform(low=xpos_low, high=xpos_high)
+        y_xpos = self.np_random.uniform(low=xpos_low, high=xpos_high)
+
+        qpos[0] = x_xpos
+        qpos[1] = y_xpos
+
         self.set_state(qpos, qvel)
 
-        observation = self._get_obs(np.array([0] * 14))
+        observation = self._get_obs(np.array([1] * 14))
 
         return observation
     
     def get_robot_com(self)->np.ndarray:
         accum_x = 0
         accum_y = 0
+        accum_z = 0
         len_names = len(self._robot_body_names)
 
         for name in self._robot_body_names:
-            x, y, _ = self.data.body(name).xpos
+            x, y, z = self.data.body(name).xpos
             accum_x = accum_x + x
             accum_y = accum_y + y
+            accum_z = accum_z + z
 
-        return np.array([accum_x / len_names, accum_y / len_names])
+        return np.array([accum_x / len_names, accum_y / len_names, accum_z / len_names])
 
     def get_robot_rot(self)->np.ndarray:
         com_roll = 0

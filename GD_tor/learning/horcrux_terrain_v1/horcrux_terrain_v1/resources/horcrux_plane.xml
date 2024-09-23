@@ -3,9 +3,9 @@
  -->
 
  <mujoco model="Horcrux v2 with flat plane">
-    <include file="horcrux.xml"/>
+    <include file="horcrux_p.xml"/>
     <option timestep="0.005"/>
-    <size memory="10G"/>
+    <size memory="64M"/>
 
     <asset>
         <texture type="skybox" builtin="gradient" width="512" height="512" rgb1=".4 .6 .8" rgb2="0 0 0"/>
@@ -23,7 +23,7 @@
     </asset>
 
 <worldbody>
-    <geom name="floor" type="plane" size="3 3 .5" priority="2" friction="1.1 0.015 0.001" material="MatPlane"/>
+    <geom name="floor" type="plane" size="3 3 .5" priority="2" friction="0.8 0.015 0.001" material="MatPlane"/>
 </worldbody>
 
 </mujoco>

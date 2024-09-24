@@ -101,6 +101,7 @@ class PlaneWorld(MujocoEnv, utils.EzPickle):
         self._n_step = 0
         self._initial_com = np.array([0,0,0])
         self._initial_rpy = np.array([0,0,0])
+        self._initial_head_rpy = np.array([0,0,0])
         self._after_com_rpy = np.array([0,0,0])
 
         MujocoEnv.__init__(
@@ -182,6 +183,8 @@ class PlaneWorld(MujocoEnv, utils.EzPickle):
     def step(self, action):
         com_pos_before = self.get_robot_com()
         com_rpy_before = self.get_robot_rot()
+        head_quat_before = self.data.body(self._main_body).xmat.copy()
+        head_quat_before = np.reshape(head_quat_before, (3,3))
 
         T_1 = np.eye(4)
         T_1[:3, :3] = Rotation.from_rotvec(com_rpy_before,True).as_matrix()
@@ -194,20 +197,36 @@ class PlaneWorld(MujocoEnv, utils.EzPickle):
 
         com_pos_after = self.get_robot_com()
         com_rpy_after = self.get_robot_rot()
+        head_quat_after = self.data.body(self._main_body).xmat.copy()
+        head_quat_after = np.reshape(head_quat_after, (3,3))
         self._after_com_rpy = com_rpy_after
 
         T_2 = np.eye(4)
         T_2[:3, :3] = Rotation.from_rotvec(com_rpy_after,True).as_matrix()
         T_2[:3, 3] = com_pos_after
 
+        # Transformation matrix of CoM between two steps
         d_T = np.linalg.inv(T_1) @ T_2
         d_T_p = d_T[:3, 3]
         d_T_r = d_T[:3, :3]
         norm_r = np.linalg.norm(Rotation.from_matrix(d_T_r).as_rotvec(False))
 
+        # Rotation matrix of head between two steps
+        d_R_head = np.linalg.inv(head_quat_before) @ head_quat_after
+
+        # Trasformation matrix of CoM from the initial step
+        T_0 = np.eye(4)
+        T_0[:3, :3] = Rotation.from_rotvec(self._initial_rpy,True).as_matrix()
+        T_0[:3, 3] = self._initial_com
+
+        d_T0 = np.linalg.inv(T_0) @ T_2
+        d_T0_p = d_T0[:3, 3]
+        d_T0_r = d_T0[:3, :3]
+
         if self._n_step == 0:
             self._initial_rpy = com_rpy_before.copy()
             self._initial_com = com_pos_before.copy()
+            self._initial_head_rpy = Rotation.from_matrix(head_quat_before).as_rotvec(True)
 
         self._n_step += 1
 
@@ -218,6 +237,12 @@ class PlaneWorld(MujocoEnv, utils.EzPickle):
         x_vel = x_disp / self.dt
         y_vel = y_disp / self.dt
         
+
+        # if self.render_mode == "human":
+        #     print(x_vel, y_vel)
+            # print(self._initial_rpy)
+            # print(Rotation.from_matrix(d_R_head).as_rotvec(True))
+
         # ## Gait changing...
         self.motion_vector = self._gait.getMvec(self._k)
         self._k += 1
@@ -250,17 +275,10 @@ class PlaneWorld(MujocoEnv, utils.EzPickle):
 
         if terminated:
             # Termination reward
-            T_0 = np.eye(4)
-            T_0[:3, :3] = Rotation.from_rotvec(self._initial_rpy,True).as_matrix()
-            T_0[:3, 3] = self._initial_com
-
-            d_T0 = np.linalg.inv(T_0) @ T_2
-            d_T0_p = d_T0[:3, 3]
-
             terminated_forward = d_T0_p[0] * self.termination_reward - (np.abs(d_T0_p[1]) * 1.5 * self.termination_reward)
 
-            if self.render_mode == "human":
-                print(terminated_forward)
+            # if self.render_mode == "human":
+            #     print(terminated_forward)
 
             reward = reward + terminated_forward
 
@@ -307,6 +325,7 @@ class PlaneWorld(MujocoEnv, utils.EzPickle):
         self._unhealth_steps = 0
         self._after_com_rpy = np.array([0,0,0])
         self._initial_rpy = np.array([0,0,0])
+        self._initial_head_rpy = np.array([0,0,0])
         self._initial_com = np.array([0,0,0])
 
         # Gait reset
@@ -336,7 +355,7 @@ class PlaneWorld(MujocoEnv, utils.EzPickle):
 
         qvel = (
             self.init_qvel
-            + self._reset_noise_scale * self.np_random.standard_normal(self.model.nv)
+            + 0 * self.np_random.standard_normal(self.model.nv)
         )
         x_xpos = self.np_random.uniform(low=xpos_low, high=xpos_high)
         y_xpos = self.np_random.uniform(low=xpos_low, high=xpos_high)

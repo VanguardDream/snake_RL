@@ -21,7 +21,7 @@ DEFAULT_CAMERA_CONFIG = {}
 
 __mjcf_model_path__ = pkg_resources.resource_filename("horcrux_terrain_v1", "resources/horcrux_plane.xml")
 
-class PlaneWorld(MujocoEnv, utils.EzPickle):
+class PlaneCGWorld(MujocoEnv, utils.EzPickle):
     metadata = {
         "render_modes": [
             "human",
@@ -125,14 +125,14 @@ class PlaneWorld(MujocoEnv, utils.EzPickle):
             "render_fps": int(np.round(1.0 / self.dt)),
         }
 
-        obs_size = self.data.sensordata.size + 14
+        obs_size = self.data.sensordata.size
 
         self.observation_space = Box(
                 low=-np.inf, high= np.inf, shape=(obs_size,)
         )
 
         self.action_space = Box(
-                low=0, high=2.7, shape=(14,)
+                low=-2.7, high=2.7, shape=(14,)
         )
 
         self.motion_vector = np.array([0] * 14)
@@ -190,10 +190,7 @@ class PlaneWorld(MujocoEnv, utils.EzPickle):
         T_1[:3, :3] = Rotation.from_rotvec(com_rpy_before,True).as_matrix()
         T_1[:3, 3] = com_pos_before
 
-        motion_vector = self.motion_vector
-        direction_action = (action * motion_vector).copy()
-
-        self.do_simulation(direction_action, self.frame_skip)
+        self.do_simulation(action, self.frame_skip)
 
         com_pos_after = self.get_robot_com()
         com_rpy_after = self.get_robot_rot()
@@ -248,7 +245,7 @@ class PlaneWorld(MujocoEnv, utils.EzPickle):
         self.motion_vector = self._gait.getMvec(self._k)
         self._k += 1
         
-        observation = self._get_obs(motion_vector)
+        observation = self._get_obs()
         reward, reward_info = self._get_rew(x_vel, y_vel, action, norm_r)
         terminated = self.is_terminated and self._terminate_when_unhealthy
         info = {
@@ -313,11 +310,11 @@ class PlaneWorld(MujocoEnv, utils.EzPickle):
         return reward, reward_info
 
 
-    def _get_obs(self, mVec : np.ndarray):
+    def _get_obs(self):
         tmp = self.data.sensordata.copy()
         tmp[42:56] = (tmp[42:56]>1).astype(int)
         tmp[56:70] = (tmp[56:70]>1).astype(int)
-        return np.concatenate((tmp.flatten(), mVec), dtype=np.float32)
+        return np.array(tmp,dtype=np.float32)
     
     def reset_model(self):
         # Unhealthy step reset
@@ -366,7 +363,7 @@ class PlaneWorld(MujocoEnv, utils.EzPickle):
 
         self.set_state(qpos, qvel)
 
-        observation = self._get_obs(np.array([1] * 14))
+        observation = self._get_obs()
 
         return observation
     

@@ -15,13 +15,23 @@ from gymnasium.utils.save_video import save_video
 # (45,45,10,10,45) # sidewinding
 # (0,0,30,30,90) # rolling
 # (30,30,40,40,90) # helix
-env = gym.make("horcrux_terrain_v1/plane-v1", 
+
+# env = gym.make("horcrux_terrain_v1/plane-v1", 
+#                terminate_when_unhealthy = False, 
+#                render_mode = "human", 
+#                render_camera_name = 'ceiling', 
+#                use_gait = True,
+#                gait_params = (30,30,15,15,0)
+#                ,) 
+
+env = gym.make("horcrux_terrain_v1/plane-cg", 
                terminate_when_unhealthy = False, 
                render_mode = "human", 
                render_camera_name = 'ceiling', 
                use_gait = True,
                gait_params = (30,30,15,15,0)
                ,) 
+
 _ = env.reset()
 
 step_starting_index = 0
@@ -49,8 +59,8 @@ datas = {"joint_pos":np.empty((0,14)),
          "reward_unhealthy":np.empty((0,1)),
          }
 for j in range(1):
-    for i in range(100):
-        # random = np.random.random(14) * 2
+    for i in range(500):
+        # random = np.random.random(14) * 5 - 2.5
         random = np.ones(14) * 0.7
 
         obs, rew, terminated, _, info = env.step(random)

@@ -40,3 +40,6 @@ GD_tor/model/assets/sand88_15comp.png
 
 # Trained agents
 GD_tor/learning/agents/*
+GD_tor/learning/Paper_agents/PPO/*
+GD_tor/learning/Paper_agents/SAC/*
+GD_tor/learning/Paper_agents/ray_logs/*

@@ -43,3 +43,4 @@ GD_tor/learning/agents/*
 GD_tor/learning/Paper_agents/PPO/*
 GD_tor/learning/Paper_agents/SAC/*
 GD_tor/learning/Paper_agents/ray_logs/*
+GD_tor/learning/obstacle_learning/agents/*

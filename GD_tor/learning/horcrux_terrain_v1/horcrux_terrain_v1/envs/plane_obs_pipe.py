@@ -217,7 +217,8 @@ class PlanePipeWorld(MujocoEnv, utils.EzPickle):
         # Trasformation matrix of CoM from the initial step
         T_0 = np.eye(4)
         T_0[:3, :3] = Rotation.from_rotvec(self._initial_rpy,True).as_matrix()
-        T_0[:3, 3] = self._initial_com
+        # T_0[:3, 3] = self._initial_com
+        T_0[:3, 3] = com_pos_before
 
         d_T0 = np.linalg.inv(T_0) @ T_2
         d_T0_p = d_T0[:3, 3]
@@ -231,8 +232,13 @@ class PlanePipeWorld(MujocoEnv, utils.EzPickle):
         self._n_step += 1
 
         ## From transformation matrix
-        x_disp = d_T_p[0]
-        y_disp = d_T_p[1]
+        # x_disp = d_T_p[0]
+        # y_disp = d_T_p[1]
+
+        ## From T0 (position vavious) matrix
+        x_disp = d_T0_p[0]
+        y_disp = d_T0_p[1]
+
 
         x_vel = x_disp / self.dt
         y_vel = y_disp / self.dt
@@ -344,8 +350,8 @@ class PlanePipeWorld(MujocoEnv, utils.EzPickle):
             self._gait = Gait((a, b, c, d, e))
 
         # System reset
-        noise_low = -0.1
-        noise_high = 0.1
+        noise_low = -0.05
+        noise_high = 0.05
         xpos_low = 0
         xpos_high = 0
 
@@ -353,7 +359,7 @@ class PlanePipeWorld(MujocoEnv, utils.EzPickle):
             low=noise_low, high=noise_high, size=self.model.nq
         )
 
-        random_rpy = [float(self.np_random.uniform(low=-10,high=10,size=1)), 0, float(self.np_random.uniform(low=-180,high=180,size=1))]
+        random_rpy = [float(self.np_random.uniform(low=-10,high=10,size=1)), 0, float(self.np_random.uniform(low=-5,high=5,size=1))]
         random_rpy = np.array(random_rpy)
         _reset_rotation = Rotation.from_rotvec(random_rpy,True).as_quat()
         qpos[3:7] = [_reset_rotation[3], _reset_rotation[0], _reset_rotation[1], _reset_rotation[2]]
@@ -369,6 +375,19 @@ class PlanePipeWorld(MujocoEnv, utils.EzPickle):
         qpos[1] = y_xpos
 
         self.set_state(qpos, qvel)
+
+        ## Pipe obstacle reset
+        color_r = [1.0, 0.4, 0.4, 0.7]
+        color_b = [0.4, 0.4, 1.0, 0.7]
+        obstacle_binary = [np.random.randint(0, 2) for _ in range(8)]
+
+        for i, binary in enumerate(obstacle_binary):
+            if binary:
+                self.model.geom(f"pvc_pipe{i+1}").rgba = color_r
+                self.model.geom(f"pvc_pipe{i+1}").pos[2] = 0.025
+            else:
+                self.model.geom(f"pvc_pipe{i+1}").rgba = color_b
+                self.model.geom(f"pvc_pipe{i+1}").pos[2] = 0.75
 
         observation = self._get_obs(np.array([1] * 14))
 

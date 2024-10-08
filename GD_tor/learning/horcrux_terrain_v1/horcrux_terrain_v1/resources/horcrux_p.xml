@@ -162,7 +162,7 @@
 <worldbody>
 
 <body>
-    <camera name="ceiling" mode="fixed" fovy="90" pos="0 0 25" euler="0 0 0"/>
+    <camera name="ceiling" mode="fixed" fovy="90" pos="2 0 3.5" euler="0 0 0"/>
 </body>
 
 <body name="link1" pos="0 0 0.4" euler="0 0 0"> 

@@ -270,6 +270,8 @@ class PlanePipeWorld(MujocoEnv, utils.EzPickle):
             "motion_vector": observation[-14:].copy(),
             # "head_rpy": rpy_after,
             "com_rpy": com_rpy_after,
+            "step_rpy": Rotation.from_matrix(d_T0_r).as_rotvec(True),
+            "step_p": np.transpose(d_T0_p),
             **reward_info,
         }
 
@@ -384,7 +386,7 @@ class PlanePipeWorld(MujocoEnv, utils.EzPickle):
         for i, binary in enumerate(obstacle_binary):
             if binary:
                 self.model.geom(f"pvc_pipe{i+1}").rgba = color_r
-                self.model.geom(f"pvc_pipe{i+1}").pos[2] = 0.025
+                self.model.geom(f"pvc_pipe{i+1}").pos[2] = 0.0125
             else:
                 self.model.geom(f"pvc_pipe{i+1}").rgba = color_b
                 self.model.geom(f"pvc_pipe{i+1}").pos[2] = 0.75

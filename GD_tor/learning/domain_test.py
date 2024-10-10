@@ -29,7 +29,7 @@ env = gym.make("horcrux_terrain_v1/pipe-v1",
                render_mode = "human", 
                render_camera_name = 'ceiling', 
                use_gait = True,
-               gait_params = (30,30,20,20,0)
+               gait_params = (30,30,80,80,0)
                ,) 
 
 _ = env.reset()
@@ -58,17 +58,29 @@ datas = {"joint_pos":np.empty((0,14)),
          "reward_side":np.empty((0,1)),
          "reward_unhealthy":np.empty((0,1)),
          }
-for j in range(20):
+
+import time
+
+for j in range(3):
+    t_now = time.time()
+    zero = np.array([0,0,0])
     for i in range(100):
+        while (time.time() - t_now) < 0.1:
+            pass
+        t_now = time.time()
         # random = np.random.random(14) * 5 - 2.5
         random = np.ones(14) * 0.7
+        # random = np.array([1,0]*7)
 
         obs, rew, terminated, _, info = env.step(random)
 
+        zero = zero + info['step_p']
         if terminated:
             env.reset()
             print("terminated")
 
+        # print(info['step_rpy'])
+        # print(info['step_p'])
         # if i % 300 == 0:
         #     env.reset()
             
@@ -97,6 +109,7 @@ for j in range(20):
         frames.append(pixels)
 
     env.reset()
+    print(zero)
 exit()
 
 save_video(frames,"./videos", name_prefix=video_prefix, fps=env.metadata["render_fps"], step_starting_index = step_starting_index, episode_index = episode_index)

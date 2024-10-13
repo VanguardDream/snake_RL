@@ -37,7 +37,7 @@ LEN_PRESENT_TEMPERATURE     = 1
 
 DXL_MINIMUM_POSITION_VALUE  = 0         # Refer to the Minimum Position Limit of product eManual
 DXL_MAXIMUM_POSITION_VALUE  = 4095      # Refer to the Maximum Position Limit of product eManual
-BAUDRATE                    = 3000000 # -> 통신 속도 조절
+BAUDRATE                    = 1000000 # -> 통신 속도 조절
 # BAUDRATE                    = 57600 # -> 통신 속도 조절
 
 PROTOCOL_VERSION            = 2.0
@@ -100,6 +100,12 @@ class motor_state_node(Node):
         )
 
         self.get_logger().info("\033[32m Node initation done...\033[0m")
+
+        self.get_logger().info("\033[32m Setting status return level...\033[0m")
+        for i in range(14):
+            self.dxl_pah.write1ByteTxRx(self.dxl_poh, (i), ADDR_STATUS_RETURN_LEVEL, 1)
+        for i in range(14):
+            self.dxl_pah.write1ByteTxRx(self.dxl_poh, (i), ADDR_STATUS_RETURN_LEVEL, 1)
 
         self.get_logger().info("\033[32m Send enable command to motors...\033[0m")
 

@@ -28,6 +28,12 @@ def generate_launch_description():
             name='NN_command'
         ),
         Node(
+            package='horcrux_fsr',
+            executable='skin_fsr_node',
+            namespace='horcrux',
+            name='skin_fsr'
+        ),
+        Node(
             package='horcrux_state',
             executable='state_node',
             namespace='horcrux',

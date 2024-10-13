@@ -5,6 +5,7 @@ from rclpy.node import Node
 from horcrux_interfaces.msg import RobotState
 from horcrux_interfaces.msg import MotorStates
 from sensor_msgs.msg import Joy, Imu, MagneticField
+from std_msgs.msg import Int32MultiArray
 
 class joy_sub(Node):
     def __init__(self):
@@ -33,6 +34,12 @@ class joy_sub(Node):
             self.motors_cb,
             1
         )
+        self.sub_fsr = self.create_subscription(
+            Int32MultiArray,
+            'skin_fsr',
+            self.fsr_cb,
+            1
+        )
 
         self.publisher_ = self.create_publisher(RobotState, 'robot_state', 10)
         timer_period = 1/20
@@ -41,6 +48,7 @@ class joy_sub(Node):
         self.imu_data = Imu()
         self.mag_data = MagneticField()
         self.motors_data = MotorStates()
+        self.fsr_data = Int32MultiArray()
 
     def joy_cb(self, msg:Joy):
         self.joy_data = msg
@@ -54,12 +62,16 @@ class joy_sub(Node):
     def motors_cb(self, msg:MotorStates):
         self.motors_data = msg
 
+    def fsr_cb(self, msg:Int32MultiArray):
+        self.fsr_data = msg
+
     def timer_cb(self):
         msg = RobotState()
         msg.joy = self.joy_data
         msg.imu = self.imu_data
         msg.mag = self.mag_data
         msg.motors = self.motors_data
+        msg.fsr = self.fsr_data
 
         self.publisher_.publish(msg)
 

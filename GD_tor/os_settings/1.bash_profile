@@ -2,7 +2,7 @@
 source /opt/ros/iron/setup.zsh
 
 # Colcon (ROS2) workspace source
-source /home/bong/project/snake_RL/GD/horcrux_ws/install/local_setup.zsh #This ws is not main just local one
+source /home/bong/project/snake_RL/GD_tor/horcrux_ws/install/local_setup.zsh #This ws is not main just local one
 
 # Colcon build tool settings
 source /usr/share/colcon_cd/function/colcon_cd.sh

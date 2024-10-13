@@ -11,6 +11,13 @@ geometry_msgs/Quaternion head_q
 geometry_msgs/Vector3 haed_angular_vel
 geometry_msgs/Vector3 head_linear_acc
 
+# FSR states
+int8[14] fsr_top
+int8[14] fsr_bottom
+
+# Motion vector
+int8[14] motion_vector
+
 # Joy states
 float32[2] axes
 

@@ -27,6 +27,8 @@ setup(
             'state_node = horcrux_state.horcrux_state:main',
             'motors_node = horcrux_state.motor_state:main',
             'command_node = horcrux_state.command:main',
+            'nn_state_node = horcrux_state.NN_startup:main',
+            'nn_policy_node = horcrux_state.NN_policy:main',
         ],
     },
 )

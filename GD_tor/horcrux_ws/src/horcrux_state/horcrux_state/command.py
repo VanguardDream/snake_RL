@@ -26,6 +26,7 @@ class horcrux_command(Node):
         self.__prior_action = np.empty((14))
         self.__action_uptime = self.get_clock().now()
 
+        self.__motion_vector = np.empty((14))
         self.__motor_currents = np.empty((14))
         self.__motor_velocities = np.empty((14))
         self.__motor_positions = np.empty((14))

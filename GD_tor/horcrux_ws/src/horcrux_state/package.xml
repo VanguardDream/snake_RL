@@ -9,6 +9,7 @@
 
   <depend>joy</depend>
   <depend>horcrux_interfaces</depend>
+  <depend>horcrux_fsr</depend>
 
   <exec_depend>ros2launch</exec_depend>
 

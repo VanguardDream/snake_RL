@@ -1,4 +1,5 @@
 import rclpy
+import time
 import numpy as np
 
 from .gait import serpenoid
@@ -12,6 +13,7 @@ from horcrux_interfaces.msg import RobotState
 
 class nn_startup(Node):
     def __init__(self, a_type:str = 'continuous'):
+        time.sleep(1)
         super().__init__('nn_startup')
         self.get_logger().info(" NN startup node initiation...")
         if a_type.lower() == 'discrete':
@@ -107,11 +109,11 @@ class nn_startup(Node):
             self.__fsr_top[idx] = msg.fsr.data[(2*idx)]
             self.__fsr_bot[idx] = msg.fsr.data[(2*idx)+1]
 
-        try:
-            self.__joy_axes[0] = msg.joy.axes[0] # Left X
-            self.__joy_axes[1] = msg.joy.axes[1] # Left Y
-        except Exception as e:
-            print(e)
+        # try:
+        #     self.__joy_axes[0] = msg.joy.axes[0] # Left X
+        #     self.__joy_axes[1] = msg.joy.axes[1] # Left Y
+        # except Exception as e:
+        #     print(e)
 
         self.__head_quat[0] = msg.imu.orientation.w
         self.__head_quat[1] = msg.imu.orientation.x

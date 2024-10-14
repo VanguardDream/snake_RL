@@ -57,7 +57,11 @@ class skin_fsr_node(Node):
                 serial_data = self.leonardo_fsr.readline().decode('utf-8').strip()
                 serial_data = serial_data[0:-1]
                 # self.get_logger().info(f'{serial_data}')
-                int_data = list(map(int, serial_data.split(',')))
+                try:
+                    int_data = list(map(int, serial_data.split(',')))
+                except Exception as e:
+                    self.get_logger().warn(f"\033[31m FSR parse failed... load all 0 array : {e} \033[0m")
+                    int_data = [0]*28
 
                 if len(int_data) == 28:  # 데이터가 12개일 경우에만 publish
                     self.fsr_msg.data = int_data

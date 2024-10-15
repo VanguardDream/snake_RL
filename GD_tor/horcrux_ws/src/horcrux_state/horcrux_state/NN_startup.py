@@ -13,7 +13,7 @@ from horcrux_interfaces.msg import RobotState
 
 class nn_startup(Node):
     def __init__(self, a_type:str = 'continuous'):
-        time.sleep(1)
+        time.sleep(3)
         super().__init__('nn_startup')
         self.get_logger().info(" NN startup node initiation...")
         if a_type.lower() == 'discrete':
@@ -32,7 +32,7 @@ class nn_startup(Node):
         self.__head_quat = np.empty((4))
         self.__head_angvel = np.empty((3))
         self.__head_linacc = np.empty((3))
-        self.__motion_vector = np.empty((14))
+        self.__motion_vector = np.empty((14), dtype=np.int8)
 
         ## For Recurrent NN
         self.__prior_action = np.empty((14))
@@ -106,8 +106,13 @@ class nn_startup(Node):
             self.__joint_vel[idx] = msg.motors.motors[idx].present_velocity
             self.__joint_pos[idx] = msg.motors.motors[idx].present_position
 
-            self.__fsr_top[idx] = msg.fsr.data[(2*idx)]
-            self.__fsr_bot[idx] = msg.fsr.data[(2*idx)+1]
+            try:
+                self.__fsr_top[idx] = msg.fsr.data[(2*idx)]
+                self.__fsr_bot[idx] = msg.fsr.data[(2*idx)+1]
+            except Exception as e:
+                print(e)
+                self.__fsr_top[idx] = [0] * 14
+                self.__fsr_bot[idx] = [0] * 14
 
         # try:
         #     self.__joy_axes[0] = msg.joy.axes[0] # Left X

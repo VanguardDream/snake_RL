@@ -355,7 +355,7 @@ class motor_state_node(Node):
     def action_sub_cb(self, msg:EnvAction):
         for idx in range(14):
             # dxl_add_param_result = self.gswrite.addParam(idx, int(100 * msg.c_action[idx]))
-            dxl_add_param_result = self.gswrite.addParam(idx, [DXL_LOBYTE(int(50 * msg.c_action[idx])),DXL_HIBYTE(int(50 * msg.c_action[idx]))])
+            dxl_add_param_result = self.gswrite.addParam(idx, [DXL_LOBYTE(int(150 * msg.c_action[idx])),DXL_HIBYTE(int(150 * msg.c_action[idx]))])
             if dxl_add_param_result != True:
                 self.get_logger().warn("\033[31m [ID:%03d] Addparam fail(action)...\033[0m" % idx)
 

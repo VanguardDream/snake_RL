@@ -33,4 +33,11 @@ def generate_launch_description():
             namespace='horcrux',
             name='horcrux_nn_state'
         )
+        ,
+            Node(
+            package='horcrux_state',
+            executable='nn_policy_node',
+            namespace='horcrux',
+            name='horcrux_nn_policy'
+        )
     ])

@@ -29,7 +29,7 @@ env = gym.make("horcrux_terrain_v1/pipe-v1",
                render_mode = "human", 
                render_camera_name = 'ceiling', 
                use_gait = True,
-               gait_params = (30,30,80,80,0)
+               gait_params = (30,30,30,30,0)
                ,) 
 
 _ = env.reset()
@@ -69,7 +69,7 @@ for j in range(3):
             pass
         t_now = time.time()
         # random = np.random.random(14) * 5 - 2.5
-        random = np.ones(14) * 0.7
+        random = np.ones(14) * 0.3
         # random = np.array([1,0]*7)
 
         obs, rew, terminated, _, info = env.step(random)

@@ -217,7 +217,8 @@ class PlaneWorld(MujocoEnv, utils.EzPickle):
         # Trasformation matrix of CoM from the initial step
         T_0 = np.eye(4)
         T_0[:3, :3] = Rotation.from_rotvec(self._initial_rpy,True).as_matrix()
-        T_0[:3, 3] = self._initial_com
+        # T_0[:3, 3] = self._initial_com
+        T_0[:3, 3] = com_pos_before
 
         d_T0 = np.linalg.inv(T_0) @ T_2
         d_T0_p = d_T0[:3, 3]
@@ -231,8 +232,13 @@ class PlaneWorld(MujocoEnv, utils.EzPickle):
         self._n_step += 1
 
         ## From transformation matrix
-        x_disp = d_T_p[0]
-        y_disp = d_T_p[1]
+        # x_disp = d_T_p[0]
+        # y_disp = d_T_p[1]
+
+        ## From T0 (position vavious) matrix
+        x_disp = d_T0_p[0]
+        y_disp = d_T0_p[1]
+
 
         x_vel = x_disp / self.dt
         y_vel = y_disp / self.dt
@@ -245,8 +251,8 @@ class PlaneWorld(MujocoEnv, utils.EzPickle):
             # print(Rotation.from_matrix(d_R_head).as_rotvec(True))
 
         # ## Gait changing...
-        self.motion_vector = self._gait.getMvec(self._k)
         self._k += 1
+        self.motion_vector = self._gait.getMvec(self._k)
         
         observation = self._get_obs(motion_vector)
         reward, reward_info = self._get_rew(x_vel, y_vel, action, norm_r)
@@ -265,6 +271,8 @@ class PlaneWorld(MujocoEnv, utils.EzPickle):
             "motion_vector": observation[-14:].copy(),
             # "head_rpy": rpy_after,
             "com_rpy": com_rpy_after,
+            "step_rpy": Rotation.from_matrix(d_T0_r).as_rotvec(True),
+            "step_p": np.transpose(d_T0_p),
             **reward_info,
         }
 

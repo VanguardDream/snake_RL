@@ -8,6 +8,8 @@ import pathlib
 import time
 import mediapy as media
 
+import matplotlib.pyplot as plt
+
 from gymnasium.utils.save_video import save_video
 
 #camera names : com, ceiling, head_mount
@@ -24,12 +26,12 @@ from gymnasium.utils.save_video import save_video
 #                gait_params = (30,30,15,15,0)
 #                ,) 
 
-env = gym.make("horcrux_terrain_v1/pipe-v1", 
+env = gym.make("horcrux_terrain_v1/plane-v1", 
                terminate_when_unhealthy = False, 
-               render_mode = "human", 
+               render_mode = "rgb_array", 
                render_camera_name = 'ceiling', 
                use_gait = True,
-               gait_params = (30,30,30,30,0)
+               gait_params = (30,30,60,60,0)
                ,) 
 
 _ = env.reset()
@@ -61,18 +63,25 @@ datas = {"joint_pos":np.empty((0,14)),
 
 import time
 
-for j in range(3):
+for j in range(1):
     t_now = time.time()
     zero = np.array([0,0,0])
-    for i in range(100):
-        while (time.time() - t_now) < 0.1:
-            pass
+    com_x = np.empty((0,1))
+    com_y = np.empty((0,1))
+    com_z = np.empty((0,1))
+    for i in range(1000):
+        # while (time.time() - t_now) < 0.1:
+        #     pass
         t_now = time.time()
         # random = np.random.random(14) * 5 - 2.5
-        random = np.ones(14) * 0.3
+        random = np.ones(14) * 0.5
         # random = np.array([1,0]*7)
 
         obs, rew, terminated, _, info = env.step(random)
+
+        com_x = np.vstack((com_x, info['com_pos'][0]))
+        com_y = np.vstack((com_y, info['com_pos'][0]))
+        com_z = np.vstack((com_z, info['com_pos'][0]))
 
         zero = zero + info['step_p']
         if terminated:
@@ -109,79 +118,88 @@ for j in range(3):
         frames.append(pixels)
 
     env.reset()
-    print(zero)
-exit()
+    # print(zero)
 
-save_video(frames,"./videos", name_prefix=video_prefix, fps=env.metadata["render_fps"], step_starting_index = step_starting_index, episode_index = episode_index)
+indices = np.arange(len(com_x))
+
+plt.figure()
+plt.plot(indices, com_x, label='Vector a', marker='o')
+plt.plot(indices, com_y, label='Vector b', marker='o')
+plt.plot(indices, com_z, label='Vector c', marker='o')
+
+
+# save_video(frames,"./videos", name_prefix=video_prefix, fps=env.metadata["render_fps"], step_starting_index = step_starting_index, episode_index = episode_index)
 
 env.close()
 
-
-import datetime
-__now_str = datetime.datetime.now().strftime("%Y%m%d_%H-%M-%S")
-savedata_pos = pd.DataFrame(datas['joint_pos'], columns=['POS_1',
-                                                         'POS_2',
-                                                         'POS_3',
-                                                         'POS_4',
-                                                         'POS_5',
-                                                         'POS_6',
-                                                         'POS_7',
-                                                         'POS_8',
-                                                         'POS_9',
-                                                         'POS_10',
-                                                         'POS_11',
-                                                         'POS_12',
-                                                         'POS_13',
-                                                         'POS_14'
-                                                         ])
-savedata_vel = pd.DataFrame(datas['joint_vel'], columns=['VEL_1',
-                                                         'VEL_2',
-                                                         'VEL_3',
-                                                         'VEL_4',
-                                                         'VEL_5',
-                                                         'VEL_6',
-                                                         'VEL_7',
-                                                         'VEL_8',
-                                                         'VEL_9',
-                                                         'VEL_10',
-                                                         'VEL_11',
-                                                         'VEL_12',
-                                                         'VEL_13',
-                                                         'VEL_14'
-                                                         ])
-savedata_h_quat = pd.DataFrame(datas['head_quat'], columns=['qw', 'qx', 'qy', 'qz'])
-savedata_h_a_vel = pd.DataFrame(datas['head_ang_vel'], columns=['angular_vel_r', 'angular_vel_p', 'angular_vel_y'])
-savedata_h_l_acc = pd.DataFrame(datas['head_lin_acc'], columns=['linear_acc_x', 'linear_acc_y', 'linear_acc_z'])
-savedata_m_Vec = pd.DataFrame(datas['motion_vector'], columns=['Motion_vec_1',
-                                                               'Motion_vec_2',
-                                                               'Motion_vec_3',
-                                                               'Motion_vec_4',
-                                                               'Motion_vec_5',
-                                                               'Motion_vec_6',
-                                                               'Motion_vec_7',
-                                                               'Motion_vec_8',
-                                                               'Motion_vec_9',
-                                                               'Motion_vec_10',
-                                                               'Motion_vec_11',
-                                                               'Motion_vec_12',
-                                                               'Motion_vec_13',
-                                                               'Motion_vec_14'
-                                                               ])
-savedata_h_rpy = pd.DataFrame(datas['head_rpy'], columns=['head_roll', 'head_pitch', 'head_yaw'])
-savedata_c_rpy = pd.DataFrame(datas['com_rpy'], columns=['com_roll', 'com_pitch', 'com_yaw'])
-
-savedata_x_disp = pd.DataFrame(datas['x_disp'], columns=['x_disp'])
-savedata_y_disp = pd.DataFrame(datas['y_disp'], columns=['y_disp'])
-savedata_o_disp = pd.DataFrame(datas['origin_disp'], columns=['origin_disp'])
-savedata_x_vel = pd.DataFrame(datas['x_vel'], columns=['x_vel'])
-savedata_y_vel = pd.DataFrame(datas['y_vel'], columns=['y_vel'])
-savedata_r_for = pd.DataFrame(datas['reward_forward'], columns=['reward_forward'])
-savedata_r_health = pd.DataFrame(datas['reward_healthy'], columns=['reward_healthy'])
-savedata_r_ctrl = pd.DataFrame(datas['reward_ctrl'], columns=['reward_ctrl'])
-savedata_r_side = pd.DataFrame(datas['reward_side'], columns=['reward_side'])
-savedata_r_uhealth = pd.DataFrame(datas['reward_unhealthy'], columns=['reward_unhealthy'])
+# exit()
 
 
-integrated_data = pd.concat([savedata_pos, savedata_vel, savedata_h_quat, savedata_h_a_vel, savedata_h_l_acc, savedata_m_Vec, savedata_h_rpy, savedata_c_rpy, savedata_x_disp, savedata_y_disp, savedata_o_disp, savedata_x_vel, savedata_y_vel, savedata_r_for, savedata_r_health, savedata_r_ctrl, savedata_r_side, savedata_r_uhealth], axis=1)
+# import datetime
+# __now_str = datetime.datetime.now().strftime("%Y%m%d_%H-%M-%S")
+# savedata_pos = pd.DataFrame(datas['joint_pos'], columns=['POS_1',
+#                                                          'POS_2',
+#                                                          'POS_3',
+#                                                          'POS_4',
+#                                                          'POS_5',
+#                                                          'POS_6',
+#                                                          'POS_7',
+#                                                          'POS_8',
+#                                                          'POS_9',
+#                                                          'POS_10',
+#                                                          'POS_11',
+#                                                          'POS_12',
+#                                                          'POS_13',
+#                                                          'POS_14'
+#                                                          ])
+# savedata_vel = pd.DataFrame(datas['joint_vel'], columns=['VEL_1',
+#                                                          'VEL_2',
+#                                                          'VEL_3',
+#                                                          'VEL_4',
+#                                                          'VEL_5',
+#                                                          'VEL_6',
+#                                                          'VEL_7',
+#                                                          'VEL_8',
+#                                                          'VEL_9',
+#                                                          'VEL_10',
+#                                                          'VEL_11',
+#                                                          'VEL_12',
+#                                                          'VEL_13',
+#                                                          'VEL_14'
+#                                                          ])
+# savedata_h_quat = pd.DataFrame(datas['head_quat'], columns=['qw', 'qx', 'qy', 'qz'])
+# savedata_h_a_vel = pd.DataFrame(datas['head_ang_vel'], columns=['angular_vel_r', 'angular_vel_p', 'angular_vel_y'])
+# savedata_h_l_acc = pd.DataFrame(datas['head_lin_acc'], columns=['linear_acc_x', 'linear_acc_y', 'linear_acc_z'])
+# savedata_m_Vec = pd.DataFrame(datas['motion_vector'], columns=['Motion_vec_1',
+#                                                                'Motion_vec_2',
+#                                                                'Motion_vec_3',
+#                                                                'Motion_vec_4',
+#                                                                'Motion_vec_5',
+#                                                                'Motion_vec_6',
+#                                                                'Motion_vec_7',
+#                                                                'Motion_vec_8',
+#                                                                'Motion_vec_9',
+#                                                                'Motion_vec_10',
+#                                                                'Motion_vec_11',
+#                                                                'Motion_vec_12',
+#                                                                'Motion_vec_13',
+#                                                                'Motion_vec_14'
+#                                                                ])
+# savedata_h_rpy = pd.DataFrame(datas['head_rpy'], columns=['head_roll', 'head_pitch', 'head_yaw'])
+# savedata_c_rpy = pd.DataFrame(datas['com_rpy'], columns=['com_roll', 'com_pitch', 'com_yaw'])
 
-integrated_data.to_csv('./'+__now_str+'integrated.csv')
+# savedata_x_disp = pd.DataFrame(datas['x_disp'], columns=['x_disp'])
+# savedata_y_disp = pd.DataFrame(datas['y_disp'], columns=['y_disp'])
+# savedata_o_disp = pd.DataFrame(datas['origin_disp'], columns=['origin_disp'])
+# savedata_x_vel = pd.DataFrame(datas['x_vel'], columns=['x_vel'])
+# savedata_y_vel = pd.DataFrame(datas['y_vel'], columns=['y_vel'])
+# savedata_r_for = pd.DataFrame(datas['reward_forward'], columns=['reward_forward'])
+# savedata_r_health = pd.DataFrame(datas['reward_healthy'], columns=['reward_healthy'])
+# savedata_r_ctrl = pd.DataFrame(datas['reward_ctrl'], columns=['reward_ctrl'])
+# savedata_r_side = pd.DataFrame(datas['reward_side'], columns=['reward_side'])
+# savedata_r_uhealth = pd.DataFrame(datas['reward_unhealthy'], columns=['reward_unhealthy'])
+
+
+# integrated_data = pd.concat([savedata_pos, savedata_vel, savedata_h_quat, savedata_h_a_vel, savedata_h_l_acc, savedata_m_Vec, savedata_h_rpy, savedata_c_rpy, savedata_x_disp, savedata_y_disp, savedata_o_disp, savedata_x_vel, savedata_y_vel, savedata_r_for, savedata_r_health, savedata_r_ctrl, savedata_r_side, savedata_r_uhealth], axis=1)
+
+# integrated_data.to_csv('./'+__now_str+'integrated.csv')

@@ -51,6 +51,7 @@ class PlaneWorld(MujocoEnv, utils.EzPickle):
             contact_force_range: Tuple[float, float] = (-1.0, 1.0),
             reset_noise_scale: float = 0.1,
             use_gait: bool = True,
+            use_friction_chg: bool = False,
             gait_params: Tuple[float, float, float, float, float] = (30, 30, 40, 40, 0),
             **kwargs,
     ):
@@ -75,6 +76,7 @@ class PlaneWorld(MujocoEnv, utils.EzPickle):
             contact_force_range,
             reset_noise_scale,
             use_gait,
+            use_friction_chg,
             gait_params,
             **kwargs,                
         )
@@ -93,6 +95,7 @@ class PlaneWorld(MujocoEnv, utils.EzPickle):
         self._main_body = main_body
         self._terminate_when_unhealthy = terminate_when_unhealthy
         self._use_gait = use_gait
+        self._use_friction_chg = use_friction_chg
         self._gait = Gait(gait_params)
         self._k = 0
         self._unhealthy_max_steps = unhealthy_max_steps
@@ -186,6 +189,11 @@ class PlaneWorld(MujocoEnv, utils.EzPickle):
         head_quat_before = self.data.body(self._main_body).xmat.copy()
         head_quat_before = np.reshape(head_quat_before, (3,3))
 
+        if self._n_step == 0:   
+            self._initial_rpy = com_rpy_before.copy()
+            self._initial_com = com_pos_before.copy()
+            self._initial_head_rpy = Rotation.from_matrix(head_quat_before).as_rotvec(True).copy()
+
         T_1 = np.eye(4)
         T_1[:3, :3] = Rotation.from_rotvec(com_rpy_before,True).as_matrix()
         T_1[:3, 3] = com_pos_before
@@ -209,7 +217,11 @@ class PlaneWorld(MujocoEnv, utils.EzPickle):
         d_T = np.linalg.inv(T_1) @ T_2
         d_T_p = d_T[:3, 3]
         d_T_r = d_T[:3, :3]
-        norm_r = np.linalg.norm(Rotation.from_matrix(d_T_r).as_rotvec(False))
+
+        # 회전의 노름
+        # norm_r = np.linalg.norm(Rotation.from_matrix(d_T_r).as_rotvec(False))
+        # 다른 회전은 무시하고, z축 회전만 고려
+        norm_r = (Rotation.from_matrix(d_T_r).as_rotvec(False))[2]
 
         # Rotation matrix of head between two steps
         d_R_head = np.linalg.inv(head_quat_before) @ head_quat_after
@@ -223,11 +235,6 @@ class PlaneWorld(MujocoEnv, utils.EzPickle):
         d_T0 = np.linalg.inv(T_0) @ T_2
         d_T0_p = d_T0[:3, 3]
         d_T0_r = d_T0[:3, :3]
-
-        if self._n_step == 0:
-            self._initial_rpy = com_rpy_before.copy()
-            self._initial_com = com_pos_before.copy()
-            self._initial_head_rpy = Rotation.from_matrix(head_quat_before).as_rotvec(True)
 
         self._n_step += 1
 
@@ -257,6 +264,33 @@ class PlaneWorld(MujocoEnv, utils.EzPickle):
         observation = self._get_obs(motion_vector)
         reward, reward_info = self._get_rew(x_vel, y_vel, action, norm_r)
         terminated = self.is_terminated and self._terminate_when_unhealthy
+
+        if self.render_mode == "human":
+            self.render()
+
+        if self._n_step >= 6000:
+            terminated = True
+
+        if terminated:
+            terminated_forward = 0
+            # Termination reward
+            if self.termination_reward > 0:
+                T_origin = np.eye(4)
+                T_origin[:3, 3] = self._initial_com
+                T_origin[:3, :3] = Rotation.from_rotvec(self._initial_rpy,True).as_matrix()
+
+                d_T_origin = np.linalg.inv(T_origin) @ T_2
+                d_T_origin_p = d_T_origin[:3, 3]
+
+                # terminated_forward = d_T_origin_p[0] * 150
+                # 종료 보상 안씀
+                terminated_forward = 0
+
+            if self.render_mode == "human":
+                print(terminated_forward)
+
+            reward = reward + terminated_forward
+
         info = {
             "x_displacement": x_disp,
             "y_displacement": y_disp,
@@ -270,26 +304,15 @@ class PlaneWorld(MujocoEnv, utils.EzPickle):
             "head_lin_acc": observation[-17:-14].copy(),
             "motion_vector": observation[-14:].copy(),
             # "head_rpy": rpy_after,
+            "com_pos": com_pos_before,
             "com_rpy": com_rpy_after,
-            "step_rpy": Rotation.from_matrix(d_T0_r).as_rotvec(True),
+            "step_rpy": Rotation.from_matrix(d_T_r).as_rotvec(True),
             "step_p": np.transpose(d_T0_p),
+            "init_rpy": self._initial_rpy,
+            "init_com": self._initial_com,
+            "init_head_rpy":self._initial_head_rpy,
             **reward_info,
         }
-
-        if self.render_mode == "human":
-            self.render()
-
-        if self._n_step >= 6000:
-            terminated = True
-
-        if terminated:
-            # Termination reward
-            terminated_forward = d_T0_p[0] * self.termination_reward - (np.abs(d_T0_p[1]) * 1.5 * self.termination_reward)
-
-            if self.render_mode == "human":
-                print(terminated_forward)
-
-            reward = reward + terminated_forward
 
         # truncation=False as the time limit is handled by the `TimeLimit` wrapper added during `make`
         return observation, reward, terminated, False, info
@@ -339,17 +362,17 @@ class PlaneWorld(MujocoEnv, utils.EzPickle):
 
         # Gait reset
         if not(self._use_gait):
-            a = np.random.randint(30, 45)
-            b = np.random.randint(30, 45)
-            c = np.random.randint(10, 30)
-            d = np.random.randint(10, 30)
-            e = np.random.randint( 0, 1)
+            a = np.random.randint(15, 46)
+            b = np.random.randint(15, 46)
+            c = np.random.randint(10, 71)
+            d = np.random.randint(10, 71)
+            e = np.random.randint( -45, 45)
 
             self._gait = Gait((a, b, c, d, e))
 
         # System reset
-        noise_low = -0.1
-        noise_high = 0.1
+        noise_low = -0.05
+        noise_high = 0.05
         xpos_low = 0
         xpos_high = 0
 
@@ -357,7 +380,7 @@ class PlaneWorld(MujocoEnv, utils.EzPickle):
             low=noise_low, high=noise_high, size=self.model.nq
         )
 
-        random_rpy = [float(self.np_random.uniform(low=-10,high=10,size=1)), 0, float(self.np_random.uniform(low=-180,high=180,size=1))]
+        random_rpy = [0, 0, float(self.np_random.uniform(low=-180,high=180,size=1))]
         random_rpy = np.array(random_rpy)
         _reset_rotation = Rotation.from_rotvec(random_rpy,True).as_quat()
         qpos[3:7] = [_reset_rotation[3], _reset_rotation[0], _reset_rotation[1], _reset_rotation[2]]
@@ -371,6 +394,12 @@ class PlaneWorld(MujocoEnv, utils.EzPickle):
 
         qpos[0] = x_xpos
         qpos[1] = y_xpos
+
+        if self._use_friction_chg:
+            u_slide = round(np.random.uniform(low=0.5, high = 1.0),3)
+            u_torsion = round(np.random.uniform(low=0.01, high = 0.06),3)
+            u_roll = round(np.random.uniform(low=0.001, high = 0.03),3)
+            self.model.geom('floor').friction = [u_slide, u_torsion, u_roll]
 
         self.set_state(qpos, qvel)
 

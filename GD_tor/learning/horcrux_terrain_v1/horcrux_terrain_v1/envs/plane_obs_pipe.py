@@ -36,12 +36,13 @@ class PlanePipeWorld(MujocoEnv, utils.EzPickle):
             frame_skip: int = 20, 
             default_camera_config: Dict[str, Union[float, int]] = DEFAULT_CAMERA_CONFIG,
             forward_reward_weight: float = 60,
-            termination_reward: float = 100,
+            termination_reward: float = 0,
             side_cost_weight:float = 60,
             ctrl_cost_weight: float = 0,
             rotation_norm_cost_weight: float = 0,
-            unhealthy_cost_weight: float = 1.0,
-            healthy_reward: float = 0,
+            rotation_orientation_cost_weight: float = 0.05,
+            unhealthy_cost_weight: float = 1,
+            healthy_reward: float = 2,
             main_body: Union[int, str] = 2,
             render_camera_name = "ceiling",
             terminate_when_unhealthy: bool = True,
@@ -51,6 +52,7 @@ class PlanePipeWorld(MujocoEnv, utils.EzPickle):
             contact_force_range: Tuple[float, float] = (-1.0, 1.0),
             reset_noise_scale: float = 0.1,
             use_gait: bool = True,
+            use_friction_chg: bool = False,
             gait_params: Tuple[float, float, float, float, float] = (30, 30, 40, 40, 0),
             **kwargs,
     ):
@@ -75,6 +77,7 @@ class PlanePipeWorld(MujocoEnv, utils.EzPickle):
             contact_force_range,
             reset_noise_scale,
             use_gait,
+            use_friction_chg,
             gait_params,
             **kwargs,                
         )
@@ -84,6 +87,7 @@ class PlanePipeWorld(MujocoEnv, utils.EzPickle):
         self._side_cost_weight = side_cost_weight
         self._ctrl_cost_weight = ctrl_cost_weight
         self._rotation_norm_cost_weight = rotation_norm_cost_weight
+        self._rotation_orientation_cost_weight = rotation_orientation_cost_weight
         self._unhealthy_cost_weight = unhealthy_cost_weight
         self._healthy_reward = healthy_reward
         self._healthy_roll_range = healthy_roll_range
@@ -93,6 +97,7 @@ class PlanePipeWorld(MujocoEnv, utils.EzPickle):
         self._main_body = main_body
         self._terminate_when_unhealthy = terminate_when_unhealthy
         self._use_gait = use_gait
+        self._use_friction_chg = use_friction_chg
         self._gait = Gait(gait_params)
         self._k = 0
         self._unhealthy_max_steps = unhealthy_max_steps
@@ -102,7 +107,7 @@ class PlanePipeWorld(MujocoEnv, utils.EzPickle):
         self._initial_com = np.array([0,0,0])
         self._initial_rpy = np.array([0,0,0])
         self._initial_head_rpy = np.array([0,0,0])
-        self._after_com_rpy = np.array([0,0,0])
+        self._cur_euler_ypr = np.array([0,0,0])
 
         MujocoEnv.__init__(
                 self,
@@ -154,14 +159,13 @@ class PlanePipeWorld(MujocoEnv, utils.EzPickle):
     
     @property
     def is_healthy(self):
-            r, p, y = self._after_com_rpy
+            y, p, r = self._cur_euler_ypr
             min_r, max_r = self._healthy_roll_range
             is_healthy = min_r <= r <= max_r
             return is_healthy
-    
     @property
     def is_terminated(self):
-            r, p, y = self._after_com_rpy
+            y, p, r = self._cur_euler_ypr
             t_min_r, t_max_r = self._terminating_roll_range
             is_not_over = t_min_r <= r <= t_max_r
 
@@ -181,81 +185,135 @@ class PlanePipeWorld(MujocoEnv, utils.EzPickle):
          return control_cost
             
     def step(self, action):
-        com_pos_before = self.get_robot_com()
-        com_rpy_before = self.get_robot_rot()
+        com_pos_before = self.get_robot_com().copy()
+        com_rpy_before = self.get_robot_rot().copy()
+        head_pos_before = self.data.body('link1').xpos.copy()
         head_quat_before = self.data.body(self._main_body).xmat.copy()
-        head_quat_before = np.reshape(head_quat_before, (3,3))
+        head_quat_before = np.reshape(head_quat_before, (3,3)).copy()
 
-        T_1 = np.eye(4)
-        T_1[:3, :3] = Rotation.from_rotvec(com_rpy_before,True).as_matrix()
-        T_1[:3, 3] = com_pos_before
+        if self._n_step == 0:   
+            self._initial_rpy = com_rpy_before.copy()
+            self._initial_com = com_pos_before.copy()
+            self._initial_head_rpy = Rotation.from_matrix(head_quat_before).as_rotvec(True).copy()
 
-        motion_vector = self.motion_vector
-        direction_action = action * motion_vector
+        motion_vector = self.motion_vector.copy()
+        direction_action = (action * motion_vector).copy()
 
         self.do_simulation(direction_action, self.frame_skip)
 
-        com_pos_after = self.get_robot_com()
-        com_rpy_after = self.get_robot_rot()
+        com_pos_after = self.get_robot_com().copy()
+        com_rpy_after = self.get_robot_rot().copy()
+        head_pos_after = self.data.body('link1').xpos.copy()
         head_quat_after = self.data.body(self._main_body).xmat.copy()
-        head_quat_after = np.reshape(head_quat_after, (3,3))
-        self._after_com_rpy = com_rpy_after
+        head_quat_after = np.reshape(head_quat_after, (3,3)).copy()
 
-        T_2 = np.eye(4)
-        T_2[:3, :3] = Rotation.from_rotvec(com_rpy_after,True).as_matrix()
-        T_2[:3, 3] = com_pos_after
+        self._n_step += 1
 
-        # Transformation matrix of CoM between two steps
-        d_T = np.linalg.inv(T_1) @ T_2
-        d_T_p = d_T[:3, 3]
-        d_T_r = d_T[:3, :3]
-        norm_r = np.linalg.norm(Rotation.from_matrix(d_T_r).as_rotvec(False))
-
-        # Rotation matrix of head between two steps
-        d_R_head = np.linalg.inv(head_quat_before) @ head_quat_after
-
-        # Trasformation matrix of CoM from the initial step
+        ## 각종 Transformation matrix 생성
+        # 원점의 Transformation matrix
         T_0 = np.eye(4)
         T_0[:3, :3] = Rotation.from_rotvec(self._initial_rpy,True).as_matrix()
         # T_0[:3, 3] = self._initial_com
         T_0[:3, 3] = com_pos_before
 
+        # Before의 Transformation matrix
+        T_1 = np.eye(4)
+        T_1[:3, :3] = Rotation.from_rotvec(com_rpy_before,True).as_matrix()
+        T_1[:3, 3] = com_pos_before
+
+        # After의 Transformation matrix
+        T_2 = np.eye(4)
+        T_2[:3, :3] = Rotation.from_rotvec(com_rpy_after,True).as_matrix()
+        T_2[:3, 3] = com_pos_after
+
+        # # Head Before의 Transformation matrix
+        # T_head_1 = np.eye(4)
+        # T_head_1[:3, :3] = Rotation.from_matrix(head_quat_before).as_matrix()
+        # T_head_1[:3, 3] = head_pos_before
+
+        # # Head After의 Transformation matrix
+        # T_head_2 = np.eye(4)
+        # T_head_2[:3, :3] = Rotation.from_matrix(head_quat_after).as_matrix()
+        # T_head_2[:3, 3] = head_pos_after
+
+        # Transformation matrix of CoM between two steps
+        d_T = np.linalg.inv(T_1) @ T_2
+        d_T_p = d_T[:3, 3]
+        d_T_r = d_T[:3, :3]
+
+        # # 원점과 T2의 step
         d_T0 = np.linalg.inv(T_0) @ T_2
         d_T0_p = d_T0[:3, 3]
         d_T0_r = d_T0[:3, :3]
 
-        if self._n_step == 0:
-            self._initial_rpy = com_rpy_before.copy()
-            self._initial_com = com_pos_before.copy()
-            self._initial_head_rpy = Rotation.from_matrix(head_quat_before).as_rotvec(True)
+        # # Head Before와 Head After의 step
+        # d_T_head = np.linalg.inv(T_head_1) @ T_head_2
+        # d_T_head_p = d_T_head[:3, 3]
+        # d_T_head_r = d_T_head[:3, :3]
 
-        self._n_step += 1
-
-        ## From transformation matrix
+        #### Reward를 위한 선형 변위 정의
+        ## CoM의 Step에서의 변위로 구하기
         # x_disp = d_T_p[0]
         # y_disp = d_T_p[1]
 
-        ## From T0 (position vavious) matrix
+        # ## Origin과 Step after를 통해서 구하기
         x_disp = d_T0_p[0]
         y_disp = d_T0_p[1]
 
+        ## Head의 변위로 구하기
+        # x_disp = d_T_head_p[0]
+        # y_disp = d_T_head_p[1]
 
+        ## CoM 좌표 그래로 사용
+        # x_disp = com_pos_after[0] - com_pos_before[0]
+        # y_disp = com_pos_after[1] - com_pos_before[1]
+
+        #### Reward를 위한 회전 변위 정의
+
+        # 회전의 노름 (회전의 크기)
+        norm_r = np.linalg.norm(Rotation.from_matrix(d_T_r).as_rotvec(False)).copy()
+        euler_r = Rotation.from_matrix(d_T_r).as_euler('ZYX',False).copy()
+        self._cur_euler_ypr = Rotation.from_matrix(d_T0_r).as_euler('ZYX',True).copy()
+
+        #### Reward 계산을 위한 변수 설정
         x_vel = x_disp / self.dt
         y_vel = y_disp / self.dt
         
 
-        # if self.render_mode == "human":
-        #     print(x_vel, y_vel)
-            # print(self._initial_rpy)
-            # print(Rotation.from_matrix(d_R_head).as_rotvec(True))
-
         # ## Gait changing...
-        self.motion_vector = self._gait.getMvec(self._k)
         self._k += 1
+        self.motion_vector = self._gait.getMvec(self._k)
         
         observation = self._get_obs(motion_vector)
-        reward, reward_info = self._get_rew(x_vel, y_vel, action, norm_r)
+        reward, reward_info = self._get_rew(x_vel, y_vel, action, norm_r, euler_r)
         terminated = self.is_terminated and self._terminate_when_unhealthy
+
+        if self.render_mode == "human":
+            self.render()
+
+        if self._n_step >= 6000:
+            terminated = True
+
+        if terminated:
+            terminated_forward = 0
+            # Termination reward
+            if self.termination_reward > 0:
+                T_origin = np.eye(4)
+                T_origin[:3, 3] = self._initial_com
+                T_origin[:3, :3] = Rotation.from_rotvec(self._initial_rpy,True).as_matrix()
+
+                d_T_origin = np.linalg.inv(T_origin) @ T_2
+                d_T_origin_p = d_T_origin[:3, 3]
+
+                # terminated_forward = d_T_origin_p[0] * 150
+                # 종료 보상 안씀
+                terminated_forward = 0
+
+            if self.render_mode == "human":
+                print(terminated_forward)
+
+            reward = reward + terminated_forward
+
         info = {
             "x_displacement": x_disp,
             "y_displacement": y_disp,
@@ -269,36 +327,21 @@ class PlanePipeWorld(MujocoEnv, utils.EzPickle):
             "head_lin_acc": observation[-17:-14].copy(),
             "motion_vector": observation[-14:].copy(),
             # "head_rpy": rpy_after,
-            "com_rpy": com_rpy_after,
-            "step_rpy": Rotation.from_matrix(d_T0_r).as_rotvec(True),
-            "step_p": np.transpose(d_T0_p),
+            "com_pos": com_pos_before,
+            # "com_rpy": com_rpy_after,
+            "com_ypr": self._cur_euler_ypr,
+            "step_ypr": euler_r,
+            # "step_p": np.transpose(d_T0_p),
+            "init_rpy": self._initial_rpy,
+            "init_com": self._initial_com,
+            "init_head_rpy":self._initial_head_rpy,
             **reward_info,
         }
 
-        if self.render_mode == "human":
-            self.render()
-
-        if self._n_step >= 6000:
-            terminated = True
-
-        if com_pos_after[0] > 4.1:
-             terminated = True
-             reward = reward + 1500
-             reward = reward + (6000 - self._n_step)
-
-        if terminated:
-            # Termination reward
-            terminated_forward = d_T0_p[0] * self.termination_reward - (np.abs(d_T0_p[1]) * 1.5 * self.termination_reward)
-
-            # if self.render_mode == "human":
-            #     print(terminated_forward)
-
-            reward = reward + terminated_forward
-
         # truncation=False as the time limit is handled by the `TimeLimit` wrapper added during `make`
         return observation, reward, terminated, False, info
-
-    def _get_rew(self, x_vel, y_vel, action, norm_r):
+    
+    def _get_rew(self, x_vel, y_vel, action, norm_r, euler_r):
         forward_reward = x_vel * self._forward_reward_weight
         healthy_reward = self.healthy_reward
 
@@ -306,10 +349,12 @@ class PlanePipeWorld(MujocoEnv, utils.EzPickle):
 
         ctrl_cost = self.control_cost(action)
         side_cost = np.abs(y_vel) * self._side_cost_weight
-        rot_cost = self._rotation_norm_cost_weight * norm_r
+        rot_cost = self._rotation_norm_cost_weight * norm_r #회전 전반적인 크기에 대한 패널티
+        step_straightness_cost = self._rotation_orientation_cost_weight * np.abs(euler_r[0]) #직진성 위반에 대한 패널티 한 스텝
+        straightness_cost = 0.02 * self._rotation_orientation_cost_weight * np.abs(self._cur_euler_ypr[0]) #직진성 위반에 대한 패널티 전체적으로
         unhealthy_cost = self.is_terminated * self._unhealthy_cost_weight
 
-        costs = ctrl_cost + side_cost + unhealthy_cost + rot_cost
+        costs = ctrl_cost + side_cost + unhealthy_cost + rot_cost + straightness_cost + step_straightness_cost
 
         reward = rewards - costs
 
@@ -319,6 +364,8 @@ class PlanePipeWorld(MujocoEnv, utils.EzPickle):
              "reward_ctrl":-ctrl_cost,
              "reward_side":-side_cost,
              "reward_rotation":-rot_cost,
+             "reward_step_straightness":-step_straightness_cost,
+             "reward_straightness":-straightness_cost,
              "reward_unhealthy":-unhealthy_cost,
         }
 
@@ -336,10 +383,10 @@ class PlanePipeWorld(MujocoEnv, utils.EzPickle):
         self._n_step = 0
         self._k = 0
         self._unhealth_steps = 0
-        self._after_com_rpy = np.array([0,0,0])
         self._initial_rpy = np.array([0,0,0])
         self._initial_head_rpy = np.array([0,0,0])
         self._initial_com = np.array([0,0,0])
+        self._cur_euler_ypr = np.array([0,0,0])
 
         # Gait reset
         if not(self._use_gait):
@@ -379,14 +426,14 @@ class PlanePipeWorld(MujocoEnv, utils.EzPickle):
         self.set_state(qpos, qvel)
 
         ## Pipe obstacle reset
-        color_r = [1.0, 0.4, 0.4, 0.7]
-        color_b = [0.4, 0.4, 1.0, 0.7]
+        color_r = [1.0, 0.4, 0.4, 0.9]
+        color_b = [0.4, 0.4, 1.0, 0.9]
         obstacle_binary = [np.random.randint(0, 2) for _ in range(8)]
 
         for i, binary in enumerate(obstacle_binary):
             if binary:
                 self.model.geom(f"pvc_pipe{i+1}").rgba = color_r
-                self.model.geom(f"pvc_pipe{i+1}").pos[2] = 0.0125
+                self.model.geom(f"pvc_pipe{i+1}").pos[2] = 0.0051
             else:
                 self.model.geom(f"pvc_pipe{i+1}").rgba = color_b
                 self.model.geom(f"pvc_pipe{i+1}").pos[2] = 0.75

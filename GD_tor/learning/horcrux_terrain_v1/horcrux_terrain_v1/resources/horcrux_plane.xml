@@ -4,7 +4,7 @@
 
  <mujoco model="Horcrux v2 with flat plane">
     <include file="horcrux_p.xml"/>
-    <option timestep="0.005"/>
+    <option timestep="0.005" cone="elliptic"/>
     <size memory="64M"/>
 
     <asset>

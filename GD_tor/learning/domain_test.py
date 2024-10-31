@@ -18,21 +18,21 @@ from gymnasium.utils.save_video import save_video
 # (0,0,30,30,90) # rolling
 # (30,30,40,40,90) # helix
 
-# env = gym.make("horcrux_terrain_v1/plane-v1", 
+env = gym.make("horcrux_terrain_v1/plane-v1", 
+               terminate_when_unhealthy = False, 
+               render_mode = "human", 
+               render_camera_name = 'ceiling', 
+               use_gait = True,
+               gait_params = (30,30,15,15,0)
+               ,) 
+
+# env = gym.make("horcrux_terrain_v1/pipe-v1", 
 #                terminate_when_unhealthy = False, 
 #                render_mode = "human", 
 #                render_camera_name = 'ceiling', 
 #                use_gait = True,
-#                gait_params = (30,30,15,15,0)
+#                gait_params = (30,30,60,60,0)
 #                ,) 
-
-env = gym.make("horcrux_terrain_v1/plane-v1", 
-               terminate_when_unhealthy = False, 
-               render_mode = "rgb_array", 
-               render_camera_name = 'ceiling', 
-               use_gait = True,
-               gait_params = (30,30,60,60,0)
-               ,) 
 
 _ = env.reset()
 
@@ -63,7 +63,7 @@ datas = {"joint_pos":np.empty((0,14)),
 
 import time
 
-for j in range(1):
+for j in range(5):
     t_now = time.time()
     zero = np.array([0,0,0])
     com_x = np.empty((0,1))
@@ -74,16 +74,12 @@ for j in range(1):
         #     pass
         t_now = time.time()
         # random = np.random.random(14) * 5 - 2.5
-        random = np.ones(14) * 0.5
+        random = np.ones(14) * 0.75
         # random = np.array([1,0]*7)
 
         obs, rew, terminated, _, info = env.step(random)
 
-        com_x = np.vstack((com_x, info['com_pos'][0]))
-        com_y = np.vstack((com_y, info['com_pos'][0]))
-        com_z = np.vstack((com_z, info['com_pos'][0]))
-
-        zero = zero + info['step_p']
+        # zero = zero + info['step_p']
         if terminated:
             env.reset()
             print("terminated")

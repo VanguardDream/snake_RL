@@ -170,7 +170,7 @@
     <site name="s_tool" pos="0.05 0 0.0" euler="0 0 0" rgba="0.2 0.9 0.3 1"/>
     <site name="s_link1_top" type="box" size="0.021 0.038 0.014" pos="0.016 0 0.018" rgba="0.8 0.1 0.2 0.3"/>
     <site name="s_link1_bot" type="box" size="0.021 0.038 0.014" pos="0.016 0 -0.018" rgba="0.2 0.1 0.8 0.3"/>
-    <geom name="collision-link1" class="collision-mesh"/> 
+    <geom class="collision-mesh"/> 
     <geom mesh="head_0"  pos="0 0 -0.03125" euler="0 90 90" material="matte_rubber" class="visual"/>
     <geom mesh="head_1"  pos="0 0 -0.03125" euler="0 90 90" material="color-9" class="visual"/>
     <geom mesh="head_2"  pos="0 0 -0.03125" euler="0 90 90" material="color-8" class="visual"/>
@@ -194,7 +194,7 @@
         <joint class="joint_defaults" name="joint1" axis="0 1 0"/>
         <site name="s_link2_top" type="box" size="0.021 0.038 0.014" pos="0.016 0 0.018" rgba="0.8 0.1 0.2 0.3"/>
         <site name="s_link2_bot" type="box" size="0.021 0.038 0.014" pos="0.016 0 -0.018" rgba="0.2 0.1 0.8 0.3"/>
-        <geom name="collision-link2" class="collision-mesh"/>
+        <geom class="collision-mesh"/>
         <geom mesh="h-link_0"  pos="0 0 -0.03125" euler="0 90 90" material="glossy_rubber" class="visual"/>
         <geom mesh="h-link_1"  pos="0 0 -0.03125" euler="0 90 90" material="v-color-10" class="visual"/>
         <geom mesh="h-link_2"  pos="0 0 -0.03125" euler="0 90 90" material="v-color-9" class="visual"/>
@@ -218,7 +218,7 @@
             <joint class="joint_defaults" name="joint2" axis="0 0 1"/>
             <site name="s_link3_top" type="box" size="0.021 0.038 0.014" pos="0.016 0 0.018" rgba="0.8 0.1 0.2 0.3"/>
             <site name="s_link3_bot" type="box" size="0.021 0.038 0.014" pos="0.016 0 -0.018" rgba="0.2 0.1 0.8 0.3"/>
-            <geom name="collision-link3" class="collision-mesh"/> 
+            <geom class="collision-mesh"/> 
             <geom mesh="v-link_0"  pos="0 0 -0.03125" euler="0 90 90" material="glossy_rubber" class="visual"/>
             <geom mesh="v-link_1"  pos="0 0 -0.03125" euler="0 90 90" material="v-color-10" class="visual"/>
             <geom mesh="v-link_2"  pos="0 0 -0.03125" euler="0 90 90" material="v-color-9" class="visual"/>
@@ -242,7 +242,7 @@
                 <joint class="joint_defaults" name="joint3" axis="0 1 0"/>
                 <site name="s_link4_top" type="box" size="0.021 0.038 0.014" pos="0.016 0 0.018" rgba="0.8 0.1 0.2 0.3"/>
                 <site name="s_link4_bot" type="box" size="0.021 0.038 0.014" pos="0.016 0 -0.018" rgba="0.2 0.1 0.8 0.3"/>
-                <geom name="collision-link4" class="collision-mesh"/> 
+                <geom class="collision-mesh"/> 
                 <geom mesh="h-link_0"  pos="0 0 -0.03125" euler="0 90 90" material="glossy_rubber" class="visual"/>
                 <geom mesh="h-link_1"  pos="0 0 -0.03125" euler="0 90 90" material="v-color-10" class="visual"/>
                 <geom mesh="h-link_2"  pos="0 0 -0.03125" euler="0 90 90" material="v-color-9" class="visual"/>
@@ -266,7 +266,7 @@
                     <joint class="joint_defaults" name="joint4" axis="0 0 1"/>
                     <site name="s_link5_top" type="box" size="0.021 0.038 0.014" pos="0.016 0 0.018" rgba="0.8 0.1 0.2 0.3"/>
                     <site name="s_link5_bot" type="box" size="0.021 0.038 0.014" pos="0.016 0 -0.018" rgba="0.2 0.1 0.8 0.3"/>
-                    <geom name="collision-link5" class="collision-mesh"/> 
+                    <geom class="collision-mesh"/> 
                     <geom mesh="v-link_0"  pos="0 0 -0.03125" euler="0 90 90" material="glossy_rubber" class="visual"/>
                     <geom mesh="v-link_1"  pos="0 0 -0.03125" euler="0 90 90" material="v-color-10" class="visual"/>
                     <geom mesh="v-link_2"  pos="0 0 -0.03125" euler="0 90 90" material="v-color-9" class="visual"/>
@@ -290,7 +290,7 @@
                         <joint class="joint_defaults" name="joint5" axis="0 1 0"/>
                         <site name="s_link6_top" type="box" size="0.021 0.038 0.014" pos="0.016 0 0.018" rgba="0.8 0.1 0.2 0.3"/>
                         <site name="s_link6_bot" type="box" size="0.021 0.038 0.014" pos="0.016 0 -0.018" rgba="0.2 0.1 0.8 0.3"/>
-                        <geom name="collision-link6" class="collision-mesh"/> 
+                        <geom class="collision-mesh"/> 
                         <geom mesh="h-link_0"  pos="0 0 -0.03125" euler="0 90 90" material="glossy_rubber" class="visual"/>
                         <geom mesh="h-link_1"  pos="0 0 -0.03125" euler="0 90 90" material="v-color-10" class="visual"/>
                         <geom mesh="h-link_2"  pos="0 0 -0.03125" euler="0 90 90" material="v-color-9" class="visual"/>
@@ -314,7 +314,7 @@
                             <joint class="joint_defaults" name="joint6" axis="0 0 1"/>
                             <site name="s_link7_top" type="box" size="0.021 0.038 0.014" pos="0.016 0 0.018" rgba="0.8 0.1 0.2 0.3"/>
                             <site name="s_link7_bot" type="box" size="0.021 0.038 0.014" pos="0.016 0 -0.018" rgba="0.2 0.1 0.8 0.3"/>
-                            <geom name="collision-link7" class="collision-mesh"/> 
+                            <geom class="collision-mesh"/> 
                             <geom mesh="v-link_0"  pos="0 0 -0.03125" euler="0 90 90" material="glossy_rubber" class="visual"/>
                             <geom mesh="v-link_1"  pos="0 0 -0.03125" euler="0 90 90" material="v-color-10" class="visual"/>
                             <geom mesh="v-link_2"  pos="0 0 -0.03125" euler="0 90 90" material="v-color-9" class="visual"/>
@@ -338,7 +338,7 @@
                                 <joint class="joint_defaults" name="joint7" axis="0 1 0"/>
                                 <site name="s_link8_top" type="box" size="0.021 0.038 0.014" pos="0.016 0 0.018" rgba="0.8 0.1 0.2 0.3"/>
                                 <site name="s_link8_bot" type="box" size="0.021 0.038 0.014" pos="0.016 0 -0.018" rgba="0.2 0.1 0.8 0.3"/>
-                                <geom name="collision-link8" class="collision-mesh"/> 
+                                <geom class="collision-mesh"/> 
                                 <geom mesh="h-link_0"  pos="0 0 -0.03125" euler="0 90 90" material="glossy_rubber" class="visual"/>
                                 <geom mesh="h-link_1"  pos="0 0 -0.03125" euler="0 90 90" material="v-color-10" class="visual"/>
                                 <geom mesh="h-link_2"  pos="0 0 -0.03125" euler="0 90 90" material="v-color-9" class="visual"/>
@@ -362,7 +362,7 @@
                                     <joint class="joint_defaults" name="joint8" axis="0 0 1"/>
                                     <site name="s_link9_top" type="box" size="0.021 0.038 0.014" pos="0.016 0 0.018" rgba="0.8 0.1 0.2 0.3"/>
                                     <site name="s_link9_bot" type="box" size="0.021 0.038 0.014" pos="0.016 0 -0.018" rgba="0.2 0.1 0.8 0.3"/>
-                                    <geom name="collision-link9" class="collision-mesh"/> 
+                                    <geom class="collision-mesh"/> 
                                     <geom mesh="v-link_0"  pos="0 0 -0.03125" euler="0 90 90" material="glossy_rubber" class="visual"/>
                                     <geom mesh="v-link_1"  pos="0 0 -0.03125" euler="0 90 90" material="v-color-10" class="visual"/>
                                     <geom mesh="v-link_2"  pos="0 0 -0.03125" euler="0 90 90" material="v-color-9" class="visual"/>
@@ -386,7 +386,7 @@
                                         <joint class="joint_defaults" name="joint9" axis="0 1 0"/>
                                         <site name="s_link10_top" type="box" size="0.021 0.038 0.014" pos="0.016 0 0.018" rgba="0.8 0.1 0.2 0.3"/>
                                         <site name="s_link10_bot" type="box" size="0.021 0.038 0.014" pos="0.016 0 -0.018" rgba="0.2 0.1 0.8 0.3"/>
-                                        <geom name="collision-link10" class="collision-mesh"/> 
+                                        <geom class="collision-mesh"/> 
                                         <geom mesh="h-link_0"  pos="0 0 -0.03125" euler="0 90 90" material="glossy_rubber" class="visual"/>
                                         <geom mesh="h-link_1"  pos="0 0 -0.03125" euler="0 90 90" material="v-color-10" class="visual"/>
                                         <geom mesh="h-link_2"  pos="0 0 -0.03125" euler="0 90 90" material="v-color-9" class="visual"/>
@@ -410,7 +410,7 @@
                                             <joint class="joint_defaults" name="joint10" axis="0 0 1"/>
                                             <site name="s_link11_top" type="box" size="0.021 0.038 0.014" pos="0.016 0 0.018" rgba="0.8 0.1 0.2 0.3"/>
                                             <site name="s_link11_bot" type="box" size="0.021 0.038 0.014" pos="0.016 0 -0.018" rgba="0.2 0.1 0.8 0.3"/>
-                                            <geom name="collision-link11" class="collision-mesh"/> 
+                                            <geom class="collision-mesh"/> 
                                             <geom mesh="v-link_0"  pos="0 0 -0.03125" euler="0 90 90" material="glossy_rubber" class="visual"/>
                                             <geom mesh="v-link_1"  pos="0 0 -0.03125" euler="0 90 90" material="v-color-10" class="visual"/>
                                             <geom mesh="v-link_2"  pos="0 0 -0.03125" euler="0 90 90" material="v-color-9" class="visual"/>
@@ -434,7 +434,7 @@
                                                 <joint class="joint_defaults" name="joint11" axis="0 1 0"/>
                                                 <site name="s_link12_top" type="box" size="0.021 0.038 0.014" pos="0.016 0 0.018" rgba="0.8 0.1 0.2 0.3"/>
                                                 <site name="s_link12_bot" type="box" size="0.021 0.038 0.014" pos="0.016 0 -0.018" rgba="0.2 0.1 0.8 0.3"/>
-                                                <geom name="collision-link12" class="collision-mesh"/> 
+                                                <geom class="collision-mesh"/> 
                                                 <geom mesh="h-link_0"  pos="0 0 -0.03125" euler="0 90 90" material="glossy_rubber" class="visual"/>
                                                 <geom mesh="h-link_1"  pos="0 0 -0.03125" euler="0 90 90" material="v-color-10" class="visual"/>
                                                 <geom mesh="h-link_2"  pos="0 0 -0.03125" euler="0 90 90" material="v-color-9" class="visual"/>
@@ -458,7 +458,7 @@
                                                     <joint class="joint_defaults" name="joint12" axis="0 0 1"/>
                                                     <site name="s_link13_top" type="box" size="0.021 0.038 0.014" pos="0.016 0 0.018" rgba="0.8 0.1 0.2 0.3"/>
                                                     <site name="s_link13_bot" type="box" size="0.021 0.038 0.014" pos="0.016 0 -0.018" rgba="0.2 0.1 0.8 0.3"/>
-                                                    <geom name="collision-link13" class="collision-mesh"/> 
+                                                    <geom class="collision-mesh"/> 
                                                     <geom mesh="v-link_0"  pos="0 0 -0.03125" euler="0 90 90" material="glossy_rubber" class="visual"/>
                                                     <geom mesh="v-link_1"  pos="0 0 -0.03125" euler="0 90 90" material="v-color-10" class="visual"/>
                                                     <geom mesh="v-link_2"  pos="0 0 -0.03125" euler="0 90 90" material="v-color-9" class="visual"/>
@@ -482,7 +482,7 @@
                                                         <joint class="joint_defaults" name="joint13" axis="0 1 0"/>
                                                         <site name="s_link14_top" type="box" size="0.021 0.038 0.014" pos="0.016 0 0.018" rgba="0.8 0.1 0.2 0.3"/>
                                                         <site name="s_link14_bot" type="box" size="0.021 0.038 0.014" pos="0.016 0 -0.018" rgba="0.2 0.1 0.8 0.3"/>
-                                                        <geom name="collision-link14" class="collision-mesh"/> 
+                                                        <geom class="collision-mesh"/> 
                                                         <geom mesh="h-link_0"  pos="0 0 -0.03125" euler="0 90 90" material="glossy_rubber" class="visual"/>
                                                         <geom mesh="h-link_1"  pos="0 0 -0.03125" euler="0 90 90" material="v-color-10" class="visual"/>
                                                         <geom mesh="h-link_2"  pos="0 0 -0.03125" euler="0 90 90" material="v-color-9" class="visual"/>
@@ -506,7 +506,7 @@
                                                             <joint class="joint_defaults" name="joint14" axis="0 0 1"/>
                                                             <site name="s_link15_top" type="box" size="0.021 0.038 0.014" pos="0.016 0 0.018" rgba="0.8 0.1 0.2 0.3"/>
                                                             <site name="s_link15_bot" type="box" size="0.021 0.038 0.014" pos="0.016 0 -0.018" rgba="0.2 0.1 0.8 0.3"/>
-                                                            <geom name="collision-link15" class="collision-mesh"/> 
+                                                            <geom class="collision-mesh"/> 
                                                             <geom mesh="v-link_0"  pos="0 0 -0.03125" euler="0 90 90" material="glossy_rubber" class="visual"/>
                                                             <geom mesh="v-link_1"  pos="0 0 -0.03125" euler="0 90 90" material="v-color-10" class="visual"/>
                                                             <geom mesh="v-link_2"  pos="0 0 -0.03125" euler="0 90 90" material="v-color-9" class="visual"/>
@@ -546,25 +546,6 @@
 </body>
 
 </worldbody>
-
-<!-- friction="tangential normal" name="collision-link" -->
-<!-- <contact>
-    <pair name="con_link1"  geom1="collision-link1"  geom2="floor" condim="3" friction="0.65 0.35"/>
-    <pair name="con_link2"  geom1="collision-link2"  geom2="floor" condim="3" friction="0.65 0.35"/>
-    <pair name="con_link3"  geom1="collision-link3"  geom2="floor" condim="3" friction="0.65 0.35"/>
-    <pair name="con_link4"  geom1="collision-link4"  geom2="floor" condim="3" friction="0.65 0.35"/>
-    <pair name="con_link5"  geom1="collision-link5"  geom2="floor" condim="3" friction="0.65 0.35"/>
-    <pair name="con_link6"  geom1="collision-link6"  geom2="floor" condim="3" friction="0.65 0.35"/>
-    <pair name="con_link7"  geom1="collision-link7"  geom2="floor" condim="3" friction="0.65 0.35"/>
-    <pair name="con_link8"  geom1="collision-link8"  geom2="floor" condim="3" friction="0.65 0.35"/>
-    <pair name="con_link9"  geom1="collision-link9"  geom2="floor" condim="3" friction="0.65 0.35"/>
-    <pair name="con_link10" geom1="collision-link10" geom2="floor" condim="3" friction="0.65 0.35"/>
-    <pair name="con_link11" geom1="collision-link11" geom2="floor" condim="3" friction="0.65 0.35"/>
-    <pair name="con_link12" geom1="collision-link12" geom2="floor" condim="3" friction="0.65 0.35"/>
-    <pair name="con_link13" geom1="collision-link13" geom2="floor" condim="3" friction="0.65 0.35"/>
-    <pair name="con_link14" geom1="collision-link14" geom2="floor" condim="3" friction="0.65 0.35"/>
-    <pair name="con_link15" geom1="collision-link15" geom2="floor" condim="3" friction="0.65 0.35"/>
-</contact>   -->
 
 <actuator>
     <motor name="motor_1"  ctrllimited="true" ctrlrange="-3.0 3.0" gear="1" joint="joint1"/>

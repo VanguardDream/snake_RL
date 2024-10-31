@@ -9,8 +9,8 @@ class Gait():
         self._el1 = params[1]
         self._el2 = params[3]
         self._delta = params[4]
-        self._t = np.arange(0, 2 * np.pi * max(np.lcm(self._el2, self._ed2), 10) / 10, 0.1).transpose()
-        # self._t = np.arange(0, 300, 0.1).transpose()
+        # self._t = np.arange(0, 2 * np.pi * max(np.lcm(self._el2, self._ed2), 10) / 10, 0.1).transpose()
+        self._t = np.arange(0, 600, 0.1).transpose()
 
         self.MotionMatrix = self.getMotionMat()
         self.joints = self.MotionMatrix.shape[0]

@@ -53,7 +53,9 @@
     <geom name="wall3" type="box" condim="1" size="0.15 1.35 0.5" rgba="0.8 0.8 0.95 0.6" pos="0.7 0 0.25"/>
     <geom name="wall4" type="box" condim="1" size="0.15 1.35 0.5" rgba="0.8 0.8 0.95 0.6" pos="-1.5 0 0.25"/>
 
-    <body name="PVC_pipe" pos="-0.45 -0.2 0" euler="90 -45 0">
+
+    <geom name="pipe4climb" type="cylinder" size="0.075 3" rgba="1 1 1 1" pos="-0.45 -0.2 2.7"/>
+    <!-- <body name="PVC_pipe" pos="-0.45 -0.2 0" euler="90 -45 0">
         <geom mesh="PVC_pipe" class="pvc-visual"/>
         <geom mesh="PVC_pipe_collision_0" rgba="0.42565785987108373 0.16495606122162187 0.6954856571776246 1"   class="pvc-collision"/>
         <geom mesh="PVC_pipe_collision_1" rgba="0.80611884875774 0.1446605488665189 0.23435988490440396 1"      class="pvc-collision"/>
@@ -66,7 +68,7 @@
         <geom mesh="PVC_pipe_collision_8" rgba="0.12936622018498045 0.09450922566494924 0.8820515379671277 1"   class="pvc-collision"/>
         <geom mesh="PVC_pipe_collision_9" rgba="0.24108938709500694 0.4334772702915214 0.9038097435757785 1"    class="pvc-collision"/>
         <geom mesh="PVC_pipe_collision_10" rgba="0.16110884957467875 0.43828223870181504 0.25414856042161105 1" class="pvc-collision"/>
-    </body>
+    </body> -->
 
     <body>
         <camera name="pipe_climbing_watcher" mode="fixed" fovy="105" pos="-0.45 1 1.5" euler="-45 0 180"/>

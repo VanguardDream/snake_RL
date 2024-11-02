@@ -53,7 +53,7 @@ class ClimbWorld(MujocoEnv, utils.EzPickle):
             reset_noise_scale: float = 0.1,
             use_gait: bool = True,
             use_friction_chg: bool = False,
-            gait_params: Tuple[float, float, float, float, float] = (25,25,65,65,90),
+            gait_params: Tuple[float, float, float, float, float] = (1,25,65,65,-90),
             **kwargs,
     ):
         utils.EzPickle.__init__(
@@ -108,6 +108,7 @@ class ClimbWorld(MujocoEnv, utils.EzPickle):
         self._initial_rpy = np.array([0,0,0])
         self._initial_head_rpy = np.array([0,0,0])
         self._cur_euler_ypr = np.array([0,0,0])
+        self._max_climb_height = 0
 
         MujocoEnv.__init__(
                 self,
@@ -271,7 +272,10 @@ class ClimbWorld(MujocoEnv, utils.EzPickle):
         x_vel = x_disp / self.dt
         y_vel = y_disp / self.dt
         z_vel = z_disp / self.dt
-        
+
+        #### 최고 높이 설정
+        if self._max_climb_height < z_disp:
+            self._max_climb_height = z_disp
 
         # ## Gait changing...
         self._k += 1
@@ -284,19 +288,14 @@ class ClimbWorld(MujocoEnv, utils.EzPickle):
         if self.render_mode == "human":
             self.render()
 
-        if self._n_step >= 2000:
+        if self._n_step >= 1000:
             terminated = True
 
         if terminated:
-            terminated_forward = 0
-            # Termination reward
-            if self.termination_reward > 0:
-                terminated_forward = np.e ** (10 * com_pos_after[2])
+             terminated_forward = np.e ** (10 * (self._max_climb_height - self._initial_com[2]))
 
-            if self.render_mode == "human":
-                print(terminated_forward)
-
-            reward = reward + terminated_forward
+             reward = reward + terminated_forward
+             pass
 
         info = {
             "x_displacement": x_disp,
@@ -371,6 +370,7 @@ class ClimbWorld(MujocoEnv, utils.EzPickle):
         self._initial_head_rpy = np.array([0,0,0])
         self._initial_com = np.array([0,0,0])
         self._cur_euler_ypr = np.array([0,0,0])
+        self._max_climb_height = 0
 
         # Gait reset
         if not(self._use_gait):
@@ -392,6 +392,9 @@ class ClimbWorld(MujocoEnv, utils.EzPickle):
             low=noise_low, high=noise_high, size=self.model.nq
         )
 
+        #### 오르기 위한 초기 관절 설정
+        qpos[7::] = [0, 0.4] * 7
+
         # random_rpy = [0, 0, float(self.np_random.uniform(low=-180,high=180,size=1))]
         # random_rpy = np.array(random_rpy)
         # _reset_rotation = Rotation.from_rotvec(random_rpy,True).as_quat()
@@ -401,11 +404,11 @@ class ClimbWorld(MujocoEnv, utils.EzPickle):
             self.init_qvel
             + 0.01 * self.np_random.standard_normal(self.model.nv)
         )
-        x_xpos = self.np_random.uniform(low=xpos_low, high=xpos_high)
-        y_xpos = self.np_random.uniform(low=xpos_low, high=xpos_high)
+        # x_xpos = self.np_random.uniform(low=xpos_low, high=xpos_high)
+        # y_xpos = self.np_random.uniform(low=xpos_low, high=xpos_high)
 
-        qpos[0] = x_xpos
-        qpos[1] = y_xpos
+        qpos[0] = -0.35
+        qpos[1] = 0.15
 
         # if self._use_friction_chg:
         #     u_slide = round(np.random.uniform(low=0.5, high = 1.0),3)

@@ -282,7 +282,7 @@ class ClimbWorld(MujocoEnv, utils.EzPickle):
         self.motion_vector = self._gait.getMvec(self._k)
         
         observation = self._get_obs(motion_vector)
-        reward, reward_info = self._get_rew(x_vel, y_vel, z_vel, action, norm_r, euler_r)
+        reward, reward_info = self._get_rew(com_pos_after[0], com_pos_after[1], com_pos_after[2], action, norm_r, euler_r)
         terminated = self.is_terminated and self._terminate_when_unhealthy
 
         if self.render_mode == "human":
@@ -292,7 +292,7 @@ class ClimbWorld(MujocoEnv, utils.EzPickle):
             terminated = True
 
         if terminated:
-             terminated_forward = np.e ** (10 * (self._max_climb_height - self._initial_com[2]))
+             terminated_forward = np.e ** ((self._max_climb_height - self._initial_com[2]))
 
              reward = reward + terminated_forward
              pass
@@ -324,8 +324,8 @@ class ClimbWorld(MujocoEnv, utils.EzPickle):
         # truncation=False as the time limit is handled by the `TimeLimit` wrapper added during `make`
         return observation, reward, terminated, False, info
 
-    def _get_rew(self, x_vel, y_vel, z_vel, action, norm_r, euler_r):
-        forward_reward = z_vel * self._forward_reward_weight
+    def _get_rew(self, x_disp, y_disp, z_dsip, action, norm_r, euler_r):
+        forward_reward = z_dsip * self._forward_reward_weight
         healthy_reward = 0
 
         rewards = forward_reward + healthy_reward

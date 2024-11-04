@@ -54,8 +54,10 @@
     <geom name="wall4" type="box" condim="1" size="0.15 1.35 0.5" rgba="0.8 0.8 0.95 0.6" pos="-1.5 0 0.25"/>
 
 
-    <geom name="pipe4climb" type="cylinder" size="0.07 4.5" rgba="1 1 1 1" pos="-0.45 -0.2 4.2"/>
-    <geom name="pipe4climbtop" type="box" condim="1" size="1.5 1.5 0.15" rgba="1 1 1 1" pos="-0.45 -0.2 8.5"/>
+    <geom name="pipe4climb" type="cylinder" size="0.13 4.5" rgba="1 1 1 1" pos="-0.35 -0.05 4.2"/>
+    <geom name="pipe4climbtop" type="box" condim="1" size="1.5 1.5 0.15" rgba="1 1 1 1" pos="-0.35 -0.05 8.5"/>
+
+
     <!-- <body name="PVC_pipe" pos="-0.45 -0.2 0" euler="90 -45 0">
         <geom mesh="PVC_pipe" class="pvc-visual"/>
         <geom mesh="PVC_pipe_collision_0" rgba="0.42565785987108373 0.16495606122162187 0.6954856571776246 1"   class="pvc-collision"/>

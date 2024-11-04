@@ -53,7 +53,7 @@ class ClimbWorld(MujocoEnv, utils.EzPickle):
             reset_noise_scale: float = 0.1,
             use_gait: bool = True,
             use_friction_chg: bool = False,
-            gait_params: Tuple[float, float, float, float, float] = (1,25,65,65,-90),
+            gait_params: Tuple[float, float, float, float, float] = (5,5,55,55,90),
             **kwargs,
     ):
         utils.EzPickle.__init__(
@@ -393,7 +393,7 @@ class ClimbWorld(MujocoEnv, utils.EzPickle):
         )
 
         #### 오르기 위한 초기 관절 설정
-        qpos[7::] = [0, 0.4] * 7
+        qpos[7::] = [-0.05, 0.6] * 7
 
         # random_rpy = [0, 0, float(self.np_random.uniform(low=-180,high=180,size=1))]
         # random_rpy = np.array(random_rpy)
@@ -402,7 +402,7 @@ class ClimbWorld(MujocoEnv, utils.EzPickle):
 
         qvel = (
             self.init_qvel
-            + 0.01 * self.np_random.standard_normal(self.model.nv)
+            + 0 * self.np_random.standard_normal(self.model.nv)
         )
         # x_xpos = self.np_random.uniform(low=xpos_low, high=xpos_high)
         # y_xpos = self.np_random.uniform(low=xpos_low, high=xpos_high)

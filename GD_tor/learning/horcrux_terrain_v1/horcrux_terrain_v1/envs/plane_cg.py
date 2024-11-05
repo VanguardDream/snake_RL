@@ -149,7 +149,6 @@ class PlaneCGWorld(MujocoEnv, utils.EzPickle):
                 "head_orientation":self.data.sensordata[70:74], #4
                 "head_angvel":self.data.sensordata[74:77], #3
                 "head_linacc":self.data.sensordata[77:80], #3
-                "motion_vector":self.motion_vector, #14
         }
 
     @property
@@ -322,7 +321,7 @@ class PlaneCGWorld(MujocoEnv, utils.EzPickle):
             "head_quat": observation[-24:-20].copy(),
             "head_ang_vel": observation[-20:-17].copy(),
             "head_lin_acc": observation[-17:-14].copy(),
-            "motion_vector": observation[-14:].copy(),
+            # "motion_vector": observation[-14:].copy(),
             # "head_rpy": rpy_after,
             "com_pos": com_pos_before,
             # "com_rpy": com_rpy_after,

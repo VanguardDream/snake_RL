@@ -19,9 +19,9 @@ DEFAULT_CAMERA_CONFIG = {}
 # __resource_dir__ = os.path.join(__pkg_dir__.parent,'resources')
 # __mjcf_model_path__ = os.path.join(__resource_dir__, 'horcrux_sand.xml')
 
-__mjcf_model_path__ = pkg_resources.resource_filename("horcrux_terrain_v1", "resources/horcrux_plane_pvc_up.xml")
+__mjcf_model_path__ = pkg_resources.resource_filename("horcrux_terrain_v1", "resources/horcrux_plane.xml")
 
-class ClimbWorld(MujocoEnv, utils.EzPickle):
+class PlaneSideWorld(MujocoEnv, utils.EzPickle):
     metadata = {
         "render_modes": [
             "human",
@@ -36,24 +36,24 @@ class ClimbWorld(MujocoEnv, utils.EzPickle):
             frame_skip: int = 20, 
             default_camera_config: Dict[str, Union[float, int]] = DEFAULT_CAMERA_CONFIG,
             forward_reward_weight: float = 60,
-            termination_reward: float = 1,
-            side_cost_weight:float = 0,
+            termination_reward: float = 0,
+            side_cost_weight:float = 60,
             ctrl_cost_weight: float = 0,
             rotation_norm_cost_weight: float = 0,
-            rotation_orientation_cost_weight: float = 0,
-            unhealthy_cost_weight: float = 0,
-            healthy_reward: float = 0,
+            rotation_orientation_cost_weight: float = 0.05,
+            unhealthy_cost_weight: float = 1,
+            healthy_reward: float = 2,
             main_body: Union[int, str] = 2,
-            render_camera_name = "pipe_climbing_watcher",
-            terminate_when_unhealthy: bool = False,
+            render_camera_name = "ceiling",
+            terminate_when_unhealthy: bool = True,
             unhealthy_max_steps: int = 30,
-            healthy_roll_range: Tuple[float, float] = (-190, 190),
-            terminating_roll_range: Tuple[float, float] = (-190, 190),
+            healthy_roll_range: Tuple[float, float] = (-45, 45),
+            terminating_roll_range: Tuple[float, float] = (-120, 120),
             contact_force_range: Tuple[float, float] = (-1.0, 1.0),
             reset_noise_scale: float = 0.1,
             use_gait: bool = True,
             use_friction_chg: bool = False,
-            gait_params: Tuple[float, float, float, float, float] = (5,5,60,60,90),
+            gait_params: Tuple[float, float, float, float, float] = (30, 30, 60, 60, 45),
             **kwargs,
     ):
         utils.EzPickle.__init__(
@@ -108,7 +108,6 @@ class ClimbWorld(MujocoEnv, utils.EzPickle):
         self._initial_rpy = np.array([0,0,0])
         self._initial_head_rpy = np.array([0,0,0])
         self._cur_euler_ypr = np.array([0,0,0])
-        self._max_climb_height = 0
 
         MujocoEnv.__init__(
                 self,
@@ -261,7 +260,16 @@ class ClimbWorld(MujocoEnv, utils.EzPickle):
         # ## Origin과 Step after를 통해서 구하기
         x_disp = d_T0_p[0]
         y_disp = d_T0_p[1]
-        z_disp = d_T0_p[2]
+
+        ## Head의 변위로 구하기
+        # x_disp = d_T_head_p[0]
+        # y_disp = d_T_head_p[1]
+
+        ## CoM 좌표 그래로 사용
+        # x_disp = com_pos_after[0] - com_pos_before[0]
+        # y_disp = com_pos_after[1] - com_pos_before[1]
+
+        #### Reward를 위한 회전 변위 정의
 
         # 회전의 노름 (회전의 크기)
         norm_r = np.linalg.norm(Rotation.from_matrix(d_T_r).as_rotvec(False)).copy()
@@ -269,35 +277,43 @@ class ClimbWorld(MujocoEnv, utils.EzPickle):
         self._cur_euler_ypr = Rotation.from_matrix(d_T0_r).as_euler('ZYX',True).copy()
 
         #### Reward 계산을 위한 변수 설정
-        x_vel = x_disp / self.dt
-        y_vel = y_disp / self.dt
-        z_vel = z_disp / self.dt
-
-        #### 최고 높이 설정
-        if self._max_climb_height < z_disp:
-            self._max_climb_height = z_disp
+        y_vel = x_disp / self.dt
+        x_vel = y_disp / self.dt
+        
 
         # ## Gait changing...
         self._k += 1
         self.motion_vector = self._gait.getMvec(self._k)
         
         observation = self._get_obs(motion_vector)
-        reward, reward_info = self._get_rew(com_pos_after[0], com_pos_after[1], com_pos_after[2], action, norm_r, euler_r)
+        reward, reward_info = self._get_rew(x_vel, y_vel, action, norm_r, euler_r)
         terminated = self.is_terminated and self._terminate_when_unhealthy
 
         if self.render_mode == "human":
             self.render()
 
-        if self._n_step >= 1000:
+        if self._n_step >= 6000:
             terminated = True
 
         if terminated:
-             terminated_forward = np.e ** ((self._max_climb_height - self._initial_com[2]))
+            terminated_forward = 0
+            # Termination reward
+            if self.termination_reward > 0:
+                T_origin = np.eye(4)
+                T_origin[:3, 3] = self._initial_com
+                T_origin[:3, :3] = Rotation.from_rotvec(self._initial_rpy,True).as_matrix()
 
-             np.clip(terminated_forward, 0, 2500)
+                d_T_origin = np.linalg.inv(T_origin) @ T_2
+                d_T_origin_p = d_T_origin[:3, 3]
 
-             reward = reward + terminated_forward
-             pass
+                # terminated_forward = d_T_origin_p[0] * 150
+                # 종료 보상 안씀
+                terminated_forward = 0
+
+            if self.render_mode == "human":
+                print(terminated_forward)
+
+            reward = reward + terminated_forward
 
         info = {
             "x_displacement": x_disp,
@@ -326,25 +342,18 @@ class ClimbWorld(MujocoEnv, utils.EzPickle):
         # truncation=False as the time limit is handled by the `TimeLimit` wrapper added during `make`
         return observation, reward, terminated, False, info
 
-    def _get_rew(self, x_disp, y_disp, z_dsip, action, norm_r, euler_r):
-        forward_reward = z_dsip * self._forward_reward_weight
-        healthy_reward = 0
+    def _get_rew(self, x_vel, y_vel, action, norm_r, euler_r):
+        forward_reward = x_vel * self._forward_reward_weight
+        healthy_reward = self.healthy_reward
 
         rewards = forward_reward + healthy_reward
 
         ctrl_cost = self.control_cost(action)
-        side_cost = 0
-
-        if abs(self._initial_com[0] - x_disp) > 0.15:
-            side_cost = side_cost + 2
-        
-        if abs(self._initial_com[1] - y_disp) > 0.15:
-            side_cost = side_cost + 2
-
-        rot_cost = 0 #회전 전반적인 크기에 대한 패널티
-        step_straightness_cost = 0 #직진성 위반에 대한 패널티 한 스텝
-        straightness_cost = 0 #직진성 위반에 대한 패널티 전체적으로
-        unhealthy_cost = 0
+        side_cost = np.abs(y_vel) * self._side_cost_weight
+        rot_cost = self._rotation_norm_cost_weight * norm_r #회전 전반적인 크기에 대한 패널티
+        step_straightness_cost = self._rotation_orientation_cost_weight * np.abs(euler_r[0]) #직진성 위반에 대한 패널티 한 스텝
+        straightness_cost = 0.02 * self._rotation_orientation_cost_weight * np.abs(self._cur_euler_ypr[0]) #직진성 위반에 대한 패널티 전체적으로
+        unhealthy_cost = self.is_terminated * self._unhealthy_cost_weight
 
         costs = ctrl_cost + side_cost + unhealthy_cost + rot_cost + straightness_cost + step_straightness_cost
 
@@ -379,7 +388,6 @@ class ClimbWorld(MujocoEnv, utils.EzPickle):
         self._initial_head_rpy = np.array([0,0,0])
         self._initial_com = np.array([0,0,0])
         self._cur_euler_ypr = np.array([0,0,0])
-        self._max_climb_height = 0
 
         # Gait reset
         if not(self._use_gait):
@@ -392,17 +400,14 @@ class ClimbWorld(MujocoEnv, utils.EzPickle):
             self._gait = Gait((a, b, c, d, e))
 
         # System reset
-        noise_low = -0.13
-        noise_high = 0
+        noise_low = -0.05
+        noise_high = 0.05
         xpos_low = 0
         xpos_high = 0
 
         qpos = self.init_qpos + self.np_random.uniform(
             low=noise_low, high=noise_high, size=self.model.nq
         )
-
-        #### 오르기 위한 초기 관절 설정
-        qpos[7::] = [-0.05, 0.6] * 7
 
         # random_rpy = [0, 0, float(self.np_random.uniform(low=-180,high=180,size=1))]
         # random_rpy = np.array(random_rpy)
@@ -411,13 +416,13 @@ class ClimbWorld(MujocoEnv, utils.EzPickle):
 
         qvel = (
             self.init_qvel
-            + 0 * self.np_random.standard_normal(self.model.nv)
+            + 0.01 * self.np_random.standard_normal(self.model.nv)
         )
-        # x_xpos = self.np_random.uniform(low=xpos_low, high=xpos_high)
-        # y_xpos = self.np_random.uniform(low=xpos_low, high=xpos_high)
+        x_xpos = self.np_random.uniform(low=xpos_low, high=xpos_high)
+        y_xpos = self.np_random.uniform(low=xpos_low, high=xpos_high)
 
-        qpos[0] = -0.35
-        qpos[1] = 0.15
+        qpos[0] = x_xpos
+        qpos[1] = y_xpos
 
         # if self._use_friction_chg:
         #     u_slide = round(np.random.uniform(low=0.5, high = 1.0),3)

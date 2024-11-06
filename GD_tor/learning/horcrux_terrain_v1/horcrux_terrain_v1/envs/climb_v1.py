@@ -53,7 +53,7 @@ class ClimbWorld(MujocoEnv, utils.EzPickle):
             reset_noise_scale: float = 0.1,
             use_gait: bool = True,
             use_friction_chg: bool = False,
-            gait_params: Tuple[float, float, float, float, float] = (5,5,55,55,90),
+            gait_params: Tuple[float, float, float, float, float] = (7,7,30,30,90),
             **kwargs,
     ):
         utils.EzPickle.__init__(
@@ -294,6 +294,8 @@ class ClimbWorld(MujocoEnv, utils.EzPickle):
         if terminated:
              terminated_forward = np.e ** ((self._max_climb_height - self._initial_com[2]))
 
+             np.clip(terminated_forward, 0, 2500)
+
              reward = reward + terminated_forward
              pass
 
@@ -332,6 +334,13 @@ class ClimbWorld(MujocoEnv, utils.EzPickle):
 
         ctrl_cost = self.control_cost(action)
         side_cost = 0
+
+        if abs(self._initial_com[0] - x_disp) > 0.15:
+            side_cost = side_cost + 2
+        
+        if abs(self._initial_com[1] - y_disp) > 0.15:
+            side_cost = side_cost + 2
+
         rot_cost = 0 #회전 전반적인 크기에 대한 패널티
         step_straightness_cost = 0 #직진성 위반에 대한 패널티 한 스텝
         straightness_cost = 0 #직진성 위반에 대한 패널티 전체적으로

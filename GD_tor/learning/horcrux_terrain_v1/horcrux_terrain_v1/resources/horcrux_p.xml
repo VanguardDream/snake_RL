@@ -139,7 +139,7 @@
     </default>
 
     <default class="collision-mesh">
-        <geom type="mesh" mesh="link_collision" mass="0.165" condim="4" rgba="0.5 0.5 0.5 0.1" priority="1" friction="0.7 0.015 0.001" euler="90 90 0"/>
+        <geom group="3" type="mesh" mesh="link_collision" mass="0.165" condim="4" rgba="0.5 0.5 0.5 0.1" priority="1" friction="0.7 0.015 0.001" euler="90 90 0"/>
     </default>
 
     <default class="visual">
@@ -549,21 +549,21 @@
 
 <!-- friction="tangential normal" name="collision-link" -->
 <!-- <contact>
-    <pair name="con_link1"  geom1="collision-link1"  geom2="floor" condim="3" friction="0.65 0.35"/>
-    <pair name="con_link2"  geom1="collision-link2"  geom2="floor" condim="3" friction="0.65 0.35"/>
-    <pair name="con_link3"  geom1="collision-link3"  geom2="floor" condim="3" friction="0.65 0.35"/>
-    <pair name="con_link4"  geom1="collision-link4"  geom2="floor" condim="3" friction="0.65 0.35"/>
-    <pair name="con_link5"  geom1="collision-link5"  geom2="floor" condim="3" friction="0.65 0.35"/>
-    <pair name="con_link6"  geom1="collision-link6"  geom2="floor" condim="3" friction="0.65 0.35"/>
-    <pair name="con_link7"  geom1="collision-link7"  geom2="floor" condim="3" friction="0.65 0.35"/>
-    <pair name="con_link8"  geom1="collision-link8"  geom2="floor" condim="3" friction="0.65 0.35"/>
-    <pair name="con_link9"  geom1="collision-link9"  geom2="floor" condim="3" friction="0.65 0.35"/>
-    <pair name="con_link10" geom1="collision-link10" geom2="floor" condim="3" friction="0.65 0.35"/>
-    <pair name="con_link11" geom1="collision-link11" geom2="floor" condim="3" friction="0.65 0.35"/>
-    <pair name="con_link12" geom1="collision-link12" geom2="floor" condim="3" friction="0.65 0.35"/>
-    <pair name="con_link13" geom1="collision-link13" geom2="floor" condim="3" friction="0.65 0.35"/>
-    <pair name="con_link14" geom1="collision-link14" geom2="floor" condim="3" friction="0.65 0.35"/>
-    <pair name="con_link15" geom1="collision-link15" geom2="floor" condim="3" friction="0.65 0.35"/>
+    <pair name="con_link1"  geom1="collision-link1"  geom2="floor" condim="4" friction="0.65 0.35 0.015 0.01 0.01"/>
+    <pair name="con_link2"  geom1="collision-link2"  geom2="floor" condim="4" friction="0.65 0.35 0.015 0.01 0.01"/>
+    <pair name="con_link3"  geom1="collision-link3"  geom2="floor" condim="4" friction="0.65 0.35 0.015 0.01 0.01"/>
+    <pair name="con_link4"  geom1="collision-link4"  geom2="floor" condim="4" friction="0.65 0.35 0.015 0.01 0.01"/>
+    <pair name="con_link5"  geom1="collision-link5"  geom2="floor" condim="4" friction="0.65 0.35 0.015 0.01 0.01"/>
+    <pair name="con_link6"  geom1="collision-link6"  geom2="floor" condim="4" friction="0.65 0.35 0.015 0.01 0.01"/>
+    <pair name="con_link7"  geom1="collision-link7"  geom2="floor" condim="4" friction="0.65 0.35 0.015 0.01 0.01"/>
+    <pair name="con_link8"  geom1="collision-link8"  geom2="floor" condim="4" friction="0.65 0.35 0.015 0.01 0.01"/>
+    <pair name="con_link9"  geom1="collision-link9"  geom2="floor" condim="4" friction="0.65 0.35 0.015 0.01 0.01"/>
+    <pair name="con_link10" geom1="collision-link10" geom2="floor" condim="4" friction="0.65 0.35 0.015 0.01 0.01"/>
+    <pair name="con_link11" geom1="collision-link11" geom2="floor" condim="4" friction="0.65 0.35 0.015 0.01 0.01"/>
+    <pair name="con_link12" geom1="collision-link12" geom2="floor" condim="4" friction="0.65 0.35 0.015 0.01 0.01"/>
+    <pair name="con_link13" geom1="collision-link13" geom2="floor" condim="4" friction="0.65 0.35 0.015 0.01 0.01"/>
+    <pair name="con_link14" geom1="collision-link14" geom2="floor" condim="4" friction="0.65 0.35 0.015 0.01 0.01"/>
+    <pair name="con_link15" geom1="collision-link15" geom2="floor" condim="4" friction="0.65 0.35 0.015 0.01 0.01"/>
 </contact>   -->
 
 <actuator>

@@ -11,6 +11,11 @@ register(
     max_episode_steps=3000,
 )
 register(
+    id="horcrux_terrain_v1/plane-side-cg",
+    entry_point="horcrux_terrain_v1.envs:PlaneSideCGWorld",
+    max_episode_steps=3000,
+)
+register(
     id="horcrux_terrain_v1/plane-cg",
     entry_point="horcrux_terrain_v1.envs:PlaneCGWorld",
     max_episode_steps=3000,

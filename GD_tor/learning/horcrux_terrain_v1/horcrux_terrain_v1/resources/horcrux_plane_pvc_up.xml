@@ -54,7 +54,7 @@
     <geom name="wall4" type="box" condim="1" size="0.15 1.35 0.5" rgba="0.8 0.8 0.95 0.6" pos="-1.5 0 0.25"/>
 
 
-    <geom name="pipe4climb" type="cylinder" size="0.11 4.5" priority="2" friction="1.2 0.01 0.005" rgba="1 1 1 1" pos="-0.35 -0.05 4.2"/>
+    <geom name="pipe4climb" type="cylinder" size="0.08 4.5" priority="2" friction="1.2 0.01 0.005" rgba="1 1 1 1" pos="-0.37 -0.05 4.2"/>
     <geom name="pipe4climbtop" type="box" condim="1" size="1.5 1.5 0.15" rgba="1 1 1 1" pos="-0.35 -0.05 8.5"/>
 
 

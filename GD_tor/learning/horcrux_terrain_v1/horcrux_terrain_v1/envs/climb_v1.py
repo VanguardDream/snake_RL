@@ -402,7 +402,7 @@ class ClimbWorld(MujocoEnv, utils.EzPickle):
         )
 
         #### 오르기 위한 초기 관절 설정
-        qpos[7::] = [-0.05, 0.6] * 7
+        qpos[7::] = [-0.1, 0.8] * 7
 
         # random_rpy = [0, 0, float(self.np_random.uniform(low=-180,high=180,size=1))]
         # random_rpy = np.array(random_rpy)

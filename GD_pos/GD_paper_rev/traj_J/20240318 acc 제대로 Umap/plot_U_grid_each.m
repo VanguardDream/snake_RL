@@ -1,7 +1,7 @@
 clc; clear;
 
 %% load
-load Slit_curve.mat
+load U_traj_linear_each_acc_g_True_0.7071_45x45x32x32x116x58x0x0_05_21720_.mat
 
 U_map_each_curve = U_map;
 Rot_vec_curve = Rot_vec;
@@ -10,7 +10,8 @@ Tf_orientation_curve = Tf_orientation;
 clear max min param_coefficient U_map Rot_vec Tf_orientation;
 
 % load U_traj_linear_each_weak_side_curve.mat
-load Slit_03.mat
+% load U_traj_linear_each_acc_g_True_0.7071_45x45x32x32x116x58x0x0_05_21720_.mat
+load U_traj_linear_each_acc_g_False_0.7071_45x45x32x32x117x58_5x0x0_05_21720_.mat
 
 % load U_traj_linear_each_False_0.3_roll.mat
 % load U_traj_linear_each_False_0.5_roll.mat

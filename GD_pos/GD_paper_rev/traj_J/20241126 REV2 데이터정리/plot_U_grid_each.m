@@ -1,8 +1,9 @@
 clc; clear;
 
 %% load
-load Slit_curve.mat
-
+% load U_traj_linear_each_acc_True_0.7071_45x45x32x32x116x58x0x0_05_21720_.mat
+load Slit_c.mat
+% 
 U_map_each_curve = U_map;
 Rot_vec_curve = Rot_vec;
 Tf_orientation_curve = Tf_orientation;
@@ -10,7 +11,9 @@ Tf_orientation_curve = Tf_orientation;
 clear max min param_coefficient U_map Rot_vec Tf_orientation;
 
 % load U_traj_linear_each_weak_side_curve.mat
-load Slit_03.mat
+% load U_traj_linear_each_acc_True_0.7071_45x45x32x32x116x58x0x0_05_21720_.mat
+
+load Slit_0.3.mat
 
 % load U_traj_linear_each_False_0.3_roll.mat
 % load U_traj_linear_each_False_0.5_roll.mat
@@ -41,21 +44,21 @@ clear max min param_coefficient U_map Rot_vec Tf_orientation;
 % Tf_orientation_curve = transpose(Tf_orientation_curve);
 % Tf_orientation_mat = transpose(Tf_orientation_mat);
 %% U map 계수 설정
-i = 300
-% i = 10;
-j = -30
-% j = -1;
-l = -0.05;
-% l = 0;
-rot = -30
-% rot = -0;
+% i = 300
+i = 1.5;
+% j = -30
+j = -1;
+% l = -0.05;
+l = 0.2;
+% rot = -30
+rot = -0;
 
 if Motion_lambda(7)> 38
-    tf = -60;
+    tf = -0.2;
     Tf_orientation_curve = abs(Tf_orientation_curve) - pi/2;
     Tf_orientation_mat = abs(Tf_orientation_mat) - pi/2;
 else
-    tf = -60;
+    tf = -0.2;
 end
 
 U_map_curve = i * U_map_each_curve(:,:,1) + j * U_map_each_curve(:,:,2) + l * U_map_each_curve(:,:,3) + rot * abs(Rot_vec_curve(:,:,3)) + tf * abs(Tf_orientation_curve);

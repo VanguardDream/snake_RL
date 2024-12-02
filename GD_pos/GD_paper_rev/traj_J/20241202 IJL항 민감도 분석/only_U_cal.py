@@ -139,24 +139,39 @@ def for_iter(lambda_m, u_w, shd_name:str, shd_shape):
     U_map = np.ndarray(shd_shape, dtype=np.float64, buffer=exist_shm.buf)
     for i in u_w:
         # [1.5 1 -0.2]
-        new_u_w = [(i[0]/10), 1, -0.2]
+        new_u_w = [(i[0]/100), 1, -0.2]
         def cal_U(lambda_c:np.ndarray):
             result = J_traj_each(lambda_m, lambda_c, new_u_w, True, gamma)
 
             return -1 * (new_u_w[0] * result[0] + new_u_w[1] * result[1] + new_u_w[2] * result[2])
-        # result = minimize(cal_U, lambda_m, method='Nelder-Mead')
-        result = cal_U(lambda_m) # -> 디버깅용
-        U_map[int(i[0])] = result
+        result = minimize(cal_U, lambda_m, method='Nelder-Mead')
 
-    return result
+        if result.success:
+            J_value = -1 * result.fun
+        else:
+            J_value = np.nan
+
+        # result = cal_U(lambda_m) # -> 디버깅용
+        # U_map[int(i[0])] = result
+
+        x_fcn = J_traj_each(lambda_m, result.x, new_u_w, True, gamma)
+
+        U_map[int(i[0]),0] = J_value
+        U_map[int(i[0]),1] = x_fcn[0]
+        U_map[int(i[0]),2] = x_fcn[1]
+        U_map[int(i[0]),3] = x_fcn[2]
+
+    return 0
 
 if __name__ == "__main__":
-    iter_weight = np.arange(0,101)
+    data_size = 1001
+    iter_weight = np.arange(0,data_size)
     lambda_m = [45, 45, 32, 32, 116, 58, 0, 0.05]
     lambda_c = [45, 45, 32, 32, 116, 58, 0, 0.05] # Bar 파라미터가 곡선함수 파라미터임. 따라서 이거를 최적화해야함.
     gamma = 0.7071
 
-    U_map = np.empty(101, dtype=np.float64)
+    # U_map = np.empty(data_size, dtype=np.float64)
+    U_map = np.empty((data_size,4), dtype=np.float64)
     shm = shared_memory.SharedMemory(name="shared_U_map", create=True, size=U_map.nbytes)
     data = np.ndarray(U_map.shape, dtype=U_map.dtype, buffer=shm.buf)
     data[:] = 0  # 초기화
@@ -185,6 +200,10 @@ if __name__ == "__main__":
     pc14 = Process(target= for_iter, args=(lambda_m, list(combinations[start_idx[13]:start_idx[14]]), shm.name, U_map.shape))
     pc15 = Process(target= for_iter, args=(lambda_m, list(combinations[start_idx[14]:start_idx[15]]), shm.name, U_map.shape))
     pc16 = Process(target= for_iter, args=(lambda_m, list(combinations[start_idx[15]::]),             shm.name, U_map.shape))
+
+    import datetime
+
+    start_time = datetime.datetime.now()
 
     pc1.start()
     pc2.start()
@@ -220,7 +239,11 @@ if __name__ == "__main__":
     pc15.join()
     pc16.join()
 
-    print(data)
+    end_time = datetime.datetime.now()
+    print(f'Elapsed Time : {end_time - start_time}')
+
+    data_dict = {'U_result': data[:,0], 'I_term':data[:,1], 'J_term':data[:,2], 'L_term':data[:,3]}
+    savemat("slithering_I_vary"+"_.mat", data_dict)
 
     shm.close()
     shm.unlink()

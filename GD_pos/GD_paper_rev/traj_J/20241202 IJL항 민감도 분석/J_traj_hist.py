@@ -251,7 +251,7 @@ if __name__ == "__main__":
     print(f'Elapsed Time : {end_time - start_time}')
 
     data_dict = {'U_result': data}
-    savemat("J_hist_map2"+"_.mat", data_dict)
+    savemat("J_hist_map_test"+"_.mat", data_dict)
 
     shm.close()
     shm.unlink()

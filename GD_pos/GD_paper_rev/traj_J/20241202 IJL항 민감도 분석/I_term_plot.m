@@ -36,4 +36,13 @@ xticks(0:1:10);
 xline(1.5,LineWidth=1.2,LineStyle="--",Color='r')
 
 % ylim([3 5.5]);
+
+ax = gca; %let user change axis setting
+ax.FontSize = 10; %axis fontsize 
+ax.LineWidth = 1.5; ax.FontWeight="bold"; %axis linewidth and Fontweight
+ax.GridLineStyle = ':';
+ax.GridLineWidth = 1.5;
+ax.GridColor='#101010';
+% ax.Color=[0.85 0.85 0.85];
+fontname(gcf,"Arial") 
 pbaspect([2 1 1])

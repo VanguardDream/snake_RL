@@ -37,12 +37,12 @@ colormap(pink)
 
 hold on;
 
-xlabel("X axis orientation");
-ylabel("Y axis orientation");
-zlabel("Z axis orientation");
+xlabel("X axis orientation (  )");
+ylabel("Y axis orientation (  )");
+zlabel("Z axis orientation (  )");
 
 ax = gca; %let user change axis setting
-ax.FontSize = 10; %axis fontsize 
+ax.FontSize = 15; %axis fontsize 
 ax.LineWidth = 1.5; ax.FontWeight="bold"; %axis linewidth and Fontweight
 ax.GridLineStyle = '-';
 ax.GridLineWidth = 1.0;
@@ -66,7 +66,7 @@ xlim([centerX - maxRange/2, centerX + maxRange/2]);
 ylim([centerY - maxRange/2, centerY + maxRange/2]);
 zlim([centerZ - maxRange/2, centerZ + maxRange/2]);
 
-xticks(-180:10:180);
+% xticks(-180:10:180);
 
 % set(gca, 'YDir', 'reverse');
 
@@ -85,12 +85,12 @@ colormap(pink)
 
 hold on;
 
-xlabel("X axis orientation");
-ylabel("Y axis orientation");
-zlabel("Z axis orientation");
+xlabel("X axis orientation (  )");
+ylabel("Y axis orientation (  )");
+zlabel("Z axis orientation (  )");
 
 ax = gca; %let user change axis setting
-ax.FontSize = 10; %axis fontsize 
+ax.FontSize = 15; %axis fontsize 
 ax.LineWidth = 1.5; ax.FontWeight="bold"; %axis linewidth and Fontweight
 ax.GridLineStyle = '-';
 ax.GridLineWidth = 1.0;
@@ -114,7 +114,7 @@ xlim([centerX - maxRange/2, centerX + maxRange/2]);
 ylim([centerY - maxRange/2, centerY + maxRange/2]);
 zlim([centerZ - maxRange/2, centerZ + maxRange/2]);
 
-xticks(-180:10:180);
+% xticks(-180:10:180);
 
 % set(gca, 'YDir', 'reverse');
 
@@ -134,12 +134,12 @@ colormap(pink)
 
 hold on;
 
-xlabel("X axis orientation");
-ylabel("Y axis orientation");
-zlabel("Z axis orientation");
+xlabel("X axis orientation (  )");
+ylabel("Y axis orientation (  )");
+zlabel("Z axis orientation (  )");
 
 ax = gca; %let user change axis setting
-ax.FontSize = 10; %axis fontsize 
+ax.FontSize = 15; %axis fontsize 
 ax.LineWidth = 1.5; ax.FontWeight="bold"; %axis linewidth and Fontweight
 ax.GridLineStyle = '-';
 ax.GridLineWidth = 1.0;
@@ -165,7 +165,7 @@ zlim([centerZ - maxRange/2, centerZ + maxRange/2]);
 
 view(90,0);
 box on;
-yticks(-180:10:180);
+% yticks(-180:10:180);
 
 plot3([-360, 360], [0, 0], [0, 0], 'k:', 'LineWidth', 1.75); % X축
 plot3([0, 0], [-360, 360], [0, 0], 'k:', 'LineWidth', 1.75); % Y축
@@ -180,12 +180,12 @@ colormap(pink)
 
 hold on;
 
-xlabel("X axis orientation");
-ylabel("Y axis orientation");
-zlabel("Z axis orientation");
+xlabel("X axis orientation (  )");
+ylabel("Y axis orientation (  )");
+zlabel("Z axis orientation (  )");
 
 ax = gca; %let user change axis setting
-ax.FontSize = 10; %axis fontsize 
+ax.FontSize = 15; %axis fontsize 
 ax.LineWidth = 1.5; ax.FontWeight="bold"; %axis linewidth and Fontweight
 ax.GridLineStyle = '-';
 ax.GridLineWidth = 1.0;
@@ -196,12 +196,13 @@ fontname(gcf,"Arial")
 pbaspect([4 3 1])
 
 cb = colorbar;
-% cb.Ticks = linspace(0, 54, 10);
-% tmp_tick = round((linspace(0, 54, 10) * (1/27)), 1);
-% cb.TickLabels = round((linspace(0, 54, 10) * (1/27)), 1);
-% cb.Label.String = "J term weight";
-cb.Label.FontSize = 10;
+cb.Ticks = [1 50:50:300];
+tmp_tick = 0.01 * [1 50:50:300];
+cb.TickLabels = tmp_tick;
+cb.Label.String = "L term weight";
+cb.Label.FontSize = 15;
 cb.Location = "south";
+cb.Position = [0.016637478108581,0.913306451612903,0.872737883340118,0.015372962073338];
 
 % 축 범위를 설정하여 정육면체 보장
 xRange = 1.2 * [min(xInterp), max(xInterp)];

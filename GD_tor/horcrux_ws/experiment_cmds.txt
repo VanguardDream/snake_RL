@@ -1,0 +1,6 @@
+실험 진행할 때, launch로 한번에 실험하면 시작 시점을 제어하기 어려워서 정책 실행은 마지막으로 실행시켜 진행하려고 함. 이를 위해서 Namespace 설정이 필요한데, 아래 명령으로 진행할 수 있음.
+
+ros2 run horcrux_state nn_policy_node --ros-args -r __ns:=/horcrux
+
+usb 응답시간 조정하는 커맨드를 실험전에 사용할 것!
+echo 4 | sudo tee /sys/bus/usb-serial/....

@@ -55,10 +55,11 @@ class nn_startup(Node):
             10
         )
 
-        self.gait = serpenoid.util(30,30,40,40,0) # serpentine
-        # self.gait = serpenoid.util(45,45,10,10,45) # sidewinding
-        # self.gait = serpenoid.util(0,0,30,30,90) # rolling
-        # self.gait = serpenoid.util(30,30,40,40,90) # helix
+        # self.gait = serpenoid.util(30,30,40,40,0) # serpentine
+        # self.gait = serpenoid.util(30,30,80,40,0) # slithering
+        # self.gait = serpenoid.util(30,30,40,40,45) # sidewinding
+        # self.gait = serpenoid.util(0,0,80,80,90) # rolling
+        self.gait = serpenoid.util(30,30,40,40,90) # helix
         self.motionMat = self.gait.getMotionMat()
         self.k_max = self.motionMat.shape[1] - 1
         self.k = 0

@@ -99,6 +99,30 @@ class nn_startup(Node):
         self.k += 1
         self.k = self.k % self.k_max
 
+        # random test msg
+        msg.currents = np.random.uniform(-3.0, 3.0, 14)
+        msg.velocities = np.random.uniform(-10, 10, 14)
+        msg.positions = np.random.uniform(-1.4, 1.4, 14)
+
+        _tmp_q = np.random.randn(4)
+        _tmp_q = _tmp_q / np.linalg.norm(_tmp_q)
+
+        msg.head_q.w = _tmp_q[0]
+        msg.head_q.x = _tmp_q[1]
+        msg.head_q.y = _tmp_q[2]
+        msg.head_q.z = _tmp_q[3]
+
+        msg.haed_angular_vel.x = np.random.uniform(-5, 5)
+        msg.haed_angular_vel.y = np.random.uniform(-5, 5)
+        msg.haed_angular_vel.z = np.random.uniform(-5, 5)
+
+        msg.head_linear_acc.z = np.random.uniform(-10, 10)
+        msg.head_linear_acc.y = np.random.uniform(-10, 10)
+        msg.head_linear_acc.z = np.random.uniform(-10, 10)
+
+        msg.fsr_top = np.random.randint(0,2, 14)
+        msg.fsr_bottom = np.random.randint(0,2, 14)
+
         self._pub_state.publish(msg)
     
     def _state_cb(self, msg:RobotState):

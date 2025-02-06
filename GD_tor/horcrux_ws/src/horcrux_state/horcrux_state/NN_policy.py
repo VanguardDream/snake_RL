@@ -42,6 +42,7 @@ class nn_policy(Node):
 
         # 상대 경로로 체크포인트 파일 경로 설정
         checkpoint_path = os.path.join(package_share_directory, 'policies')
+        # print(checkpoint_path)
         self.get_logger().info(f"Policy checkpoint path: {checkpoint_path}")
 
         # Env 등록
@@ -69,7 +70,7 @@ class nn_policy(Node):
         self.__algo = new_algo_config.build()
 
         try:
-            # self.__algo.get_policy().from_checkpoint(checkpoint_path+"/LP")
+            self.__algo.get_policy().from_checkpoint(checkpoint_path+"/LP")
             self.get_logger().info("\033[32m Policy loaded successfully. \033[0m")
 
         except Exception as e:
@@ -108,9 +109,9 @@ class nn_policy(Node):
             obs[80:94] = msg.motion_vector
 
             t_up = Clock().now()
-            # torque_vector = self.__algo.compute_action(obs)
-            # action = np.array(msg.motion_vector) * torque_vector
-            action = np.array(obs[80:94]) * 0.5
+            torque_vector = self.__algo.compute_action(obs)
+            action = np.array(msg.motion_vector) * torque_vector
+            # action = np.array(obs[80:94]) * 0.1
             t_done = Clock().now()
 
             self.__prior_state = obs

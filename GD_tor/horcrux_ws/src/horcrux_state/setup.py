@@ -1,4 +1,9 @@
 import os
+import sys
+
+# use conda env python
+sys.executable = "/home/bong/anaconda3/envs/gdtor/bin/python"
+
 from glob import glob
 from setuptools import find_packages, setup
 

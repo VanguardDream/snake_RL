@@ -70,7 +70,7 @@ class nn_policy(Node):
         self.__algo = new_algo_config.build()
 
         try:
-            self.__algo.get_policy().from_checkpoint(checkpoint_path+"/LP")
+            self.__algo.get_policy().from_checkpoint(checkpoint_path+"/linear")
             self.get_logger().info("\033[32m Policy loaded successfully. \033[0m")
 
         except Exception as e:

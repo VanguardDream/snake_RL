@@ -109,7 +109,7 @@ class nn_policy(Node):
             obs[80:94] = msg.motion_vector
 
             t_up = Clock().now()
-            torque_vector = self.__algo.compute_action(obs)
+            torque_vector = self.__algo.compute_single_action(obs)
             action = np.array(msg.motion_vector) * torque_vector
             # action = np.array(obs[80:94]) * 0.1
             t_done = Clock().now()

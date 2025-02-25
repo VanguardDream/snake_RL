@@ -7,7 +7,7 @@ register(
 )
 register(
     id="horcrux_terrain_v1/plane-v2",
-    entry_point="horcrux_terrain_v2.envs:PlaneJoyWorld",
+    entry_point="horcrux_terrain_v1.envs:PlaneJoyWorld",
     max_episode_steps=3000,
 )
 register(

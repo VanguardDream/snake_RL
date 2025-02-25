@@ -39,7 +39,7 @@ class PlaneJoyWorld(MujocoEnv, utils.EzPickle):
             termination_reward: float = 0,
             side_cost_weight:float = 60,
             ctrl_cost_weight: float = 0,
-            rotation_norm_cost_weight: float = 0,
+            rotation_norm_cost_weight: float = 0.1,
             rotation_orientation_cost_weight: float = 0.05,
             unhealthy_cost_weight: float = 1,
             healthy_reward: float = 2,
@@ -279,8 +279,8 @@ class PlaneJoyWorld(MujocoEnv, utils.EzPickle):
         #### Reward를 위한 회전 변위 정의
 
         # 회전의 노름 (회전의 크기)
-        norm_r = np.linalg.norm(Rotation.from_matrix(d_T_r).as_rotvec(False)).copy()
         euler_r = Rotation.from_matrix(d_T_r).as_euler('ZYX',False).copy()
+        norm_r = np.linalg.norm(np.array([euler_r[1], euler_r[2]])).copy()
         self._cur_euler_ypr = Rotation.from_matrix(d_T0_r).as_euler('ZYX',True).copy()
 
         #### Reward 계산을 위한 변수 설정
@@ -354,9 +354,9 @@ class PlaneJoyWorld(MujocoEnv, utils.EzPickle):
     def _get_rew(self, x_vel, y_vel, joy_x, joy_y, action, norm_r, yaw_vel, joy_r):
         _v_vel = np.array([x_vel, y_vel])
         _v_joy = np.array([joy_x, joy_y])
-        _scale_k = 5 # 실제 뱀로봇 속도와 조이스틱 범위 스케일링을 위한 계수
+        _scale_k = 7 # 실제 뱀로봇 속도와 조이스틱 범위 스케일링을 위한 계수
         _beta = 1 # 크기 차이에 대한 민감도를 조절하는 계수
-        _scale_r = 1.57 # 회전에 대한 스케일을 조절하는 계수
+        _scale_r = 2.1 # 회전에 대한 스케일을 조절하는 계수
         _alpha = 1 # 회전에 대한 민감도를 조절하는 계수
 
         if np.linalg.norm(_v_joy) < 1e-1:

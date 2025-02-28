@@ -13,6 +13,8 @@ from gymnasium.spaces import Box
 
 from scipy.spatial.transform import Rotation
 
+from collections import deque
+
 DEFAULT_CAMERA_CONFIG = {}
 
 # __pkg_dir__ = pathlib.Path(os.path.dirname(__file__))
@@ -20,6 +22,24 @@ DEFAULT_CAMERA_CONFIG = {}
 # __mjcf_model_path__ = os.path.join(__resource_dir__, 'horcrux_sand.xml')
 
 __mjcf_model_path__ = pkg_resources.resource_filename("horcrux_terrain_v1", "resources/horcrux_plane.xml")
+
+class MovingAverageFilter3D:
+    def __init__(self, window_size=20):
+        self.window_size = window_size
+        self.x_queue = deque(maxlen=window_size)
+        self.y_queue = deque(maxlen=window_size)
+        self.z_queue = deque(maxlen=window_size)
+
+    def update(self, new_x, new_y, new_z):
+        self.x_queue.append(new_x)
+        self.y_queue.append(new_y)
+        self.z_queue.append(new_z)
+
+        avg_x = np.mean(self.x_queue) if self.x_queue else 0.0
+        avg_y = np.mean(self.y_queue) if self.y_queue else 0.0
+        avg_z = np.mean(self.z_queue) if self.z_queue else 0.0
+
+        return avg_x, avg_y, avg_z
 
 class PlaneJoyWorld(MujocoEnv, utils.EzPickle):
     metadata = {
@@ -103,6 +123,7 @@ class PlaneJoyWorld(MujocoEnv, utils.EzPickle):
         self._use_gait = use_gait
         self._use_friction_chg = use_friction_chg
         self._gait = Gait(gait_params)
+        self._gait_params = gait_params
         self._k = 0
         self._unhealthy_max_steps = unhealthy_max_steps
         self._unhealth_steps = 0
@@ -114,6 +135,11 @@ class PlaneJoyWorld(MujocoEnv, utils.EzPickle):
         self._cur_euler_ypr = np.array([0,0,0])
         self._joy_input = np.array(joy_input)
         self._joy_input_random = joy_input_random
+
+        _temporal_param = max(self._gait_params[2], self._gait_params[3])
+        _period = int(np.ceil((_temporal_param) / (2 * np.pi))) * 2
+        self._mov_mean = MovingAverageFilter3D(window_size=_period)
+
 
         MujocoEnv.__init__(
                 self,
@@ -284,10 +310,11 @@ class PlaneJoyWorld(MujocoEnv, utils.EzPickle):
         self._cur_euler_ypr = Rotation.from_matrix(d_T0_r).as_euler('ZYX',True).copy()
 
         #### Reward 계산을 위한 변수 설정
-        x_vel = x_disp / self.dt
-        y_vel = y_disp / self.dt
-        yaw_vel = euler_r[0] / self.dt
-        
+        tmp_x_vel = x_disp / self.dt
+        tmp_y_vel = y_disp / self.dt
+        tmp_yaw_vel = euler_r[0] / self.dt
+
+        x_vel, y_vel, yaw_vel = self._mov_mean.update(tmp_x_vel, tmp_y_vel, tmp_yaw_vel)
 
         # ## Gait changing...
         self._k += 1
@@ -329,6 +356,7 @@ class PlaneJoyWorld(MujocoEnv, utils.EzPickle):
             "distance_from_origin": np.linalg.norm(self.data.qpos[0:2], ord=2),
             "x_velocity": x_vel,
             "y_velocity": y_vel,
+            "yaw_velocity": yaw_vel,
             "joint_pos": observation[:14].copy(),
             "joint_vel": observation[-41:-27].copy(),
             "head_quat": observation[-27:-23].copy(),
@@ -354,9 +382,9 @@ class PlaneJoyWorld(MujocoEnv, utils.EzPickle):
     def _get_rew(self, x_vel, y_vel, joy_x, joy_y, action, norm_r, yaw_vel, joy_r):
         _v_vel = np.array([x_vel, y_vel])
         _v_joy = np.array([joy_x, joy_y])
-        _scale_k = 7 # 실제 뱀로봇 속도와 조이스틱 범위 스케일링을 위한 계수
+        _scale_k = 0.7 # 실제 뱀로봇 속도와 조이스틱 범위 스케일링을 위한 계수
         _beta = 1 # 크기 차이에 대한 민감도를 조절하는 계수
-        _scale_r = 2.1 # 회전에 대한 스케일을 조절하는 계수
+        _scale_r = 1.5 # 회전에 대한 스케일을 조절하는 계수
         _alpha = 1 # 회전에 대한 민감도를 조절하는 계수
 
         if np.linalg.norm(_v_joy) < 1e-1:
@@ -407,6 +435,11 @@ class PlaneJoyWorld(MujocoEnv, utils.EzPickle):
         self._initial_com = np.array([0,0,0])
         self._cur_euler_ypr = np.array([0,0,0])
 
+        _temporal_param = max(self._gait_params[2], self._gait_params[3])
+        _period = int(np.ceil((_temporal_param) / (2 * np.pi))) * 2
+        self._mov_mean = MovingAverageFilter3D(window_size=_period)
+
+
         # Gait reset
         if not(self._use_gait):
             a = np.random.randint(15, 46)
@@ -419,12 +452,15 @@ class PlaneJoyWorld(MujocoEnv, utils.EzPickle):
 
         # Joy input reset
         if self._joy_input_random:
+            self._joy_input = np.array([0, 0, 0])
             while np.linalg.norm(self._joy_input) < 0.2:  # 너무 작은 값 방지
-                self._joy_input = np.array([
-                    np.random.uniform(-1, 1),
-                    np.random.uniform(-1, 1),
-                    np.random.uniform(-1, 1)
-                ])
+
+                theta = np.random.uniform(0, 2 * np.pi)  # [0, 2π] 범위의 랜덤 각도
+                r = np.sqrt(np.random.uniform(0, 1))  # 제곱근 샘플링을 통해 균등한 분포 생성
+                x = r * np.cos(theta)
+                y = r * np.sin(theta)
+
+                self._joy_input = np.array([x, y, np.random.uniform(-1, 1)])
 
         # System reset
         noise_low = -0.05

@@ -9,7 +9,9 @@ allnew/svm/data.csv
 *.zip
 *.pkl
 *.egg-info
+*.OMEN-45L
 rllib_checkpoint.json
+result.json
 
 allnew/svm/*.csv
 allnew/svm/*.mat
@@ -29,6 +31,9 @@ SB3/TorquePPO/*
 rllib/bongEnv/bongSnake/*.txt
 
 science-contest2022/DynamixelSDK/*
+
+#Paper data
+GD_pos/GD_paper_rev/traj_J/20241202 IJL항 민감도 분석/*.mat
 
 #ROS builds
 GD_tor/horcrux_ws/build/*

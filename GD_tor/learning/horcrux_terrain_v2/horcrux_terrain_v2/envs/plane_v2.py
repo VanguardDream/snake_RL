@@ -1,6 +1,6 @@
 from typing import Dict, Optional, Tuple, Union
 from gymnasium.envs.mujoco.mujoco_env import DEFAULT_SIZE
-from horcrux_terrain_v1.envs.gait import Gait
+from horcrux_terrain_v2.envs.gait import Gait
 
 import numpy as np
 import pkg_resources

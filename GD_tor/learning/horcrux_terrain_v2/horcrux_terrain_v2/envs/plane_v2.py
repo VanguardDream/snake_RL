@@ -17,6 +17,8 @@ DEFAULT_CAMERA_CONFIG = {}
 
 __mjcf_model_path__ = pkg_resources.resource_filename("horcrux_terrain_v2", "resources/horcrux_plane.xml")
 
+# __mjcf_model_path__ = 'horcrux_plane.xml'
+
 class MovingAverageFilter3D:
     def __init__(self, window_size=20):
         self.window_size = window_size
@@ -42,7 +44,6 @@ class PlaneJoyWorld(MujocoEnv, utils.EzPickle):
             "rgb_array",
             "depth_array",
         ],
-        "render_fps" : 10 # For gymnasium 0.28.1
     }
     def __init__(
             self, 

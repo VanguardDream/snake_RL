@@ -292,6 +292,7 @@ class PlaneJoyWorld(MujocoEnv, utils.EzPickle):
             terminated = True
 
         info = {
+            "step": self._n_step,
             "x_displacement": x_disp,
             "y_displacement": y_disp,
             "distance_from_origin": np.linalg.norm(self.data.qpos[0:2], ord=2),

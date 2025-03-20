@@ -17,10 +17,6 @@ from collections import deque
 
 DEFAULT_CAMERA_CONFIG = {}
 
-# __pkg_dir__ = pathlib.Path(os.path.dirname(__file__))
-# __resource_dir__ = os.path.join(__pkg_dir__.parent,'resources')
-# __mjcf_model_path__ = os.path.join(__resource_dir__, 'horcrux_sand.xml')
-
 __mjcf_model_path__ = pkg_resources.resource_filename("horcrux_terrain_v1", "resources/horcrux_plane.xml")
 
 class MovingAverageFilter3D:
@@ -140,7 +136,6 @@ class PlaneJoyWorld(MujocoEnv, utils.EzPickle):
         _period = int(np.ceil((_temporal_param) / (2 * np.pi))) * 2
         self._mov_mean = MovingAverageFilter3D(window_size=_period)
 
-
         MujocoEnv.__init__(
                 self,
                 model_path,
@@ -247,8 +242,6 @@ class PlaneJoyWorld(MujocoEnv, utils.EzPickle):
         # 원점의 Transformation matrix
         T_0 = np.eye(4)
         T_0[:3, :3] = Rotation.from_rotvec(self._initial_rpy,True).as_matrix()
-        # T_0[:3, 3] = self._initial_com
-        T_0[:3, 3] = com_pos_before
 
         # Before의 Transformation matrix
         T_1 = np.eye(4)
@@ -259,16 +252,6 @@ class PlaneJoyWorld(MujocoEnv, utils.EzPickle):
         T_2 = np.eye(4)
         T_2[:3, :3] = Rotation.from_rotvec(com_rpy_after,True).as_matrix()
         T_2[:3, 3] = com_pos_after
-
-        # # Head Before의 Transformation matrix
-        # T_head_1 = np.eye(4)
-        # T_head_1[:3, :3] = Rotation.from_matrix(head_quat_before).as_matrix()
-        # T_head_1[:3, 3] = head_pos_before
-
-        # # Head After의 Transformation matrix
-        # T_head_2 = np.eye(4)
-        # T_head_2[:3, :3] = Rotation.from_matrix(head_quat_after).as_matrix()
-        # T_head_2[:3, 3] = head_pos_after
 
         # Transformation matrix of CoM between two steps
         d_T = np.linalg.inv(T_1) @ T_2
@@ -291,8 +274,8 @@ class PlaneJoyWorld(MujocoEnv, utils.EzPickle):
         # y_disp = d_T_p[1]
 
         # ## Origin과 Step after를 통해서 구하기
-        x_disp = d_T0_p[0]
-        y_disp = d_T0_p[1]
+        x_disp = d_T_p[0]
+        y_disp = d_T_p[1]
 
         ## Head의 변위로 구하기
         # x_disp = d_T_head_p[0]
@@ -436,8 +419,11 @@ class PlaneJoyWorld(MujocoEnv, utils.EzPickle):
         self._cur_euler_ypr = np.array([0,0,0])
 
         _temporal_param = max(self._gait_params[2], self._gait_params[3])
+        # 로봇 속도를 위한 이동 평균 
         _period = int(np.ceil((_temporal_param) / (2 * np.pi))) * 2
         self._mov_mean = MovingAverageFilter3D(window_size=_period)
+        # IMU 센서 필터링을 위한 이동 평균
+        self._mov_mean_
 
 
         # Gait reset

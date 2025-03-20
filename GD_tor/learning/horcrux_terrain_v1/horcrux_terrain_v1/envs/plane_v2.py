@@ -423,7 +423,7 @@ class PlaneJoyWorld(MujocoEnv, utils.EzPickle):
         _period = int(np.ceil((_temporal_param) / (2 * np.pi))) * 2
         self._mov_mean = MovingAverageFilter3D(window_size=_period)
         # IMU 센서 필터링을 위한 이동 평균
-        self._mov_mean_
+        # self._mov_mean_
 
 
         # Gait reset

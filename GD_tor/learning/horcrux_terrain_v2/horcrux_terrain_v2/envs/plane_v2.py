@@ -37,6 +37,80 @@ class MovingAverageFilter3D:
 
         return avg_x, avg_y, avg_z
 
+class MovingAverageFilterQuaternion:
+    def __init__(self, window_size=10):
+        self.window_size = window_size
+        self.w_queue = deque(maxlen=window_size)
+        self.x_queue = deque(maxlen=window_size)
+        self.y_queue = deque(maxlen=window_size)
+        self.z_queue = deque(maxlen=window_size)
+
+    def update(self, quat):
+        if not (np.linalg.norm(quat) < 1e-8):
+            self.w_queue.append(quat[0])
+            self.x_queue.append(quat[1])
+            self.y_queue.append(quat[2])
+            self.z_queue.append(quat[3])
+        else:
+            self.w_queue.append(1)
+            self.x_queue.append(0)
+            self.y_queue.append(0)
+            self.z_queue.append(0)
+
+        _raw_quat = np.array([self.w_queue, self.x_queue, self.y_queue, self.z_queue]).T
+
+        _rot = Rotation.from_quat(_raw_quat, scalar_first=True)
+
+        _avg_rot = _rot.mean().as_quat(scalar_first=True)
+
+        return _avg_rot
+
+# class MovingAverageFilterQuaternion:
+#     def __init__(self, window_size=10):
+#         self.window_size = window_size
+#         self.quat_queue = deque(maxlen=window_size)  # (x, y, z, w) 형식
+
+#     def update(self, new_quat):  # new_quat: (x, y, z, w) or (4,) ndarray
+#         # 부호 일관성 유지
+#         if not (np.linalg.norm(new_quat) < 1e-8):
+#             if self.quat_queue:
+#                 last_quat = self.quat_queue[-1]
+#                 if np.dot(last_quat, new_quat) < 0:
+#                     new_quat = -new_quat
+
+#             self.quat_queue.append(new_quat)
+#         else:
+#             self.quat_queue.append(np.array([1, 0, 0, 0]))
+
+#         if len(self.quat_queue) < 2:
+#             return Rotation.from_quat(self.quat_queue[-1], scalar_first=True).as_quat(scalar_first=True)  # 초기값은 그대로 반환
+
+#         # 고유값 기반 평균
+#         A = np.zeros((4, 4))
+#         for q in self.quat_queue:
+#             q = q / np.linalg.norm(q)
+#             A += np.outer(q, q)
+#         A /= len(self.quat_queue)
+
+#         eigvals, eigvecs = np.linalg.eigh(A)
+#         avg_quat = eigvecs[:, np.argmax(eigvals)]  # 최대 고유값의 고유벡터
+
+#         if avg_quat[3] < 0:  # w<0이면 부호 반전
+#             avg_quat = -avg_quat
+
+#         # scipy는 (x, y, z, w) 형식 사용
+#         rot_avg = Rotation.from_quat(avg_quat, scalar_first=True)
+
+#         # print("Quaternion sequence (Euler angles):")
+#         for q in self.quat_queue:
+#             # print(R.from_quat(q).as_euler('XYZ', degrees=True))
+#             pass
+
+#         # print("Averaged (Euler):", rot_avg.as_euler('XYZ', degrees=True))
+
+#         return rot_avg.as_quat(scalar_first=True)
+
+
 class PlaneJoyWorld(MujocoEnv, utils.EzPickle):
     metadata = {
         "render_modes": [
@@ -71,6 +145,7 @@ class PlaneJoyWorld(MujocoEnv, utils.EzPickle):
             joy_input_random: bool = True,
             joy_input: Union[float, float, float] = (0, 0, 0), # X axis velocity, Y axis velocity, Yaw angular velocity
             gait_params: Tuple[float, float, float, float, float] = (30, 30, 40, 40, 0),
+            use_imu_window: bool = False,
             **kwargs,
     ):
         utils.EzPickle.__init__(
@@ -98,6 +173,7 @@ class PlaneJoyWorld(MujocoEnv, utils.EzPickle):
             joy_input_random,
             joy_input,
             gait_params,
+            use_imu_window,
             **kwargs,                
         )
 
@@ -130,11 +206,16 @@ class PlaneJoyWorld(MujocoEnv, utils.EzPickle):
         self._cur_euler_ypr = np.array([0,0,0])
         self._joy_input = np.array(joy_input)
         self._joy_input_random = joy_input_random
+        self._use_imu_mov_mean = use_imu_window
 
         _temporal_param = max(self._gait_params[2], self._gait_params[3])
         _period = int(np.ceil((_temporal_param) / (2 * np.pi))) * 2
-        self._mov_mean = MovingAverageFilter3D(window_size=_period)
+        self._mov_mean_vels = MovingAverageFilter3D(window_size=_period)
 
+        # IMU data filter
+        self._mov_mean_imu_vel = MovingAverageFilter3D(window_size=10)
+        self._mov_mean_imu_acc = MovingAverageFilter3D(window_size=10)
+        self._mov_mean_imu_quat = MovingAverageFilterQuaternion(window_size=10)
 
         MujocoEnv.__init__(
                 self,
@@ -275,7 +356,7 @@ class PlaneJoyWorld(MujocoEnv, utils.EzPickle):
         tmp_y_vel = y_disp / self.dt
         tmp_yaw_vel = euler_r[0] / self.dt
 
-        x_vel, y_vel, yaw_vel = self._mov_mean.update(tmp_x_vel, tmp_y_vel, tmp_yaw_vel)
+        x_vel, y_vel, yaw_vel = self._mov_mean_vels.update(tmp_x_vel, tmp_y_vel, tmp_yaw_vel)
 
         # ## Gait changing...
         self._k += 1
@@ -359,7 +440,20 @@ class PlaneJoyWorld(MujocoEnv, utils.EzPickle):
 
 
     def _get_obs(self, mVec : np.ndarray):
+        """
+        Mujoco Sensor Tags
+        "head_quat": observation[-10:-6].copy(),
+        "head_ang_vel": observation[-6:-3].copy(),
+        "head_lin_acc": observation[-3::].copy(),
+        """
+
         tmp = self.data.sensordata.copy()
+
+        if self._use_imu_mov_mean:
+            tmp[-10:-6] = self._mov_mean_imu_quat.update((self.data.sensordata[-10].copy(), self.data.sensordata[-9].copy(), self.data.sensordata[-8].copy(), self.data.sensordata[-7].copy()))
+            tmp[-6:-3] = self._mov_mean_imu_vel.update(self.data.sensordata[-6].copy(), self.data.sensordata[-5].copy(), self.data.sensordata[-4].copy())
+            tmp[-3::] = self._mov_mean_imu_acc.update(self.data.sensordata[-3].copy(), self.data.sensordata[-2].copy(), self.data.sensordata[-1].copy())
+
         tmp[42:56] = (tmp[42:56]>1).astype(int)
         tmp[56:70] = (tmp[56:70]>1).astype(int)
         return np.concatenate((tmp.flatten(), mVec, self._joy_input), dtype=np.float32)
@@ -376,7 +470,12 @@ class PlaneJoyWorld(MujocoEnv, utils.EzPickle):
 
         _temporal_param = max(self._gait_params[2], self._gait_params[3])
         _period = int(np.ceil((_temporal_param) / (2 * np.pi))) * 2
-        self._mov_mean = MovingAverageFilter3D(window_size=_period)
+
+        self._mov_mean_vels = MovingAverageFilter3D(window_size=_period)
+
+        self._mov_mean_imu_vel = MovingAverageFilter3D(window_size=10)
+        self._mov_mean_imu_acc = MovingAverageFilter3D(window_size=10)
+        self._mov_mean_imu_quat = MovingAverageFilterQuaternion(window_size=10)
 
 
         # Gait reset
@@ -422,9 +521,9 @@ class PlaneJoyWorld(MujocoEnv, utils.EzPickle):
         qpos[1] = y_xpos
 
         if self._use_friction_chg:
-            u_slide = round(np.random.uniform(low=0.5, high = 1.0),3)
-            u_torsion = round(np.random.uniform(low=0.01, high = 0.06),3)
-            u_roll = round(np.random.uniform(low=0.001, high = 0.03),3)
+            u_slide = round(np.random.uniform(low=0.6, high = 0.8),2)
+            u_torsion = round(np.random.uniform(low=0.013, high = 0.017),3)
+            u_roll = round(np.random.uniform(low=0.0008, high = 0.0012),4)
             self.model.geom('floor').friction = [u_slide, u_torsion, u_roll]
 
         self.set_state(qpos, qvel)

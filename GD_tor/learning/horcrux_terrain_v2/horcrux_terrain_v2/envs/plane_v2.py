@@ -210,6 +210,7 @@ class PlaneJoyWorld(MujocoEnv, utils.EzPickle):
         self._joy_input = np.array(joy_input)
         self._joy_input_random = joy_input_random
         self._use_imu_mov_mean = use_imu_window
+        self._friction_information = [0, 0, 0]
 
         _temporal_param = max(self._gait_params[2], self._gait_params[3])
         _period = int(np.ceil((_temporal_param) / (2 * np.pi))) * 2
@@ -396,6 +397,7 @@ class PlaneJoyWorld(MujocoEnv, utils.EzPickle):
             "init_rpy": self._initial_rpy,
             "init_com": self._initial_com,
             "init_head_rpy":self._initial_head_rpy,
+            "friction_coeff": self._friction_information,
             **reward_info,
         }
 
@@ -579,6 +581,7 @@ class PlaneJoyWorld(MujocoEnv, utils.EzPickle):
             u_torsion = round(np.random.uniform(low=0.013, high = 0.017),3)
             u_roll = round(np.random.uniform(low=0.0008, high = 0.0012),4)
             self.model.geom('floor').friction = [u_slide, u_torsion, u_roll]
+            self._friction_information = [u_slide, u_torsion, u_roll]
 
         self.set_state(qpos, qvel)
 

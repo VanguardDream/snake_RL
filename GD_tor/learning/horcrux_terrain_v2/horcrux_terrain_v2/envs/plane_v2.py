@@ -125,10 +125,11 @@ class PlaneJoyWorld(MujocoEnv, utils.EzPickle):
             frame_skip: int = 20, 
             default_camera_config: Dict[str, Union[float, int]] = DEFAULT_CAMERA_CONFIG,
             forward_reward_weight: float = 60,
+            rotation_reward_weight: float = 45,
             termination_reward: float = 0,
             side_cost_weight:float = 60,
             ctrl_cost_weight: float = 0,
-            rotation_norm_cost_weight: float = 0.1,
+            rotation_norm_cost_weight: float = 0.5,
             rotation_orientation_cost_weight: float = 0.05,
             unhealthy_cost_weight: float = 1,
             healthy_reward: float = 2,
@@ -154,6 +155,7 @@ class PlaneJoyWorld(MujocoEnv, utils.EzPickle):
             frame_skip,
             default_camera_config,
             forward_reward_weight,
+            rotation_reward_weight,
             termination_reward,
             side_cost_weight,
             ctrl_cost_weight,
@@ -178,6 +180,7 @@ class PlaneJoyWorld(MujocoEnv, utils.EzPickle):
         )
 
         self._forward_reward_weight = forward_reward_weight
+        self._rotation_reward_weight = rotation_reward_weight
         self.termination_reward = termination_reward
         self._side_cost_weight = side_cost_weight
         self._ctrl_cost_weight = ctrl_cost_weight
@@ -213,9 +216,9 @@ class PlaneJoyWorld(MujocoEnv, utils.EzPickle):
         self._mov_mean_vels = MovingAverageFilter3D(window_size=_period)
 
         # IMU data filter
-        self._mov_mean_imu_vel = MovingAverageFilter3D(window_size=10)
-        self._mov_mean_imu_acc = MovingAverageFilter3D(window_size=10)
-        self._mov_mean_imu_quat = MovingAverageFilterQuaternion(window_size=10)
+        self._mov_mean_imu_vel = MovingAverageFilter3D(window_size=5)
+        self._mov_mean_imu_acc = MovingAverageFilter3D(window_size=5)
+        self._mov_mean_imu_quat = MovingAverageFilterQuaternion(window_size=5)
 
         MujocoEnv.__init__(
                 self,
@@ -399,41 +402,91 @@ class PlaneJoyWorld(MujocoEnv, utils.EzPickle):
         # truncation=False as the time limit is handled by the `TimeLimit` wrapper added during `make`
         return observation, reward, False, terminated, info
 
-    def _get_rew(self, x_vel, y_vel, joy_x, joy_y, action, norm_r, yaw_vel, joy_r):
-        _v_vel = np.array([x_vel, y_vel])
-        _v_joy = np.array([joy_x, joy_y])
-        _scale_k = 0.7 # 실제 뱀로봇 속도와 조이스틱 범위 스케일링을 위한 계수
-        _beta = 1 # 크기 차이에 대한 민감도를 조절하는 계수
-        _scale_r = 1.5 # 회전에 대한 스케일을 조절하는 계수
-        _alpha = 1 # 회전에 대한 민감도를 조절하는 계수
+    # def _get_rew(self, x_vel, y_vel, joy_x, joy_y, action, norm_r, yaw_vel, joy_r):
+    #     """
+    #     속도 범위까지 포함된 보상 함수
+    #     """
+    #     _v_vel = np.array([x_vel, y_vel])
+    #     _v_joy = np.array([joy_x, joy_y])
+    #     _scale_k = 0.7 # 실제 뱀로봇 속도와 조이스틱 범위 스케일링을 위한 계수
+    #     _beta = 1 # 크기 차이에 대한 민감도를 조절하는 계수
+    #     _scale_r = 1.5 # 회전에 대한 스케일을 조절하는 계수
+    #     _alpha = 1 # 회전에 대한 민감도를 조절하는 계수
 
-        if np.linalg.norm(_v_joy) < 1e-1:
-            forward_direction_reward = self._forward_reward_weight * (1 / (1 + np.linalg.norm(_v_vel)))
-        else:
-            forward_direction_reward = self._forward_reward_weight * np.dot(_v_vel, _v_joy) / (np.linalg.norm(_v_vel) * np.linalg.norm(_v_joy) + 1e-6)
+    #     if np.linalg.norm(_v_joy) < 1e-1:
+    #         forward_direction_reward = self._forward_reward_weight * (1 / (1 + np.linalg.norm(_v_vel)))
+    #     else:
+    #         forward_direction_reward = self._forward_reward_weight * np.dot(_v_vel, _v_joy) / (np.linalg.norm(_v_vel) * np.linalg.norm(_v_joy) + 1e-6)
 
         
-        forward_magnitude_reward = self._forward_reward_weight * np.exp(-_beta * np.abs(np.linalg.norm(_v_vel) - _scale_k * np.linalg.norm(_v_joy)))
-        rot_reward = self._forward_reward_weight * np.exp(-_alpha * np.abs(yaw_vel - _scale_r * joy_r))
+    #     forward_magnitude_reward = self._forward_reward_weight * np.exp(-_beta * np.abs(np.linalg.norm(_v_vel) - _scale_k * np.linalg.norm(_v_joy)))
+    #     rot_reward = self._forward_reward_weight * np.exp(-_alpha * np.abs(yaw_vel - _scale_r * joy_r))
+    #     healthy_reward = self.healthy_reward
+
+    #     rewards = forward_direction_reward + forward_magnitude_reward + rot_reward + healthy_reward
+
+    #     ctrl_cost = self.control_cost(action)
+    #     unhealthy_cost = self.is_terminated * self._unhealthy_cost_weight
+    #     rot_cost = self._rotation_norm_cost_weight * norm_r
+
+    #     costs = ctrl_cost + unhealthy_cost + rot_cost
+    #     reward = rewards - costs
+
+    #     reward_info = {
+    #          "reward_forward_direction":forward_direction_reward,
+    #          "reward_forward_magnitude":forward_magnitude_reward,
+    #          "reward_rotation":rot_reward,
+    #          "reward_healthy":healthy_reward,
+    #          "reward_ctrl":-ctrl_cost,
+    #          "reward_unhealthy":-unhealthy_cost,
+    #          "reward_rotation":-rot_cost,
+    #     }
+
+    #     return reward, reward_info
+
+    def _get_rew(self, x_vel, y_vel, joy_x, joy_y, action, norm_r, yaw_vel, joy_r):
+        """
+        운동 방향만 고려하는 보상함수
+        """
+        _v_vel = np.array([x_vel, y_vel])
+        _v_joy = np.array([joy_x, joy_y])
+
+        _linear_magnitude = np.linalg.norm(_v_vel)
+        _angular_magnitude = np.linalg.norm(yaw_vel)
+
+        if np.linalg.norm(_v_joy) < 1e-1:
+            _rew_ctrl_cost_weight = 2 * self._ctrl_cost_weight/(np.linalg.norm(_v_joy) + 1e-1)
+            linear_direction = 0
+        else:
+            _rew_ctrl_cost_weight = self._ctrl_cost_weight / (np.linalg.norm(_v_joy))
+            linear_direction = self._forward_reward_weight * np.dot(_v_vel, _v_joy) / (np.linalg.norm(_v_vel) * np.linalg.norm(_v_joy) + 1e-6)
+
+        if joy_r < 1e-1:
+            rotation_direction = 0
+        else:
+            rotation_direction = np.sign(joy_r * yaw_vel)
+
+        linear_movement_reward = self._forward_reward_weight * linear_direction * _linear_magnitude
+        angular_movement_reward = self._rotation_reward_weight * rotation_direction * _angular_magnitude
+        
         healthy_reward = self.healthy_reward
 
-        rewards = forward_direction_reward + forward_magnitude_reward + rot_reward + healthy_reward
+        rewards = linear_movement_reward + angular_movement_reward + healthy_reward
 
-        ctrl_cost = self.control_cost(action)
+        ctrl_cost = _rew_ctrl_cost_weight * np.sum(action)
         unhealthy_cost = self.is_terminated * self._unhealthy_cost_weight
-        rot_cost = self._rotation_norm_cost_weight * norm_r
+        orientation_cost = self._rotation_norm_cost_weight * norm_r
 
-        costs = ctrl_cost + unhealthy_cost + rot_cost
+        costs = ctrl_cost + unhealthy_cost + orientation_cost
         reward = rewards - costs
 
         reward_info = {
-             "reward_forward_direction":forward_direction_reward,
-             "reward_forward_magnitude":forward_magnitude_reward,
-             "reward_rotation":rot_reward,
+             "reward_linear_movement": linear_movement_reward,
+             "reward_angular_movement": angular_movement_reward,
              "reward_healthy":healthy_reward,
              "reward_ctrl":-ctrl_cost,
              "reward_unhealthy":-unhealthy_cost,
-             "reward_rotation":-rot_cost,
+             "reward_orientation": -orientation_cost,
         }
 
         return reward, reward_info
@@ -473,9 +526,9 @@ class PlaneJoyWorld(MujocoEnv, utils.EzPickle):
 
         self._mov_mean_vels = MovingAverageFilter3D(window_size=_period)
 
-        self._mov_mean_imu_vel = MovingAverageFilter3D(window_size=10)
-        self._mov_mean_imu_acc = MovingAverageFilter3D(window_size=10)
-        self._mov_mean_imu_quat = MovingAverageFilterQuaternion(window_size=10)
+        self._mov_mean_imu_vel = MovingAverageFilter3D(window_size=5)
+        self._mov_mean_imu_acc = MovingAverageFilter3D(window_size=5)
+        self._mov_mean_imu_quat = MovingAverageFilterQuaternion(window_size=5)
 
 
         # Gait reset
@@ -498,7 +551,8 @@ class PlaneJoyWorld(MujocoEnv, utils.EzPickle):
                 x = r * np.cos(theta)
                 y = r * np.sin(theta)
 
-                self._joy_input = np.array([x, y, np.random.uniform(-1, 1)])
+                # self._joy_input = np.array([x, y, np.random.uniform(-1, 1)]) # 회전 속도의 크기도 고려
+                self._joy_input = np.array([x, y, np.random.randint(-1,2)]) # 회전 방향만 고려
 
         # System reset
         noise_low = -0.05

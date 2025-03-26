@@ -10,6 +10,7 @@ from gymnasium.envs.mujoco import MujocoEnv
 from gymnasium.spaces import Box
 
 from scipy.spatial.transform import Rotation
+from scipy.linalg import logm, expm
 
 from collections import deque
 
@@ -274,14 +275,14 @@ class PlaneJoyWorld(MujocoEnv, utils.EzPickle):
     
     @property
     def is_healthy(self):
-            y, p, r = self._cur_euler_ypr
+            y, r, p = self._cur_euler_ypr
             min_r, max_r = self._healthy_roll_range
             is_healthy = min_r <= r <= max_r
             return is_healthy
     
     @property
     def is_terminated(self):
-            y, p, r = self._cur_euler_ypr
+            y, r, p = self._cur_euler_ypr
             t_min_r, t_max_r = self._terminating_roll_range
             is_not_over = t_min_r <= r <= t_max_r
 
@@ -306,7 +307,7 @@ class PlaneJoyWorld(MujocoEnv, utils.EzPickle):
         head_quat_before = self.data.body(self._main_body).xmat.copy()
         head_quat_before = np.reshape(head_quat_before, (3,3)).copy()
 
-        if self._n_step == 0:   
+        if self._n_step < 1:   
             self._initial_rpy = com_rpy_before.copy()
             self._initial_com = com_pos_before.copy()
             self._initial_head_rpy = Rotation.from_matrix(head_quat_before).as_rotvec(True).copy()
@@ -360,9 +361,13 @@ class PlaneJoyWorld(MujocoEnv, utils.EzPickle):
         x_disp = d_T0_p[0]
         y_disp = d_T0_p[1]
 
-        # 회전의 노름 (회전의 크기)
+        # 회전의 노름 (회전의 크기) 'ZYX' -> 마지막에 Roll축에 왜곡이 생겨서 다른 방법으로 바꿔야함.
         step_euler_ypr = Rotation.from_matrix(d_T_r).as_euler('ZYX',False).copy()
         self._cur_euler_ypr = Rotation.from_matrix(d_T0_r).as_euler('ZYX',True).copy()
+
+        # 회전의 노름 (회전의 크기) 'ZXY' -> 왜곡 문제 해결을 위해서 XY 순서로 변경
+        # step_euler_ypr = Rotation.from_matrix(d_T_r).as_euler('zyx',False).copy() #주의! Yaw Roll Pitch 순서로 저장됨
+        # self._cur_euler_ypr = Rotation.from_matrix(d_T0_r).as_euler('zyx',True).copy() #주의! Yaw Roll Pitch 순서로 저장됨
 
         norm_r = np.linalg.norm(np.array([self._cur_euler_ypr[1], self._cur_euler_ypr[2]])).copy()
 
@@ -563,7 +568,7 @@ class PlaneJoyWorld(MujocoEnv, utils.EzPickle):
 
         ctrl_cost = ctrl_cost_weight * np.sum(action)
         unhealthy_cost = self.is_terminated * self._unhealthy_cost_weight
-        orientation_cost = self._rotation_norm_cost_weight * norm_r
+        orientation_cost = self._rotation_norm_cost_weight * norm_r * 0
         yaw_cost_weight = 3 if np.abs(joy_r) < 1e-2 else 0
         yaw_vel_cost = yaw_cost_weight * yaw_mag
 
@@ -699,7 +704,7 @@ class PlaneJoyWorld(MujocoEnv, utils.EzPickle):
 
         return np.array([accum_x / len_names, accum_y / len_names, accum_z / len_names])
 
-    def get_robot_rot(self)->np.ndarray:
+    def get_robot_rot(self)->np.ndarray: #Chordal L2 method
         com_roll = 0
         com_pitch = 0
         com_yaw = 0
@@ -714,3 +719,50 @@ class PlaneJoyWorld(MujocoEnv, utils.EzPickle):
         com_roll, com_pitch, com_yaw = robot_rot.mean().as_rotvec(True)
 
         return np.array([com_roll, com_pitch, com_yaw])
+
+    # def chordal_mean_rot(self)->np.ndarray: #Chordal L2 method
+    #     com_roll = 0
+    #     com_pitch = 0
+    #     com_yaw = 0
+
+    #     robot_quats = np.empty((0,4))
+    #     for name in self._robot_body_names:
+    #         robot_quats = np.vstack((robot_quats, self.data.body(name).xquat.copy()))
+
+    #     robot_quats = robot_quats[:, [1, 2, 3, 0]]
+    #     robot_rot = Rotation(robot_quats)
+
+    #     com_roll, com_pitch, com_yaw = robot_rot.mean().as_rotvec(True)
+
+    #     return np.array([com_roll, com_pitch, com_yaw])
+
+    # def get_robot_rot(self)->np.ndarray: #Karcher method
+    #     com_roll = 0
+    #     com_pitch = 0
+    #     com_yaw = 0
+
+    #     robot_rots = []
+    #     for name in self._robot_body_names:
+    #         robot_quats = self.data.body(name).xquat.copy()
+    #         link_rot = Rotation.from_quat(robot_quats, scalar_first=True)
+    #         robot_rots.append(link_rot)
+
+    #     mean_rot = self.log_exp_karcher_mean(robot_rots)
+
+    #     com_roll, com_pitch, com_yaw = mean_rot.as_rotvec(True)
+
+    #     return np.array([com_roll, com_pitch, com_yaw])
+    
+    # def log_exp_karcher_mean(self, rot_list, max_iter=100, tol=1e-6):
+    #     R_mean = rot_list[0].as_matrix()
+    #     for _ in range(max_iter):
+    #         delta_sum = np.zeros((3, 3))
+    #         for r in rot_list:
+    #             delta = logm(r.as_matrix() @ R_mean.T)
+    #             delta_sum += delta
+    #         delta_avg = delta_sum / len(rot_list)
+    #         norm = np.linalg.norm(delta_avg, ord='fro')
+    #         R_mean = expm(delta_avg) @ R_mean
+    #         if norm < tol:
+    #             break
+    #     return Rotation.from_matrix(R_mean)

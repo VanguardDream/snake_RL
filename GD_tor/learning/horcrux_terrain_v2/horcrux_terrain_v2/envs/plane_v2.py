@@ -131,7 +131,8 @@ class PlaneJoyWorld(MujocoEnv, utils.EzPickle):
             ctrl_cost_weight: float = 0,
             rotation_norm_cost_weight: float = 0.5,
             rotation_orientation_cost_weight: float = 0.05,
-            unhealthy_cost_weight: float = 1,
+            unhealthy_cost_weight: float = 2,
+            efficiency_reward_weight: float = 3,
             healthy_reward: float = 2,
             main_body: Union[int, str] = 2,
             render_camera_name = "ceiling",
@@ -187,6 +188,7 @@ class PlaneJoyWorld(MujocoEnv, utils.EzPickle):
         self._rotation_norm_cost_weight = rotation_norm_cost_weight
         self._rotation_orientation_cost_weight = rotation_orientation_cost_weight
         self._unhealthy_cost_weight = unhealthy_cost_weight
+        self._efficiency_reward_weight = efficiency_reward_weight
         self._healthy_reward = healthy_reward
         self._healthy_roll_range = healthy_roll_range
         self._terminating_roll_range = terminating_roll_range
@@ -325,6 +327,7 @@ class PlaneJoyWorld(MujocoEnv, utils.EzPickle):
         # 원점의 Transformation matrix
         T_0 = np.eye(4)
         T_0[:3, :3] = Rotation.from_rotvec(self._initial_rpy,True).as_matrix()
+        T_0[:3, 3] = com_pos_before
 
         # Before의 Transformation matrix
         T_1 = np.eye(4)
@@ -346,19 +349,27 @@ class PlaneJoyWorld(MujocoEnv, utils.EzPickle):
         d_T0_p = d_T0[:3, 3]
         d_T0_r = d_T0[:3, :3]
 
-        # ## Origin과 Step after를 통해서 구하기
-        x_disp = d_T_p[0]
-        y_disp = d_T_p[1]
+        # ## Step before와 Step after를 통해서 구하기
+        # x_disp = d_T_p[0]
+        # y_disp = d_T_p[1]
+
+        ## Origin과 Step after를 통해서 구하기
+        # """
+        # 학습 초기에는 이 방법을 통해서 속도를 구하는 것으로 변경했음. 학습 초기에는 뱀 로봇이 원하는 방향으로 잘 움직이지 않는데, 너무 타이트한 속도 조건을 요구하는 것으로 생각됨. 이후 어느정도 뱀 로봇이 조향 방향으로 움직이기 시작하면 Step을 통해서 구해진 속도를 사용하는 것으로 변경할 예정임.
+        # """
+        x_disp = d_T0_p[0]
+        y_disp = d_T0_p[1]
 
         # 회전의 노름 (회전의 크기)
-        euler_r = Rotation.from_matrix(d_T_r).as_euler('ZYX',False).copy()
-        norm_r = np.linalg.norm(np.array([euler_r[1], euler_r[2]])).copy()
+        step_euler_ypr = Rotation.from_matrix(d_T_r).as_euler('ZYX',False).copy()
         self._cur_euler_ypr = Rotation.from_matrix(d_T0_r).as_euler('ZYX',True).copy()
+
+        norm_r = np.linalg.norm(np.array([self._cur_euler_ypr[1], self._cur_euler_ypr[2]])).copy()
 
         #### Reward 계산을 위한 변수 설정
         tmp_x_vel = x_disp / self.dt
         tmp_y_vel = y_disp / self.dt
-        tmp_yaw_vel = euler_r[0] / self.dt
+        tmp_yaw_vel = step_euler_ypr[0] / self.dt
 
         x_vel, y_vel, yaw_vel = self._mov_mean_vels.update(tmp_x_vel, tmp_y_vel, tmp_yaw_vel)
 
@@ -393,7 +404,7 @@ class PlaneJoyWorld(MujocoEnv, utils.EzPickle):
             "joy_input": observation[-3:].copy(),
             "com_pos": com_pos_before,
             "com_ypr": self._cur_euler_ypr,
-            "step_ypr": euler_r,
+            "step_ypr": step_euler_ypr,
             "init_rpy": self._initial_rpy,
             "init_com": self._initial_com,
             "init_head_rpy":self._initial_head_rpy,
@@ -446,52 +457,134 @@ class PlaneJoyWorld(MujocoEnv, utils.EzPickle):
 
     #     return reward, reward_info
 
+    # def _get_rew(self, x_vel, y_vel, joy_x, joy_y, action, norm_r, yaw_vel, joy_r):
+    #     """
+    #     운동 방향만 고려하는 보상함수
+    #     """
+    #     _v_vel = np.array([x_vel, y_vel])
+    #     _v_joy = np.array([joy_x, joy_y])
+
+    #     _linear_magnitude = np.linalg.norm(_v_vel)
+    #     _angular_magnitude = np.linalg.norm(yaw_vel)
+
+    #     linear_direction = 0
+    #     rotation_direction = 0
+    #     yaw_vel_cost_weight = 0
+
+    #     if np.linalg.norm(_v_joy) < 1e-1:
+    #         _rew_ctrl_cost_weight = 2 * self._ctrl_cost_weight/(np.linalg.norm(_v_joy) + 1e-1)
+    #         linear_direction = 0
+    #     else:
+    #         _rew_ctrl_cost_weight = self._ctrl_cost_weight / (np.linalg.norm(_v_joy))
+    #         linear_direction = self._forward_reward_weight * np.dot(_v_vel, _v_joy) / (np.linalg.norm(_v_vel) * np.linalg.norm(_v_joy) + 1e-6)
+
+    #     if joy_r < 1e-1:
+    #         rotation_direction = 0
+    #         yaw_vel_cost_weight = 3
+    #     else:
+    #         rotation_direction = np.sign(joy_r * yaw_vel)
+
+    #     linear_movement_reward = self._forward_reward_weight * linear_direction * _linear_magnitude
+    #     angular_movement_reward = self._rotation_reward_weight * rotation_direction * _angular_magnitude * np.abs(joy_r)
+        
+    #     healthy_reward = self.healthy_reward
+
+    #     rewards = linear_movement_reward + angular_movement_reward + healthy_reward
+
+    #     ctrl_cost = _rew_ctrl_cost_weight * np.sum(action)
+    #     unhealthy_cost = self.is_terminated * self._unhealthy_cost_weight
+    #     orientation_cost = self._rotation_norm_cost_weight * norm_r
+    #     yaw_vel_cost = yaw_vel_cost_weight * np.abs(yaw_vel)
+
+    #     costs = ctrl_cost + unhealthy_cost + orientation_cost + yaw_vel_cost
+    #     reward = rewards - costs
+
+    #     reward_info = {
+    #          "reward_linear_movement": linear_movement_reward,
+    #          "reward_angular_movement": angular_movement_reward,
+    #          "reward_healthy":healthy_reward,
+    #          "reward_ctrl":-ctrl_cost,
+    #          "reward_unhealthy":-unhealthy_cost,
+    #          "reward_orientation": -orientation_cost,
+    #          "reward_yaw_vel_cost": -yaw_vel_cost,
+    #     }
+
+    #     return reward, reward_info
+    
     def _get_rew(self, x_vel, y_vel, joy_x, joy_y, action, norm_r, yaw_vel, joy_r):
         """
-        운동 방향만 고려하는 보상함수
+        ChatGPT 리팩토링 보상함수
         """
         _v_vel = np.array([x_vel, y_vel])
         _v_joy = np.array([joy_x, joy_y])
 
-        _linear_magnitude = np.linalg.norm(_v_vel)
-        _angular_magnitude = np.linalg.norm(yaw_vel)
+        # 벡터 크기
+        vel_mag = np.linalg.norm(_v_vel)
+        joy_mag = np.linalg.norm(_v_joy)
+        yaw_mag = np.abs(yaw_vel)
 
-        if np.linalg.norm(_v_joy) < 1e-1:
-            _rew_ctrl_cost_weight = 2 * self._ctrl_cost_weight/(np.linalg.norm(_v_joy) + 1e-1)
-            linear_direction = 0
+        # 정렬 유사도 (선형)
+        if joy_mag > 1e-1 and vel_mag > 1e-1:
+            direction_similarity = np.dot(_v_vel, _v_joy) / (vel_mag * joy_mag + 5e-2)
+            direction_similarity = np.clip(direction_similarity, 0, 1)
         else:
-            _rew_ctrl_cost_weight = self._ctrl_cost_weight / (np.linalg.norm(_v_joy))
-            linear_direction = self._forward_reward_weight * np.dot(_v_vel, _v_joy) / (np.linalg.norm(_v_vel) * np.linalg.norm(_v_joy) + 1e-6)
+            direction_similarity = 0.0
 
-        if joy_r < 1e-1:
-            rotation_direction = 0
+        # 선형 움직임 보상
+        linear_movement_reward = self._forward_reward_weight * direction_similarity * vel_mag
+
+        # 회전 정렬 보상
+        if np.abs(joy_r) > 1e-1 and yaw_mag > 1e-1:
+            rotation_alignment = np.sign(joy_r * yaw_vel)
         else:
-            rotation_direction = np.sign(joy_r * yaw_vel)
+            rotation_alignment = 0.0
 
-        linear_movement_reward = self._forward_reward_weight * linear_direction * _linear_magnitude
-        angular_movement_reward = self._rotation_reward_weight * rotation_direction * _angular_magnitude
-        
+        angular_movement_reward = self._rotation_reward_weight * rotation_alignment * yaw_mag * np.abs(joy_r)
+
+        # 조작 효율성 보상: 적은 조작으로 많은 이동을 유도
+        if np.linalg.norm(action) > 1e-3:
+            efficiency = direction_similarity * vel_mag / (np.linalg.norm(action) * 1e-2 + 1e-1)
+        else:
+            efficiency = 0.0
+
+        efficiency_reward = self._efficiency_reward_weight * efficiency
+
+        # 건강 보상
         healthy_reward = self.healthy_reward
 
-        rewards = linear_movement_reward + angular_movement_reward + healthy_reward
+        # 보상 총합
+        rewards = linear_movement_reward + angular_movement_reward + efficiency_reward + healthy_reward
 
-        ctrl_cost = _rew_ctrl_cost_weight * np.sum(action)
+        # 비용: 컨트롤, 자세, 회전, 비정상 상태
+        if joy_mag > 1e-1:
+            ctrl_cost_weight = self._ctrl_cost_weight / joy_mag
+        else:
+            ctrl_cost_weight = 2 * self._ctrl_cost_weight
+
+        ctrl_cost = ctrl_cost_weight * np.sum(action)
         unhealthy_cost = self.is_terminated * self._unhealthy_cost_weight
         orientation_cost = self._rotation_norm_cost_weight * norm_r
+        yaw_cost_weight = 3 if np.abs(joy_r) < 1e-2 else 0
+        yaw_vel_cost = yaw_cost_weight * yaw_mag
 
-        costs = ctrl_cost + unhealthy_cost + orientation_cost
+        costs = ctrl_cost + unhealthy_cost + orientation_cost + yaw_vel_cost
         reward = rewards - costs
 
         reward_info = {
-             "reward_linear_movement": linear_movement_reward,
-             "reward_angular_movement": angular_movement_reward,
-             "reward_healthy":healthy_reward,
-             "reward_ctrl":-ctrl_cost,
-             "reward_unhealthy":-unhealthy_cost,
-             "reward_orientation": -orientation_cost,
+            "reward_linear_movement": linear_movement_reward,
+            "reward_angular_movement": angular_movement_reward,
+            "reward_efficiency": efficiency_reward,
+            "reward_healthy": healthy_reward,
+            "cost_ctrl": -ctrl_cost,
+            "cost_unhealthy": -unhealthy_cost,
+            "cost_orientation": -orientation_cost,
+            "cost_yaw_vel": -yaw_vel_cost,
+            "direction_similarity": direction_similarity,
+            "rotation_alignment": rotation_alignment,
         }
 
         return reward, reward_info
+
 
 
     def _get_obs(self, mVec : np.ndarray):
@@ -546,7 +639,7 @@ class PlaneJoyWorld(MujocoEnv, utils.EzPickle):
         # Joy input reset
         if self._joy_input_random:
             self._joy_input = np.array([0, 0, 0])
-            while np.linalg.norm(self._joy_input) < 0.2:  # 너무 작은 값 방지
+            while np.linalg.norm(self._joy_input) < 0.5:  # 너무 작은 값 방지
 
                 theta = np.random.uniform(0, 2 * np.pi)  # [0, 2π] 범위의 랜덤 각도
                 r = np.sqrt(np.random.uniform(0, 1))  # 제곱근 샘플링을 통해 균등한 분포 생성
@@ -554,11 +647,14 @@ class PlaneJoyWorld(MujocoEnv, utils.EzPickle):
                 y = r * np.sin(theta)
 
                 # self._joy_input = np.array([x, y, np.random.uniform(-1, 1)]) # 회전 속도의 크기도 고려
-                self._joy_input = np.array([x, y, np.random.randint(-1,2)]) # 회전 방향만 고려
+                self._joy_input = np.array([x, y, 0]) # 회전안함
 
         # System reset
-        noise_low = -0.05
-        noise_high = 0.05
+        # noise_low = -0.05
+        # noise_high = 0.05
+        noise_low = 0
+        noise_high = 0
+        noise_qvel = 0
         xpos_low = 0
         xpos_high = 0
 
@@ -568,7 +664,7 @@ class PlaneJoyWorld(MujocoEnv, utils.EzPickle):
 
         qvel = (
             self.init_qvel
-            + 0.01 * self.np_random.standard_normal(self.model.nv)
+            + noise_qvel * self.np_random.standard_normal(self.model.nv)
         )
         x_xpos = self.np_random.uniform(low=xpos_low, high=xpos_high)
         y_xpos = self.np_random.uniform(low=xpos_low, high=xpos_high)

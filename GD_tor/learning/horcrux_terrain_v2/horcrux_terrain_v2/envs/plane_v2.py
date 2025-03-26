@@ -560,13 +560,13 @@ class PlaneJoyWorld(MujocoEnv, utils.EzPickle):
         # 보상 총합
         rewards = linear_movement_reward + angular_movement_reward + efficiency_reward + healthy_reward
 
-        # 비용: 컨트롤, 자세, 회전, 비정상 상태
-        if joy_mag > 1e-1:
-            ctrl_cost_weight = self._ctrl_cost_weight / joy_mag
-        else:
-            ctrl_cost_weight = 2 * self._ctrl_cost_weight
+        # # 비용: 컨트롤, 자세, 회전, 비정상 상태
+        # if joy_mag > 1e-1:
+        #     ctrl_cost_weight = self._ctrl_cost_weight / joy_mag
+        # else:
+        #     ctrl_cost_weight = 2 * self._ctrl_cost_weight
 
-        ctrl_cost = ctrl_cost_weight * np.sum(action)
+        ctrl_cost = self._ctrl_cost_weight * np.sum(action)
         unhealthy_cost = self.is_terminated * self._unhealthy_cost_weight
         orientation_cost = self._rotation_norm_cost_weight * norm_r * 0
         yaw_cost_weight = 3 if np.abs(joy_r) < 1e-2 else 0

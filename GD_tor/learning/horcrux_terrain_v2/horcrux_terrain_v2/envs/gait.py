@@ -1,8 +1,8 @@
 import numpy as np
 
 class Gait():
-    def __init__(self, params:tuple[float, float, int, int, float]) -> None:
-        self.gait_sampling_interval = 0.1
+    def __init__(self, params:tuple[float, float, int, int, float], sampling_t = 0.1, model_timestep = 0.005, frame_skip = 20) -> None:
+        self.gait_sampling_interval = model_timestep * frame_skip
 
         self._ed1 = params[0]
         self._ed2 = params[2]
@@ -10,7 +10,8 @@ class Gait():
         self._el2 = params[3]
         self._delta = params[4]
         # self._t = np.arange(0, 2 * np.pi * max(np.lcm(self._el2, self._ed2), 10) / 10, 0.1).transpose()
-        self._t = np.arange(0, 600, 0.1).transpose()
+        # int(2 * np.pi / self.gait_sampling_interval)
+        self._t = np.arange(0, 600, self.gait_sampling_interval).transpose()
 
         self.MotionMatrix = self.getMotionMat()
         self.joints = self.MotionMatrix.shape[0]

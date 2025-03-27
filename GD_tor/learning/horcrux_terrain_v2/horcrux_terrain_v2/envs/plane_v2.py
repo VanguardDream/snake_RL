@@ -123,7 +123,8 @@ class PlaneJoyWorld(MujocoEnv, utils.EzPickle):
     def __init__(
             self, 
             model_path = __mjcf_model_path__,
-            frame_skip: int = 20, 
+            frame_skip: int = 2, 
+            gait_sampling_interval: float = 0.1,
             default_camera_config: Dict[str, Union[float, int]] = DEFAULT_CAMERA_CONFIG,
             forward_reward_weight: float = 60,
             rotation_reward_weight: float = 45,
@@ -155,6 +156,7 @@ class PlaneJoyWorld(MujocoEnv, utils.EzPickle):
             self,
             model_path,
             frame_skip,
+            gait_sampling_interval,
             default_camera_config,
             forward_reward_weight,
             rotation_reward_weight,
@@ -180,7 +182,7 @@ class PlaneJoyWorld(MujocoEnv, utils.EzPickle):
             use_imu_window,
             **kwargs,                
         )
-
+        self._gait_sampling_interval = gait_sampling_interval
         self._forward_reward_weight = forward_reward_weight
         self._rotation_reward_weight = rotation_reward_weight
         self.termination_reward = termination_reward
@@ -199,7 +201,6 @@ class PlaneJoyWorld(MujocoEnv, utils.EzPickle):
         self._terminate_when_unhealthy = terminate_when_unhealthy
         self._use_gait = use_gait
         self._use_friction_chg = use_friction_chg
-        self._gait = Gait(gait_params)
         self._gait_params = gait_params
         self._k = 0
         self._unhealthy_max_steps = unhealthy_max_steps
@@ -217,7 +218,8 @@ class PlaneJoyWorld(MujocoEnv, utils.EzPickle):
 
         _temporal_param = max(self._gait_params[2], self._gait_params[3])
         _period = int(np.ceil((_temporal_param) / (2 * np.pi))) * 2
-        self._mov_mean_vels = MovingAverageFilter3D(window_size=_period)
+        # self._mov_mean_vels = MovingAverageFilter3D(window_size=_period)
+        self._mov_mean_vels = MovingAverageFilter3D(window_size=5)
 
         # IMU data filter
         self._mov_mean_imu_vel = MovingAverageFilter3D(window_size=5)
@@ -235,6 +237,8 @@ class PlaneJoyWorld(MujocoEnv, utils.EzPickle):
                 camera_name = render_camera_name,
                 **kwargs,
         )
+
+        self._gait = Gait(gait_params, sampling_t = gait_sampling_interval, frame_skip=self.frame_skip)
 
         self.metadata = {
             "render_modes": [
@@ -566,9 +570,9 @@ class PlaneJoyWorld(MujocoEnv, utils.EzPickle):
         # else:
         #     ctrl_cost_weight = 2 * self._ctrl_cost_weight
 
-        ctrl_cost = self._ctrl_cost_weight * np.sum(action)
+        ctrl_cost = self._ctrl_cost_weight * np.sum(action) * (1 / 30)
         unhealthy_cost = self.is_terminated * self._unhealthy_cost_weight
-        orientation_cost = self._rotation_norm_cost_weight * norm_r * 0
+        orientation_cost = self._rotation_norm_cost_weight * norm_r * (1 / 20)
         yaw_cost_weight = 3 if np.abs(joy_r) < 1e-2 else 0
         yaw_vel_cost = yaw_cost_weight * yaw_mag
 
@@ -618,13 +622,14 @@ class PlaneJoyWorld(MujocoEnv, utils.EzPickle):
         self._unhealth_steps = 0
         self._initial_rpy = np.array([0,0,0])
         self._initial_head_rpy = np.array([0,0,0])
-        self._initial_com = np.array([0,0,0])
+        self._initial_com = np.array([-0.4795,0,0.0350])
         self._cur_euler_ypr = np.array([0,0,0])
 
         _temporal_param = max(self._gait_params[2], self._gait_params[3])
         _period = int(np.ceil((_temporal_param) / (2 * np.pi))) * 2
 
-        self._mov_mean_vels = MovingAverageFilter3D(window_size=_period)
+        # self._mov_mean_vels = MovingAverageFilter3D(window_size=_period)
+        self._mov_mean_vels = MovingAverageFilter3D(window_size=5)
 
         self._mov_mean_imu_vel = MovingAverageFilter3D(window_size=5)
         self._mov_mean_imu_acc = MovingAverageFilter3D(window_size=5)
@@ -639,7 +644,7 @@ class PlaneJoyWorld(MujocoEnv, utils.EzPickle):
             d = np.random.randint(10, 71)
             e = np.random.randint( -46, 46)
 
-            self._gait = Gait((a, b, c, d, e))
+            self._gait = Gait((a, b, c, d, e), sampling_t = self._gait_sampling_interval, frame_skip=self._frame_skip)
 
         # Joy input reset
         if self._joy_input_random:
@@ -766,3 +771,6 @@ class PlaneJoyWorld(MujocoEnv, utils.EzPickle):
     #         if norm < tol:
     #             break
     #     return Rotation.from_matrix(R_mean)
+
+    def do_simulation(self, ctrl, n_frames):
+        return super().do_simulation(ctrl, n_frames)

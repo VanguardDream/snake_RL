@@ -232,7 +232,8 @@ class PlaneJoyWorld(MujocoEnv, utils.EzPickle):
         )
 
         _temporal_param = max(self._gait_params[2], self._gait_params[3])
-        _period = int(np.ceil((_temporal_param) / (2 * np.pi)) * 2 * (20 / self.frame_skip))
+        # _period = int(np.ceil((_temporal_param) / (2 * np.pi)) * 2 * (20 / self.frame_skip))
+        _period = 140
         self._mov_mean_vels = MovingAverageFilter3D(window_size=_period)
         # self._mov_mean_vels = MovingAverageFilter3D(window_size=5)
 
@@ -633,12 +634,14 @@ class PlaneJoyWorld(MujocoEnv, utils.EzPickle):
         _temporal_param = max(self._gait_params[2], self._gait_params[3])
         _period = int(np.ceil((_temporal_param) / (2 * np.pi))) * 2
 
-        # self._mov_mean_vels = MovingAverageFilter3D(window_size=_period)
-        self._mov_mean_vels = MovingAverageFilter3D(window_size=5)
+        self._mov_mean_vels = MovingAverageFilter3D(window_size=_period)
+        # self._mov_mean_vels = MovingAverageFilter3D(window_size=5)
 
         self._mov_mean_imu_vel = MovingAverageFilter3D(window_size=5)
         self._mov_mean_imu_acc = MovingAverageFilter3D(window_size=5)
         self._mov_mean_imu_quat = MovingAverageFilterQuaternion(window_size=5)
+        
+        self._com_ypr_filter = MovingAverageFilterQuaternion(window_size=_period *2)
 
 
         # Gait reset

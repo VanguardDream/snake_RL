@@ -1,46 +1,10 @@
-File creation time: 2025-03-28 18:23:49.284780
-Video file name: rl-video2, Joy input: [-0.11217897  0.8460023   0.        ], Friction: [0.75, 0.015, 0.0008]
-File creation time: 2025-03-28 22:20:15.791952
-Video file name: rl-video3, Joy input: [-0.16739863  0.49526381  0.        ], Friction: [0.7, 0.017, 0.0011]
-File creation time: 2025-03-29 01:04:02.680056
-Video file name: rl-video4, Joy input: [-0.9022099  0.1435056  0.       ], Friction: [0.67, 0.015, 0.0009]
-File creation time: 2025-03-29 05:09:04.611795
-Video file name: rl-video5, Joy input: [-0.3165239 -0.646531   0.       ], Friction: [0.8, 0.014, 0.0009]
-File creation time: 2025-03-29 08:49:24.520044
-Video file name: rl-video6, Joy input: [ 0.8028618  -0.04418255  0.        ], Friction: [0.77, 0.015, 0.0009]
-File creation time: 2025-03-29 12:24:02.299056
-Video file name: rl-video7, Joy input: [-0.46583393 -0.7270625   0.        ], Friction: [0.77, 0.014, 0.001]
-File creation time: 2025-03-29 15:40:22.695188
-Video file name: rl-video8, Joy input: [0.5775272  0.39173606 0.        ], Friction: [0.78, 0.013, 0.001]
-File creation time: 2025-03-29 20:08:33.455509
-Video file name: rl-video9, Joy input: [-0.6798839   0.24182925  0.        ], Friction: [0.7, 0.017, 0.0012]
-File creation time: 2025-03-30 00:31:15.295582
-Video file name: rl-video10, Joy input: [-0.61313754 -0.22449133  0.        ], Friction: [0.67, 0.016, 0.0009]
-File creation time: 2025-03-30 05:14:55.071100
-Video file name: rl-video11, Joy input: [-0.07928366  0.65684843  0.        ], Friction: [0.71, 0.017, 0.0011]
-File creation time: 2025-03-30 09:43:20.568667
-Video file name: rl-video12, Joy input: [ 0.7132423 -0.5248737  0.       ], Friction: [0.75, 0.016, 0.0009]
-File creation time: 2025-03-30 13:21:17.166810
-Video file name: rl-video13, Joy input: [-0.12248778 -0.834529    0.        ], Friction: [0.68, 0.014, 0.0011]
-File creation time: 2025-03-30 15:47:13.094479
-Video file name: rl-video14, Joy input: [-0.28613585  0.78549784  0.        ], Friction: [0.62, 0.014, 0.001]
-File creation time: 2025-03-30 18:13:18.161476
-Video file name: rl-video15, Joy input: [0.02679243 0.97021514 0.        ], Friction: [0.66, 0.015, 0.0012]
-File creation time: 2025-03-30 20:39:42.751004
-Video file name: rl-video16, Joy input: [-0.12590748 -0.50399923  0.        ], Friction: [0.76, 0.015, 0.001]
-File creation time: 2025-03-30 23:06:40.594895
-Video file name: rl-video17, Joy input: [-0.78962976 -0.24064668  0.        ], Friction: [0.77, 0.017, 0.0011]
-File creation time: 2025-03-31 01:33:50.509412
-Video file name: rl-video18, Joy input: [0.29130524 0.4335483  0.        ], Friction: [0.63, 0.017, 0.001]
-File creation time: 2025-03-31 03:34:38.304138
-Video file name: rl-video19, Joy input: [-0.4828196  -0.74719477  0.        ], Friction: [0.61, 0.016, 0.0009]
-File creation time: 2025-03-31 05:48:31.261053
-Video file name: rl-video20, Joy input: [-0.5240618 -0.3894989  0.       ], Friction: [0.64, 0.016, 0.0009]
-File creation time: 2025-03-31 08:14:46.467664
-Video file name: rl-video21, Joy input: [0.4109582  0.33440006 0.        ], Friction: [0.77, 0.017, 0.0009]
-File creation time: 2025-03-31 10:18:46.029528
-Video file name: rl-video22, Joy input: [ 0.2647568 -0.8271748  0.       ], Friction: [0.77, 0.015, 0.0008]
-File creation time: 2025-03-31 13:02:38.716606
-Video file name: rl-video23, Joy input: [ 0.93627083 -0.2740486   0.        ], Friction: [0.69, 0.016, 0.001]
-File creation time: 2025-03-31 15:51:55.196838
-Video file name: rl-video24, Joy input: [ 0.80990887 -0.5451937   0.        ], Friction: [0.77, 0.016, 0.0011]
+File creation time: 2025-04-01 10:53:09.172109
+Video file name: rl-video2, Joy input: [-0.35292768 -0.69617605  0.        ], Friction: [0.78, 0.016, 0.001]
+File creation time: 2025-04-01 11:34:34.536057
+Video file name: rl-video3, Joy input: [-0.6192294   0.42872208  0.        ], Friction: [0.61, 0.017, 0.0009]
+File creation time: 2025-04-01 12:15:47.711048
+Video file name: rl-video4, Joy input: [-0.00725574  0.7628343   0.        ], Friction: [0.73, 0.015, 0.0009]
+File creation time: 2025-04-01 12:57:03.663282
+Video file name: rl-video5, Joy input: [-0.33069074  0.6084816   0.        ], Friction: [0.61, 0.016, 0.0011]
+File creation time: 2025-04-01 13:38:23.314770
+Video file name: rl-video6, Joy input: [0.6872363 0.6465338 0.       ], Friction: [0.66, 0.013, 0.0011]

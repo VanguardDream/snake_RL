@@ -150,7 +150,6 @@ class PlaneJoyWorld(MujocoEnv, utils.EzPickle):
             joy_input: Union[float, float, float] = (0, 0, 0), # X axis velocity, Y axis velocity, Yaw angular velocity
             gait_params: Tuple[float, float, float, float, float] = (30, 30, 40, 40, 0),
             use_imu_window: bool = False,
-            use_com_ypr_window: bool = False,
             **kwargs,
     ):
         utils.EzPickle.__init__(
@@ -181,7 +180,6 @@ class PlaneJoyWorld(MujocoEnv, utils.EzPickle):
             joy_input,
             gait_params,
             use_imu_window,
-            use_com_ypr_window,
             **kwargs,                
         )
         self._gait_sampling_interval = gait_sampling_interval
@@ -216,7 +214,6 @@ class PlaneJoyWorld(MujocoEnv, utils.EzPickle):
         self._joy_input = np.array(joy_input)
         self._joy_input_random = joy_input_random
         self._use_imu_mov_mean = use_imu_window
-        self._use_com_ypr_mov_mean = use_com_ypr_window
         self._friction_information = [0, 0, 0]
 
         MujocoEnv.__init__(
@@ -243,7 +240,6 @@ class PlaneJoyWorld(MujocoEnv, utils.EzPickle):
         self._mov_mean_imu_quat = MovingAverageFilterQuaternion(window_size=5)
 
         # Get com ypr filter
-        self._com_ypr_filter = MovingAverageFilterQuaternion(window_size=_period *2)
         self._gait = Gait(gait_params, sampling_t = gait_sampling_interval, frame_skip=self.frame_skip)
 
         self.metadata = {
@@ -640,9 +636,6 @@ class PlaneJoyWorld(MujocoEnv, utils.EzPickle):
         self._mov_mean_imu_vel = MovingAverageFilter3D(window_size=5)
         self._mov_mean_imu_acc = MovingAverageFilter3D(window_size=5)
         self._mov_mean_imu_quat = MovingAverageFilterQuaternion(window_size=5)
-        
-        self._com_ypr_filter = MovingAverageFilterQuaternion(window_size=_period *2)
-
 
         # Gait reset
         if not(self._use_gait):
@@ -729,13 +722,7 @@ class PlaneJoyWorld(MujocoEnv, utils.EzPickle):
         robot_quats = robot_quats[:, [1, 2, 3, 0]]
         robot_rot = Rotation(robot_quats)
 
-        if self._use_com_ypr_mov_mean:
-            windowed_rot = self._com_ypr_filter.update(robot_rot.mean().as_quat(scalar_first=True))
-            robot_rot = Rotation.from_quat(windowed_rot, scalar_first=True)
-            com_roll, com_pitch, com_yaw = robot_rot.as_rotvec(True)
-        else:
-            com_roll, com_pitch, com_yaw = robot_rot.mean().as_rotvec(True)
-
+        com_roll, com_pitch, com_yaw = robot_rot.mean().as_rotvec(True)
 
         return np.array([com_roll, com_pitch, com_yaw])
     

@@ -123,7 +123,7 @@ class PlaneJoyWorld(MujocoEnv, utils.EzPickle):
     def __init__(
             self, 
             model_path = __mjcf_model_path__,
-            frame_skip: int = 2, 
+            frame_skip: int = 10, 
             gait_sampling_interval: float = 0.1,
             default_camera_config: Dict[str, Union[float, int]] = DEFAULT_CAMERA_CONFIG,
             forward_reward_weight: float = 60,
@@ -150,6 +150,7 @@ class PlaneJoyWorld(MujocoEnv, utils.EzPickle):
             joy_input: Union[float, float, float] = (0, 0, 0), # X axis velocity, Y axis velocity, Yaw angular velocity
             gait_params: Tuple[float, float, float, float, float] = (30, 30, 40, 40, 0),
             use_imu_window: bool = False,
+            use_vels_window: bool = False,
             **kwargs,
     ):
         utils.EzPickle.__init__(
@@ -180,6 +181,7 @@ class PlaneJoyWorld(MujocoEnv, utils.EzPickle):
             joy_input,
             gait_params,
             use_imu_window,
+            use_vels_window,
             **kwargs,                
         )
         self._gait_sampling_interval = gait_sampling_interval
@@ -214,6 +216,7 @@ class PlaneJoyWorld(MujocoEnv, utils.EzPickle):
         self._joy_input = np.array(joy_input)
         self._joy_input_random = joy_input_random
         self._use_imu_mov_mean = use_imu_window
+        self._use_vels_mov_mean = use_vels_window
         self._friction_information = [0, 0, 0]
 
         MujocoEnv.__init__(
@@ -229,15 +232,15 @@ class PlaneJoyWorld(MujocoEnv, utils.EzPickle):
         )
 
         _temporal_param = max(self._gait_params[2], self._gait_params[3])
-        # _period = int(np.ceil((_temporal_param) / (2 * np.pi)) * 2 * (20 / self.frame_skip))
-        _period = 140
+        _period = int(( (2 * np.pi) / (_temporal_param / 10) ) * ( 1 / (self.model.opt.timestep * self.frame_skip) ) * (1 / 2) )  # 좌변 -> 초 단위, 우변 -> 초 단위를 몇 슬롯으로 나눌지
+        _period2 = int(( 1 / (self.model.opt.timestep * self.frame_skip) ) * 0.3)
+
         self._mov_mean_vels = MovingAverageFilter3D(window_size=_period)
-        # self._mov_mean_vels = MovingAverageFilter3D(window_size=5)
 
         # IMU data filter
-        self._mov_mean_imu_vel = MovingAverageFilter3D(window_size=5)
-        self._mov_mean_imu_acc = MovingAverageFilter3D(window_size=5)
-        self._mov_mean_imu_quat = MovingAverageFilterQuaternion(window_size=5)
+        self._mov_mean_imu_vel = MovingAverageFilter3D(window_size=_period2)
+        self._mov_mean_imu_acc = MovingAverageFilter3D(window_size=_period2)
+        self._mov_mean_imu_quat = MovingAverageFilterQuaternion(window_size=_period2)
 
         # Get com ypr filter
         self._gait = Gait(gait_params, sampling_t = gait_sampling_interval, frame_skip=self.frame_skip)
@@ -331,11 +334,6 @@ class PlaneJoyWorld(MujocoEnv, utils.EzPickle):
         self._n_step += 1
 
         ## 각종 Transformation matrix 생성
-        # 원점의 Transformation matrix
-        T_0 = np.eye(4)
-        T_0[:3, :3] = Rotation.from_rotvec(self._initial_rpy,True).as_matrix()
-        T_0[:3, 3] = com_pos_before
-
         # Before의 Transformation matrix
         T_1 = np.eye(4)
         T_1[:3, :3] = Rotation.from_rotvec(com_rpy_before,True).as_matrix()
@@ -351,11 +349,6 @@ class PlaneJoyWorld(MujocoEnv, utils.EzPickle):
         d_T_p = d_T[:3, 3]
         d_T_r = d_T[:3, :3]
 
-        # # 원점과 T2의 step
-        d_T0 = np.linalg.inv(T_0) @ T_2
-        d_T0_p = d_T0[:3, 3]
-        d_T0_r = d_T0[:3, :3]
-
         # ## Step before와 Step after를 통해서 구하기
         # x_disp = d_T_p[0]
         # y_disp = d_T_p[1]
@@ -364,12 +357,12 @@ class PlaneJoyWorld(MujocoEnv, utils.EzPickle):
         # """
         # 학습 초기에는 이 방법을 통해서 속도를 구하는 것으로 변경했음. 학습 초기에는 뱀 로봇이 원하는 방향으로 잘 움직이지 않는데, 너무 타이트한 속도 조건을 요구하는 것으로 생각됨. 이후 어느정도 뱀 로봇이 조향 방향으로 움직이기 시작하면 Step을 통해서 구해진 속도를 사용하는 것으로 변경할 예정임.
         # """
-        x_disp = d_T0_p[0]
-        y_disp = d_T0_p[1]
+
+        x_disp, y_disp, z_disp = T_2[:3, 3] - T_1[:3, 3]
 
         # 회전의 노름 (회전의 크기) 'ZYX' -> 마지막에 Roll축에 왜곡이 생겨서 다른 방법으로 바꿔야함.
         step_euler_ypr = Rotation.from_matrix(d_T_r).as_euler('ZYX',False).copy()
-        self._cur_euler_ypr = Rotation.from_matrix(d_T0_r).as_euler('ZYX',True).copy()
+        self._cur_euler_ypr = Rotation.from_rotvec(com_rpy_after,True).as_euler('ZYX',True).copy()
 
         # 회전의 노름 (회전의 크기) 'ZXY' -> 왜곡 문제 해결을 위해서 XY 순서로 변경
         # step_euler_ypr = Rotation.from_matrix(d_T_r).as_euler('zyx',False).copy() #주의! Yaw Roll Pitch 순서로 저장됨
@@ -382,7 +375,13 @@ class PlaneJoyWorld(MujocoEnv, utils.EzPickle):
         tmp_y_vel = y_disp / self.dt
         tmp_yaw_vel = step_euler_ypr[0] / self.dt
 
-        x_vel, y_vel, yaw_vel = self._mov_mean_vels.update(tmp_x_vel, tmp_y_vel, tmp_yaw_vel)
+        if self._use_vels_mov_mean:
+            x_vel, y_vel, yaw_vel = self._mov_mean_vels.update(tmp_x_vel, tmp_y_vel, tmp_yaw_vel)
+
+        else:
+            x_vel = tmp_x_vel
+            y_vel = tmp_y_vel
+            yaw_vel = tmp_yaw_vel
 
         # ## Gait changing...
         self._k += 1
@@ -400,6 +399,7 @@ class PlaneJoyWorld(MujocoEnv, utils.EzPickle):
 
         info = {
             "step": self._n_step,
+            "action": action.copy(),
             "x_displacement": x_disp,
             "y_displacement": y_disp,
             "distance_from_origin": np.linalg.norm(self.data.qpos[0:2], ord=2),
@@ -537,7 +537,7 @@ class PlaneJoyWorld(MujocoEnv, utils.EzPickle):
         # 정렬 유사도 (선형)
         if joy_mag > 1e-1 and vel_mag > 1e-1:
             direction_similarity = np.dot(_v_vel, _v_joy) / (vel_mag * joy_mag + 5e-2)
-            direction_similarity = np.clip(direction_similarity, 0, 1)
+            direction_similarity = np.clip(direction_similarity, -0.3, 1)
         else:
             direction_similarity = 0.0
 
@@ -628,14 +628,14 @@ class PlaneJoyWorld(MujocoEnv, utils.EzPickle):
         self._cur_euler_ypr = np.array([0,0,0])
 
         _temporal_param = max(self._gait_params[2], self._gait_params[3])
-        _period = int(np.ceil((_temporal_param) / (2 * np.pi))) * 2
+        _period = int(( (2 * np.pi) / (_temporal_param / 10) ) * ( 1 / (self.model.opt.timestep * self.frame_skip) ) * (1 / 2) )  # 좌변 -> 초 단위, 우변 -> 초 단위를 몇 슬롯으로 나눌지
+        _period2 = int(( 1 / (self.model.opt.timestep * self.frame_skip) ) * 0.3)
 
         self._mov_mean_vels = MovingAverageFilter3D(window_size=_period)
-        # self._mov_mean_vels = MovingAverageFilter3D(window_size=5)
-
-        self._mov_mean_imu_vel = MovingAverageFilter3D(window_size=5)
-        self._mov_mean_imu_acc = MovingAverageFilter3D(window_size=5)
-        self._mov_mean_imu_quat = MovingAverageFilterQuaternion(window_size=5)
+        
+        self._mov_mean_imu_vel = MovingAverageFilter3D(window_size=_period2)
+        self._mov_mean_imu_acc = MovingAverageFilter3D(window_size=_period2)
+        self._mov_mean_imu_quat = MovingAverageFilterQuaternion(window_size=_period2)
 
         # Gait reset
         if not(self._use_gait):
@@ -647,18 +647,42 @@ class PlaneJoyWorld(MujocoEnv, utils.EzPickle):
 
             self._gait = Gait((a, b, c, d, e), sampling_t = self._gait_sampling_interval, frame_skip=self._frame_skip)
 
-        # Joy input reset
+        # Joy input reset 완전 랜덤
+        # if self._joy_input_random:
+        #     self._joy_input = np.array([0, 0, 0])
+        #     while np.linalg.norm(self._joy_input) < 0.5:  # 너무 작은 값 방지
+
+        #         theta = np.random.uniform(0, 2 * np.pi)  # [0, 2π] 범위의 랜덤 각도
+        #         r = np.sqrt(np.random.uniform(0, 1))  # 제곱근 샘플링을 통해 균등한 분포 생성
+        #         x = r * np.cos(theta)
+        #         y = r * np.sin(theta)
+
+        #         # self._joy_input = np.array([x, y, np.random.uniform(-1, 1)]) # 회전 속도의 크기도 고려
+        #         self._joy_input = np.array([x, y, 0]) # 회전안함
+
+
+        # Joy input reset 방향키 처럼  8방위 랜덤
         if self._joy_input_random:
             self._joy_input = np.array([0, 0, 0])
-            while np.linalg.norm(self._joy_input) < 0.5:  # 너무 작은 값 방지
 
-                theta = np.random.uniform(0, 2 * np.pi)  # [0, 2π] 범위의 랜덤 각도
-                r = np.sqrt(np.random.uniform(0, 1))  # 제곱근 샘플링을 통해 균등한 분포 생성
-                x = r * np.cos(theta)
-                y = r * np.sin(theta)
+            # 8방향 정의 (정규화된 단위 벡터)
+            directions = [
+                np.array([0, 1]),                                # ↑
+                np.array([np.sqrt(2)/2, np.sqrt(2)/2]),          # ↗
+                np.array([1, 0]),                                # →
+                np.array([np.sqrt(2)/2, -np.sqrt(2)/2]),         # ↘
+                np.array([0, -1]),                               # ↓
+                np.array([-np.sqrt(2)/2, -np.sqrt(2)/2]),        # ↙
+                np.array([-1, 0]),                               # ←
+                np.array([-np.sqrt(2)/2, np.sqrt(2)/2])          # ↖
+            ]
 
-                # self._joy_input = np.array([x, y, np.random.uniform(-1, 1)]) # 회전 속도의 크기도 고려
-                self._joy_input = np.array([x, y, 0]) # 회전안함
+            # 랜덤하게 방향 선택
+            idx = np.random.choice(len(directions))
+            direction = directions[idx]
+
+            # z축 회전 없이 출력
+            self._joy_input = np.array([direction[0], direction[1], 0])
 
         # System reset
         # noise_low = -0.05

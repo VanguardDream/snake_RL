@@ -392,6 +392,9 @@ class PlaneWorld(MujocoEnv, utils.EzPickle):
         return np.array([accum_x / len_names, accum_y / len_names, accum_z / len_names])
 
     def get_robot_rot(self)->np.ndarray:
+        """
+        Returns the roll, pitch, yaw of the robot in Degrees.
+        """
         com_roll = 0
         com_pitch = 0
         com_yaw = 0

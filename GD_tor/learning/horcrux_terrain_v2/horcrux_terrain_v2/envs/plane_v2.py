@@ -236,6 +236,8 @@ class PlaneJoyWorld(MujocoEnv, utils.EzPickle):
         _period2 = int(( 1 / (self.model.opt.timestep * self.frame_skip) ) * 0.3)
 
         self._mov_mean_vels = MovingAverageFilter3D(window_size=_period)
+        # self._mov_gait_ypr = MovingAverageFilter3D(window_size=_period * 2)
+        self._mov_gait_ypr = MovingAverageFilterQuaternion(window_size=_period * 2)
 
         # IMU data filter
         self._mov_mean_imu_vel = MovingAverageFilter3D(window_size=_period2)
@@ -368,7 +370,8 @@ class PlaneJoyWorld(MujocoEnv, utils.EzPickle):
         # step_euler_ypr = Rotation.from_matrix(d_T_r).as_euler('zyx',False).copy() #주의! Yaw Roll Pitch 순서로 저장됨
         # self._cur_euler_ypr = Rotation.from_matrix(d_T0_r).as_euler('zyx',True).copy() #주의! Yaw Roll Pitch 순서로 저장됨
 
-        norm_r = np.linalg.norm(np.array([self._cur_euler_ypr[1], self._cur_euler_ypr[2]])).copy()
+        # norm_r = np.linalg.norm(np.array([self._cur_euler_ypr[1], self._cur_euler_ypr[2]])).copy()
+        # norm_r = np.linalg.norm(np.array([self._cur_euler_ypr[0]])).copy() #Roll 방향 일단 무시
 
         #### Reward 계산을 위한 변수 설정
         tmp_x_vel = x_disp / self.dt
@@ -388,7 +391,7 @@ class PlaneJoyWorld(MujocoEnv, utils.EzPickle):
         self.motion_vector = self._gait.getMvec(self._k)
         
         observation = self._get_obs(motion_vector)
-        reward, reward_info = self._get_rew(x_vel, y_vel, self._joy_input[0], self._joy_input[1], action, norm_r, yaw_vel, self._joy_input[2])
+        reward, reward_info = self._get_rew(x_vel, y_vel, self._joy_input[0], self._joy_input[1], action, self._cur_euler_ypr, yaw_vel, self._joy_input[2])
         terminated = self.is_terminated and self._terminate_when_unhealthy
 
         if self.render_mode == "human":
@@ -522,9 +525,84 @@ class PlaneJoyWorld(MujocoEnv, utils.EzPickle):
 
     #     return reward, reward_info
     
-    def _get_rew(self, x_vel, y_vel, joy_x, joy_y, action, norm_r, yaw_vel, joy_r):
+    # def _get_rew(self, x_vel, y_vel, joy_x, joy_y, action, norm_r, yaw_vel, joy_r):
+    #     """
+    #     ChatGPT 리팩토링 보상함수
+    #     """
+    #     _v_vel = np.array([x_vel, y_vel])
+    #     _v_joy = np.array([joy_x, joy_y])
+
+    #     # 벡터 크기
+    #     vel_mag = np.linalg.norm(_v_vel)
+    #     joy_mag = np.linalg.norm(_v_joy)
+    #     yaw_mag = np.abs(yaw_vel)
+
+    #     # 정렬 유사도 (선형)
+    #     if joy_mag > 1e-1 and vel_mag > 1e-1:
+    #         direction_similarity = np.dot(_v_vel, _v_joy) / (vel_mag * joy_mag + 5e-2)
+    #         direction_similarity = np.clip(direction_similarity, -0.3, 1)
+    #     else:
+    #         direction_similarity = 0.0
+
+    #     # 선형 움직임 보상
+    #     linear_movement_reward = self._forward_reward_weight * direction_similarity * vel_mag
+
+    #     # 회전 정렬 보상
+    #     if np.abs(joy_r) > 1e-1 and yaw_mag > 1e-1:
+    #         rotation_alignment = np.sign(joy_r * yaw_vel)
+    #     else:
+    #         rotation_alignment = 0.0
+
+    #     angular_movement_reward = self._rotation_reward_weight * rotation_alignment * yaw_mag * np.abs(joy_r)
+
+    #     # 조작 효율성 보상: 적은 조작으로 많은 이동을 유도
+    #     if np.linalg.norm(action) > 1e-3:
+    #         efficiency = direction_similarity * vel_mag / (np.linalg.norm(action) * 1e-2 + 1e-1)
+    #     else:
+    #         efficiency = 0.0
+
+    #     efficiency_reward = self._efficiency_reward_weight * efficiency
+
+    #     # 건강 보상
+    #     healthy_reward = self.healthy_reward
+
+    #     # 보상 총합
+    #     rewards = linear_movement_reward + angular_movement_reward + efficiency_reward + healthy_reward
+
+    #     # # 비용: 컨트롤, 자세, 회전, 비정상 상태
+    #     # if joy_mag > 1e-1:
+    #     #     ctrl_cost_weight = self._ctrl_cost_weight / joy_mag
+    #     # else:
+    #     #     ctrl_cost_weight = 2 * self._ctrl_cost_weight
+
+    #     ctrl_cost = self._ctrl_cost_weight * np.sum(action) * (1 / 30)
+    #     unhealthy_cost = self.is_terminated * self._unhealthy_cost_weight
+    #     orientation_cost = self._rotation_norm_cost_weight * norm_r * (1 / 20)
+    #     yaw_cost_weight = 3 if np.abs(joy_r) < 1e-2 else 0
+    #     yaw_vel_cost = yaw_cost_weight * yaw_mag
+
+    #     costs = ctrl_cost + unhealthy_cost + orientation_cost + yaw_vel_cost
+    #     reward = rewards - costs
+
+    #     reward_info = {
+    #         "reward_linear_movement": linear_movement_reward,
+    #         "reward_angular_movement": angular_movement_reward,
+    #         "reward_efficiency": efficiency_reward,
+    #         "reward_healthy": healthy_reward,
+    #         "cost_ctrl": -ctrl_cost,
+    #         "cost_unhealthy": -unhealthy_cost,
+    #         "cost_orientation": -orientation_cost,
+    #         "cost_yaw_vel": -yaw_vel_cost,
+    #         "direction_similarity": direction_similarity,
+    #         "rotation_alignment": rotation_alignment,
+    #     }
+
+    #     return reward, reward_info
+
+    def _get_rew(self, x_vel, y_vel, joy_x, joy_y, action, cur_ypr, yaw_vel, joy_r):
         """
         ChatGPT 리팩토링 보상함수
+        Norm_r대신 YRP 불러옴
         """
         _v_vel = np.array([x_vel, y_vel])
         _v_joy = np.array([joy_x, joy_y])
@@ -572,6 +650,17 @@ class PlaneJoyWorld(MujocoEnv, utils.EzPickle):
         # else:
         #     ctrl_cost_weight = 2 * self._ctrl_cost_weight
 
+        tmp_cur_ypr = cur_ypr
+        if self._use_vels_mov_mean:
+            # tmp_cur_ypr = self._mov_gait_ypr.update(tmp_cur_ypr[0], tmp_cur_ypr[1], tmp_cur_ypr[2])
+            
+            # 쿼터니언 윈도우를 사용했을 시
+            tmp_rot = Rotation.from_euler('ZYX', tmp_cur_ypr, degrees=True)
+            tmp_quat = self._mov_gait_ypr.update(tmp_rot.as_quat(scalar_first=True))
+            tmp_cur_ypr = Rotation.from_quat(tmp_quat, scalar_first=True).as_euler('ZYX', degrees=True)
+
+        norm_r = np.linalg.norm(np.array([tmp_cur_ypr[0]])).copy() #Roll Pitch 방향 일단 무시
+
         ctrl_cost = self._ctrl_cost_weight * np.sum(action) * (1 / 30)
         unhealthy_cost = self.is_terminated * self._unhealthy_cost_weight
         orientation_cost = self._rotation_norm_cost_weight * norm_r * (1 / 20)
@@ -592,6 +681,7 @@ class PlaneJoyWorld(MujocoEnv, utils.EzPickle):
             "cost_yaw_vel": -yaw_vel_cost,
             "direction_similarity": direction_similarity,
             "rotation_alignment": rotation_alignment,
+            "reward_func_orientation": tmp_cur_ypr,
         }
 
         return reward, reward_info
@@ -632,6 +722,8 @@ class PlaneJoyWorld(MujocoEnv, utils.EzPickle):
         _period2 = int(( 1 / (self.model.opt.timestep * self.frame_skip) ) * 0.3)
 
         self._mov_mean_vels = MovingAverageFilter3D(window_size=_period)
+        # self._mov_gait_ypr = MovingAverageFilter3D(window_size=_period * 2)
+        self._mov_gait_ypr = MovingAverageFilterQuaternion(window_size=_period * 2)
         
         self._mov_mean_imu_vel = MovingAverageFilter3D(window_size=_period2)
         self._mov_mean_imu_acc = MovingAverageFilter3D(window_size=_period2)

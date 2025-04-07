@@ -1,0 +1,8 @@
+File creation time: 2025-04-04 18:30:43.569728
+Video file name: rl-video2, Joy input: [ 0.70710677 -0.70710677  0.        ], Friction: [0.76, 0.013, 0.0012]
+File creation time: 2025-04-04 19:25:06.192470
+Video file name: rl-video3, Joy input: [ 0.70710677 -0.70710677  0.        ], Friction: [0.68, 0.013, 0.0009]
+File creation time: 2025-04-04 20:19:55.639977
+Video file name: rl-video4, Joy input: [ 0.70710677 -0.70710677  0.        ], Friction: [0.71, 0.014, 0.001]
+File creation time: 2025-04-04 21:15:27.104058
+Video file name: rl-video5, Joy input: [1. 0. 0.], Friction: [0.67, 0.015, 0.0009]

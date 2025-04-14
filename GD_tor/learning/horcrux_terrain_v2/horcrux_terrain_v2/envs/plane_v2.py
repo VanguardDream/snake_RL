@@ -233,7 +233,7 @@ class PlaneJoyWorld(MujocoEnv, utils.EzPickle):
 
         _temporal_param = max(self._gait_params[2], self._gait_params[3])
         _period = int(( (2 * np.pi) / (_temporal_param / 10) ) * ( 1 / (self.model.opt.timestep * self.frame_skip) ) * (1 / 2) )  # 좌변 -> 초 단위, 우변 -> 초 단위를 몇 슬롯으로 나눌지
-        _period2 = int(( 1 / (self.model.opt.timestep * self.frame_skip) ) * 0.3)
+        _period2 = int(( 1 / (self.model.opt.timestep * self.frame_skip) ) * 0.15)
 
         self._mov_mean_vels = MovingAverageFilter3D(window_size=_period)
         # self._mov_gait_ypr = MovingAverageFilter3D(window_size=_period * 2)
@@ -612,10 +612,21 @@ class PlaneJoyWorld(MujocoEnv, utils.EzPickle):
         joy_mag = np.linalg.norm(_v_joy)
         yaw_mag = np.abs(yaw_vel)
 
-        # 정렬 유사도 (선형)
+        # # 정렬 유사도 (선형)
+        # if joy_mag > 1e-1 and vel_mag > 1e-1:
+        #     direction_similarity = np.dot(_v_vel, _v_joy) / (vel_mag * joy_mag + 5e-2)
+        #     direction_similarity = np.clip(direction_similarity, -0.5, 1)
+        # else:
+        #     direction_similarity = 0.0
+
+        # 정렬 유사도 (선형) 방향 세분화 진행
         if joy_mag > 1e-1 and vel_mag > 1e-1:
-            direction_similarity = np.dot(_v_vel, _v_joy) / (vel_mag * joy_mag + 5e-2)
-            direction_similarity = np.clip(direction_similarity, -0.3, 1)
+            vel_direction = np.dot(_v_vel, _v_joy) / (vel_mag * joy_mag + 5e-3)
+            vel_direction = np.clip(vel_direction, -1, 1)
+            vel_theta = np.arccos(vel_direction)
+
+            direction_similarity = np.cos(vel_theta) - 2 * (vel_theta / np.pi)
+            direction_similarity = np.clip(direction_similarity, -1, 1)
         else:
             direction_similarity = 0.0
 
@@ -666,7 +677,7 @@ class PlaneJoyWorld(MujocoEnv, utils.EzPickle):
         orientation_cost = self._rotation_norm_cost_weight * norm_r * (1 / 20)
         yaw_cost_weight = 3 if np.abs(joy_r) < 1e-2 else 0
         yaw_vel_cost = yaw_cost_weight * yaw_mag
-
+ 
         costs = ctrl_cost + unhealthy_cost + orientation_cost + yaw_vel_cost
         reward = rewards - costs
 

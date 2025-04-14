@@ -286,14 +286,14 @@ class PlaneJoyWorld(MujocoEnv, utils.EzPickle):
     
     @property
     def is_healthy(self):
-            y, r, p = self._cur_euler_ypr
+            y, p, r = self._cur_euler_ypr
             min_r, max_r = self._healthy_roll_range
             is_healthy = min_r <= r <= max_r
             return is_healthy
     
     @property
     def is_terminated(self):
-            y, r, p = self._cur_euler_ypr
+            y, p, r = self._cur_euler_ypr
             t_min_r, t_max_r = self._terminating_roll_range
             is_not_over = t_min_r <= r <= t_max_r
 
@@ -616,6 +616,7 @@ class PlaneJoyWorld(MujocoEnv, utils.EzPickle):
         # if joy_mag > 1e-1 and vel_mag > 1e-1:
         #     direction_similarity = np.dot(_v_vel, _v_joy) / (vel_mag * joy_mag + 5e-2)
         #     direction_similarity = np.clip(direction_similarity, -0.5, 1)
+        #     vel_theta = None
         # else:
         #     direction_similarity = 0.0
 
@@ -629,6 +630,7 @@ class PlaneJoyWorld(MujocoEnv, utils.EzPickle):
             direction_similarity = np.clip(direction_similarity, -1, 1)
         else:
             direction_similarity = 0.0
+            vel_theta = 0.0
 
         # 선형 움직임 보상
         linear_movement_reward = self._forward_reward_weight * direction_similarity * vel_mag
@@ -693,6 +695,7 @@ class PlaneJoyWorld(MujocoEnv, utils.EzPickle):
             "direction_similarity": direction_similarity,
             "rotation_alignment": rotation_alignment,
             "reward_func_orientation": tmp_cur_ypr,
+            "velocity_theta": vel_theta,
         }
 
         return reward, reward_info

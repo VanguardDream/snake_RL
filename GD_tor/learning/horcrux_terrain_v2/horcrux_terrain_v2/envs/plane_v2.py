@@ -20,6 +20,18 @@ __mjcf_model_path__ = pkg_resources.resource_filename("horcrux_terrain_v2", "res
 
 # __mjcf_model_path__ = 'horcrux_plane.xml'
 
+class MovingAverageFilter1D:
+    def __init__(self, window_size=20):
+        self.window_size = window_size
+        self.x_queue = deque(maxlen=window_size)
+
+    def update(self, new_x):
+        self.x_queue.append(new_x)
+
+        avg_x = np.mean(self.x_queue) if self.x_queue else 0.0
+
+        return avg_x
+
 class MovingAverageFilter3D:
     def __init__(self, window_size=20):
         self.window_size = window_size
@@ -232,7 +244,7 @@ class PlaneJoyWorld(MujocoEnv, utils.EzPickle):
         )
 
         _temporal_param = max(self._gait_params[2], self._gait_params[3])
-        _period = int(( (2 * np.pi) / (_temporal_param / 10) ) * ( 1 / (self.model.opt.timestep * self.frame_skip) ) * (1 / 2) )  # 좌변 -> 초 단위, 우변 -> 초 단위를 몇 슬롯으로 나눌지
+        _period = int(( (2 * np.pi) / (_temporal_param / 10) ) * ( 1 / (self.model.opt.timestep * self.frame_skip) ) )  # 좌변 -> 초 단위, 우변 -> 초 단위를 몇 슬롯으로 나눌지
         _period2 = int(( 1 / (self.model.opt.timestep * self.frame_skip) ) * 0.15)
 
         self._mov_mean_vels = MovingAverageFilter3D(window_size=_period)
@@ -243,8 +255,8 @@ class PlaneJoyWorld(MujocoEnv, utils.EzPickle):
         self._mov_mean_imu_vel = MovingAverageFilter3D(window_size=_period2)
         self._mov_mean_imu_acc = MovingAverageFilter3D(window_size=_period2)
         self._mov_mean_imu_quat = MovingAverageFilterQuaternion(window_size=_period2)
+        self._mov_vel_orient = MovingAverageFilter1D(window_size=_period2)
 
-        # Get com ypr filter
         self._gait = Gait(gait_params, sampling_t = gait_sampling_interval, frame_skip=self.frame_skip)
 
         self.metadata = {
@@ -626,11 +638,18 @@ class PlaneJoyWorld(MujocoEnv, utils.EzPickle):
             vel_direction = np.clip(vel_direction, -1, 1)
             vel_theta = np.arccos(vel_direction)
 
+            if self._use_imu_mov_mean:
+                vel_theta = self._mov_vel_orient.update(vel_theta)
+
             direction_similarity = np.cos(vel_theta) - 2 * (vel_theta / np.pi)
             direction_similarity = np.clip(direction_similarity, -1, 1)
         else:
             direction_similarity = 0.0
             vel_theta = 0.0
+
+            if self._use_imu_mov_mean:
+                vel_theta = self._mov_vel_orient.update(vel_theta)
+
 
         # 선형 움직임 보상
         linear_movement_reward = self._forward_reward_weight * direction_similarity * vel_mag
@@ -732,7 +751,7 @@ class PlaneJoyWorld(MujocoEnv, utils.EzPickle):
         self._cur_euler_ypr = np.array([0,0,0])
 
         _temporal_param = max(self._gait_params[2], self._gait_params[3])
-        _period = int(( (2 * np.pi) / (_temporal_param / 10) ) * ( 1 / (self.model.opt.timestep * self.frame_skip) ) * (1 / 2) )  # 좌변 -> 초 단위, 우변 -> 초 단위를 몇 슬롯으로 나눌지
+        _period = int(( (2 * np.pi) / (_temporal_param / 10) ) * ( 1 / (self.model.opt.timestep * self.frame_skip) ) )  # 좌변 -> 초 단위, 우변 -> 초 단위를 몇 슬롯으로 나눌지
         _period2 = int(( 1 / (self.model.opt.timestep * self.frame_skip) ) * 0.3)
 
         self._mov_mean_vels = MovingAverageFilter3D(window_size=_period)
@@ -742,6 +761,7 @@ class PlaneJoyWorld(MujocoEnv, utils.EzPickle):
         self._mov_mean_imu_vel = MovingAverageFilter3D(window_size=_period2)
         self._mov_mean_imu_acc = MovingAverageFilter3D(window_size=_period2)
         self._mov_mean_imu_quat = MovingAverageFilterQuaternion(window_size=_period2)
+        self._mov_vel_orient = MovingAverageFilter1D(window_size=_period2)
 
         # Gait reset
         if not(self._use_gait):

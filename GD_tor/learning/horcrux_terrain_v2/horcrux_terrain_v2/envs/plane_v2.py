@@ -633,7 +633,7 @@ class PlaneJoyWorld(MujocoEnv, utils.EzPickle):
         #     direction_similarity = 0.0
 
         # 정렬 유사도 (선형) 방향 세분화 진행
-        if joy_mag > 1e-1 and vel_mag > 1e-1:
+        if joy_mag > 1e-1:
             vel_direction = np.dot(_v_vel, _v_joy) / (vel_mag * joy_mag + 5e-3)
             vel_direction = np.clip(vel_direction, -1, 1)
             vel_theta = np.arccos(vel_direction)

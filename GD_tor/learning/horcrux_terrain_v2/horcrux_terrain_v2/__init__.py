@@ -10,3 +10,9 @@ register(
     entry_point="horcrux_terrain_v2.envs:PlaneJoyWorld",
     max_episode_steps=6000,
 )
+
+register(
+    id="horcrux_terrain_v2/plane-v2-CG",
+    entry_point="horcrux_terrain_v2.envs:PlaneJoyWorldCG",
+    max_episode_steps=6000,
+)

@@ -793,14 +793,14 @@ class PlaneJoyWorld(MujocoEnv, utils.EzPickle):
 
             # 8방향 정의 (정규화된 단위 벡터)
             directions = [
-                # np.array([0, 1]),                                # ↑
+                np.array([0, 1]),                                # ↑
                 np.array([np.sqrt(2)/2, np.sqrt(2)/2]),          # ↗
-                np.array([1, 0]),                                # →
-                np.array([np.sqrt(2)/2, -np.sqrt(2)/2]),         # ↘
+                # np.array([1, 0]),                                # →
+                # np.array([np.sqrt(2)/2, -np.sqrt(2)/2]),         # ↘
                 # np.array([0, -1]),                               # ↓
                 # np.array([-np.sqrt(2)/2, -np.sqrt(2)/2]),        # ↙
                 # np.array([-1, 0]),                               # ←
-                # np.array([-np.sqrt(2)/2, np.sqrt(2)/2])          # ↖
+                np.array([-np.sqrt(2)/2, np.sqrt(2)/2])          # ↖
             ]
 
             # 랜덤하게 방향 선택

@@ -589,22 +589,22 @@ class PlaneJoyDirWorld(MujocoEnv, utils.EzPickle):
             directions = [
                 np.array([0, 1]),                                # ↑ 30,30,40,40,45
                 np.array([np.sqrt(2)/2, np.sqrt(2)/2]),          # ↗ 30,30,40,40,180
-                np.array([1, 0]),                                # → 30,30,40,40,180
+                np.array([1, 0]),                                # → 30,30,40,40,0
                 np.array([np.sqrt(2)/2, -np.sqrt(2)/2]),         # ↘ 30,30,40,40,0
                 np.array([0, -1]),                               # ↓ 30,30,40,40,315
                 np.array([-np.sqrt(2)/2, -np.sqrt(2)/2]),        # ↙ 30,30,40,40,45,-1
-                np.array([-1, 0]),                               # ← 30,30,40,40,0,-1
+                np.array([-1, 0]),                               # ← 30,30,40,40,180,-1
                 np.array([-np.sqrt(2)/2, np.sqrt(2)/2])          # ↖ 30,30,40,40,315,-1
             ]
 
             gait_params =[
                 (30, 30, 40, 40, 45),   # ↑
                 (30, 30, 40, 40, 180),  # ↗
-                (30, 30, 40, 40, 180),  # →
+                (30, 30, 40, 40, 0),  # →
                 (30, 30, 40, 40, 0),    # ↘
                 (30, 30, 40, 40, 315),  # ↓
                 (30, 30, 40, 40, 45, -1),   # ↙
-                (30, 30, 40, 40, 0, -1),    # ←
+                (30, 30, 40, 40, 180, -1),    # ←
                 (30, 30, 40, 40, 315, -1)   # ↖
             ]
 
@@ -615,8 +615,10 @@ class PlaneJoyDirWorld(MujocoEnv, utils.EzPickle):
             # z축 회전 없이 출력
             self._joy_input = np.array([direction[0], direction[1], 0])
 
+            self._gait_params = gait_params[idx]
+
             # Gait reset
-            self._gait = GaitV2(gait_params[idx], sampling_t = self._gait_sampling_interval, frame_skip=self.frame_skip)
+            self._gait = GaitV2(self._gait_params, sampling_t = self._gait_sampling_interval, frame_skip=self.frame_skip)
 
         # System reset
         # noise_low = -0.05

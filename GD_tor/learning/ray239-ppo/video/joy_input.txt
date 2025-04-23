@@ -1,2 +1,0 @@
-File creation time: 2025-04-23 10:05:49.933942
-Video file name: rl-video2, Joy input: [-0.70710677  0.70710677  0.        ], Friction: [0.8, 0.014, 0.0009]

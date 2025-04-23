@@ -159,7 +159,7 @@ class PlaneJoyDirWorld(MujocoEnv, utils.EzPickle):
             use_gait: bool = True,
             use_friction_chg: bool = False,
             joy_input_random: bool = True,
-            joy_input: Union[float, float, float] = (0, 0, 0), # X axis velocity, Y axis velocity, Yaw angular velocity
+            joy_input: Union[float, float, float] = (1, 0, 0), # X axis velocity, Y axis velocity, Yaw angular velocity
             gait_params: Tuple[float, float, float, float, float] = (30, 30, 40, 40, 0),
             use_imu_window: bool = False,
             use_vels_window: bool = False,

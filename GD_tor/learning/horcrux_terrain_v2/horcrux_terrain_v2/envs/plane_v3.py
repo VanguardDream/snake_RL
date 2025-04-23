@@ -136,7 +136,7 @@ class PlaneJoyDirWorld(MujocoEnv, utils.EzPickle):
             self, 
             model_path = __mjcf_model_path__,
             frame_skip: int = 10, 
-            gait_sampling_interval: float = 0.1,
+            gait_sampling_interval: float = 0.05,
             default_camera_config: Dict[str, Union[float, int]] = DEFAULT_CAMERA_CONFIG,
             forward_reward_weight: float = 60,
             rotation_reward_weight: float = 45,
@@ -278,7 +278,7 @@ class PlaneJoyDirWorld(MujocoEnv, utils.EzPickle):
                 low=0, high=2.7, shape=(14,)
         )
 
-        self.motion_vector = np.array([0] * 14)
+        self._motion_vector = np.array([0] * 14)
         self.observation_structure = {
                 "jpos":self.data.sensordata[:14], #14
                 "jvel":self.data.sensordata[14:28], #14
@@ -288,7 +288,7 @@ class PlaneJoyDirWorld(MujocoEnv, utils.EzPickle):
                 "head_orientation":self.data.sensordata[70:74], #4
                 "head_angvel":self.data.sensordata[74:77], #3
                 "head_linacc":self.data.sensordata[77:80], #3
-                "motion_vector":self.motion_vector, #14
+                "motion_vector":self._motion_vector, #14
                 "joy_input":self._joy_input, #3
         }
 
@@ -335,7 +335,7 @@ class PlaneJoyDirWorld(MujocoEnv, utils.EzPickle):
             self._initial_com = com_pos_before.copy()
             self._initial_head_rpy = Rotation.from_matrix(head_quat_before).as_rotvec(True).copy()
 
-        motion_vector = self.motion_vector.copy()
+        motion_vector = self._motion_vector.copy()
         direction_action = (action * motion_vector).copy()
 
         self.do_simulation(direction_action, self.frame_skip)
@@ -400,9 +400,9 @@ class PlaneJoyDirWorld(MujocoEnv, utils.EzPickle):
 
         # ## Gait changing...
         self._k += 1
-        self.motion_vector = self._gait.getMvec(self._k)
+        self._motion_vector = self._gait.getMvec(self._k).copy()
         
-        observation = self._get_obs(motion_vector)
+        observation = self._get_obs(self._motion_vector)
         reward, reward_info = self._get_rew(x_vel, y_vel, self._joy_input[0], self._joy_input[1], action, self._cur_euler_ypr, yaw_vel, self._joy_input[2])
         terminated = self.is_terminated and self._terminate_when_unhealthy
 
@@ -436,6 +436,7 @@ class PlaneJoyDirWorld(MujocoEnv, utils.EzPickle):
             "init_head_rpy":self._initial_head_rpy,
             "gait_params": self._gait_params,
             "friction_coeff": self._friction_information,
+            "motionMatrix":self._gait.getMotionMat().copy(),
             **reward_info,
         }
 

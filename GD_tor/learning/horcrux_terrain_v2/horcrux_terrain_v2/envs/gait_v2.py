@@ -17,37 +17,35 @@ class GaitV2():
             else:
                 self._reverse = True
 
-        # self._t = np.arange(0, 2 * np.pi * max(np.lcm(self._el2, self._ed2), 10) / 10, 0.1).transpose()
-        # int(2 * np.pi / self.gait_sampling_interval)
-        self._t = np.arange(0, 600, self.gait_sampling_interval).transpose()
+        self._t = np.arange(0, 20 * np.pi * (1 / np.gcd(self._ed2, self._el2)), self.gait_sampling_interval).transpose()
 
-        self.MotionMatrix = self.getMotionMat()
+        self.MotionMatrix = self.getMotionMat().copy()
         self.joints = self.MotionMatrix.shape[0]
         self.Mvecs = self.MotionMatrix.shape[1]
 
     def getMotionMat(self)->np.ndarray:
-        raw_serp = self.serpenoid(self._t, self._ed1, self._el1, self._ed2 / 10, self._el2 / 10, self._delta)
+        raw_serp = self.serpenoid(self._t, self._ed1, self._el1, self._ed2, self._el2, self._delta)
         M_mat = self.__genMotionMat(raw_serp)
-
-        if self._reverse:
-            M_mat = np.flip(M_mat, axis=1)
 
         return M_mat
     
     def getMvec(self, k):
+        if self._reverse:
+            k = -k
+            
         k = k % self.Mvecs
 
         return self.MotionMatrix[:,k]
         
     ## Predefined functions
-    def serpenoid(self, t, e_d1, e_l1, e_d2, e_l2, delta)->np.ndarray:
+    def serpenoid(self, t, e_d1:float, e_l1:float, e_d2:float, e_l2:float, delta:float)->np.ndarray:
         #Hirose (1993) serpenoid curve implementations
         e_d1 = np.radians(e_d1)
         e_l1 = np.radians(e_l1)
         delta = np.radians(delta)
 
-        f1 = e_d2 * t
-        f2 = e_l2 * t
+        f1 = (e_d2/10) * t
+        f2 = (e_l2/10) * t
 
         j_1 = np.sin(e_d1 + f1)
         j_2 = np.sin(e_l1 * 2 + f2 + delta)
@@ -76,6 +74,6 @@ class GaitV2():
         serp_vel = np.diff(serp_pos.copy()) * (1 / self.gait_sampling_interval)
         serp_tor = np.diff(serp_vel.copy()) * (1 / self.gait_sampling_interval)
 
-        motionMat = np.sign(serp_tor)
+        motionMat = np.sign(serp_tor).copy()
 
         return motionMat

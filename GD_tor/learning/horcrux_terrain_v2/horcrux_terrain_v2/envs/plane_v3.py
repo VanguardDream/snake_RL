@@ -160,7 +160,7 @@ class PlaneJoyDirWorld(MujocoEnv, utils.EzPickle):
             use_friction_chg: bool = False,
             joy_input_random: bool = True,
             joy_input: Union[float, float, float] = (1, 0, 0), # X axis velocity, Y axis velocity, Yaw angular velocity
-            gait_params: Tuple[float, float, float, float, float] = (30, 30, 40, 40, 45),
+            gait_params: Tuple[float, float, float, float, float] = (30, 30, 40, 40, 23),
             use_imu_window: bool = False,
             use_vels_window: bool = False,
             **kwargs,
@@ -589,8 +589,8 @@ class PlaneJoyDirWorld(MujocoEnv, utils.EzPickle):
             # 8방향 정의 (정규화된 단위 벡터)
             directions = [
                 # np.array([0, 1]),                                # ↑ 30,30,40,40,45
-                # np.array([np.sqrt(2)/2, np.sqrt(2)/2]),          # ↗ 30,30,40,40,180
-                np.array([1, 0]),                                # → 30,30,40,40,0
+                np.array([np.sqrt(2)/2, np.sqrt(2)/2]),          # ↗ 30,30,40,40,180
+                # np.array([1, 0]),                                # → 30,30,40,40,0
                 # np.array([np.sqrt(2)/2, -np.sqrt(2)/2]),         # ↘ 30,30,40,40,0
                 # np.array([0, -1]),                               # ↓ 30,30,40,40,315
                 # np.array([-np.sqrt(2)/2, -np.sqrt(2)/2]),        # ↙ 30,30,40,40,45,-1
@@ -600,8 +600,8 @@ class PlaneJoyDirWorld(MujocoEnv, utils.EzPickle):
 
             gait_params =[
                 # (30, 30, 40, 40, 45),   # ↑
-                # (30, 30, 40, 40, 23),  # ↗
-                (30, 30, 40, 40, 0),  # →
+                (30, 30, 40, 40, 23),  # ↗
+                # (30, 30, 40, 40, 0),  # →
                 # (30, 30, 40, 40, -23),    # ↘
                 # (30, 30, 40, 40, -45),  # ↓
                 # (30, 30, 40, 40, 23, -1),   # ↙

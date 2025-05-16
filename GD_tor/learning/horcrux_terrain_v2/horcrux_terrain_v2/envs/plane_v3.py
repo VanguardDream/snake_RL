@@ -143,6 +143,7 @@ class PlaneJoyDirWorld(MujocoEnv, utils.EzPickle):
             termination_reward: float = 0,
             side_cost_weight:float = 60,
             ctrl_cost_weight: float = 0,
+            proj_dist_cost_weight: float = 30,
             rotation_norm_cost_weight: float = 0.5,
             rotation_orientation_cost_weight: float = 0.05,
             unhealthy_cost_weight: float = 2,
@@ -176,6 +177,7 @@ class PlaneJoyDirWorld(MujocoEnv, utils.EzPickle):
             termination_reward,
             side_cost_weight,
             ctrl_cost_weight,
+            proj_dist_cost_weight,
             rotation_norm_cost_weight,
             unhealthy_cost_weight,
             healthy_reward,
@@ -202,6 +204,7 @@ class PlaneJoyDirWorld(MujocoEnv, utils.EzPickle):
         self.termination_reward = termination_reward
         self._side_cost_weight = side_cost_weight
         self._ctrl_cost_weight = ctrl_cost_weight
+        self._proj_dist_cost_weight = proj_dist_cost_weight
         self._rotation_norm_cost_weight = rotation_norm_cost_weight
         self._rotation_orientation_cost_weight = rotation_orientation_cost_weight
         self._unhealthy_cost_weight = unhealthy_cost_weight
@@ -323,6 +326,35 @@ class PlaneJoyDirWorld(MujocoEnv, utils.EzPickle):
     def control_cost(self, action):
          control_cost = self._ctrl_cost_weight * np.sum(action)
          return control_cost
+    
+
+    def straightness_cost(self, p0: np.ndarray, pt: np.ndarray, direction: np.ndarray, weight: float = 1.0) -> float:
+        """
+        직진성 비용 계산 함수
+        :param p0: 기준점 (원점 좌표) ndarray of shape (2,)
+        :param pt: 현재 위치 ndarray of shape (2,)
+        :param direction: 목표 방향 (단위벡터) ndarray of shape (2,)
+        :param weight: 가중치 (cost 크기 조절)
+        :return: 직진성 cost (float)
+        """
+        # 방향 벡터 정규화
+        dir_unit = direction / np.linalg.norm(direction)
+        
+        # 기준점에서 현재 위치까지의 벡터
+        vec = pt - p0
+        
+        # vec를 기준 직선 방향으로 투영
+        proj_length = np.dot(vec, dir_unit)
+        proj_vec = proj_length * dir_unit
+        
+        # 투영 벡터를 빼면 수직 거리 벡터가 됨
+        orthogonal_vec = vec - proj_vec
+        
+        # 거리(norm)를 cost로 사용
+        cost = weight * np.linalg.norm(orthogonal_vec)
+        
+        return cost
+
             
     def step(self, action):
         com_pos_before = self.get_robot_com().copy()
@@ -403,7 +435,7 @@ class PlaneJoyDirWorld(MujocoEnv, utils.EzPickle):
         self._motion_vector = self._gait.getMvec(self._k).copy()
         
         observation = self._get_obs(self._motion_vector)
-        reward, reward_info = self._get_rew(x_vel, y_vel, self._joy_input[0], self._joy_input[1], action, self._cur_euler_ypr, yaw_vel, self._joy_input[2])
+        reward, reward_info = self._get_rew(x_vel, y_vel, self._joy_input[0], self._joy_input[1], action, self._cur_euler_ypr, yaw_vel, self._joy_input[2], com_pos_after[0:2].copy())
         terminated = self.is_terminated and self._terminate_when_unhealthy
 
         if self.render_mode == "human":
@@ -443,7 +475,7 @@ class PlaneJoyDirWorld(MujocoEnv, utils.EzPickle):
         # truncation=False as the time limit is handled by the `TimeLimit` wrapper added during `make`
         return observation, reward, False, terminated, info
 
-    def _get_rew(self, x_vel, y_vel, joy_x, joy_y, action, cur_ypr, yaw_vel, joy_r):
+    def _get_rew(self, x_vel, y_vel, joy_x, joy_y, action, cur_ypr, yaw_vel, joy_r, com_pos_after):
         """
         ChatGPT 리팩토링 보상함수
         Norm_r대신 YRP 불러옴
@@ -528,10 +560,14 @@ class PlaneJoyDirWorld(MujocoEnv, utils.EzPickle):
         ctrl_cost = self._ctrl_cost_weight * np.sum(action) * (1 / 30)
         unhealthy_cost = self.is_terminated * self._unhealthy_cost_weight
         orientation_cost = self._rotation_norm_cost_weight * norm_r * (1 / 20)
+
+        # 방향 정사형 비용 계산
+        proj_dist_cost = self._proj_dist_cost_weight * self.straightness_cost(self._initial_com[0:2].copy(), com_pos_after, _v_joy, weight=self._proj_dist_cost_weight)
+
         yaw_cost_weight = 3 if np.abs(joy_r) < 1e-2 else 0
         yaw_vel_cost = yaw_cost_weight * yaw_mag
  
-        costs = ctrl_cost + unhealthy_cost + orientation_cost + yaw_vel_cost
+        costs = ctrl_cost + unhealthy_cost + orientation_cost + yaw_vel_cost + proj_dist_cost
         reward = rewards - costs
 
         reward_info = {
@@ -543,6 +579,7 @@ class PlaneJoyDirWorld(MujocoEnv, utils.EzPickle):
             "cost_unhealthy": -unhealthy_cost,
             "cost_orientation": -orientation_cost,
             "cost_yaw_vel": -yaw_vel_cost,
+            "cost_proj_dist": -proj_dist_cost,
             "direction_similarity": direction_similarity,
             "rotation_alignment": rotation_alignment,
             "reward_func_orientation": tmp_cur_ypr,

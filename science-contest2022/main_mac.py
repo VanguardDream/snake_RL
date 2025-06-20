@@ -44,7 +44,9 @@ PROTOCOL_VERSION            = 2.0
 
 # ex) Windows: "COM*", Linux: "/dev/ttyUSB*", Mac: "/dev/tty.usbserial-*"
 # DEVICENAME                  = 'COM1'
-DEVICENAME                    = '/dev/tty.usbserial-FT3M9YHP'
+# DEVICENAME                    = '/dev/tty.usbserial-FT3M9YHP'
+DEVICENAME                    = '/dev/tty.usbmodemFFFFFFFEFFFF1' #OpenCR
+# DEVICENAME                    = '/dev/tty.usbserial-FT7WBNDT' #ExBoard
 
 portHandler = PortHandler(DEVICENAME)
 packetHandler = PacketHandler(PROTOCOL_VERSION)
@@ -110,6 +112,7 @@ def tx_thread(idx:int, degree:float)->None:
 def tx_en_thread(en:int)->None:
     for i in range(14):
         packetHandler.write1ByteTxOnly(portHandler, (i), ADDR_TORQUE_ENABLE, en)
+        sleep(0.001)
 
 def tx_reset()->None:
     tx_en_thread(0)
@@ -156,7 +159,7 @@ def pthread():
         motor_comand = np.array([])
         en_move = False
 
-        if (n_t - p_t).microseconds > 9000:
+        if (n_t - p_t).microseconds > 9000: #9000 원래
             p_t = n_t
 
             ax_idx = np.argmax(abs(gait_comm[:3]))

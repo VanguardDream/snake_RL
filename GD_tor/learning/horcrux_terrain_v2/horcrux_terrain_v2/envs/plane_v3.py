@@ -143,7 +143,7 @@ class PlaneJoyDirWorld(MujocoEnv, utils.EzPickle):
             termination_reward: float = 0,
             side_cost_weight:float = 60,
             ctrl_cost_weight: float = 0,
-            proj_dist_cost_weight: float = 30,
+            proj_dist_cost_weight: float = 0,
             rotation_norm_cost_weight: float = 0.5,
             rotation_orientation_cost_weight: float = 0.05,
             unhealthy_cost_weight: float = 2,
